@@ -1,5 +1,8 @@
 <template>
-    <div class="login-container">
+    <div class="logo">
+        <h2>Fl<span class="material-symbols-outlined">all_inclusive</span>wsynk</h2>
+    </div>
+    <div class="login-container fade-in-top">
         <div class="bg-1">
             <div class="bg-2">
                 <div class="login-card">
@@ -13,7 +16,22 @@
                             <label for="password">Password:</label>
                             <input type="password" id="password" v-model="password" required />
                         </div>
-                        <button type="submit">Login</button>
+                        <div class="btn-grp">
+                            <button>Register</button>
+                            <button type="submit">Login</button>
+                        </div>
+                        <div class="forgot-password">
+                            <a href="#">Forgot password?</a>
+                        </div>
+                        <div class="other-login">
+                            <p>Or login with:</p>
+                            <button>
+                                <img src="../components/icons/search.png" alt="Google" />
+                            </button>
+                            <button>
+                                <img src="../components/icons/facebook.png" alt="Google" />
+                            </button>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -47,6 +65,17 @@ const handleLogin = async () => {
 </script>
 
 <style scoped>
+.logo {
+    display: block;
+    position: absolute;
+    margin-left: 20px;
+}
+.logo h2 {
+    display: flex
+;
+    justify-content: center;
+    align-items: center;
+}
 .login-container {
     margin: 0 auto;
     padding: 20px;
@@ -67,8 +96,8 @@ const handleLogin = async () => {
     align-items: center;
     border-radius: 60px;
     background: linear-gradient(45deg, #3AA9B6, #14376B, #513C75, #C4597D, #FC930F);
-    height: 300px;
-    width: 300px;
+    height: 350px;
+    width: 350px;
     border: 1px solid #ccc;
     box-shadow: 0 30px 16px rgba(0, 0, 0, 0.2);
     transform: rotate(15deg);
@@ -79,8 +108,8 @@ const handleLogin = async () => {
     align-items: center;
     border-radius: 60px;
     background: linear-gradient(45deg, #3AA9B6, #14376B, #513C75, #C4597D, #FC930F);
-    height: 300px;
-    width: 300px;
+    height: 350px;
+    width: 350px;
     border: 1px solid #ccc;
     box-shadow: 0 30px 16px rgba(0, 0, 0, 0.2);
     transform: rotate(40deg);
@@ -107,5 +136,32 @@ input {
 }
 input:focus {
     outline: none;
+}
+.btn-grp {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+.other-login {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    margin: 10px 0;
+}
+.other-login button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2px;
+    border-radius: 30px;
+    margin: 0 5px;
+}
+.other-login button img {
+    margin: 0 5px;
+    height: 25px;
+}
+.forgot-password {
+    margin: 10px 0;
 }
 </style>
