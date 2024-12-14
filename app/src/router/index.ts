@@ -7,16 +7,6 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/',
     component: () => import('../views/Home.vue'),
-    children: [
-      {
-        path: '',
-        component: () => import('../views/Child.vue'),
-      },
-      {
-        path: 'child2',
-        component: () => import('../views/Child2.vue'),
-      },
-    ],
     beforeEnter: (_, __, next) => {
       if (!session.value) {
         next({ path: '/login' })

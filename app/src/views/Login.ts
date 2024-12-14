@@ -30,7 +30,7 @@ class LoginHandler {
             });
             if (resp.status === 200) {
                 session.value = resp.data.token;
-                this.router.push({ path: '/child2' });
+                this.router.push({ path: '/' });
             } else {
                 alert('Invalid username or password');
             }
