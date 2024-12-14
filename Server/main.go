@@ -1,7 +1,7 @@
 package main
 
 import (
-	"flowsync/db"
+	"github.com/raenardcruz/floowsynk/db"
 
 	"github.com/gin-gonic/gin"
 )
@@ -16,8 +16,8 @@ func main() {
 	defer dbobj.Close()
 	dbobj.InitDB()
 
-	r.POST("/login", Login)
-	r.GET("/protected", Protected)
+	r.POST("/api/login", Login)
+	r.GET("/api/protected", Protected)
 
 	r.Run(":8080")
 }

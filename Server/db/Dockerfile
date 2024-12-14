@@ -2,9 +2,9 @@
 FROM postgres:latest
 
 # Set environment variables
-ENV POSTGRES_USER=admin
-ENV POSTGRES_PASSWORD=flowsync
-ENV POSTGRES_DB=flowsync
+ENV POSTGRES_USER=root
+ENV POSTGRES_PASSWORD=floowsynk
+ENV POSTGRES_DB=floowsynk
 
 # Expose the PostgreSQL port
 EXPOSE 5432
