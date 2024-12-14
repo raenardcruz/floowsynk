@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"time"
 
-	"flowsync/crypto"
-	"flowsync/db"
+	"github.com/raenardcruz/floowsynk/crypto"
+	"github.com/raenardcruz/floowsynk/db"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
@@ -30,19 +30,16 @@ func Login(c *gin.Context) {
 
 	dbUser, err := db.GetUserByUsername(user.Username)
 	if err != nil {
-		log.Fatalf("Error getting user: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error getting user"})
 		return
 	}
 	if dbUser.ID == 0 {
-		log.Fatalf("Error getting user: %v", err)
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
 	}
 
 	ePassword, err := crypto.EncryptPassword(user.Password)
 	if err != nil {
-		log.Fatalf("Error encrypting password: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error encrypting password"})
 		return
 	}

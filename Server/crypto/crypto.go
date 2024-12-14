@@ -6,8 +6,10 @@ import (
 	"encoding/hex"
 )
 
+var key string = "HGD86teHeCb3Gl7Q"
+
 func EncryptPassword(password string) (string, error) {
-	block, err := aes.NewCipher([]byte("flowsync12345678"))
+	block, err := aes.NewCipher([]byte(key))
 	if err != nil {
 		return "", err
 	}
@@ -18,7 +20,7 @@ func EncryptPassword(password string) (string, error) {
 	}
 
 	// Use a fixed nonce to produce the same encryption result for the same value
-	nonce := []byte("fixednonce123456")[:aesGCM.NonceSize()]
+	nonce := []byte(key)[:aesGCM.NonceSize()]
 
 	ciphertext := aesGCM.Seal(nonce, nonce, []byte(password), nil)
 	return hex.EncodeToString(ciphertext), nil

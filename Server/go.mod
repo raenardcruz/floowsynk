@@ -1,4 +1,4 @@
-module flowsync
+module github.com/raenardcruz/floowsynk
 
 go 1.23.4
 

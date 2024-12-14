@@ -2,8 +2,9 @@ package db
 
 import (
 	"database/sql"
-	"flowsync/crypto"
 	"log"
+
+	"github.com/raenardcruz/floowsynk/crypto"
 )
 
 func (db *DB) GetUsers() ([]UsersModel, error) {

@@ -19,9 +19,9 @@ type DB struct {
 var (
 	host     = getEnv("DB_HOST", "localhost")
 	port     = getEnvAsInt("DB_PORT", 5432)
-	user     = getEnv("DB_USER", "admin")
-	password = getEnv("DB_PASSWORD", "flowsync")
-	dbname   = getEnv("DB_NAME", "flowsync")
+	user     = getEnv("DB_USER", "root")
+	password = getEnv("DB_PASSWORD", "floowsynk")
+	dbname   = getEnv("DB_NAME", "floowsynk")
 )
 
 func init() {
