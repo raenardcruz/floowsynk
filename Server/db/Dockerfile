@@ -3,7 +3,7 @@ FROM postgres:latest
 
 # Set environment variables
 ENV POSTGRES_USER=root
-ENV POSTGRES_PASSWORD=floowsynk
+ENV POSTGRES_PASSWORD=
 ENV POSTGRES_DB=floowsynk
 
 # Expose the PostgreSQL port
