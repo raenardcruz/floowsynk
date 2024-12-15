@@ -1,6 +1,6 @@
 <template>
     <div class="logo">
-        <h2>Fl<span class="material-symbols-outlined">all_inclusive</span>wsynk</h2>
+        <logo />
     </div>
     <div class="login-container fade-in-top">
         <div class="bg-1">
@@ -42,6 +42,7 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router";
 import { LoginHandler, loginstore } from "./Login"
+import Logo from "../components/Logo.vue";
 
 const router = useRouter();
 const loginHandler = new LoginHandler(router);
