@@ -18,7 +18,7 @@ import Logo from "../components/Logo.vue";
     display: flex;
     align-items: center;
     padding: 0 20px;
-    height: 60px;
+    height: 50px;
     width: 100%;
     background-color: #f5f5f5;
     box-shadow: 0 0 10px gray;
@@ -31,8 +31,8 @@ import Logo from "../components/Logo.vue";
     align-items: center;
     color: #222;
     gap: 20px;
-    height: 60px;
-    width: 60px;
+    height: 50px;
+    width: 50px;
     cursor: pointer;
 }
 
@@ -46,7 +46,7 @@ import Logo from "../components/Logo.vue";
     content: "Apps";
     color: #222;
     position: absolute;
-    top: 36px;
+    top: 30px;
     left: 5;
     padding: 5px 10px;
     border-radius: 4px;
@@ -65,5 +65,6 @@ import Logo from "../components/Logo.vue";
 .logo {
     display: flex;
     color: #222;
+    font-size: 15px;
 }
 </style>
