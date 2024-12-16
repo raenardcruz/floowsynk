@@ -1,16 +1,30 @@
 <template>
-    <div class="header">
-        <div class="navigation">
+    <div class="header fade-in">
+        <div class="navigation" @click="openAppDrawer">
             <span class="material-symbols-outlined">apps</span>
         </div>
         <div class="logo">
             <logo />
         </div>
+        <div class="logout" @click="logout">
+            <span class="material-symbols-outlined">logout</span>
+        </div>
     </div>
+    <app-drawer />
 </template>
 
 <script setup lang="ts">
 import Logo from "../components/Logo.vue";
+import AppDrawer from "../components/AppDrawer.vue";
+import { appDrawerStore } from "../components/AppDrawer"
+const { appDrawer } = appDrawerStore();
+const openAppDrawer = function () {
+    appDrawer.value = true;
+}
+const logout = function () {
+    localStorage.clear();
+    window.location.href = "/login";
+}
 </script>
 
 <style scoped>
@@ -66,5 +80,21 @@ import Logo from "../components/Logo.vue";
     display: flex;
     color: #222;
     font-size: 15px;
+}
+.logout {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #222;
+    gap: 20px;
+    height: 50px;
+    width: 50px;
+    cursor: pointer;
+    position: absolute;
+    right: 20px;
+}
+.logout:hover .material-symbols-outlined {
+    color: #007BFF;
+    transition: all 0.3s;
 }
 </style>

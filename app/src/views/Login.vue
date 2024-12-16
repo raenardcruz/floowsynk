@@ -16,6 +16,7 @@
                             <label for="password">Password:</label>
                             <input type="password" id="password" v-model="password" required />
                         </div>
+                        <div v-if="loginError" class="tooltip">{{ loginErrorMessage }}</div>
                         <div class="btn-grp">
                             <button>Register</button>
                             <button type="submit">Login</button>
@@ -26,10 +27,10 @@
                         <div class="other-login">
                             <p>Or login with:</p>
                             <button>
-                                <img src="../components/icons/search.png" alt="Google" />
+                                <img src="../components/icons/google.svg" alt="Google" />
                             </button>
                             <button>
-                                <img src="../components/icons/facebook.png" alt="Google" />
+                                <img src="../components/icons/facebook.svg" alt="Facebook" />
                             </button>
                         </div>
                     </form>
@@ -41,16 +42,21 @@
 
 <script setup lang="ts">
 import { useRouter } from "vue-router";
-import { LoginHandler, loginstore } from "./Login"
+import { LoginHandler, loginstore } from "./Login";
 import Logo from "../components/Logo.vue";
 
 const router = useRouter();
 const loginHandler = new LoginHandler(router);
+loginHandler.checkSession(); // Check session on component mount
 const handleLogin = loginHandler.handleLogin;
 const {
     username,
-    password
-} = loginstore()
+    password,
+    loginError,
+    loginErrorMessage,
+} = loginstore();
+
+
 </script>
 
 <style scoped src="./Login.css" />
