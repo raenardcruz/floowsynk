@@ -3,12 +3,6 @@
     position: absolute;
     margin-left: 20px;
 }
-.logo h2 {
-    display: flex
-;
-    justify-content: center;
-    align-items: center;
-}
 .login-container {
     margin: 0 auto;
     padding: 20px;
@@ -89,11 +83,22 @@ input:focus {
     padding: 2px;
     border-radius: 30px;
     margin: 0 5px;
+    background-color: transparent;
 }
 .other-login button img {
     margin: 0 5px;
     height: 25px;
+    border-radius: 20px;
+    transition: box-shadow 0.3s ease;
+}
+.other-login button img:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 .forgot-password {
     margin: 10px 0;
+}
+.tooltip {
+    color: red;
+    margin-top: 10px;
+    font-size: 0.9em;
 }

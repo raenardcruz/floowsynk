@@ -1,7 +1,7 @@
 # Use the official PostgreSQL image
 FROM postgres:latest
 
-# Set environment variables
+# Set environment variables used only on Local
 ENV POSTGRES_USER=root
 ENV POSTGRES_PASSWORD=floowsynk
 ENV POSTGRES_DB=floowsynk
