@@ -11,6 +11,7 @@
         </div>
     </div>
     <app-drawer />
+    <router-view class="fade-in" />
 </template>
 
 <script setup lang="ts">
