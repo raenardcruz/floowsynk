@@ -2,37 +2,9 @@
     <div class="background" :class="{ show: appDrawer }" @click.self="closeAppDrawer">
         <span class="material-symbols-outlined close" @click="closeAppDrawer">close</span>
         <div class="apps-container" :class="{ showapp: appDrawer }">
-            <div class="app" @click.prevent="navigateTo('/')">
-                <img src="./Icons/dashboard.svg" alt="dashboard" />
-                <span>Dashboard</span>
-            </div>
-            <div class="app" @click.prevent="navigateTo('/pages')">
-                <img src="./Icons/pages.svg" alt="pages" />
-                <span>Pages</span>
-            </div>
-            <div class="app" @click.prevent="navigateTo('/workflow')">
-                <img src="./Icons/workflow.svg" alt="workflow" />
-                <span>Workflow</span>
-            </div>
-            <div class="app" @click.prevent="navigateTo('/connectors')">
-                <img src="./Icons/connection.svg" alt="connection" />
-                <span>Connectors</span>
-            </div>
-            <div class="app" @click.prevent="navigateTo('/reviews')">
-                <img src="./Icons/approve.svg" alt="approve" />
-                <span>Reviews</span>
-            </div>
-            <div class="app" @click.prevent="navigateTo('/accounts')">
-                <img src="./Icons/user.svg" alt="user" />
-                <span>Accounts</span>
-            </div>
-            <div class="app" @click.prevent="navigateTo('/logs')">
-                <img src="./Icons/logs.svg" alt="logs" />
-                <span>Logs</span>
-            </div>
-            <div class="app" @click.prevent="navigateTo('/settings')">
-                <img src="./Icons/settings.svg" alt="settings" />
-                <span>Settings</span>
+            <div class="app" v-for="app in appNav" :key="app.name" @click.prevent="navigateTo(app.path)">
+                <img :src="app.icon" />
+                <span>{{ app.name }}</span>
             </div>
         </div>
         <div class="iconfooter">Vectors and icons by <a href="https://www.svgrepo.com" target="_blank">SVG Repo</a></div>
@@ -42,6 +14,7 @@
 <script setup lang="ts">
 import { appDrawerStore } from "./AppDrawer";
 import { useRouter } from 'vue-router';
+import { appNav } from "./Config/appdDrawer";
 
 const router = useRouter();
 
@@ -53,9 +26,6 @@ const navigateTo = function (path: string) {
 const { appDrawer } = appDrawerStore();
 const closeAppDrawer = function () {
     appDrawer.value = false;
-}
-const test = function () {
-    console.log("test");
 }
 </script>
 
