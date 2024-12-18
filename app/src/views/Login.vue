@@ -55,8 +55,6 @@ const {
     loginError,
     loginErrorMessage,
 } = loginstore();
-
-
 </script>
 
 <style scoped src="./Login.css" />
