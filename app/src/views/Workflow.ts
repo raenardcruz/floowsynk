@@ -1,23 +1,30 @@
 import { ref } from "vue";
 
-const activeTab = ref<string>('main');
-const tabs = ref<string[]>([]);
+export interface Tab {
+    id: number;
+    name: string;
+}
 
-export function workflowStore() {
-    return {
+const activeTab = ref<number>(0);
+const tabs = ref<Tab[]>([]);
+
+export class Workflow {
+    static store = {
         activeTab,
         tabs
     }
-}
 
-export class WorkflowHandler {
-    selectTab(tabName: string) {
-        activeTab.value = tabName;
+    static selectTab(tabId: number) {
+        activeTab.value = tabId;
     }
 
-    closeTab(index: number, tabId: string) {
-        tabs.value.splice(index, 1);
-        if (activeTab.value == tabId)
-            activeTab.value = 'main';
+    static closeTabById(tabId: number) {
+        const index = tabs.value.findIndex(tab => tab.id === tabId);
+        if (index !== -1) {
+            tabs.value.splice(index, 1);
+            if (activeTab.value === tabId) {
+                activeTab.value = 0;
+            }
+        }
     }
 }

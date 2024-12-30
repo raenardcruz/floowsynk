@@ -1,6 +1,7 @@
 import { ref, computed } from "vue";
+import { Tab, Workflow } from "../../views/Workflow"
 
-interface Process {
+export interface Process {
     id: number;
     title: string;
     description: string;
@@ -49,10 +50,21 @@ const filteredProcesses = computed<Process[]>(() => {
     );
 });
 
-export function processListStore() {
-  return {
-    processes,
-    search,
-    filteredProcesses,
-  };
+
+export class ProcessList {
+    static store = {
+        processes,
+        search,
+        filteredProcesses
+    };
+    static cardClicked(tab: Tab) {
+        const {
+            tabs,
+            activeTab
+        } = Workflow.store;
+        if (!tabs.value.some(existingTab => existingTab.id === tab.id)) {
+            tabs.value.push(tab);
+        }
+        activeTab.value = tab.id;
+    }
 }
