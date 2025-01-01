@@ -23,7 +23,6 @@
             </div>
         </div>
         <div class="content">
-            <!-- Logic Here -->
             <log-modal :id="id" v-if="tab.showLogModal" />
             <sidebar />
             <VueFlow :class="id" class="basicflow" :nodes="tab.nodes" :edges="tab.edges" :default-viewport="{ zoom: 1 }"
