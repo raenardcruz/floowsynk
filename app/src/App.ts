@@ -2,8 +2,8 @@ import { ref } from 'vue';
 
 const session = ref<string | null>(null);
 
-export function appStore() {
-    return {
+export default class App {
+    static store = {
         session
     }
 }

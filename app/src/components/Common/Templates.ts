@@ -1,5 +1,5 @@
-import { Process } from "../Common/Interfaces"
-import Utilities from "../Common/Utilities"
+import { Process } from "@/components/Common/Interfaces"
+import Utilities from "@/components/Common/Utilities"
 
 export default class Templates {
     static Process(): Process {

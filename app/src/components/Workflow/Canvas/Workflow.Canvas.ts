@@ -1,5 +1,5 @@
-import Workflow from "../../views/Workflow";
-import { Process } from "../Common/Interfaces"
+import Workflow from "@/views/Workflow";
+import { Process } from "@/components/Common/Interfaces"
 
 export default class WorkflowCanvas {
     static store = {

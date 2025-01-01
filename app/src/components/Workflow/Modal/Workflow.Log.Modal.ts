@@ -1,5 +1,5 @@
-import { Process } from "../Common/Interfaces";
-import Workflow from "../../views/Workflow"
+import { Process } from "@/components/Common/Interfaces";
+import Workflow from "@/views/Workflow"
 
 export default class WorkflowLogModal {
     static utcDateToLocal(utcDate: string): string {

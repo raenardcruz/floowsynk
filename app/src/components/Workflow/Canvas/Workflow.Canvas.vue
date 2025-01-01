@@ -45,8 +45,8 @@ import { VueFlow, useVueFlow } from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
 import { ControlButton, Controls } from '@vue-flow/controls'
 import WorkflowCanvas from "./Workflow.Canvas";
-import Sidebar from "./Workflow.Canvas.SideBar.vue";
-import LogModal from "./Workflow.Log.Modal";
+import Sidebar from "@/components/Workflow/Sidebar/Workflow.Canvas.SideBar.vue";
+import LogModal from "@/components/Workflow/Modal/Workflow.Log.Modal.vue";
 import { ref } from "vue";
 
 const tags = ref<string[]>([])

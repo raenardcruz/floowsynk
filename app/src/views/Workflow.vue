@@ -25,8 +25,8 @@
 
 <script setup lang="ts">
 import Workflow from "./Workflow";
-import WorkflowsProcessList from "../components/Workflow/ProcessList.vue";
-import WorkflowCanvas from "../components/Workflow/Workflow.Canvas.vue";
+import WorkflowsProcessList from "@/components/Workflow/Process/Process.List.vue";
+import WorkflowCanvas from "@/components/Workflow/Canvas/Workflow.Canvas.vue";
 const {
     tabs,
     activeTab,

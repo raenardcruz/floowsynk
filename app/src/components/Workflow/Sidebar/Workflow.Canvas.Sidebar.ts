@@ -1,7 +1,7 @@
 import { ref, computed } from "vue";
-import nodes from "../Config/nodes";
-import { Node } from "../Common/Interfaces"
-import iconStyles from "../Icons/Icon.Style";
+import nodes from "@/components/Workflow/Nodes/node";
+import { Node } from "@/components/Common/Interfaces"
+import iconStyles from "@/components/Icons/Icon.Style";
 
 const showSideBar = ref<boolean>(false);
 const search = ref<string>('');

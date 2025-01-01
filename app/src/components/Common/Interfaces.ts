@@ -21,9 +21,17 @@ export interface Node {
     id: string;
     type: string;
     label: string;
+    group: number[];
     position: {
         x: number;
         y: number;
     };
     data: any;
+}
+
+export interface Group {
+    id: number;
+    name: string;
+    description: string;
+    icon: string;
 }

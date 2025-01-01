@@ -13,7 +13,7 @@
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
-import { appNav } from "./Config/appdDrawer";
+import { appNav } from "@/components/Config/appDrawer";
 import AppDrawer from './AppDrawer';
 
 const router = useRouter();

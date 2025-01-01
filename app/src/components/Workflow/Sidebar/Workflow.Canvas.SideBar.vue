@@ -44,7 +44,7 @@
 
 <script setup lang="ts">
 import Sidebar from "./Workflow.Canvas.Sidebar";
-import nodes from "../Config/nodes"
+import nodes from "@/components/Workflow/Nodes/node"
 
 const {
     showSideBar,
