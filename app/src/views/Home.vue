@@ -17,8 +17,8 @@
 <script setup lang="ts">
 import Logo from "../components/Logo.vue";
 import AppDrawer from "../components/AppDrawer.vue";
-import { appDrawerStore } from "../components/AppDrawer"
-const { appDrawer } = appDrawerStore();
+import AppDrawerClass from "../components/AppDrawer"
+const { appDrawer } = AppDrawerClass.store;
 const openAppDrawer = function () {
     appDrawer.value = true;
 }

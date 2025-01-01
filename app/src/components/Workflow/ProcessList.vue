@@ -10,11 +10,9 @@
             <input class="search-box" type="search" placeholder="Search" v-model="search">
         </div>
         <div class="cards-gallery">
-            <div class="create">
-                <span class="material-symbols-outlined">add</span>
-            </div>
+            <div class="create" @click="ProcessList.createProcess"></div>
             <div class="card" v-for="process in filteredProcesses" :key="process.id" :class="process.type"
-                @click="ProcessList.cardClicked({ 'id': process.id, 'name': process.title })">
+                @click="ProcessList.cardClicked(process)">
                 <div class="type">
                     <span style="color: #14BF47; margin-right: 10px;" class="material-symbols-outlined"
                         v-if="process.type == 'default'">flag_circle</span>

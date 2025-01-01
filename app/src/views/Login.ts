@@ -9,23 +9,21 @@ const password = ref<string>('');
 const loginError = ref(false);
 const loginErrorMessage = ref('');
 
-export function loginstore() {
-    return {
-        username,
-        password,
-        loginError,
-        loginErrorMessage
-    }
-}
-
-class LoginHandler {
+export default class Login {
     private router;
 
     constructor(router: ReturnType<typeof useRouter>) {
         this.router = router;
     }
 
-    async handleLogin() {
+    static store = {
+        username,
+        password,
+        loginError,
+        loginErrorMessage
+    }
+
+    async login() {
         const { session } = appStore();
         try {
             let resp: any = await axios.post('/api/login', {
@@ -65,8 +63,4 @@ class LoginHandler {
             }
         }
     }
-}
-
-export {
-    LoginHandler
 }

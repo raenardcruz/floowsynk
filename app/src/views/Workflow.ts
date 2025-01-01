@@ -1,29 +1,25 @@
 import { ref } from "vue";
+import { Process } from "../components/Common/Interfaces";
 
-export interface Tab {
-    id: number;
-    name: string;
-}
+const activeTab = ref<string>('main');
+const tabs = ref<Process[]>([]);
 
-const activeTab = ref<number>(0);
-const tabs = ref<Tab[]>([]);
-
-export class Workflow {
+export default class Workflow {
     static store = {
         activeTab,
         tabs
     }
 
-    static selectTab(tabId: number) {
+    static selectTab(tabId: string) {
         activeTab.value = tabId;
     }
 
-    static closeTabById(tabId: number) {
+    static closeTabById(tabId: string) {
         const index = tabs.value.findIndex(tab => tab.id === tabId);
         if (index !== -1) {
             tabs.value.splice(index, 1);
             if (activeTab.value === tabId) {
-                activeTab.value = 0;
+                activeTab.value = 'main';
             }
         }
     }

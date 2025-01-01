@@ -1,38 +1,32 @@
 import { ref, computed } from "vue";
-import { Tab, Workflow } from "../../views/Workflow"
-
-export interface Process {
-    id: number;
-    title: string;
-    description: string;
-    type: string;
-    tags: string[];
-}
+import Workflow from "../../views/Workflow";
+import { Process } from "../Common/Interfaces";
+import Templates from "../Common/Templates"
 
 const processes = ref<Process[]>([
     {
-        id: 1,
+        id: 'de8672e3-e5f3-43a5-9ca0-fced34ea4251',
         type: 'default',
         title: 'Main Process',
         description: 'This is the main process',
         tags: ['tag1', 'tag2', 'tag3']
     },
     {
-        id: 2,
+        id: '6e2c3d59-6a8e-4e54-9fac-5787636e5956',
         type: 'interval',
         title: 'Interval Process',
         description: 'This is the interval process',
         tags: ['tag1', 'tag2', 'tag3']
     },
     {
-        id: 3,
+        id: 'de3abb53-34ab-4010-8635-1008849bee50',
         type: 'webhook',
         title: 'Webhook Process',
         description: 'This is the webhook process',
         tags: ['tag1', 'tag2', 'tag3']
     },
     {
-        id: 4,
+        id: '07d81a79-20ad-4f63-aed0-745d0a84b9e0',
         type: 'events',
         title: 'Events Process',
         description: 'This is the events process',
@@ -57,14 +51,19 @@ export class ProcessList {
         search,
         filteredProcesses
     };
-    static cardClicked(tab: Tab) {
+    static cardClicked(process: Process) {
+        if (!Workflow.store.tabs.value.some(existingTab => existingTab.id === process.id)) {
+            Workflow.store.tabs.value.push(process);
+        }
+        Workflow.store.activeTab.value = process.id;
+    }
+    static createProcess() {
         const {
             tabs,
             activeTab
         } = Workflow.store;
-        if (!tabs.value.some(existingTab => existingTab.id === tab.id)) {
-            tabs.value.push(tab);
-        }
-        activeTab.value = tab.id;
+        let newProcess = Templates.Process();
+        tabs.value.push(newProcess);
+        activeTab.value = newProcess.id;
     }
 }

@@ -7,7 +7,7 @@
             <div class="bg-2">
                 <div class="login-card">
                     <h1>Login</h1>
-                    <form @submit.prevent="handleLogin">
+                    <form @submit.prevent="loginHandler.login">
                         <div class="form-group">
                             <label for="username">User Name:</label>
                             <input type="text" id="username" v-model="username" required />
@@ -42,19 +42,18 @@
 
 <script setup lang="ts">
 import { useRouter } from "vue-router";
-import { LoginHandler, loginstore } from "./Login";
+import Login from "./Login";
 import Logo from "../components/Logo.vue";
 
 const router = useRouter();
-const loginHandler = new LoginHandler(router);
+const loginHandler = new Login(router);
 loginHandler.checkSession(); // Check session on component mount
-const handleLogin = loginHandler.handleLogin;
 const {
     username,
     password,
     loginError,
     loginErrorMessage,
-} = loginstore();
+} = Login.store;
 </script>
 
 <style scoped src="./Login.css" />

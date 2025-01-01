@@ -14,12 +14,12 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
 import { appNav } from "./Config/appdDrawer";
-import { AppDrawerHandler, appDrawerStore } from './AppDrawer';
+import AppDrawer from './AppDrawer';
 
 const router = useRouter();
-const appDrawerHandler = new AppDrawerHandler(router);
+const appDrawerHandler = new AppDrawer(router);
 
-const { appDrawer } = appDrawerStore();
+const { appDrawer } = AppDrawer.store;
 const closeAppDrawer = appDrawerHandler.closeAppDrawer;
 const navigateTo = appDrawerHandler.navigateTo;
 </script>
