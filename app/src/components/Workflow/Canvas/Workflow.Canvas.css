@@ -1,5 +1,6 @@
 @import '@vue-flow/core/dist/style.css';
 @import '@vue-flow/core/dist/theme-default.css';
+@import '@vue-flow/controls/dist/style.css';
 
 .tab-container {
     position: relative;
@@ -92,19 +93,6 @@
     align-items: end;
   }
   
-  .my-custom-node-class {
-    background: purple;
-    color: white;
-    border: 1px solid purple;
-    border-radius: 4px;
-    box-shadow: 0 0 0 1px purple;
-    padding: 8px;
-  }
-  
-  .my-custom-node-class:focus-visible {
-    border-color: pink;
-  }
-  
   .active {
     color: #fff;
     background: #3489CD;
@@ -171,11 +159,4 @@
     transform: scale(1.02);
     box-shadow: 15px 15px 30px #868686,
       -15px -15px 30px #ffffff;
-  }
-
-  .basicflow {
-    display: flex;
-    position: relative;
-    height: 100%;
-    width: 100%;
   }

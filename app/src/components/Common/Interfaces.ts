@@ -22,6 +22,7 @@ export interface Node {
     type: string;
     label: string;
     group: number[];
+    icon: {  name: string; color: string; };
     position: {
         x: number;
         y: number;
