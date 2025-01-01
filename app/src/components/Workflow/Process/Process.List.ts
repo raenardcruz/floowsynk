@@ -1,7 +1,7 @@
 import { ref, computed } from "vue";
-import Workflow from "../../views/Workflow";
-import { Process } from "../Common/Interfaces";
-import Templates from "../Common/Templates"
+import Workflow from "@/views/Workflow";
+import { Process } from "@/components/Common/Interfaces";
+import Templates from "@/components/Common/Templates"
 
 const processes = ref<Process[]>([
     {

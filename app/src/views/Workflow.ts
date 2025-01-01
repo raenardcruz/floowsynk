@@ -1,5 +1,5 @@
 import { ref } from "vue";
-import { Process } from "../components/Common/Interfaces";
+import { Process } from "@/components/Common/Interfaces";
 
 const activeTab = ref<string>('main');
 const tabs = ref<Process[]>([]);

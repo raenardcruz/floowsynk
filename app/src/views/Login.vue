@@ -43,7 +43,7 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router";
 import Login from "./Login";
-import Logo from "../components/Logo.vue";
+import Logo from "@/components/Logo.vue";
 
 const router = useRouter();
 const loginHandler = new Login(router);

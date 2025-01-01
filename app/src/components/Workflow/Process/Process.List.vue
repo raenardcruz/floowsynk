@@ -41,8 +41,8 @@
 </template>
 
 <script setup lang="ts">
-import { ProcessList } from "./ProcessList"
+import { ProcessList } from "./Process.List"
 const { search, filteredProcesses } = ProcessList.store;
 </script>
 
-<style scoped src="./ProcessList.css"></style>
+<style scoped src="./Process.List.css"></style>

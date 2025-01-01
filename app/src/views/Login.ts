@@ -1,7 +1,7 @@
 import { ref } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
-import { appStore } from "../App";
+import App from "../App";
 
 // Store Section
 const username = ref<string>('');
@@ -24,7 +24,7 @@ export default class Login {
     }
 
     async login() {
-        const { session } = appStore();
+        const { session } = App.store;
         try {
             let resp: any = await axios.post('/api/login', {
                 username: username.value,
@@ -54,7 +54,7 @@ export default class Login {
         if (token && expiry) {
             const expiryDate = new Date(expiry);
             if (expiryDate > new Date()) {
-                const { session } = appStore();
+                const { session } = App.store;
                 session.value = token;
                 this.router.push({ path: '/' });
             } else {
