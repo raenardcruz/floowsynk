@@ -2,6 +2,7 @@ import { ref, computed } from "vue";
 import nodes from "@/components/Workflow/Nodes/node";
 import { Node } from "@/components/Common/Interfaces"
 import iconStyles from "@/components/Icons/Icon.Style";
+import groups from "@/components/Workflow/Nodes/node.groups";
 
 const showSideBar = ref<boolean>(false);
 const search = ref<string>('');
@@ -14,11 +15,12 @@ const searchNode = computed(() => {
 
 export default class WorkflowCanvasSidebar {
     static store = {
-        showSideBar,
-        search,
-        searchNode,
-        draggedNode,
-        expandGroup
+        showSideBar, // ref
+        search, // ref
+        searchNode, // computed
+        draggedNode, // ref
+        expandGroup, // ref
+        groups, // constant
     }
     static onDragStart(node: Node) {
         draggedNode.value = node;
@@ -43,5 +45,8 @@ export default class WorkflowCanvasSidebar {
             expandGroup.value.splice(expandGroup.value.findIndex(f => f == name));
         else
             expandGroup.value.push(name)
+    }
+    static groupNodes(id: number): Node[] {
+        return nodes.filter(f => f.group.includes(id))
     }
 }
