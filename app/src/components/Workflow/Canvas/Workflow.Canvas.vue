@@ -26,6 +26,7 @@
             <log-modal :id="id" v-if="tab.showLogModal" />
             <sidebar />
             <VueFlow :nodes="testNode" :edges="tab.edges"
+            @paneClick="test"
                 :only-render-visible-elements="false"
                 :node-types="nodeTypes" 
                 no-wheel-class-name="no-scroll"
@@ -48,6 +49,10 @@ import LogModal from "@/components/Workflow/Modal/Workflow.Log.Modal.vue";
 import { ref } from "vue";
 import nodeTypes from "@/components/Workflow/Nodes/node.types";
 import { NodeComponent } from '@vue-flow/core';
+
+const test= function () {
+    alert('asas')
+}
 
 const tags = ref<string[]>([])
 const props = defineProps(['id']);
