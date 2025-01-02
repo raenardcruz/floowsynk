@@ -1,5 +1,5 @@
 <template>
-    <div class="node no-scroll">
+    <div class="node no-scroll" :style="nodestyle">
         <div class="icon" :style="{ background: icon.color }">
             <span class="material-symbols-outlined">{{ icon.name }}</span>
         </div>
@@ -7,18 +7,38 @@
             <div class="label">{{ label }}</div>
             <div class="type">{{ type }}</div>
         </div>
+        <Handle
+    class="handle-input"
+    v-if="outputs"
+    v-for="(input, index) in inputs" 
+    :key="input" 
+    :id="input"
+    :data-output="input"
+    type="target"
+    :position="Position.Left"
+    :style="{ top: `${(100 / (outputs.length + 1)) * (index + 1)}%` }" />
+    <Handle
+    class="handle-output"
+    v-if="outputs"
+    v-for="(output, index) in outputs" 
+    :key="output" 
+    :id="output"
+    :data-output="output"
+    type="source"
+    :position="Position.Right"
+    :style="{ top: `${(100 / (outputs.length + 1)) * (index + 1)}%` }" />
     </div>
 </template>
 
 <script setup lang="ts">
-    import { useNode } from '@vue-flow/core'
+    import { Handle, Position, useNode } from '@vue-flow/core'
     import { Node } from "@/components/Common/Interfaces";
 
     const { 
         node
     } = useNode()
 
-    const { icon, type, label } = node as unknown as Node;
+    const { icon, type, label, outputs, inputs, nodestyle } = node as unknown as Node;
 </script>
 
 <style scoped>
@@ -62,5 +82,36 @@
     .type {
         font-size: 12px;
         color: #666;
+    }
+
+    .handle-input::before,
+    .handle-output::before {
+        opacity: 0;
+        transition: all 0.3s;
+    }
+
+    .node:hover .handle-input::before,
+    .node:hover .handle-output::before {
+        opacity: 1;
+    }
+
+    .handle-input::before,
+    .handle-output::before {
+        content: attr(data-output);
+        position: absolute;
+        white-space: nowrap;
+        font-size: 8px;
+        top: -4px;
+        background: #f0f0f0;
+        border: solid 1px #ccc;
+        border-radius: 8px;
+        padding: 0 5px;
+    }
+
+    .handle-input::before {
+        left: -40px;
+    }
+    .handle-output::before {
+        right: -45px;
     }
 </style>

@@ -25,12 +25,8 @@
         <div class="content">
             <log-modal :id="id" v-if="tab.showLogModal" />
             <sidebar />
-            <VueFlow :nodes="testNode" :edges="tab.edges"
-            @paneClick="test"
-                :only-render-visible-elements="false"
-                :node-types="nodeTypes" 
-                no-wheel-class-name="no-scroll"
-                class="vue-flow-container">
+            <VueFlow :nodes="testNode" :edges="tab.edges" @paneClick="test" :only-render-visible-elements="false"
+                :node-types="nodeTypes" no-wheel-class-name="no-scroll" class="vue-flow-container">
                 <Background />
                 <Controls position="top-right">
                 </Controls>
@@ -50,8 +46,8 @@ import { ref } from "vue";
 import nodeTypes from "@/components/Workflow/Nodes/node.types";
 import { NodeComponent } from '@vue-flow/core';
 
-const test= function () {
-    alert('asas')
+const test = function () {
+    console.log('test')
 }
 
 const tags = ref<string[]>([])
@@ -63,22 +59,25 @@ const testNode = [{
     type: 'start',
     label: 'Default',
     icon: { name: 'play_arrow', color: '#4CAF50' },
+    outputs: ['output'],
     group: [1],
     position: { x: 100, y: 100 },
     data: { label: 'Node 1' },
 },
 {
-        id: '1', type: 'image', label: 'Output Image', position: { x: 300, y: 100 },
-        group: [7],
-        icon: {
-            name: "image",
-            color: "#98BC18"
-        },
-        data: {
-            status: "",
-            value: ""
-        }
-    }]
+    id: '1', type: 'image', label: 'Output Image', position: { x: 300, y: 100 },
+    group: [7],
+    inputs: ['input1', 'input2'],
+    outputs: ['output1', 'output2'],
+    icon: {
+        name: "image",
+        color: "#98BC18"
+    },
+    data: {
+        status: "",
+        value: ""
+    }
+}]
 </script>
 
 <style scoped src="./Workflow.Canvas.css"></style>
