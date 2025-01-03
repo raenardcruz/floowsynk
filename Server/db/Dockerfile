@@ -1,5 +1,5 @@
 # Use the official PostgreSQL image
-FROM postgres:latest
+FROM postgres:17.2-alpine
 
 # Set environment variables used only on Local
 ENV POSTGRES_USER=root

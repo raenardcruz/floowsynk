@@ -10,7 +10,7 @@ const loginError = ref(false);
 const loginErrorMessage = ref('');
 
 export default class Login {
-    private router;
+    private readonly router;
 
     constructor(router: ReturnType<typeof useRouter>) {
         this.router = router;

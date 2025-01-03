@@ -3,7 +3,7 @@
         <span class="material-symbols-outlined close" @click="closeAppDrawer">close</span>
         <div class="apps-container" :class="{ showapp: appDrawer }">
             <div class="app" v-for="app in appNav" :key="app.name" @click.prevent="navigateTo(app.path)">
-                <img :src="app.icon" />
+                <img :src="app.icon" :alt="app.name + ' icon'" />
                 <span>{{ app.name }}</span>
             </div>
         </div>

@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router';
 const appDrawer = ref(false);
 
 export default class AppDrawer {
-    private router;
+    private readonly router;
     
     constructor(router: ReturnType<typeof useRouter>) {
         this.router = router;
