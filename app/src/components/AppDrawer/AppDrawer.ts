@@ -10,7 +10,7 @@ export default class AppDrawer {
         this.router = router;
     }
 
-    static store = {
+    static readonly store = {
         appDrawer
     }
 

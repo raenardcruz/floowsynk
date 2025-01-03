@@ -38,13 +38,11 @@
 <script setup lang="ts">
 import { VueFlow } from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
-import { ControlButton, Controls } from '@vue-flow/controls'
 import WorkflowCanvas from "./Workflow.Canvas";
 import Sidebar from "@/components/Workflow/Sidebar/Workflow.Canvas.SideBar.vue";
 import LogModal from "@/components/Workflow/Modal/Workflow.Log.Modal.vue";
 import { ref } from "vue";
 import nodeTypes from "@/components/Workflow/Nodes/node.types";
-import { NodeComponent } from '@vue-flow/core';
 
 const test = function () {
     console.log('test')

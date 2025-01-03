@@ -3,7 +3,7 @@ import { ref } from 'vue';
 const session = ref<string | null>(null);
 
 export default class App {
-    static store = {
+    static readonly store = {
         session
     }
 }

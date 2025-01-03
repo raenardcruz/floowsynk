@@ -46,7 +46,7 @@ const filteredProcesses = computed<Process[]>(() => {
 
 
 export class ProcessList {
-    static store = {
+    static readonly store = {
         processes,
         search,
         filteredProcesses

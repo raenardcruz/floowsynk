@@ -19,7 +19,7 @@ export default class WorkflowLogModal {
             return "";
         if (text.length > 300) {
             const blob = new Blob([text], { type: 'text/plain' });
-            var url = URL.createObjectURL(blob);
+            let url = URL.createObjectURL(blob);
             return `Content too big. Click <a href="${url}" target="_blank">HERE</a> to view the whole document`
         } else {
             return text;

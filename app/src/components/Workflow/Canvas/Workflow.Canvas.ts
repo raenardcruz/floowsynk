@@ -2,7 +2,7 @@ import Workflow from "@/views/Workflow";
 import { Process } from "@/components/Common/Interfaces"
 
 export default class WorkflowCanvas {
-    static store = {
+    static readonly store = {
         activeTab: Workflow.store.activeTab,
         tabs: Workflow.store.tabs
     }

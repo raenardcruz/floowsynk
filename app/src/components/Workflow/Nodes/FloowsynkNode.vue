@@ -48,7 +48,6 @@
         justify-content: left;
         padding: 5px 15px 5px 5px;
         border: 1px solid #ccc;
-        border-radius: 5px;
         cursor: pointer;
         background: #f0f0f0;
         gap: 20px;
@@ -84,12 +83,6 @@
         color: #666;
     }
 
-    .handle-input::before,
-    .handle-output::before {
-        opacity: 0;
-        transition: all 0.3s;
-    }
-
     .node:hover .handle-input::before,
     .node:hover .handle-output::before {
         opacity: 1;
@@ -106,6 +99,8 @@
         border: solid 1px #ccc;
         border-radius: 8px;
         padding: 0 5px;
+        opacity: 0;
+        transition: all 0.3s;
     }
 
     .handle-input::before {

@@ -40,11 +40,9 @@ table {
     overflow: hidden;
     border-collapse: collapse;
 }
-th,
 th {
     background: #dddddd;
 }
-
 td,
 th {
     border: 0.5px solid #dddddd;

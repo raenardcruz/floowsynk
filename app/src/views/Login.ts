@@ -16,7 +16,7 @@ export default class Login {
         this.router = router;
     }
 
-    static store = {
+    static readonly store = {
         username,
         password,
         loginError,

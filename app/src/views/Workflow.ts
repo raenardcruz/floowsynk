@@ -5,7 +5,7 @@ const activeTab = ref<string>('main');
 const tabs = ref<Process[]>([]);
 
 export default class Workflow {
-    static store = {
+    static readonly store = {
         activeTab,
         tabs
     }

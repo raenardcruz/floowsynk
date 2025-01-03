@@ -60,13 +60,11 @@
   }
   .title-section .title input {
     font-size: 30px;
-    field-sizing: content;
   }
   
   .title-section .description input {
     font-size: 12px;
     color: grey;
-    field-sizing: content;
   }
   
   .title-section input {
@@ -133,7 +131,6 @@
     transition: 0.3s;
     box-shadow: 6px 6px 12px #868686,
       -6px -6px 12px #ffffff;
-    ;
   }
   
   .run-btns .close-btn {
@@ -151,7 +148,6 @@
     transition: 0.3s;
     box-shadow: 6px 6px 12px #868686,
       -6px -6px 12px #ffffff;
-    ;
   }
   
   .run-btns .log-btn:hover,

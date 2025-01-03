@@ -13,7 +13,7 @@ const searchNode = computed(() => {
 })
 
 export default class WorkflowCanvasSidebar {
-    static store = {
+    static readonly store = {
         showSideBar, // ref
         search, // ref
         searchNode, // computed
