@@ -85,5 +85,3 @@ const iconStyles = [
         color: "#1986BD"
     }
 ]
-
-export default iconStyles;

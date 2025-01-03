@@ -1,7 +1,6 @@
 import { ref, computed } from "vue";
 import nodes from "@/components/Workflow/Nodes/node";
 import { Node } from "@/components/Common/Interfaces"
-import iconStyles from "@/components/Icons/Icon.Style";
 import groups from "@/components/Workflow/Nodes/node.groups";
 
 const showSideBar = ref<boolean>(false);
@@ -29,16 +28,6 @@ export default class WorkflowCanvasSidebar {
     static onDragEnd() {
         draggedNode.value = null
         document.removeEventListener('drop', this.onDragEnd)
-    }
-    static iconColor(type: string) {
-        var filterStyle = iconStyles.filter(f => f.name == type);
-        if (filterStyle.length > 0)
-            return filterStyle[0];
-        else
-            return {
-                icon: "square",
-                color: "#fff"
-            }
     }
     static expandToggle(name: string) {
         if (expandGroup.value.includes(name))

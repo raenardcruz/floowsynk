@@ -92,13 +92,12 @@
     height: 70px;
     width: 100px;
     border-radius: 8px;
-    box-shadow: inset 3px 6px 4px rgba(255, 255, 255, 0.5), inset 0px -4px 4px rgba(0, 0, 0, 0.5);
+    background: #f0f0f0;
+    box-shadow: 3px 3px 5px #868686,-3px -3px 5px #fff;
 }
 
 .node:hover {
-    box-shadow: inset 3px 6px 4px rgba(255, 255, 255, 0.5),
-    inset 0px -4px 4px rgba(0, 0, 0, 0.5),
-    2px 5px 10px #868686;
+    box-shadow: 3px 3px 8px #868686,-3px -3px 8px #fff;
     transform: scale(1.02);
 }
 

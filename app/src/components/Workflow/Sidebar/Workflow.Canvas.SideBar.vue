@@ -11,8 +11,8 @@
             <div class="nodes expand">
                 <div class="node" v-for="node in searchNode" :key="node.id" :draggable="true"
                     @dragstart="Sidebar.onDragStart(node)" v-if="search.length > 0">
-                    <div class="node-icon" :style="'color:' + Sidebar.iconColor(node.type).color">
-                        <span class="material-symbols-outlined">{{ Sidebar.iconColor(node.type).icon }}</span>
+                    <div class="node-icon" :style="'color:' + node.icon.color">
+                        <span class="material-symbols-outlined">{{ node.icon.name }}</span>
                     </div>
                     <div class="node-type">
                         {{ node.type }}
@@ -30,8 +30,8 @@
                 <div class="nodes" :class="{ 'expand': expandGroup.includes('all') }">
                     <div class="node" v-for="node in nodes" :key="node.id" :draggable="true"
                         @dragstart="Sidebar.onDragStart(node)" @click.stop>
-                        <div class="node-icon" :style="'color:' + Sidebar.iconColor(node.type).color">
-                            <span class="material-symbols-outlined">{{ Sidebar.iconColor(node.type).icon }}</span>
+                        <div class="node-icon" :style="'color:' + node.icon.color">
+                            <span class="material-symbols-outlined">{{ node.icon.name }}</span>
                         </div>
                         <div class="node-type">
                             {{ node.type }}
@@ -51,8 +51,8 @@
                 <div class="nodes" :class="{ 'expand': expandGroup.includes(group.name) }">
                     <div class="node" v-for="node in Sidebar.groupNodes(group.id)" :key="node.id" :draggable="true"
                         @dragstart="Sidebar.onDragStart(node)" @click.stop>
-                        <div class="node-icon" :style="'color:' + Sidebar.iconColor(node.type).color">
-                            <span class="material-symbols-outlined">{{ Sidebar.iconColor(node.type).icon }}</span>
+                        <div class="node-icon" :style="'color:' + node.icon.color">
+                            <span class="material-symbols-outlined">{{ node.icon.name }}</span>
                         </div>
                         <div class="node-type">
                             {{ node.type }}

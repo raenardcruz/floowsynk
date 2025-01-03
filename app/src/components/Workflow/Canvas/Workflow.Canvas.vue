@@ -25,14 +25,10 @@
         <div class="content">
             <log-modal :id="id" v-if="tab.showLogModal" />
             <sidebar />
-            <VueFlow :class="id" class="basicflow" :nodes="tab.nodes" :edges="tab.edges" :default-viewport="{ zoom: 1 }"
-                :min-zoom="0.1" :max-zoom="5" :only-render-visible-elements="false" no-wheel-class-name="no-scroll"
-                delete-key-code="false" tabindex="0">
-                <Background pattern-color="#222" :size="1" :gap="20" />
-                <Controls :showInteractive="false" position="top-right">
-                    <ControlButton title="Reset Transform">
-                        <span class="material-symbols-outlined">refresh</span>
-                    </ControlButton>
+            <VueFlow :nodes="testNode" :edges="tab.edges" @paneClick="test" :only-render-visible-elements="false"
+                :node-types="nodeTypes" no-wheel-class-name="no-scroll" class="vue-flow-container">
+                <Background />
+                <Controls position="top-right">
                 </Controls>
             </VueFlow>
         </div>
@@ -40,17 +36,48 @@
 </template>
 
 <script setup lang="ts">
-import { VueFlow, useVueFlow } from '@vue-flow/core'
+import { VueFlow } from '@vue-flow/core'
 import { Background } from '@vue-flow/background'
 import { ControlButton, Controls } from '@vue-flow/controls'
 import WorkflowCanvas from "./Workflow.Canvas";
 import Sidebar from "@/components/Workflow/Sidebar/Workflow.Canvas.SideBar.vue";
 import LogModal from "@/components/Workflow/Modal/Workflow.Log.Modal.vue";
 import { ref } from "vue";
+import nodeTypes from "@/components/Workflow/Nodes/node.types";
+import { NodeComponent } from '@vue-flow/core';
+
+const test = function () {
+    console.log('test')
+}
 
 const tags = ref<string[]>([])
 const props = defineProps(['id']);
 const tab = WorkflowCanvas.findTabById(props.id) || { name: '', tags: [], description: '' };
+
+const testNode = [{
+    id: '0',
+    type: 'start',
+    label: 'Default',
+    icon: { name: 'play_arrow', color: '#4CAF50' },
+    outputs: ['output'],
+    group: [1],
+    position: { x: 100, y: 100 },
+    data: { label: 'Node 1' },
+},
+{
+    id: '1', type: 'image', label: 'Output Image', position: { x: 300, y: 100 },
+    group: [7],
+    inputs: ['input1', 'input2'],
+    outputs: ['output1', 'output2'],
+    icon: {
+        name: "image",
+        color: "#98BC18"
+    },
+    data: {
+        status: "",
+        value: ""
+    }
+}]
 </script>
 
 <style scoped src="./Workflow.Canvas.css"></style>

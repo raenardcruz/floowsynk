@@ -22,6 +22,10 @@ export interface Node {
     type: string;
     label: string;
     group: number[];
+    nodestyle?: string;
+    inputs?: string[];
+    outputs?: string[];
+    icon: {  name: string; color: string; };
     position: {
         x: number;
         y: number;
