@@ -1,9 +1,9 @@
 # Use the official PostgreSQL image
 FROM postgres:17.2-alpine
 
-# Set environment variables used only on Local
-ENV POSTGRES_USER=root
-ENV POSTGRES_PASSWORD=floowsynk
+# Uncomment the following lines to set the default username and password
+# ENV POSTGRES_USER=
+# ENV POSTGRES_PASSWORD=
 ENV POSTGRES_DB=floowsynk
 
 # Expose the PostgreSQL port
