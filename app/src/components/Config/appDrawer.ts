@@ -2,7 +2,7 @@ const appNav = [
     {
         "name": "Dashboard",
         "icon": "/src/components/Icons/dashboard.svg",
-        "path": "/dashboard"
+        "path": "/"
     },
     {
         "name": "Pages",

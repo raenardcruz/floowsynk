@@ -1,0 +1,160 @@
+.logic-main .logic-main-sidebar {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    justify-self: left;
+    height: 100%;
+    width: 280px;
+    z-index: 2;
+    transition: 0.3s ease-in-out;
+    left: -280px;
+}
+
+.show {
+    left: 0px !important;
+    box-shadow: 4px 2px 4px grey;
+}
+
+.logic-main .logic-main-sidebar .toggle-sidebar {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    top: 50%;
+    right: -40px;
+    height: 30px;
+    width: 30px;
+    background: #fff;
+    border-radius: 90px;
+    cursor: pointer;
+    box-shadow: 0px 5px 10px grey;
+}
+
+.sidebar {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-self: left;
+    height: 100%;
+    width: 280px;
+    z-index: 2;
+    transition: 0.3s ease-in-out;
+    background: #f0f0f0;
+    overflow: auto;
+    padding: 20px;
+}
+.group {
+    position: relative;
+    display: flex;
+    border-top: solid 1px grey;
+    padding: 10px;
+    justify-content: flex-start;
+    align-items: center;
+    flex-wrap: wrap;
+    flex-direction: column;
+    cursor: pointer;
+    transition: 0.3s ease-in-out;
+}
+.group:hover .name {
+    color: rgb(184, 106, 17);
+}
+.group .name {
+    font-size: 15px;
+    font-weight: 600;
+    color: rgb(40, 39, 39);
+    transition: 0.3s ease-in-out;
+}
+
+.group .description {
+    font-size: 10px;
+    color: rgb(72, 72, 72)
+}
+.nodes {
+    position: relative;
+    display: grid;
+    width: 100%;
+    transition: 0.5s ease-out;
+    max-height: 0;
+    opacity: 0;
+    height: fit-content;
+    grid-template-columns: repeat(2, auto);
+    grid-gap: 10px;
+}
+.nodes.expand {
+    max-height: 1000vh; /* Set this to a value that is enough to show your content */
+    opacity: 1;
+}
+.node {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 70px;
+    width: 100px;
+    border-radius: 8px;
+    background: #f0f0f0;
+    box-shadow: 3px 3px 5px #868686,-3px -3px 5px #fff;
+}
+
+.node:hover {
+    box-shadow: 3px 3px 8px #868686,-3px -3px 8px #fff;
+    transform: scale(1.02);
+}
+
+.node .node-type {
+    font-size: 12px;
+    color: grey;
+}
+.grp-icon {
+    font-size: 13px;
+    margin-right: 10px;
+}
+.expand-icon {
+    font-size: 10px;
+    margin-left: 10px;
+    transition: 0.3s ease-in-out;
+}
+.expand-icon.expand {
+    transform: rotate(90deg);
+}
+
+.input {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    margin-bottom: 10px;
+}
+.input label {
+    font-size: 7px;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+.input input,
+.input select {
+    border-radius: 20px;
+    padding: 5px;
+    font-size: 10px;
+    border: 0.05px solid grey;
+    overflow: auto;
+}
+.input .textbox {
+    border-radius: 20px;
+    font-size: 10px;
+    border: 0.05px solid grey;
+    background-color: #fff;
+}
+.input input:focus,
+.input select:focus,
+.input textarea:focus {
+    outline: none;
+    border: 0.05px solid #1092B3;
+}
+
+.input textarea {
+    border-radius: 5px;
+    padding: 5px;
+    font-size: 10px;
+    border: 0.05px solid grey;
+    overflow: auto;
+}

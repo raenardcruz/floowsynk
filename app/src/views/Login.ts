@@ -1,7 +1,7 @@
 import { ref } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
-import { appStore } from "../App";
+import App from "../App";
 
 // Store Section
 const username = ref<string>('');
@@ -9,24 +9,22 @@ const password = ref<string>('');
 const loginError = ref(false);
 const loginErrorMessage = ref('');
 
-export function loginstore() {
-    return {
-        username,
-        password,
-        loginError,
-        loginErrorMessage
-    }
-}
-
-class LoginHandler {
-    private router;
+export default class Login {
+    private readonly router;
 
     constructor(router: ReturnType<typeof useRouter>) {
         this.router = router;
     }
 
-    async handleLogin() {
-        const { session } = appStore();
+    static readonly store = {
+        username,
+        password,
+        loginError,
+        loginErrorMessage
+    }
+
+    async login() {
+        const { session } = App.store;
         try {
             let resp: any = await axios.post('/api/login', {
                 username: username.value,
@@ -56,7 +54,7 @@ class LoginHandler {
         if (token && expiry) {
             const expiryDate = new Date(expiry);
             if (expiryDate > new Date()) {
-                const { session } = appStore();
+                const { session } = App.store;
                 session.value = token;
                 this.router.push({ path: '/' });
             } else {
@@ -65,8 +63,4 @@ class LoginHandler {
             }
         }
     }
-}
-
-export {
-    LoginHandler
 }

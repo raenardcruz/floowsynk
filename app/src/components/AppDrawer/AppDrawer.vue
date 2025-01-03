@@ -3,7 +3,7 @@
         <span class="material-symbols-outlined close" @click="closeAppDrawer">close</span>
         <div class="apps-container" :class="{ showapp: appDrawer }">
             <div class="app" v-for="app in appNav" :key="app.name" @click.prevent="navigateTo(app.path)">
-                <img :src="app.icon" />
+                <img :src="app.icon" :alt="app.name + ' icon'" />
                 <span>{{ app.name }}</span>
             </div>
         </div>
@@ -13,13 +13,13 @@
 
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
-import { appNav } from "./Config/appdDrawer";
-import { AppDrawerHandler, appDrawerStore } from './AppDrawer';
+import { appNav } from "@/components/Config/appDrawer";
+import AppDrawer from './AppDrawer';
 
 const router = useRouter();
-const appDrawerHandler = new AppDrawerHandler(router);
+const appDrawerHandler = new AppDrawer(router);
 
-const { appDrawer } = appDrawerStore();
+const { appDrawer } = AppDrawer.store;
 const closeAppDrawer = appDrawerHandler.closeAppDrawer;
 const navigateTo = appDrawerHandler.navigateTo;
 </script>

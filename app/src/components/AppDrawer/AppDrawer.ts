@@ -3,17 +3,15 @@ import { useRouter } from 'vue-router';
 
 const appDrawer = ref(false);
 
-export function appDrawerStore() {
-    return {
-        appDrawer,
-    }
-}
-
-class AppDrawerHandler {
-     private router;
+export default class AppDrawer {
+    private readonly router;
     
     constructor(router: ReturnType<typeof useRouter>) {
         this.router = router;
+    }
+
+    static readonly store = {
+        appDrawer
     }
 
     navigateTo (path: string) {
@@ -24,8 +22,4 @@ class AppDrawerHandler {
     closeAppDrawer () {
         appDrawer.value = false;
     }
-}
-
-export {
-    AppDrawerHandler
 }

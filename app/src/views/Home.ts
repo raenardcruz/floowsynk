@@ -1,9 +1,14 @@
-import { ref } from 'vue';
+import AppDrawerClass from "@/components/AppDrawer/AppDrawer"
 
-const appDrawer = ref(false);
+const { appDrawer } = AppDrawerClass.store;
 
-export function homeStore() {
-    return {
-        appDrawer,
-    }   
+export default class Home {
+    static openAppDrawer() {
+        appDrawer.value = true;
+    }
+    
+    static logout() {
+        localStorage.clear();
+        window.location.href = "/login";
+    }
 }
