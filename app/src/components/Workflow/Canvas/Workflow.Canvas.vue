@@ -25,24 +25,40 @@
         <div class="content">
             <log-modal :id="id" v-if="tab.showLogModal" />
             <sidebar />
-            <VueFlow :nodes="testNode" :edges="tab.edges" @paneClick="test" :only-render-visible-elements="false"
-                :node-types="nodeTypes" no-wheel-class-name="no-scroll" class="vue-flow-container">
-                <Background />
-                <Controls position="top-right">
-                </Controls>
+            <VueFlow
+                class="vue-flow-container"
+                :nodes="tab.nodes"
+                :edges="tab.edges"
+                :only-render-visible-elements="false"
+                :node-types="nodeTypes"
+                @paneClick="test"
+                @connect="WorkflowCanvas.onConnectEdge($event, props.id)"
+                @drop="WorkflowCanvas.onDrop($event, props.id)"
+                @dragover="WorkflowCanvas.onDragOver($event)"
+                @dragleave="WorkflowCanvas.onDragLeave()"
+                @node-drag-stop="WorkflowCanvas.onNodeDragEnd($event, props.id)"
+                no-wheel-class-name="no-scroll">
+                <DropzoneBackground
+                    :style="{
+                    backgroundColor: isDragOver ? '#e7f3ff' : 'transparent',
+                    transition: 'background-color 0.2s ease', height: '100vh'}">
+                    <p v-if="isDragOver">Drop here</p>
+                </DropzoneBackground>
             </VueFlow>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { VueFlow } from '@vue-flow/core'
-import { Background } from '@vue-flow/background'
+import { VueFlow } from '@vue-flow/core';
 import WorkflowCanvas from "./Workflow.Canvas";
 import Sidebar from "@/components/Workflow/Sidebar/Workflow.Canvas.SideBar.vue";
 import LogModal from "@/components/Workflow/Modal/Workflow.Log.Modal.vue";
 import { ref } from "vue";
 import nodeTypes from "@/components/Workflow/Nodes/node.types";
+import DropzoneBackground from './Background/Dropzone.vue';
+
+const { isDragOver } = WorkflowCanvas.store;
 
 const test = function () {
     console.log('test')
@@ -50,32 +66,7 @@ const test = function () {
 
 const tags = ref<string[]>([])
 const props = defineProps(['id']);
-const tab = WorkflowCanvas.findTabById(props.id) || { name: '', tags: [], description: '' };
-
-const testNode = [{
-    id: '0',
-    type: 'start',
-    label: 'Default',
-    icon: { name: 'play_arrow', color: '#4CAF50' },
-    outputs: ['output'],
-    group: [1],
-    position: { x: 100, y: 100 },
-    data: { label: 'Node 1' },
-},
-{
-    id: '1', type: 'image', label: 'Output Image', position: { x: 300, y: 100 },
-    group: [7],
-    inputs: ['input1', 'input2'],
-    outputs: ['output1', 'output2'],
-    icon: {
-        name: "image",
-        color: "#98BC18"
-    },
-    data: {
-        status: "",
-        value: ""
-    }
-}]
+const tab = WorkflowCanvas.findTabById(props.id) || { name: '', tags: [], description: '', nodes: [], edges: [] };
 </script>
 
 <style scoped src="./Workflow.Canvas.css"></style>

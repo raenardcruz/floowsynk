@@ -2,6 +2,8 @@ import { ref, computed } from "vue";
 import nodes from "@/components/Workflow/Nodes/node";
 import { Node } from "@/components/Common/Interfaces"
 import groups from "@/components/Workflow/Nodes/node.groups";
+import { stringify } from "querystring";
+import CanvasHelper from "@/components/Workflow/Canvas/Workflow.Canvas";
 
 const showSideBar = ref<boolean>(false);
 const search = ref<string>('');
@@ -26,6 +28,7 @@ export default class WorkflowCanvasSidebar {
         document.addEventListener('drop', this.onDragEnd);
     }
     static onDragEnd() {
+        CanvasHelper.store.isDragOver.value = false
         draggedNode.value = null
         document.removeEventListener('drop', this.onDragEnd)
     }

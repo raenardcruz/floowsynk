@@ -83,8 +83,8 @@
         color: #666;
     }
 
-    .node:hover .handle-input::before,
-    .node:hover .handle-output::before {
+    .handle-input:hover::before,
+    .handle-output:hover::before {
         opacity: 1;
     }
 
