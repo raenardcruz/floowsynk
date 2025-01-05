@@ -27,6 +27,7 @@ export default class WorkflowCanvas {
     static onConnectEdge(edge: any, tabId: string) {
         const tab = this.findTabById(tabId);
         if (Workflow.store.activeTab.value != tabId) return;
+        edge.type = "custom";
         edge.animated = true;
         edge.tabId = tab.id;
         if (tab.edges) {

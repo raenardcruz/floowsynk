@@ -20,7 +20,6 @@
             </div>
             <div class="description">
                 <input type="text" v-model="tab.description" placeholder="Enter Description">
-                <button @click="console.log(tab)">Log Tab</button>
             </div>
         </div>
         <div class="content">
@@ -32,6 +31,7 @@
                 v-model:edges="tab.edges"
                 :only-render-visible-elements="false"
                 :node-types="nodeTypes"
+                :edge-types="edgeTypes"
                 @paneClick="test"
                 @connect="WorkflowCanvas.onConnectEdge($event, props.id)"
                 @drop="WorkflowCanvas.onDrop($event, props.id)"
@@ -58,6 +58,7 @@ import Sidebar from "@/components/Workflow/Sidebar/Workflow.Canvas.SideBar.vue";
 import LogModal from "@/components/Workflow/Modal/Workflow.Log.Modal.vue";
 import { ref } from "vue";
 import nodeTypes from "@/components/Workflow/Nodes/node.types";
+import edgeTypes from  "@/components/Workflow/Edges/egde.type";
 import DropzoneBackground from './Background/Dropzone.vue';
 
 const { isDragOver } = WorkflowCanvas.store;

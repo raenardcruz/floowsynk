@@ -1,4 +1,4 @@
-import { NodeComponent, NodeTypesObject } from '@vue-flow/core';
+import { NodeTypesObject } from '@vue-flow/core';
 import FloowsynkNode from './FloowsynkNode.vue';
 
 const nodeTypes: NodeTypesObject = {

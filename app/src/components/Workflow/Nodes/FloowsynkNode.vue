@@ -1,5 +1,5 @@
 <template>
-    <div class="node no-scroll" :style="nodestyle">
+    <div class="node no-scroll nopan" :style="nodestyle">
         <div class="icon" :style="{ background: icon.color }">
             <span class="material-symbols-outlined">{{ icon.name }}</span>
         </div>

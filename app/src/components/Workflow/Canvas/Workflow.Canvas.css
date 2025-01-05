@@ -60,11 +60,13 @@
   }
   .title-section .title input {
     font-size: 30px;
+    field-sizing: content;
   }
   
   .title-section .description input {
     font-size: 12px;
     color: grey;
+    field-sizing: content;
   }
   
   .title-section input {
