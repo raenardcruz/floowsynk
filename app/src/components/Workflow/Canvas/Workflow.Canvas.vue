@@ -20,6 +20,7 @@
             </div>
             <div class="description">
                 <input type="text" v-model="tab.description" placeholder="Enter Description">
+                <button @click="console.log(tab)">Log Tab</button>
             </div>
         </div>
         <div class="content">
@@ -27,8 +28,8 @@
             <sidebar />
             <VueFlow
                 class="vue-flow-container"
-                :nodes="tab.nodes"
-                :edges="tab.edges"
+                v-model:nodes="tab.nodes"
+                v-model:edges="tab.edges"
                 :only-render-visible-elements="false"
                 :node-types="nodeTypes"
                 @paneClick="test"
@@ -43,7 +44,7 @@
                     :style="{
                     backgroundColor: isDragOver ? '#e7f3ff' : 'transparent',
                     transition: 'background-color 0.2s ease', height: '100%'}">
-                    <p v-if="isDragOver">Drop here</p>
+                    <h2 v-if="isDragOver">DRAG AREA</h2>
                 </DropzoneBackground>
             </VueFlow>
         </div>
