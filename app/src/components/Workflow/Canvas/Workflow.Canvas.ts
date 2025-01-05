@@ -1,20 +1,25 @@
 import Workflow from "@/views/Workflow";
 import { Process } from "@/components/Common/Interfaces";
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import SidebarHelper from "@/components/Workflow/Sidebar/Workflow.Canvas.Sidebar";
 import { useVueFlow } from "@vue-flow/core";
 import Utilities from "@/components/Common/Utilities";
 
 const isDragOver = ref(false);
+const viewportPosition = ref({ x: 0, y: 0, zoom: 1 });
 
 export default class WorkflowCanvas {
     static readonly store = {
         activeTab: Workflow.store.activeTab,
         tabs: Workflow.store.tabs,
-        isDragOver
+        isDragOver,
+        viewportPosition,
     }
 
     static findTabById(tabId: string): Process {
+      watch(() => useVueFlow().viewport, (newViewport) => {
+        console.log("Viewport changed:", newViewport);
+    });
         const tab = Workflow.store.tabs.value.find(tab => tab.id === tabId);
         if (!tab) {
             throw new Error(`Tab with id ${tabId} not found`);
@@ -50,8 +55,8 @@ export default class WorkflowCanvas {
         const newNode = { ...node };
         const headerHeight = 159.4;
         const position = screenToFlowCoordinate({
-            x: event.clientX,
-            y: event.clientY - headerHeight,
+            x: (event.clientX - viewportPosition.value.x) / viewportPosition.value.zoom,
+            y: (event.clientY - headerHeight - viewportPosition.value.y) / viewportPosition.value.zoom,
         });
         if (node) {
             newNode.position = position;
@@ -85,5 +90,9 @@ export default class WorkflowCanvas {
             y: event.clientY - headerHeight,
         });
         node.position = position;
+    }
+
+    static onBackgroundMove(event: any) {
+      viewportPosition.value = event.flowTransform;
     }
 }

@@ -37,11 +37,12 @@
                 @dragover="WorkflowCanvas.onDragOver($event)"
                 @dragleave="WorkflowCanvas.onDragLeave()"
                 @node-drag-stop="WorkflowCanvas.onNodeDragEnd($event, props.id)"
+                @move="WorkflowCanvas.onBackgroundMove($event)"
                 no-wheel-class-name="no-scroll">
                 <DropzoneBackground
                     :style="{
                     backgroundColor: isDragOver ? '#e7f3ff' : 'transparent',
-                    transition: 'background-color 0.2s ease', height: '100vh'}">
+                    transition: 'background-color 0.2s ease', height: '100%'}">
                     <p v-if="isDragOver">Drop here</p>
                 </DropzoneBackground>
             </VueFlow>
