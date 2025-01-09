@@ -13,8 +13,7 @@
                         <datalist :id="tab.tags[index]">
                             <option :value="tag" v-for="tag in tags.filter(f => f != 'No Tags')"></option>
                         </datalist>
-                        <span class="material-symbols-outlined" style="color: #BC0F26;"
-                            @click="tab.tags.splice(index, 1)">close</span>
+                        <span class="material-symbols-outlined" style="color: #BC0F26;" @click="tab.tags.splice(index, 1)">close</span>
                     </div>
                 </div>
             </div>
@@ -32,6 +31,7 @@
                 :only-render-visible-elements="false"
                 :node-types="nodeTypes"
                 :edge-types="edgeTypes"
+                :snapToGrid="true"
                 @paneClick="test"
                 @connect="WorkflowCanvas.onConnectEdge($event, props.id)"
                 @drop="WorkflowCanvas.onDrop($event, props.id)"
@@ -46,30 +46,31 @@
                     transition: 'background-color 0.2s ease', height: '100%'}">
                     <h2 v-if="isDragOver">DRAG AREA</h2>
                 </DropzoneBackground>
+                <MiniMap />
             </VueFlow>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
+import { ref } from "vue";
 import { VueFlow } from '@vue-flow/core';
+import { MiniMap } from '@vue-flow/minimap';
 import WorkflowCanvas from "./Workflow.Canvas";
 import Sidebar from "@/components/Workflow/Sidebar/Workflow.Canvas.SideBar.vue";
 import LogModal from "@/components/Workflow/Modal/Workflow.Log.Modal.vue";
-import { ref } from "vue";
 import nodeTypes from "@/components/Workflow/Nodes/node.types";
-import edgeTypes from  "@/components/Workflow/Edges/egde.type";
+import edgeTypes from "@/components/Workflow/Edges/egde.type";
 import DropzoneBackground from './Background/Dropzone.vue';
 
 const { isDragOver } = WorkflowCanvas.store;
+const props = defineProps(['id']);
+const tab = WorkflowCanvas.findTabById(props.id) || { name: '', tags: [], description: '', nodes: [], edges: [] };
+const tags = ref<string[]>([]);
 
 const test = function () {
     console.log('test')
 }
-
-const tags = ref<string[]>([])
-const props = defineProps(['id']);
-const tab = WorkflowCanvas.findTabById(props.id) || { name: '', tags: [], description: '', nodes: [], edges: [] };
 </script>
 
 <style scoped src="./Workflow.Canvas.css"></style>
