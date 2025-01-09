@@ -38,6 +38,16 @@
    source ~/.zshrc  # Reload configuration
    ```
 
+3. Make zsh the default terminal:
+    ```bash
+    # Set default
+    chsh -s /usr/bin/zsh
+
+    # Validate
+    echo $SHELL
+    # should output /usr/bin/zsh
+    ```
+
 ### Development Tools
 1. Install essential packages:
    ```bash
