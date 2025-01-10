@@ -26,19 +26,21 @@
             <sidebar />
             <VueFlow
                 class="vue-flow-container"
+                tabindex="0"
                 v-model:nodes="tab.nodes"
                 v-model:edges="tab.edges"
                 :only-render-visible-elements="false"
                 :node-types="nodeTypes"
                 :edge-types="edgeTypes"
                 :snapToGrid="true"
-                @paneClick="test"
                 @connect="WorkflowCanvas.onConnectEdge($event, props.id)"
                 @drop="WorkflowCanvas.onDrop($event, props.id)"
                 @dragover="WorkflowCanvas.onDragOver($event)"
                 @dragleave="WorkflowCanvas.onDragLeave()"
                 @node-drag-stop="WorkflowCanvas.onNodeDragEnd($event, props.id)"
                 @move="WorkflowCanvas.onBackgroundMove($event)"
+                @mousemove="WorkflowCanvas.onMouseMove($event)"
+                @keydown="onKeyDown($event)"
                 no-wheel-class-name="no-scroll">
                 <DropzoneBackground
                     :style="{
@@ -54,7 +56,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { VueFlow } from '@vue-flow/core';
+import { VueFlow, useVueFlow } from '@vue-flow/core';
 import { MiniMap } from '@vue-flow/minimap';
 import WorkflowCanvas from "./Workflow.Canvas";
 import Sidebar from "@/components/Workflow/Sidebar/Workflow.Canvas.SideBar.vue";
@@ -64,13 +66,13 @@ import edgeTypes from "@/components/Workflow/Edges/egde.type";
 import DropzoneBackground from './Background/Dropzone.vue';
 
 const { isDragOver } = WorkflowCanvas.store;
+const { getSelectedNodes, getSelectedEdges } = useVueFlow();
 const props = defineProps(['id']);
 const tab = WorkflowCanvas.findTabById(props.id) || { name: '', tags: [], description: '', nodes: [], edges: [] };
 const tags = ref<string[]>([]);
-
-const test = function () {
-    console.log('test')
-}
+const onKeyDown = function (event: KeyboardEvent) {
+    WorkflowCanvas.onKeyDown(event, props.id, getSelectedNodes, getSelectedEdges);
+};
 </script>
 
 <style scoped src="./Workflow.Canvas.css"></style>
