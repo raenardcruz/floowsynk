@@ -294,6 +294,16 @@ export default class WorkflowCanvas {
           throw new Error(`Tab nodes not found for id ${tabId}`);
         }
         break;
+      case 'Delete':
+      case 'Backspace':
+        event.preventDefault();
+        if (tab.nodes) {
+            const nodesToDelete = selectedNodes.value.filter((node: any) => node.type !== 'start');
+            tab.nodes = tab.nodes.filter((node: any) => !nodesToDelete.includes(node));
+        } else {
+            throw new Error(`Tab nodes not found for id ${tabId}`);
+        }
+        break;
     }
   }
 }

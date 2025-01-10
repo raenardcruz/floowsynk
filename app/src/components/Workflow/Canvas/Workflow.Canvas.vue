@@ -41,6 +41,7 @@
                 @move="WorkflowCanvas.onBackgroundMove($event)"
                 @mousemove="WorkflowCanvas.onMouseMove($event)"
                 @keydown="onKeyDown($event)"
+                delete-key-code="false"
                 no-wheel-class-name="no-scroll">
                 <DropzoneBackground
                     :style="{
