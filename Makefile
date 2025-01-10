@@ -15,7 +15,7 @@ build:
 
 install:
 	@echo 💾 ... Installing all services...
-	@make -j2 install-ui install- db-install
+	@make -j2 install-ui install-server
 
 clean:
 	@echo 🧹 ... Cleaning up all services...
