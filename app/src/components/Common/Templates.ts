@@ -12,6 +12,7 @@ export default class Templates {
                 id: '0',
                 type: 'start',
                 label: 'Default',
+                draggable: false,
                 icon: { name: 'play_arrow', color: '#4CAF50' },
                 outputs: ['output'],
                 group: [1],

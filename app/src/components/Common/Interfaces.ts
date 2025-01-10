@@ -9,6 +9,7 @@ export interface Process {
     nodes?: Node[];
     edges?: any[];
     runMode?: boolean;
+    draggable?: boolean;
 }
 
 export interface Alert {
@@ -25,6 +26,7 @@ export interface Node {
     nodestyle?: string;
     inputs?: string[];
     outputs?: string[];
+    draggable?: boolean;
     icon: {  name: string; color: string; };
     position: {
         x: number;
