@@ -66,12 +66,12 @@ import edgeTypes from "@/components/Workflow/Edges/egde.type";
 import DropzoneBackground from './Background/Dropzone.vue';
 
 const { isDragOver } = WorkflowCanvas.store;
-const { getSelectedNodes, getSelectedEdges } = useVueFlow();
+const { getSelectedNodes, getSelectedEdges, addSelectedNodes } = useVueFlow();
 const props = defineProps(['id']);
 const tab = WorkflowCanvas.findTabById(props.id) || { name: '', tags: [], description: '', nodes: [], edges: [] };
 const tags = ref<string[]>([]);
 const onKeyDown = function (event: KeyboardEvent) {
-    WorkflowCanvas.onKeyDown(event, props.id, getSelectedNodes, getSelectedEdges);
+    WorkflowCanvas.onKeyDown(event, props.id, getSelectedNodes, getSelectedEdges, addSelectedNodes);
 };
 </script>
 
