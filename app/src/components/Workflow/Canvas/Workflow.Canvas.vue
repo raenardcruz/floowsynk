@@ -49,6 +49,20 @@
                     <h2 v-if="isDragOver">DRAG AREA</h2>
                 </DropzoneBackground>
                 <MiniMap />
+                <Controls style="display: flex;" position="top-right">
+                    <ControlButton title="Reset Transform" @click="resetTransform">
+                        <span class="material-symbols-outlined">refresh</span>
+                    </ControlButton>
+                    <ControlButton title="Delete">
+                        <span class="material-symbols-outlined">delete</span>
+                    </ControlButton>
+                    <ControlButton title="Save">
+                        <span class="material-symbols-outlined">save</span>
+                    </ControlButton>
+                    <ControlButton title="Run" style="background: #6FA071; color: #fff;">
+                        <span class="material-symbols-outlined">play_arrow</span>
+                    </ControlButton>
+                </Controls>
             </VueFlow>
         </div>
     </div>
@@ -64,14 +78,22 @@ import LogModal from "@/components/Workflow/Modal/Workflow.Log.Modal.vue";
 import nodeTypes from "@/components/Workflow/Nodes/node.types";
 import edgeTypes from "@/components/Workflow/Edges/egde.type";
 import DropzoneBackground from './Background/Dropzone.vue';
+import { ControlButton, Controls } from '@vue-flow/controls'
 
 const { isDragOver } = WorkflowCanvas.store;
-const { getSelectedNodes, getSelectedEdges, addSelectedNodes } = useVueFlow();
+const { 
+    getSelectedNodes,
+    getSelectedEdges,
+    addSelectedNodes,
+    setViewport } = useVueFlow();
 const props = defineProps(['id']);
 const tab = WorkflowCanvas.findTabById(props.id) || { name: '', tags: [], description: '', nodes: [], edges: [] };
 const tags = ref<string[]>([]);
 const onKeyDown = function (event: KeyboardEvent) {
     WorkflowCanvas.onKeyDown(event, props.id, getSelectedNodes, getSelectedEdges, addSelectedNodes);
+};
+const resetTransform = function () {
+    setViewport({ x: 0, y: 0, zoom: 1 })
 };
 </script>
 
