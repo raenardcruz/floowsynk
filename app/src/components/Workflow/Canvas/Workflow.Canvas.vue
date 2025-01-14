@@ -58,7 +58,7 @@
                         <span class="material-symbols-outlined">delete</span>
                     </ControlButton>
                     <ControlButton title="Save">
-                        <span class="material-symbols-outlined">save</span>
+                        <span class="material-symbols-outlined" @click="WorkflowCanvas.save(tab)">save</span>
                     </ControlButton>
                     <ControlButton title="Run" style="background: #6FA071; color: #fff;">
                         <span class="material-symbols-outlined">play_arrow</span>

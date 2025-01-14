@@ -33,7 +33,7 @@ func Login(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error getting user"})
 		return
 	}
-	if dbUser.ID == 0 {
+	if dbUser.ID == "" {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
 	}
@@ -45,7 +45,7 @@ func Login(c *gin.Context) {
 	}
 
 	if dbUser.Password == ePassword {
-		token := generateToken(user.Username, dbUser.Role)
+		token := generateToken(dbUser.ID, user.Username, dbUser.Role, time.Now().Add(time.Minute*15).UTC().Unix())
 		c.JSON(http.StatusOK, LoginResponse{Token: token})
 		return
 	}
@@ -53,11 +53,12 @@ func Login(c *gin.Context) {
 	c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
 }
 
-func generateToken(username, role string) string {
+func generateToken(id string, username, role string, expiry int64) string {
 	claims := jwt.MapClaims{
+		"id":       id,
 		"username": username,
 		"role":     role,
-		"exp":      time.Now().Add(time.Minute * 10).Unix(),
+		"exp":      expiry,
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -65,14 +66,38 @@ func generateToken(username, role string) string {
 	return tokenString
 }
 
-func validateToken(tokenString string) (*jwt.Token, error) {
+func validateToken(c *gin.Context) *ValidateResults {
+	tokenString := c.GetHeader("Authorization")
+	if tokenString == "" {
+		return &ValidateResults{status: http.StatusUnauthorized, message: "Unauthorized"}
+	}
+
 	token, err := jwt.ParseWithClaims(tokenString, jwt.MapClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return jwtKey, nil
 	})
-
-	if _, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		return token, nil
+	if err != nil {
+		return &ValidateResults{status: http.StatusUnauthorized, message: err.Error()}
 	}
 
-	return nil, err
+	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		return &ValidateResults{
+			id:       claims["id"].(string),
+			username: claims["username"].(string),
+			role:     claims["role"].(string),
+			status:   http.StatusOK,
+		}
+	}
+
+	return &ValidateResults{status: http.StatusUnauthorized, message: "Invalid token"}
+}
+
+func ExtendToken(c *gin.Context) {
+	results := validateToken(c)
+	if results.status != http.StatusOK {
+		c.JSON(results.status, gin.H{"error": results.message})
+		return
+	}
+
+	token := generateToken(results.id, results.username, results.role, time.Now().Add(time.Minute*15).UTC().Unix())
+	c.JSON(http.StatusOK, LoginResponse{Token: token})
 }

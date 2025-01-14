@@ -4,6 +4,7 @@ import { ref } from "vue";
 import SidebarHelper from "@/components/Workflow/Sidebar/Workflow.Canvas.Sidebar";
 import { useVueFlow } from "@vue-flow/core";
 import Utilities from "@/components/Common/Utilities";
+import axios from "axios";
 
 const isDragOver = ref(false);
 const clipBoard = ref({
@@ -306,4 +307,29 @@ export default class WorkflowCanvas {
         break;
     }
   }
+
+
+  /*
+    * ----------------------------------------------------------------------------
+    * SECTION: Control Button Actions
+    * Description: These functions are called by control buttons
+    * ----------------------------------------------------------------------------
+  */
+  static async save(tab: Process) {
+    let payload: any = {
+      id: tab.id,
+      name: tab.title,
+      description: tab.description,
+      nodes: tab.nodes,
+      edges: tab.edges
+    };
+    var headers = {
+      headers: {
+        'Authorization': `${localStorage.getItem('sessionToken')}`,
+        'Content-Type': 'application/json'
+      }
+    }
+    let resp: any = await axios.post('http://localhost:3000/api/workflow', payload, headers)
+    console.log(resp)
+}
 }

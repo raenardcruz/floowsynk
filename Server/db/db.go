@@ -12,10 +12,6 @@ import (
 	_ "github.com/lib/pq"
 )
 
-type DB struct {
-	conn *sql.DB
-}
-
 var (
 	host     = getEnv("DB_HOST", "localhost")
 	port     = getEnvAsInt("DB_PORT", 5432)
@@ -60,7 +56,7 @@ func (db *DB) InitDB() error {
 	log.Println("Creating tables...")
 	_, err := db.conn.Exec(`
 		CREATE TABLE IF NOT EXISTS users (
-			id SERIAL PRIMARY KEY,
+			id UUID PRIMARY KEY,
 			username VARCHAR(50) NOT NULL UNIQUE,
 			password VARCHAR(255) NOT NULL,
 			role VARCHAR(50) NOT NULL,
@@ -68,18 +64,35 @@ func (db *DB) InitDB() error {
 			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 			updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 		);
+		CREATE TABLE IF NOT EXISTS workflows (
+			id UUID PRIMARY KEY,
+			name VARCHAR(100) NOT NULL,
+			description TEXT,
+			nodes JSONB,
+			edges JSONB,
+			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+			updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+			created_by UUID NOT NULL,
+			updated_by UUID NOT NULL
+		);
+		CREATE TABLE IF NOT EXISTS workflow_profiles (
+			id SERIAL PRIMARY KEY,
+			workflow_id UUID NOT NULL,
+			name VARCHAR(100) NOT NULL,
+			profile JSONB
+		);
 	`)
 	if err != nil {
-		log.Fatalf("Error creating users table: %v", err)
+		log.Fatalf("Error creating tables: %v", err)
 		return err
 	}
-	admin, err := db.GetUser(1)
+	admin, err := db.GetUser("b5bd8424-fb52-4454-8102-488959a41ca8")
 	if err != nil {
 		log.Fatalf("Error getting user: %v", err)
 	}
-	if admin.ID == 0 {
+	if admin.ID == "" {
 		db.AddUser(UsersModel{
-			ID:       1,
+			ID:       "b5bd8424-fb52-4454-8102-488959a41ca8",
 			Username: "admin",
 			Password: "admin",
 			Role:     "admin",
