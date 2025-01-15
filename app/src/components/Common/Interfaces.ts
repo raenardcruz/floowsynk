@@ -10,6 +10,7 @@ export interface Process {
     edges?: any[];
     runMode?: boolean;
     draggable?: boolean;
+    isnew: boolean;
 }
 
 export interface Alert {
@@ -32,7 +33,7 @@ export interface Node {
         x: number;
         y: number;
     };
-    data: any;
+    data?: any;
 }
 
 export interface Group {

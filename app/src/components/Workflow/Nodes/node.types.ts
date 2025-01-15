@@ -2,7 +2,10 @@ import { NodeTypesObject } from '@vue-flow/core';
 import FloowsynkNode from './FloowsynkNode.vue';
 
 const nodeTypes: NodeTypesObject = {
-    start: FloowsynkNode,
+    defaultnode: FloowsynkNode,
+    webhook: FloowsynkNode,
+    interval: FloowsynkNode,
+    events: FloowsynkNode,
     setVariable: FloowsynkNode,
     condition: FloowsynkNode,
     loop: FloowsynkNode,

@@ -4,7 +4,7 @@
             <span class="material-symbols-outlined">{{ icon.name }}</span>
         </div>
         <div class="content">
-            <div class="label">{{ label }}</div>
+            <div class="label" v-if="label.length > 0">{{ label }}</div>
             <div class="type">{{ type }}</div>
         </div>
         <Handle

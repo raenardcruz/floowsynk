@@ -20,15 +20,16 @@ type UsersModel struct {
 }
 
 type WorkflowModel struct {
-	ID          string
-	Name        string
-	Description string
-	Nodes       []interface{}
-	Edges       []interface{}
-	CreatedAt   time.Time
-	CreatedBy   string
-	UpdatedAt   time.Time
-	UpdatedBy   string
+	ID          string        `json:"id"`
+	Name        string        `json:"name"`
+	Description string        `json:"description"`
+	Type        string        `json:"type"`
+	Nodes       []interface{} `json:"nodes"`
+	Edges       []interface{} `json:"edges"`
+	CreatedAt   time.Time     `json:"created_at"`
+	CreatedBy   string        `json:"created_by"`
+	UpdatedAt   time.Time     `json:"updated_at"`
+	UpdatedBy   string        `json:"updated_by"`
 }
 
 type WprkflowProfileModel struct {

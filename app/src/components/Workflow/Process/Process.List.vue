@@ -43,6 +43,7 @@
 <script setup lang="ts">
 import { ProcessList } from "./Process.List"
 const { search, filteredProcesses } = ProcessList.store;
+ProcessList.init();
 </script>
 
 <style scoped src="./Process.List.css"></style>

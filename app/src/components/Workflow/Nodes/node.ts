@@ -264,4 +264,50 @@ const nodes: Node[] = [
     }
 ]
 
-export default nodes;
+const startNodes: Node[] = [
+    {
+        id: '0',
+        type: 'defaultnode',
+        label: '',
+        draggable: false,
+        icon: { name: 'flag_circle', color: '#84ab86' },
+        outputs: ['output'],
+        group: [1],
+        position: { x: 100, y: 100 },
+    },
+    {
+        id: '0',
+        type: 'interval',
+        label: '',
+        draggable: false,
+        icon: { name: 'calendar_month', color: '#09a6d6' },
+        outputs: ['output'],
+        group: [1],
+        position: { x: 100, y: 100 },
+    },
+    {
+        id: '0',
+        type: 'webhook',
+        label: '',
+        draggable: false,
+        icon: { name: 'webhook', color: '#b86a11' },
+        outputs: ['output'],
+        group: [1],
+        position: { x: 100, y: 100 },
+    },
+    {
+        id: '0',
+        type: 'events',
+        label: '',
+        draggable: false,
+        icon: { name: 'event', color: '#A3245B' },
+        outputs: ['output'],
+        group: [1],
+        position: { x: 100, y: 100 },
+    },
+]
+
+export {
+    nodes,
+    startNodes
+};

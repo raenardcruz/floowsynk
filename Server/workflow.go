@@ -21,7 +21,7 @@ func GetWorkflow(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"data": w})
+	c.JSON(http.StatusOK, w)
 }
 
 func PostWorkflow(c *gin.Context) {
@@ -43,7 +43,7 @@ func PostWorkflow(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"data": workflow})
+	c.JSON(http.StatusCreated, workflow)
 }
 
 func listWorkflows(c *gin.Context) {
@@ -72,7 +72,7 @@ func listWorkflows(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"data": workflows})
+	c.JSON(http.StatusOK, gin.H{"items": workflows})
 }
 
 func UpdateWorkflow(c *gin.Context) {
@@ -81,7 +81,7 @@ func UpdateWorkflow(c *gin.Context) {
 		c.JSON(ValidateResults.status, gin.H{"error": ValidateResults.message})
 		return
 	}
-	id := c.Request.PathValue("id")
+	id := c.Params.ByName("id")
 
 	var workflow db.WorkflowModel
 	if err := c.ShouldBindJSON(&workflow); err != nil {
@@ -89,12 +89,13 @@ func UpdateWorkflow(c *gin.Context) {
 		return
 	}
 	workflow.ID = id
+	workflow.UpdatedBy = ValidateResults.id
 
 	if err := dbcon.UpdateWorkflow(workflow); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"data": workflow})
+	c.JSON(http.StatusOK, workflow)
 }
 
 func DeleteWorkflow(c *gin.Context) {

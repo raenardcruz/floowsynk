@@ -8,19 +8,22 @@ export default class Templates {
             type: 'default',
             title: 'Untitled',
             description: '',
-            nodes: [{
-                id: '0',
-                type: 'start',
-                label: 'Default',
-                draggable: false,
-                icon: { name: 'play_arrow', color: '#4CAF50' },
-                outputs: ['output'],
-                group: [1],
-                position: { x: 100, y: 100 },
-                data: { label: 'Node 1' },
-            }],
+            nodes: [],
             edges: [],
-            tags: []
+            tags: [],
+            isnew: true
+        }
+    }
+    static processFactory(data: any): Process {
+        return {
+            id: data.id,
+            type: data.type,
+            title: data.name,
+            description: data.description,
+            nodes: data.nodes,
+            edges: data.edges,
+            tags: [],
+            isnew: false,
         }
     }
 }

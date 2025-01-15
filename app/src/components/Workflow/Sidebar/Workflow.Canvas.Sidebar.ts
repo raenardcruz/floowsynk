@@ -1,5 +1,5 @@
 import { ref, computed } from "vue";
-import nodes from "@/components/Workflow/Nodes/node";
+import { nodes } from "@/components/Workflow/Nodes/node";
 import { Node } from "@/components/Common/Interfaces"
 import groups from "@/components/Workflow/Nodes/node.groups";
 import { stringify } from "querystring";

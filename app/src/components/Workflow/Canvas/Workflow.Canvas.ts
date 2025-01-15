@@ -317,7 +317,7 @@ export default class WorkflowCanvas {
   */
   static async save(tab: Process) {
     let payload: any = {
-      id: tab.id,
+      type: tab.type,
       name: tab.title,
       description: tab.description,
       nodes: tab.nodes,
@@ -329,7 +329,13 @@ export default class WorkflowCanvas {
         'Content-Type': 'application/json'
       }
     }
-    let resp: any = await axios.post('http://localhost:3000/api/workflow', payload, headers)
-    console.log(resp)
+
+    if (tab.isnew) {
+      payload.id = tab.id;
+      await axios.post('/api/workflow', payload, headers)
+      tab.isnew = false;
+    } else {
+      await axios.put(`/api/workflow/${tab.id}`, payload, headers)
+    }
 }
 }
