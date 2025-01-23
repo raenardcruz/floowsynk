@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"log"
 
+	"github.com/google/uuid"
 	"github.com/raenardcruz/floowsynk/crypto"
 )
 
@@ -31,8 +32,8 @@ func (db *DB) GetUsers() ([]UsersModel, error) {
 	return users, nil
 }
 
-func (db *DB) GetUser(u int) (UsersModel, error) {
-	log.Printf("Getting user with id %d", u)
+func (db *DB) GetUser(u string) (UsersModel, error) {
+	log.Printf("Getting user with id %s", u)
 	row := db.conn.QueryRow("SELECT * FROM users WHERE id = $1;", u)
 
 	var user UsersModel
@@ -53,12 +54,12 @@ func (db *DB) AddUser(u UsersModel) error {
 		log.Printf("Error encrypting password: %v", err)
 		return err
 	}
-	query := "INSERT INTO users (username, password, email, role, created_at, updated_at) VALUES ($1, $2, $3, $4, NOW(), NOW())"
-	args := []interface{}{u.Username, encPassword, u.Email, u.Role}
-	if u.ID != 0 {
-		query = "INSERT INTO users (id, username, password, email, role, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, NOW(), NOW())"
-		args = append([]interface{}{u.ID}, args...)
+	if u.ID == "" {
+		u.ID = uuid.New().String()
 	}
+	query := "INSERT INTO users (id, username, password, email, role, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, NOW(), NOW())"
+	args := []interface{}{u.ID, u.Username, encPassword, u.Email, u.Role}
+
 	_, err = db.conn.Exec(query, args...)
 	if err != nil {
 		log.Printf("Error adding user: %v", err)
@@ -83,7 +84,7 @@ func (db *DB) GetUserByUsername(username string) (UsersModel, error) {
 }
 
 func (db *DB) UpdateUser(u UsersModel) error {
-	log.Printf("Updating user with id %d", u.ID)
+	log.Printf("Updating user with id %s", u.ID)
 	encPassword, err := crypto.EncryptPassword(u.Password)
 	if err != nil {
 		log.Printf("Error encrypting password: %v", err)
@@ -97,8 +98,8 @@ func (db *DB) UpdateUser(u UsersModel) error {
 	return nil
 }
 
-func (db *DB) DeleteUser(u int) error {
-	log.Printf("Deleting user with id %d", u)
+func (db *DB) DeleteUser(u string) error {
+	log.Printf("Deleting user with id %s", u)
 	_, err := db.conn.Exec("DELETE FROM users WHERE id = $1", u)
 	if err != nil {
 		log.Printf("Error deleting user: %v", err)

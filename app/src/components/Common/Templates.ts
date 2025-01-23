@@ -8,7 +8,22 @@ export default class Templates {
             type: 'default',
             title: 'Untitled',
             description: '',
-            tags: []
+            nodes: [],
+            edges: [],
+            tags: [],
+            isnew: true
+        }
+    }
+    static processFactory(data: any): Process {
+        return {
+            id: data.id,
+            type: data.type,
+            title: data.name,
+            description: data.description,
+            nodes: data.nodes,
+            edges: data.edges,
+            tags: [],
+            isnew: false,
         }
     }
 }

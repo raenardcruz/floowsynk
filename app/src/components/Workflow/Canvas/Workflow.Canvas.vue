@@ -13,8 +13,7 @@
                         <datalist :id="tab.tags[index]">
                             <option :value="tag" v-for="tag in tags.filter(f => f != 'No Tags')"></option>
                         </datalist>
-                        <span class="material-symbols-outlined" style="color: #BC0F26;"
-                            @click="tab.tags.splice(index, 1)">close</span>
+                        <span class="material-symbols-outlined" style="color: #BC0F26;" @click="tab.tags.splice(index, 1)">close</span>
                     </div>
                 </div>
             </div>
@@ -25,10 +24,45 @@
         <div class="content">
             <log-modal :id="id" v-if="tab.showLogModal" />
             <sidebar />
-            <VueFlow :nodes="testNode" :edges="tab.edges" @paneClick="test" :only-render-visible-elements="false"
-                :node-types="nodeTypes" no-wheel-class-name="no-scroll" class="vue-flow-container">
-                <Background />
-                <Controls position="top-right">
+            <VueFlow
+                class="vue-flow-container"
+                tabindex="0"
+                v-model:nodes="tab.nodes"
+                v-model:edges="tab.edges"
+                :only-render-visible-elements="false"
+                :node-types="nodeTypes"
+                :edge-types="edgeTypes"
+                :snapToGrid="true"
+                @connect="WorkflowCanvas.onConnectEdge($event, props.id)"
+                @drop="WorkflowCanvas.onDrop($event, props.id)"
+                @dragover="WorkflowCanvas.onDragOver($event)"
+                @dragleave="WorkflowCanvas.onDragLeave()"
+                @node-drag-stop="WorkflowCanvas.onNodeDragEnd($event, props.id)"
+                @move="WorkflowCanvas.onBackgroundMove($event)"
+                @mousemove="WorkflowCanvas.onMouseMove($event)"
+                @keydown="onKeyDown($event)"
+                delete-key-code="false"
+                no-wheel-class-name="no-scroll">
+                <DropzoneBackground
+                    :style="{
+                    backgroundColor: isDragOver ? '#e7f3ff' : 'transparent',
+                    transition: 'background-color 0.2s ease', height: '100%'}">
+                    <h2 v-if="isDragOver">DRAG AREA</h2>
+                </DropzoneBackground>
+                <MiniMap />
+                <Controls style="display: flex;" position="top-right">
+                    <ControlButton title="Reset Transform" @click="resetTransform">
+                        <span class="material-symbols-outlined">refresh</span>
+                    </ControlButton>
+                    <ControlButton title="Delete">
+                        <span class="material-symbols-outlined">delete</span>
+                    </ControlButton>
+                    <ControlButton title="Save">
+                        <span class="material-symbols-outlined" @click="WorkflowCanvas.save(tab)">save</span>
+                    </ControlButton>
+                    <ControlButton title="Run" style="background: #6FA071; color: #fff;">
+                        <span class="material-symbols-outlined">play_arrow</span>
+                    </ControlButton>
                 </Controls>
             </VueFlow>
         </div>
@@ -36,46 +70,32 @@
 </template>
 
 <script setup lang="ts">
-import { VueFlow } from '@vue-flow/core'
-import { Background } from '@vue-flow/background'
+import { ref } from "vue";
+import { VueFlow, useVueFlow } from '@vue-flow/core';
+import { MiniMap } from '@vue-flow/minimap';
 import WorkflowCanvas from "./Workflow.Canvas";
 import Sidebar from "@/components/Workflow/Sidebar/Workflow.Canvas.SideBar.vue";
 import LogModal from "@/components/Workflow/Modal/Workflow.Log.Modal.vue";
-import { ref } from "vue";
 import nodeTypes from "@/components/Workflow/Nodes/node.types";
+import edgeTypes from "@/components/Workflow/Edges/egde.type";
+import DropzoneBackground from './Background/Dropzone.vue';
+import { ControlButton, Controls } from '@vue-flow/controls'
 
-const test = function () {
-    console.log('test')
-}
-
-const tags = ref<string[]>([])
+const { isDragOver } = WorkflowCanvas.store;
+const { 
+    getSelectedNodes,
+    getSelectedEdges,
+    addSelectedNodes,
+    setViewport } = useVueFlow();
 const props = defineProps(['id']);
-const tab = WorkflowCanvas.findTabById(props.id) || { name: '', tags: [], description: '' };
-
-const testNode = [{
-    id: '0',
-    type: 'start',
-    label: 'Default',
-    icon: { name: 'play_arrow', color: '#4CAF50' },
-    outputs: ['output'],
-    group: [1],
-    position: { x: 100, y: 100 },
-    data: { label: 'Node 1' },
-},
-{
-    id: '1', type: 'image', label: 'Output Image', position: { x: 300, y: 100 },
-    group: [7],
-    inputs: ['input1', 'input2'],
-    outputs: ['output1', 'output2'],
-    icon: {
-        name: "image",
-        color: "#98BC18"
-    },
-    data: {
-        status: "",
-        value: ""
-    }
-}]
+const tab = WorkflowCanvas.findTabById(props.id) || { name: '', tags: [], description: '', nodes: [], edges: [] };
+const tags = ref<string[]>([]);
+const onKeyDown = function (event: KeyboardEvent) {
+    WorkflowCanvas.onKeyDown(event, props.id, getSelectedNodes, getSelectedEdges, addSelectedNodes);
+};
+const resetTransform = function () {
+    setViewport({ x: 0, y: 0, zoom: 1 })
+};
 </script>
 
 <style scoped src="./Workflow.Canvas.css"></style>

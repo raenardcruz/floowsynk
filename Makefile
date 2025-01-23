@@ -1,7 +1,26 @@
-ui:
-	@echo "Running Front End"
-	cd app && @npm run dev
+.PHONY: all start build install clean
+# Define directories
+APP_DIR = app
+SERVER_DIR = Server
 
-serve:
-	@echo "Running Back End"
-	@cd Server && @go run .
+all: start
+
+start:
+	@echo 🚀 ... Starting all services...
+	@make -j2 start-ui start-server
+
+build:
+	@echo 🔧 ... Building all services...
+	@make -j2 build-ui build-server
+
+install:
+	@echo 💾 ... Installing all services...
+	@make -j2 install-ui install-server
+
+clean:
+	@echo 🧹 ... Cleaning up all services...
+	@make -j2 db-clean
+
+include $(APP_DIR)/app.mk
+include $(SERVER_DIR)/server.mk
+include $(SERVER_DIR)/db/db.mk

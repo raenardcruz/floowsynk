@@ -60,11 +60,13 @@
   }
   .title-section .title input {
     font-size: 30px;
+    field-sizing: content;
   }
   
   .title-section .description input {
     font-size: 12px;
     color: grey;
+    field-sizing: content;
   }
   
   .title-section input {
@@ -155,4 +157,8 @@
     transform: scale(1.02);
     box-shadow: 15px 15px 30px #868686,
       -15px -15px 30px #ffffff;
+  }
+
+  .vue-flow__controls-button:hover {
+    color: #222;
   }

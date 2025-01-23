@@ -12,7 +12,9 @@ const nodes: Node[] = [
             status: "",
             name: "",
             value: ""
-        }
+        },
+        inputs: ["input"],
+        outputs: ["output"]
     },
     {
         id: '', type: 'condition', label: 'Condition', position: { x: 0, y: 0 },
@@ -24,7 +26,9 @@ const nodes: Node[] = [
         data: {
             status: "",
             expression: ""
-        }
+        },
+        inputs: ["input"],
+        outputs: ["True", "False"]
     },
     {
         id: '', type: 'loop', label: 'Loop', position: { x: 0, y: 0 },
@@ -36,7 +40,9 @@ const nodes: Node[] = [
         data: {
             status: "",
             iteration: 1
-        }
+        },
+        inputs: ["input"],
+        outputs: ["output"]
     },
     {
         id: '', type: 'foreach', label: 'For Each', position: { x: 0, y: 0 },
@@ -48,7 +54,9 @@ const nodes: Node[] = [
         data: {
             status: "",
             listvar: ""
-        }
+        },
+        inputs: ["input"],
+        outputs: ["output"]
     },
     {
         id: '', type: 'while', label: 'While', position: { x: 0, y: 0 },
@@ -61,7 +69,9 @@ const nodes: Node[] = [
             status: "",
             expression: "",
             limit: 1000
-        }
+        },
+        inputs: ["input"],
+        outputs: ["output"]
     },
     {
         id: '', type: 'api', label: 'Rest API', position: { x: 0, y: 0 },
@@ -82,7 +92,9 @@ const nodes: Node[] = [
             ],
             payload: "",
             variable: ""
-        }
+        },
+        inputs: ["input"],
+        outputs: ["output"]
     },
     {
         id: '', type: 'log', label: 'Logging', position: { x: 0, y: 0 },
@@ -94,7 +106,9 @@ const nodes: Node[] = [
         data: {
             status: "",
             message: ""
-        }
+        },
+        inputs: ["input"],
+        outputs: ["output"]
     },
     {
         id: '', type: 'getGuid', label: 'Get Guid', position: { x: 0, y: 0 },
@@ -106,7 +120,9 @@ const nodes: Node[] = [
         data: {
             status: "",
             variable: ""
-        }
+        },
+        inputs: ["input"],
+        outputs: ["output"]
     },
     {
         id: '', type: 'text', label: 'Text', position: { x: 0, y: 0 },
@@ -119,7 +135,9 @@ const nodes: Node[] = [
             status: "",
             message: "",
             variable: ""
-        }
+        },
+        inputs: ["input"],
+        outputs: ["output"]
     },
     {
         id: '', type: 'math', label: 'math', position: { x: 0, y: 0 },
@@ -132,7 +150,9 @@ const nodes: Node[] = [
             status: "",
             expression: "",
             variable: ""
-        }
+        },
+        inputs: ["input"],
+        outputs: ["output"]
     },
     {
         id: '', type: 'list', label: 'List', position: { x: 0, y: 0 },
@@ -146,7 +166,9 @@ const nodes: Node[] = [
             type: "string",
             list: [],
             variable: ""
-        }
+        },
+        inputs: ["input"],
+        outputs: ["output"]
     },
     {
         id: '', type: 'count', label: 'List Count', position: { x: 0, y: 0 },
@@ -159,7 +181,9 @@ const nodes: Node[] = [
             status: "",
             list: [],
             variable: ""
-        }
+        },
+        inputs: ["input"],
+        outputs: ["output"]
     },
     {
         id: '', type: 'map', label: 'Map', position: { x: 0, y: 0 },
@@ -173,7 +197,9 @@ const nodes: Node[] = [
             list: [],
             template: "",
             variable: ""
-        }
+        },
+        inputs: ["input"],
+        outputs: ["output"]
     },
     {
         id: '', type: 'replace', label: 'Replace', position: { x: 0, y: 0 },
@@ -188,7 +214,9 @@ const nodes: Node[] = [
             pattern: "",
             replaceText: "",
             variable: ""
-        }
+        },
+        inputs: ["input"],
+        outputs: ["output"]
     },
     {
         id: '', type: 'regexfind', label: 'Find Regex', position: { x: 0, y: 0 },
@@ -202,7 +230,9 @@ const nodes: Node[] = [
             text: "",
             pattern: "",
             variable: ""
-        }
+        },
+        inputs: ["input"],
+        outputs: ["output"]
     },
     {
         id: '', type: 'image', label: 'Output Image', position: { x: 0, y: 0 },
@@ -214,7 +244,9 @@ const nodes: Node[] = [
         data: {
             status: "",
             value: ""
-        }
+        },
+        inputs: ["input"],
+        outputs: ["output"]
     },
     {
         id: '', type: 'subprocess', label: 'Sub Process', position: { x: 0, y: 0 },
@@ -226,8 +258,56 @@ const nodes: Node[] = [
         data: {
             status: "",
             value: ""
-        }
+        },
+        inputs: ["input"],
+        outputs: ["output"]
     }
 ]
 
-export default nodes;
+const startNodes: Node[] = [
+    {
+        id: '0',
+        type: 'defaultnode',
+        label: '',
+        draggable: false,
+        icon: { name: 'flag_circle', color: '#84ab86' },
+        outputs: ['output'],
+        group: [1],
+        position: { x: 100, y: 100 },
+    },
+    {
+        id: '0',
+        type: 'interval',
+        label: '',
+        draggable: false,
+        icon: { name: 'calendar_month', color: '#09a6d6' },
+        outputs: ['output'],
+        group: [1],
+        position: { x: 100, y: 100 },
+    },
+    {
+        id: '0',
+        type: 'webhook',
+        label: '',
+        draggable: false,
+        icon: { name: 'webhook', color: '#b86a11' },
+        outputs: ['output'],
+        group: [1],
+        position: { x: 100, y: 100 },
+    },
+    {
+        id: '0',
+        type: 'events',
+        label: '',
+        draggable: false,
+        icon: { name: 'event', color: '#A3245B' },
+        outputs: ['output'],
+        group: [1],
+        position: { x: 100, y: 100 },
+    },
+]
+
+export {
+    nodes,
+    startNodes
+};

@@ -109,3 +109,17 @@ button:hover {
 .mal {
   margin-left: 20px;
 }
+
+.vue-flow__handle {
+  background: #72716E;
+  height:12px;
+  width:5px;
+  border-radius: 2px;
+}
+.vue-flow__handle::after {
+  content: '';
+  display: flex;
+  position: absolute;
+  height: 20px;
+  width: 20px;
+}
