@@ -264,7 +264,7 @@ const nodes: Node[] = [
     }
 ]
 
-const startNodes: Node[] = [
+const startNodesArray: Node[] = [
     {
         id: '0',
         type: 'defaultnode',
@@ -306,6 +306,11 @@ const startNodes: Node[] = [
         position: { x: 100, y: 100 },
     },
 ]
+
+const startNodes: { [key: string]: Node } = {};
+startNodesArray.forEach(node => {
+    startNodes[node.type] = node;
+});
 
 export {
     nodes,

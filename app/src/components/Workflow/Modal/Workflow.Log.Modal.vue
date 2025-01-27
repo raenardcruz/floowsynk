@@ -42,7 +42,7 @@
 </template>
 
 <script setup lang="ts">
-import LogModal from "./Workflow.Log.Modal";
+import LogModal from "./Workflow.Modal";
 import { computed } from 'vue';
 
 interface Props {
@@ -65,3 +65,5 @@ const displayText = (message: string) => {
     return LogModal.displayText(message);
 };
 </script>
+
+<style scoped src="./Workflow.Modal.css"></style>

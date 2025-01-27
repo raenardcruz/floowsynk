@@ -1,7 +1,7 @@
 import { Process } from "@/components/Common/Interfaces";
 import Workflow from "@/views/Workflow"
 
-export default class WorkflowLogModal {
+export default class WorkflowModal {
     static utcDateToLocal(utcDate: string): string {
         const date = new Date(utcDate);
         const year = date.getFullYear();
