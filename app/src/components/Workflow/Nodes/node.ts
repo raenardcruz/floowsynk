@@ -281,6 +281,11 @@ const startNodesArray: Node[] = [
         label: '',
         draggable: false,
         icon: { name: 'calendar_month', color: '#09a6d6' },
+        data: {
+            type: 'seconds',
+            interval: 1,
+            weeks: [true, true, true, true, true, true, true],
+        },
         outputs: ['output'],
         group: [1],
         position: { x: 100, y: 100 },
@@ -291,6 +296,9 @@ const startNodesArray: Node[] = [
         label: '',
         draggable: false,
         icon: { name: 'webhook', color: '#b86a11' },
+        data: {
+            name: ''
+        },
         outputs: ['output'],
         group: [1],
         position: { x: 100, y: 100 },
@@ -301,6 +309,9 @@ const startNodesArray: Node[] = [
         label: '',
         draggable: false,
         icon: { name: 'event', color: '#A3245B' },
+        data: {
+            name: ''
+        },
         outputs: ['output'],
         group: [1],
         position: { x: 100, y: 100 },

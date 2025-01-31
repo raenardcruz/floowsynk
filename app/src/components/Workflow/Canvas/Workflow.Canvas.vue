@@ -17,14 +17,13 @@
                     </div>
                 </div>
             </div>
-            <div class="type">
-                <a @click="toggleTypeModal">
-                    <span class="material-symbols-outlined">edit</span>
-                </a>
-                <b>{{ tab.type }}</b>
-            </div>
             <div class="description">
                 <input type="text" v-model="tab.description" placeholder="Enter Description">
+            </div>
+            <div class="type">
+                <a @click="toggleTypeModal">
+                    Change Workflow Type
+                </a>
             </div>
         </div>
         <div class="content">
@@ -115,7 +114,6 @@ const toggleTypeModal = function () {
     .type {
         display: flex;
         align-items: center;
-        font: 10px;
         justify-content: center;
         align-items: center;
         text-transform: uppercase;
@@ -123,5 +121,6 @@ const toggleTypeModal = function () {
     }
     .type a {
         cursor: pointer;
+        font-size: 9px;
     }
 </style>
