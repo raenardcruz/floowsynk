@@ -33,6 +33,7 @@
     position: relative;
     display: flex;
     overflow: auto;
+    height: 100%;
 }
 table {
     width: fit-content !important;

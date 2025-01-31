@@ -17,12 +17,19 @@
                     </div>
                 </div>
             </div>
+            <div class="type">
+                <a @click="toggleTypeModal">
+                    <span class="material-symbols-outlined">edit</span>
+                </a>
+                <b>{{ tab.type }}</b>
+            </div>
             <div class="description">
                 <input type="text" v-model="tab.description" placeholder="Enter Description">
             </div>
         </div>
         <div class="content">
             <log-modal :id="id" v-if="tab.showLogModal" />
+            <process-type-modal :id="id" ref="typemodal" />
             <sidebar />
             <VueFlow
                 class="vue-flow-container"
@@ -79,7 +86,8 @@ import LogModal from "@/components/Workflow/Modal/Workflow.Log.Modal.vue";
 import nodeTypes from "@/components/Workflow/Nodes/node.types";
 import edgeTypes from "@/components/Workflow/Edges/egde.type";
 import DropzoneBackground from './Background/Dropzone.vue';
-import { ControlButton, Controls } from '@vue-flow/controls'
+import { ControlButton, Controls } from '@vue-flow/controls';
+import ProcessTypeModal from "@/components/Workflow/Modal/Workflow.Process.Type.Modal.vue";
 
 const { isDragOver } = WorkflowCanvas.store;
 const { 
@@ -96,6 +104,24 @@ const onKeyDown = function (event: KeyboardEvent) {
 const resetTransform = function () {
     setViewport({ x: 0, y: 0, zoom: 1 })
 };
+const typemodal = ref<InstanceType<typeof ProcessTypeModal> | null>(null);
+const toggleTypeModal = function () {
+    typemodal.value?.toggleModal();
+};
 </script>
 
 <style scoped src="./Workflow.Canvas.css"></style>
+<style scoped>
+    .type {
+        display: flex;
+        align-items: center;
+        font: 10px;
+        justify-content: center;
+        align-items: center;
+        text-transform: uppercase;
+        gap: 5px;
+    }
+    .type a {
+        cursor: pointer;
+    }
+</style>

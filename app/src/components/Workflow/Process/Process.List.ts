@@ -52,7 +52,7 @@ export class ProcessList {
         } = Workflow.store;
         let newProcess = Templates.Process();
         if (newProcess.nodes) {
-            newProcess.nodes.push(startNodes[0]);
+            newProcess.nodes.push(startNodes["defaultnode"]);
         }
         tabs.value.push(newProcess);
         activeTab.value = newProcess.id;
