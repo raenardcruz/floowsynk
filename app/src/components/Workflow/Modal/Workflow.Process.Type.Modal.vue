@@ -82,11 +82,17 @@
     const tab = reactive(TypeModal.getTab(props.id));
     const isSelected = (type: string) => tab.type === type;
     const toggleModal = () => isModalVisible.value = !isModalVisible.value;
+    const tempData = reactive<Record<string, any>>({});
     const selectNode = (type: string) => {
         if (tab.nodes) {
+            tempData[tab.type] = { ...tab.nodes[0].data };
             tab.type = type;
             let tmpNodes = [...tab.nodes];
             tmpNodes[0] = startNodes[type];
+            if (tempData[type]) {
+                tmpNodes[0].data = { ...tempData[type] };
+            }
+
             tab.nodes = [];
             setTimeout(() => tab.nodes = tmpNodes, 0);
         }
