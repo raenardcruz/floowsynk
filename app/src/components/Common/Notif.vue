@@ -1,5 +1,5 @@
 <template>
-    <div v-for="(alert, index) in alerts" :key="index" class="alert" :style="{bottom: `${(index + 1) * 40}px`}" :class="alert.status">
+    <div v-for="(alert, index) in alerts" :key="index" class="alert" :style="{bottom: `${(index + 1) * 50}px`}" :class="alert.status">
         {{ alert.message }}
     </div>
 </template>
@@ -20,8 +20,14 @@ const show = (msg: string, status="info") => {
     }, 5000);
 };
 
+const success = (msg: string) => show(msg, "success");
+const error = (msg: string) => show(msg, "error");
+const info = (msg: string) => show(msg, "info");
+
 defineExpose({
-    show
+    success,
+    error,
+    info
 });
 </script>
 
@@ -32,7 +38,7 @@ defineExpose({
     justify-content: center;
     align-items: center;
     padding: 10px;
-    border-radius: 20px;
+    border-radius: 10px;
     height: fit-content;
     width: fit-content;
     min-width: 100px;
@@ -44,13 +50,13 @@ defineExpose({
     animation: alert-entry 5.5s;
 }
 .info {
-    background: #3990C5;
+    background: #6199B9;
 }
 .success {
-    background: rgb(3, 122, 43);
+    background: #7AB961;
 }
 .error {
-    background: rgb(156, 51, 33);
+    background: #B96461;
 }
 
 @keyframes alert-entry {

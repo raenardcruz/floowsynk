@@ -315,27 +315,33 @@ export default class WorkflowCanvas {
     * Description: These functions are called by control buttons
     * ----------------------------------------------------------------------------
   */
-  static async save(tab: Process) {
-    let payload: any = {
-      type: tab.type,
-      name: tab.title,
-      description: tab.description,
-      nodes: tab.nodes,
-      edges: tab.edges
-    };
-    var headers = {
-      headers: {
-        'Authorization': `${localStorage.getItem('sessionToken')}`,
-        'Content-Type': 'application/json'
+  static async save(tab: Process, notif: any) {
+    try {
+      let payload: any = {
+        type: tab.type,
+        name: tab.title,
+        description: tab.description,
+        nodes: tab.nodes,
+        edges: tab.edges
+      };
+      var headers = {
+        headers: {
+          'Authorization': `${localStorage.getItem('sessionToken')}`,
+          'Content-Type': 'application/json'
+        }
       }
+  
+      if (tab.isnew) {
+        payload.id = tab.id;
+        await axios.post('/api/workflow', payload, headers)
+        tab.isnew = false;
+      } else {
+        await axios.put(`/api/workflow/${tab.id}`, payload, headers)
+      }
+      notif.success("Workflow saved successfully");
     }
-
-    if (tab.isnew) {
-      payload.id = tab.id;
-      await axios.post('/api/workflow', payload, headers)
-      tab.isnew = false;
-    } else {
-      await axios.put(`/api/workflow/${tab.id}`, payload, headers)
+    catch (error) {
+      notif.error("Failed to save workflow");
     }
 }
 }

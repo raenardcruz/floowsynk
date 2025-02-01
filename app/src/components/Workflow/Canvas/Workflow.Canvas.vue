@@ -30,6 +30,7 @@
             <log-modal :id="id" v-if="tab.showLogModal" />
             <process-type-modal :id="id" ref="typemodal" />
             <sidebar />
+            <notif ref="notif" />
             <VueFlow
                 class="vue-flow-container"
                 tabindex="0"
@@ -64,7 +65,7 @@
                         <span class="material-symbols-outlined">delete</span>
                     </ControlButton>
                     <ControlButton title="Save">
-                        <span class="material-symbols-outlined" @click="WorkflowCanvas.save(tab)">save</span>
+                        <span class="material-symbols-outlined" @click="WorkflowCanvas.save(tab, notif)">save</span>
                     </ControlButton>
                     <ControlButton title="Run" style="background: #6FA071; color: #fff;">
                         <span class="material-symbols-outlined">play_arrow</span>
@@ -87,6 +88,9 @@ import edgeTypes from "@/components/Workflow/Edges/egde.type";
 import DropzoneBackground from './Background/Dropzone.vue';
 import { ControlButton, Controls } from '@vue-flow/controls';
 import ProcessTypeModal from "@/components/Workflow/Modal/Workflow.Process.Type.Modal.vue";
+import Notif from "@/components/Common/Notif.vue";
+
+const notif = ref<InstanceType<typeof Notif> | null>(null);
 
 const { isDragOver } = WorkflowCanvas.store;
 const { 
