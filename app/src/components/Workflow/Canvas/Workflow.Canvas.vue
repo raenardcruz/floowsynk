@@ -30,7 +30,6 @@
             <log-modal :id="id" v-if="tab.showLogModal" />
             <process-type-modal :id="id" ref="typemodal" />
             <sidebar />
-            <notif ref="notif" />
             <VueFlow
                 class="vue-flow-container"
                 tabindex="0"
@@ -62,10 +61,10 @@
                         <span class="material-symbols-outlined">refresh</span>
                     </ControlButton>
                     <ControlButton title="Delete">
-                        <span class="material-symbols-outlined">delete</span>
+                        <span class="material-symbols-outlined" @click="WorkflowCanvas.delete(tab, props.notif)">delete</span>
                     </ControlButton>
                     <ControlButton title="Save">
-                        <span class="material-symbols-outlined" @click="WorkflowCanvas.save(tab, notif)">save</span>
+                        <span class="material-symbols-outlined" @click="WorkflowCanvas.save(tab, props.notif)">save</span>
                     </ControlButton>
                     <ControlButton title="Run" style="background: #6FA071; color: #fff;">
                         <span class="material-symbols-outlined">play_arrow</span>
@@ -77,7 +76,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, defineProps } from "vue";
 import { VueFlow, useVueFlow } from '@vue-flow/core';
 import { MiniMap } from '@vue-flow/minimap';
 import WorkflowCanvas from "./Workflow.Canvas";
@@ -88,9 +87,6 @@ import edgeTypes from "@/components/Workflow/Edges/egde.type";
 import DropzoneBackground from './Background/Dropzone.vue';
 import { ControlButton, Controls } from '@vue-flow/controls';
 import ProcessTypeModal from "@/components/Workflow/Modal/Workflow.Process.Type.Modal.vue";
-import Notif from "@/components/Common/Notif.vue";
-
-const notif = ref<InstanceType<typeof Notif> | null>(null);
 
 const { isDragOver } = WorkflowCanvas.store;
 const { 
@@ -98,7 +94,7 @@ const {
     getSelectedEdges,
     addSelectedNodes,
     setViewport } = useVueFlow();
-const props = defineProps(['id']);
+const props = defineProps(['id', 'notif']);
 const tab = WorkflowCanvas.findTabById(props.id) || { name: '', tags: [], description: '', nodes: [], edges: [] };
 const tags = ref<string[]>([]);
 const onKeyDown = function (event: KeyboardEvent) {

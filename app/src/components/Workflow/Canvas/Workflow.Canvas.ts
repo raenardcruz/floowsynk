@@ -5,6 +5,7 @@ import SidebarHelper from "@/components/Workflow/Sidebar/Workflow.Canvas.Sidebar
 import { useVueFlow } from "@vue-flow/core";
 import Utilities from "@/components/Common/Utilities";
 import axios from "axios";
+import {ProcessList} from "@/components/Workflow/Process/Process.List";
 
 const isDragOver = ref(false);
 const clipBoard = ref({
@@ -334,6 +335,7 @@ export default class WorkflowCanvas {
       if (tab.isnew) {
         payload.id = tab.id;
         await axios.post('/api/workflow', payload, headers)
+        await ProcessList.init();
         tab.isnew = false;
       } else {
         await axios.put(`/api/workflow/${tab.id}`, payload, headers)
@@ -343,5 +345,23 @@ export default class WorkflowCanvas {
     catch (error) {
       notif.error("Failed to save workflow");
     }
-}
+  }
+
+  static async delete(tab: Process, notif: any) {
+    try {
+      var headers = {
+        headers: {
+          'Authorization': `${localStorage.getItem('sessionToken')}`
+        }
+      }
+      await axios.delete(`/api/workflow/${tab.id}`, headers)
+      notif.success("Workflow deleted successfully");
+      await ProcessList.init();
+      Workflow.store.tabs.value.splice(Workflow.store.tabs.value.indexOf(tab), 1);
+      Workflow.store.activeTab.value = 'main';
+    }
+    catch (error) {
+      notif.error("Failed to delete workflow");
+    }
+  }
 }

@@ -32,6 +32,7 @@ export class ProcessList {
                 "Authorization": `${localStorage.getItem("sessionToken")}`
             }
         });
+        processes.value = [];
         resp.data.items.forEach((process: any) => {
             processes.value.push(Templates.processFactory(process));
         });
