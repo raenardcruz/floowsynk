@@ -104,7 +104,7 @@ func DeleteWorkflow(c *gin.Context) {
 		c.JSON(ValidateResults.status, gin.H{"error": ValidateResults.message})
 		return
 	}
-	id := c.Request.PathValue("id")
+	id := c.Params.ByName("id")
 
 	if err := dbcon.DeleteWorkflow(id); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
