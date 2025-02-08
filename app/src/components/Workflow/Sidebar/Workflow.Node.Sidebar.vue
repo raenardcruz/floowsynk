@@ -1,14 +1,21 @@
 <template>
-<div class="bg-content">
+<div id="nodesidebar" class="sidebar">
+    <slot></slot>
 </div>
 </template>
 
 <style scoped>
-    .bg-content {
-        position: absolute;
+    .sidebar {
+        position: relative;
         display: flex;
-        background: rgb(255,255,255,0.5);
-        width: 100vw;
-        height: 100vh;
+        right: 0;
+        flex-direction: column;
+        background: #f5f5f5;
+        width: 300px;
+        height: 100%;
+        box-shadow: -2px 0px 4px grey;
+        z-index: 100;
+        transition: all 0.3s ease;
     }
+
 </style>

@@ -18,18 +18,24 @@
                 </div>
             </div>
             <div class="description">
+                <span @click="show = !show">test</span>
                 <input type="text" v-model="tab.description" placeholder="Enter Description">
             </div>
-            <div class="type">
-                <a @click="toggleTypeModal">
-                    Change Workflow Type
-                </a>
-            </div>
         </div>
-        <div class="content">
+        <div class="content" id="canvas-content">
             <log-modal :id="id" v-if="tab.showLogModal" />
             <process-type-modal :id="id" ref="typemodal" />
             <sidebar />
+            <modal 
+                title="Modal Title" 
+                v-model:visible="show"
+                fontcolor="#fff"
+                bgcolor="red"
+                :onOk="handleOk" 
+                :onCancel="handleCancel" 
+            >
+                TEst data
+            </modal>
             <VueFlow
                 class="vue-flow-container"
                 tabindex="0"
@@ -69,6 +75,9 @@
                     <ControlButton title="Run" style="background: #6FA071; color: #fff;">
                         <span class="material-symbols-outlined">play_arrow</span>
                     </ControlButton>
+                    <ControlButton title="Log" @click="show = !show">
+                        <span class="material-symbols-outlined">history</span>
+                    </ControlButton>
                 </Controls>
             </VueFlow>
         </div>
@@ -87,6 +96,9 @@ import edgeTypes from "@/components/Workflow/Edges/egde.type";
 import DropzoneBackground from './Background/Dropzone.vue';
 import { ControlButton, Controls } from '@vue-flow/controls';
 import ProcessTypeModal from "@/components/Workflow/Modal/Workflow.Process.Type.Modal.vue";
+import Modal from "@/components/Common/UI/Modal.vue";
+
+const show = ref(true);
 
 const { isDragOver } = WorkflowCanvas.store;
 const { 
@@ -107,23 +119,17 @@ const typemodal = ref<InstanceType<typeof ProcessTypeModal> | null>(null);
 const toggleTypeModal = function () {
     typemodal.value?.toggleModal();
 };
+const handleOk = () => {
+    alert('test0');
+};
+
+const handleCancel = () => {
+    alert();
+};
+
 document.addEventListener('startClicked', () => {
     toggleTypeModal();
 });
 </script>
 
 <style scoped src="./Workflow.Canvas.css"></style>
-<style scoped>
-    .type {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        align-items: center;
-        text-transform: uppercase;
-        gap: 5px;
-    }
-    .type a {
-        cursor: pointer;
-        font-size: 9px;
-    }
-</style>

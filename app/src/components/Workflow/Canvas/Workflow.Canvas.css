@@ -91,6 +91,7 @@
     width: 100%;
     justify-content: center;
     align-items: end;
+    overflow: hidden;
   }
   
   .active {
