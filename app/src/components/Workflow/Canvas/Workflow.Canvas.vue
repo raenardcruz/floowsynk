@@ -107,6 +107,9 @@ const typemodal = ref<InstanceType<typeof ProcessTypeModal> | null>(null);
 const toggleTypeModal = function () {
     typemodal.value?.toggleModal();
 };
+document.addEventListener('startClicked', () => {
+    toggleTypeModal();
+});
 </script>
 
 <style scoped src="./Workflow.Canvas.css"></style>
