@@ -1,69 +1,69 @@
 <template>
-    <div class="background" v-if="isModalVisible">
-        <div class="modal">
-            <div class="modal-header">
-                <span class="material-symbols-outlined close-btn" @click="isModalVisible = false">close</span>
-                <h4 style="margin-bottom: 20px;">Process Type</h4>
-            </div>
-            <div class="modal-content">
-                <div class="content">
-                    <div class="type-content">
-                    <div class="card" :class="{ selected: isSelected('defaultnode') || isSelected('default') }" @click="selectNode('defaultnode')">
-                        <WorkflowIcon type="defaultnode" />
-                        <span>Default</span>
-                    </div>
-                    <div class="card" :class="{ selected: isSelected('webhook') }" @click="selectNode('webhook')">
-                        <WorkflowIcon type="webhook" />
-                        <span>Webhook</span>
-                    </div>
-                    <div class="card" :class="{ selected: isSelected('interval') }" @click="selectNode('interval')">
-                        <WorkflowIcon type="interval" />
-                        <span>Interval</span>
-                    </div>
-                    <div class="card" :class="{ selected: isSelected('events') }" @click="selectNode('events')">
-                        <WorkflowIcon type="events" />
-                        <span>Events</span>
-                    </div>
+    <div class="modalcontent">
+        <div class="content">
+            <div class="type-content">
+                <div class="card" :class="{ selected: isSelected('defaultnode') || isSelected('default') }"
+                    @click="selectNode('defaultnode')">
+                    <WorkflowIcon type="defaultnode" />
+                    <span>Default</span>
                 </div>
-                <div class="field-content">
-                    <div v-if="isSelected('defaultnode') || isSelected('default')">
-                        No additional fields required.
-                    </div>
-                    <div v-if="isSelected('events')" class="fields">
-                        <label for="name">Name: </label>
-                        <input type="text" class="input" id="name" placeholder="Event Name" v-model="tab.nodes[0].data.name" v-if="tab.nodes && tab.nodes[0]" />
-                    </div>
-                    <div v-else-if="isSelected('webhook')" class="fields">
-                        <label for="name">Name: </label>
-                        <input type="text" class="input" id="name" placeholder="Name of webhook" v-model="tab.nodes[0].data.name" v-if="tab.nodes && tab.nodes[0]" />
-                        <label for="url" v-if="tab.nodes && tab.nodes[0] && tab.nodes[0].data.name.length > 0">Webhook Url: </label>
-                        <span style="display: flex; align-items: center; position: relative;" v-if="tab.nodes && tab.nodes[0] && tab.nodes[0].data.name.length > 0">
-                            <input type="text" class="input" id="url" :value="webhookUrl" readonly />
-                            <span class="material-symbols-outlined copy-btn" @click="copyToClipboard">content_copy</span>
-                            <span class="tooltip" v-if="showTooltip">URL copied!</span>
-                        </span>
-                    </div>
-                    <div v-else-if="isSelected('interval')" class="fields">
-                        <label for="name">Type: </label>
-                        <Select class="input" v-model="tab.nodes[0].data.type" v-if="tab.nodes && tab.nodes[0]">
-                            <option value="seconds">Seconds</option>
-                            <option value="minutes">Minutes</option>
-                            <option value="hours">Hours</option>
-                            <option value="days">Days</option>
-                        </Select>
-                        <label for="interval">Interval: </label>
-                        <input type="number" class="input" id="interval" placeholder="Interval in seconds" v-model="tab.nodes[0].data.interval" v-if="tab.nodes && tab.nodes[0]" />
-                        <label>Days of the week:</label>
-                        <div class="week">
-                            <div class="weekdays">
-                                <label v-for="(day, index) in ['S', 'M', 'T', 'W', 'T', 'F', 'S']" :key="day" class="day-box">
-                                    <input type="checkbox" :value="day" v-model="tab.nodes[0].data.weeks[index]" v-if="tab.nodes && tab.nodes[0]" />
-                                    <span class="day-label">{{ day }}</span>
-                                </label>
-                            </div>
+                <div class="card" :class="{ selected: isSelected('webhook') }" @click="selectNode('webhook')">
+                    <WorkflowIcon type="webhook" />
+                    <span>Webhook</span>
+                </div>
+                <div class="card" :class="{ selected: isSelected('interval') }" @click="selectNode('interval')">
+                    <WorkflowIcon type="interval" />
+                    <span>Interval</span>
+                </div>
+                <div class="card" :class="{ selected: isSelected('events') }" @click="selectNode('events')">
+                    <WorkflowIcon type="events" />
+                    <span>Events</span>
+                </div>
+            </div>
+            <div class="field-content">
+                <div v-if="isSelected('defaultnode') || isSelected('default')">
+                    No additional fields required.
+                </div>
+                <div v-if="isSelected('events')" class="fields">
+                    <label for="name">Name: </label>
+                    <input type="text" class="input" id="name" placeholder="Event Name" v-model="tab.nodes[0].data.name"
+                        v-if="tab.nodes && tab.nodes[0]" />
+                </div>
+                <div v-else-if="isSelected('webhook')" class="fields">
+                    <label for="name">Name: </label>
+                    <input type="text" class="input" id="name" placeholder="Name of webhook"
+                        v-model="tab.nodes[0].data.name" v-if="tab.nodes && tab.nodes[0]" />
+                    <label for="url" v-if="tab.nodes && tab.nodes[0] && tab.nodes[0].data.name.length > 0">Webhook Url:
+                    </label>
+                    <span style="display: flex; align-items: center; position: relative;"
+                        v-if="tab.nodes && tab.nodes[0] && tab.nodes[0].data.name.length > 0">
+                        <input type="text" class="input" id="url" :value="webhookUrl" readonly />
+                        <span class="material-symbols-outlined copy-btn" @click="copyToClipboard">content_copy</span>
+                        <span class="tooltip" v-if="showTooltip">URL copied!</span>
+                    </span>
+                </div>
+                <div v-else-if="isSelected('interval')" class="fields">
+                    <label for="name">Type: </label>
+                    <Select class="input" v-model="tab.nodes[0].data.type" v-if="tab.nodes && tab.nodes[0]">
+                        <option value="seconds">Seconds</option>
+                        <option value="minutes">Minutes</option>
+                        <option value="hours">Hours</option>
+                        <option value="days">Days</option>
+                    </Select>
+                    <label for="interval">Interval: </label>
+                    <input type="number" class="input" id="interval" placeholder="Interval in seconds"
+                        v-model="tab.nodes[0].data.interval" v-if="tab.nodes && tab.nodes[0]" />
+                    <label>Days of the week:</label>
+                    <div class="week">
+                        <div class="weekdays">
+                            <label v-for="(day, index) in ['S', 'M', 'T', 'W', 'T', 'F', 'S']" :key="day"
+                                class="day-box">
+                                <input type="checkbox" :value="day" v-model="tab.nodes[0].data.weeks[index]"
+                                    v-if="tab.nodes && tab.nodes[0]" />
+                                <span class="day-label">{{ day }}</span>
+                            </label>
                         </div>
                     </div>
-                </div>
                 </div>
             </div>
         </div>
@@ -71,48 +71,74 @@
 </template>
 
 <script setup lang="ts">
-    import WorkflowIcon from '../Workflow.Icon.vue';
-    import TypeModal from './Workflow.Modal';
-    import { startNodes } from '../Nodes/node';
-    import { defineProps, ref, reactive, computed } from 'vue';
+import { defineProps, ref, reactive, computed } from 'vue';
+import WorkflowIcon from '@/components/Workflow/Workflow.Icon.vue';
+import TypeModal from './Workflow.Modal';
+import { startNodes } from '@/components/Workflow/Nodes/node';
 
-    const props = defineProps(['id']);
-    const isModalVisible = ref(false);
+// Props
+const props = defineProps(['id']);
 
-    const tab = reactive(TypeModal.getTab(props.id));
-    const isSelected = (type: string) => tab.type === type;
-    const toggleModal = () => isModalVisible.value = !isModalVisible.value;
-    const selectNode = (type: string) => {
-        if (tab.nodes) {
-            tab.type = type;
-            let tmpNodes = [...tab.nodes];
-            tmpNodes[0] = startNodes[type];
-            tab.nodes = [];
-            setTimeout(() => tab.nodes = tmpNodes, 0);
+// Reactive state
+const tab = reactive(TypeModal.getTab(props.id));
+const showTooltip = ref(false);
+
+// Computed properties
+const baseurl = window.location.origin;
+const webhookUrl = computed(() => 
+    tab.nodes && tab.nodes[0] 
+        ? `${baseurl}/api/webhook/${encodeURIComponent(tab.nodes[0].data.name)}` 
+        : ''
+);
+
+// Node selection functions
+const isSelected = (type: string) => tab.type == type;
+
+const selectNode = (type: string) => {
+    if (!tab.nodes) return;
+
+    tab.type = type;
+    let tmpNodes = [...tab.nodes];
+    const newNode = {
+        ...startNodes[type],
+        data: {
+            ...startNodes[type].data,
+            name: tab.nodes[0]?.data?.name || '',
         }
     };
-    const baseurl = window.location.origin;
-    const webhookUrl = computed(() => tab.nodes && tab.nodes[0] ? `${baseurl}/api/webhook/${encodeURIComponent(tab.nodes[0].data.name)}` : '')
+    
+    if (type === 'interval') {
+        newNode.data.type = tab.nodes[0]?.data?.type || 'minutes';
+        newNode.data.interval = tab.nodes[0]?.data?.interval || 1;
+        newNode.data.weeks = tab.nodes[0]?.data?.weeks || Array(7).fill(false);
+    }
+    
+    tmpNodes[0] = newNode;
+    tab.nodes = tmpNodes;
+};
 
-    const showTooltip = ref(false);
-
-    const copyToClipboard = async () => {
-        try {
-            await navigator.clipboard.writeText(webhookUrl.value);
-            showTooltip.value = true;
-            setTimeout(() => {
-                showTooltip.value = false;
-            }, 2000);
-        } catch (err) {
-            console.error('Failed to copy URL:', err);
-        }
-    };
-
-    defineExpose({ toggleModal });
+// Utility functions
+const copyToClipboard = async () => {
+    try {
+        await navigator.clipboard.writeText(webhookUrl.value);
+        showTooltip.value = true;
+        setTimeout(() => {
+            showTooltip.value = false;
+        }, 2000);
+    } catch (err) {
+        console.error('Failed to copy URL:', err);
+    }
+};
 </script>
 
-<style scoped src="./Workflow.Modal.css"></style>
 <style scoped>
+.modalcontent {
+    position: relative;
+    display: flex;
+    overflow: auto;
+    height: 100%;
+    width: 100%;
+}
 .content {
     position: relative;
     display: flex;
@@ -122,6 +148,7 @@
     height: 100%;
     border-top: solid 1px grey;
 }
+
 .content .type-content {
     position: relative;
     display: grid;
@@ -132,7 +159,9 @@
     grid-gap: 20px;
     width: 100%;
     height: fit-content;
+    padding: 10px;
 }
+
 .content .type-content .card {
     position: relative;
     display: flex;
@@ -141,16 +170,19 @@
     background: #f5f5f5;
     padding: 20px;
     border-radius: 5px;
-    box-shadow: 3px 3px 5px #868686,-3px -3px 5px #fff;
+    box-shadow: 3px 3px 5px #868686, -3px -3px 5px #fff;
     cursor: pointer;
     transition: all 0.3s ease;
 }
+
 .content .type-content .card:hover {
-    box-shadow: 3px 3px 10px #868686,-3px -3px 10px #fff;
+    box-shadow: 3px 3px 10px #868686, -3px -3px 10px #fff;
 }
+
 .content .type-content .card.selected {
     box-shadow: inset 3px 3px 5px #868686, inset -3px -3px 5px #fff !important;
 }
+
 .content .field-content {
     position: relative;
     display: flex;
@@ -159,7 +191,9 @@
     width: 100%;
     height: 100%;
     border-left: solid 1px grey;
+    padding: 10px;
 }
+
 .fields {
     position: relative;
     display: grid;
@@ -171,6 +205,7 @@
     width: 100%;
     height: fit-content;
 }
+
 .fields .input {
     position: relative;
     display: block;
@@ -181,6 +216,7 @@
     box-shadow: inset 3px 3px 5px #868686, inset -3px -3px 5px #fff;
     transition: all 0.3s ease;
 }
+
 .week {
     position: relative;
     grid-column: span 2;
@@ -221,21 +257,23 @@
     height: 100%;
     border-radius: 50%;
     background: #f5f5f5;
-    box-shadow: 3px 3px 5px #868686,-3px -3px 5px #fff;
+    box-shadow: 3px 3px 5px #868686, -3px -3px 5px #fff;
     transition: all 0.3s ease;
 }
 
-.day-box input[type="checkbox"]:checked + .day-label {
+.day-box input[type="checkbox"]:checked+.day-label {
     box-shadow: inset 3px 3px 5px #868686, inset -3px -3px 5px #fff;
     color: #4a90e2;
 }
 
 .day-box:hover .day-label {
-    box-shadow: 3px 3px 10px #868686,-3px -3px 10px #fff;
+    box-shadow: 3px 3px 10px #868686, -3px -3px 10px #fff;
 }
+
 .copy-btn {
     cursor: pointer;
 }
+
 .tooltip {
     position: absolute;
     right: -50px;

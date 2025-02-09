@@ -9,7 +9,6 @@ const nodes: Node[] = [
             color: "green"
         },
         data: {
-            status: "",
             name: "",
             value: ""
         },
@@ -24,7 +23,6 @@ const nodes: Node[] = [
             color: "red"
         },
         data: {
-            status: "",
             expression: ""
         },
         inputs: ["input"],
@@ -38,7 +36,6 @@ const nodes: Node[] = [
             color: "#2864A9"
         },
         data: {
-            status: "",
             iteration: 1
         },
         inputs: ["input"],
@@ -52,7 +49,6 @@ const nodes: Node[] = [
             color: "#2864A9"
         },
         data: {
-            status: "",
             listvar: ""
         },
         inputs: ["input"],
@@ -66,7 +62,6 @@ const nodes: Node[] = [
             color: "#2864A9"
         },
         data: {
-            status: "",
             expression: "",
             limit: 1000
         },
@@ -81,7 +76,6 @@ const nodes: Node[] = [
             color: "#87B359"
         },
         data: {
-            status: "",
             url: "",
             method: "GET",
             headers: [
@@ -104,7 +98,6 @@ const nodes: Node[] = [
             color: "#222"
         },
         data: {
-            status: "",
             message: ""
         },
         inputs: ["input"],
@@ -118,7 +111,6 @@ const nodes: Node[] = [
             color: "#3477B9"
         },
         data: {
-            status: "",
             variable: ""
         },
         inputs: ["input"],
@@ -132,7 +124,6 @@ const nodes: Node[] = [
             color: "#9A9A9A"
         },
         data: {
-            status: "",
             message: "",
             variable: ""
         },
@@ -147,7 +138,6 @@ const nodes: Node[] = [
             color: "#D36C6C"
         },
         data: {
-            status: "",
             expression: "",
             variable: ""
         },
@@ -162,7 +152,6 @@ const nodes: Node[] = [
             color: "#85B158"
         },
         data: {
-            status: "",
             type: "string",
             list: [],
             variable: ""
@@ -178,7 +167,6 @@ const nodes: Node[] = [
             color: "#979797"
         },
         data: {
-            status: "",
             list: [],
             variable: ""
         },
@@ -193,7 +181,6 @@ const nodes: Node[] = [
             color: "#85B158"
         },
         data: {
-            status: "",
             list: [],
             template: "",
             variable: ""
@@ -209,7 +196,6 @@ const nodes: Node[] = [
             color: "#77584C"
         },
         data: {
-            status: "",
             text: "",
             pattern: "",
             replaceText: "",
@@ -226,7 +212,6 @@ const nodes: Node[] = [
             color: "#057D72"
         },
         data: {
-            status: "",
             text: "",
             pattern: "",
             variable: ""
@@ -242,7 +227,6 @@ const nodes: Node[] = [
             color: "#98BC18"
         },
         data: {
-            status: "",
             value: ""
         },
         inputs: ["input"],
@@ -256,7 +240,6 @@ const nodes: Node[] = [
             color: "#1986BD"
         },
         data: {
-            status: "",
             value: ""
         },
         inputs: ["input"],

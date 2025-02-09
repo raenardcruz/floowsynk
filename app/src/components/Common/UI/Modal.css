@@ -9,6 +9,7 @@
     z-index: -1;
     opacity: 0;
     transition: all 0.3s ease;
+    backdrop-filter: blur(2px);
 }
 .background.show {
     opacity: 1;
@@ -20,16 +21,17 @@
     display: flex;
     flex-direction: column;
     height: 90%;
-    width: 40%;
+    width: 60%;
     min-height: 100px;
     min-width: 300px;
     border-radius: 10px;
-    background: #fff;
+    background: #E6E5E5;
     overflow: auto;
     animation: modalentry 0.5s;
     user-select: text;
     transform: translateY(-50px);
     transition: all 0.5s ease-in-out;
+    box-shadow: 4px 4px 8px #585D59;
 }
 .background.show .modal {
     transform: translateY(0);
@@ -37,14 +39,25 @@
 .background .modal .modal-header {
     position: relative;
     display: flex;
+    flex-direction: column;
     justify-content: baseline;
-    height: 60px;
-    font-size: 20px;
+    height: fit-content;
     padding: 20px;
     border-bottom:  1px solid #ddd;
 }
+.modal-header .title {
+    font-size: 20px;
+    font-weight: 600;
+    height: fit-content;
+}
+.modal-header .caption {
+    font-size: 12px;
+    font-weight: 400;
+    color: #666;
+}
 .modal-header .btn-close {
     position: absolute;
+    cursor: pointer;
     right: 10px;
     top: 10px;
     transition: 0.3s;
@@ -67,9 +80,10 @@
 }
 .modal-actions button {
     margin: 0 10px;
-    height: 30px;
+    height: 35px;
     width: 80%;
     cursor: pointer;
+    border-radius: 50px;
 }
 .btn-primary {
     background: #3990C5;
