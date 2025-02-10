@@ -96,25 +96,12 @@ const isSelected = (type: string) => tab.type == type;
 
 const selectNode = (type: string) => {
     if (!tab.nodes) return;
-
+    
     tab.type = type;
     let tmpNodes = [...tab.nodes];
-    const newNode = {
-        ...startNodes[type],
-        data: {
-            ...startNodes[type].data,
-            name: tab.nodes[0]?.data?.name || '',
-        }
-    };
-    
-    if (type === 'interval') {
-        newNode.data.type = tab.nodes[0]?.data?.type || 'minutes';
-        newNode.data.interval = tab.nodes[0]?.data?.interval || 1;
-        newNode.data.weeks = tab.nodes[0]?.data?.weeks || Array(7).fill(false);
-    }
-    
-    tmpNodes[0] = newNode;
-    tab.nodes = tmpNodes;
+    tmpNodes[0] = startNodes[type];
+    tab.nodes = [];
+    setTimeout(() => tab.nodes = tmpNodes, 0);
 };
 
 // Utility functions
