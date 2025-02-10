@@ -5,7 +5,7 @@
         </div>
         <div class="content">
             <div class="label" v-if="label.length > 0">{{ label }}</div>
-            <div class="type">{{ type }}</div>
+            <div class="type">{{ nodetype }}</div>
         </div>
         <Handle class="handle-input" v-if="outputs" v-for="(input, index) in inputs" :key="input" :id="input"
             :data-output="input" type="target" :position="Position.Left"
@@ -27,6 +27,7 @@
                     </legend>
                     <input class="sidebar-input" type="text" v-model="node.data[key]" v-if="(typeof value) == 'string'"/>
                     <input class="sidebar-input" type="number" v-model="node.data[key]" v-if="(typeof value) == 'number'"/>
+                    {{ node.data }}
                 </div>
             </div>
         </Sidebar>
@@ -35,7 +36,7 @@
 
 <script setup lang="ts">
 import { ref, watch } from "vue";
-import { Handle, Position, useNode, useVueFlow } from '@vue-flow/core';
+import { Handle, Position, useNode } from '@vue-flow/core';
 import { Node } from "@/components/Common/Interfaces";
 import Sidebar from "@/components/Common/UI/Sidebar.vue";
 
@@ -43,9 +44,9 @@ const {
     node
 } = useNode()
 
-const {
-    id
-} = useVueFlow()
+const props = defineProps<{
+    tabid: string;
+}>();
 
 const show = ref(false);
 
@@ -70,14 +71,14 @@ watch(() => node.dragging, (value) => {
 
 const clickhandler = () => {
     if (node.id == '0') {
-        const event = new CustomEvent('type-select', { detail: { tabid: id } });
+        const event = new CustomEvent('type-select', { detail: { tabid: props.tabid } });
         window.dispatchEvent(event);
     } else {
         show.value = true;
     }
 }
 
-const { icon, type, label, outputs, inputs, nodestyle } = node as unknown as Node;
+const { icon, nodetype, label, outputs, inputs, nodestyle } = node as unknown as Node;
 </script>
 
 <style scoped src="./FloowsynkNode.css"></style>

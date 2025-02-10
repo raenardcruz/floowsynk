@@ -29,7 +29,7 @@
                 <WorkflowProcessTypeModal :id="tab.id" />
             </Modal>
             <VueFlow class="vue-flow-container" tabindex="0" v-model:nodes="tab.nodes" v-model:edges="tab.edges"
-                :id="tab.id" :only-render-visible-elements="false" :node-types="nodeTypes" :edge-types="edgeTypes"
+                :only-render-visible-elements="false" :edge-types="edgeTypes"
                 :snapToGrid="true" @connect="WorkflowCanvas.onConnectEdge($event, props.id)"
                 @drop="WorkflowCanvas.onDrop($event, props.id)" @dragover="WorkflowCanvas.onDragOver($event)"
                 @dragleave="WorkflowCanvas.onDragLeave()"
@@ -59,6 +59,9 @@
                         <span class="material-symbols-outlined">play_arrow</span>
                     </ControlButton>
                 </Controls>
+                <template #node-default="nodeProps">
+                    <FloowsynkNode v-bind="nodeProps" :tabid="tab.id" />
+                </template>
             </VueFlow>
         </div>
     </div>
@@ -71,12 +74,12 @@ import { MiniMap } from '@vue-flow/minimap';
 import WorkflowCanvas from "./Workflow.Canvas";
 import Sidebar from "@/components/Workflow/Sidebar/Workflow.Canvas.SideBar.vue";
 import LogModal from "@/components/Workflow/Modal/Workflow.Log.Modal.vue";
-import nodeTypes from "@/components/Workflow/Nodes/node.types";
 import edgeTypes from "@/components/Workflow/Edges/egde.type";
 import DropzoneBackground from './Background/Dropzone.vue';
 import { ControlButton, Controls } from '@vue-flow/controls';
 import Modal from "@/components/Common/UI/Modal.vue"
 import WorkflowProcessTypeModal from '@/components/Workflow/Modal/Workflow.Process.Type.Modal.vue';
+import FloowsynkNode from "../Nodes/FloowsynkNode.vue";
 
 const { isDragOver } = WorkflowCanvas.store;
 const {
@@ -88,6 +91,7 @@ const props = defineProps(['id', 'notif']);
 const tab = WorkflowCanvas.findTabById(props.id) || { name: '', tags: [], description: '', nodes: [], edges: [] };
 const tags = ref<string[]>([]);
 const onKeyDown = function (event: KeyboardEvent) {
+    console.log(getSelectedNodes.value)
     WorkflowCanvas.onKeyDown(event, props.id, getSelectedNodes, getSelectedEdges, addSelectedNodes);
 };
 const resetTransform = function () {

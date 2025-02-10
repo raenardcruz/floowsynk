@@ -123,3 +123,10 @@ button:hover {
   height: 20px;
   width: 20px;
 }
+.vue-flow__node-default {
+  --vf-box-shadow: none;
+  padding: 0px !important;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+}

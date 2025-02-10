@@ -15,7 +15,7 @@
                         <span class="material-symbols-outlined">{{ node.icon.name }}</span>
                     </div>
                     <div class="node-type">
-                        {{ node.type }}
+                        {{ node.nodetype }}
                     </div>
                 </div>
             </div>
@@ -34,7 +34,7 @@
                             <span class="material-symbols-outlined">{{ node.icon.name }}</span>
                         </div>
                         <div class="node-type">
-                            {{ node.type }}
+                            {{ node.nodetype }}
                         </div>
                     </div>
                 </div>
@@ -55,7 +55,7 @@
                             <span class="material-symbols-outlined">{{ node.icon.name }}</span>
                         </div>
                         <div class="node-type">
-                            {{ node.type }}
+                            {{ node.nodetype }}
                         </div>
                     </div>
                 </div>
