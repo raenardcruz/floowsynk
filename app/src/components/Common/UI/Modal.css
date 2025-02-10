@@ -1,0 +1,95 @@
+.background {
+    position: absolute;
+    display: flex;
+    height: 100%;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.525);
+    z-index: -1;
+    opacity: 0;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(2px);
+}
+.background.show {
+    opacity: 1;
+    z-index: 100;
+}
+
+.background .modal {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 90%;
+    width: 60%;
+    min-height: 100px;
+    min-width: 300px;
+    border-radius: 10px;
+    background: #E6E5E5;
+    overflow: auto;
+    animation: modalentry 0.5s;
+    user-select: text;
+    transform: translateY(-50px);
+    transition: all 0.5s ease-in-out;
+    box-shadow: 4px 4px 8px #585D59;
+}
+.background.show .modal {
+    transform: translateY(0);
+}
+.background .modal .modal-header {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: baseline;
+    height: fit-content;
+    padding: 20px;
+    border-bottom:  1px solid #ddd;
+}
+.modal-header .title {
+    font-size: 20px;
+    font-weight: 600;
+    height: fit-content;
+}
+.modal-header .caption {
+    font-size: 12px;
+    font-weight: 400;
+    color: #666;
+}
+.modal-header .btn-close {
+    position: absolute;
+    cursor: pointer;
+    right: 10px;
+    top: 10px;
+    transition: 0.3s;
+    z-index: 102;
+}
+
+.background .modal .modal-content {
+    position: relative;
+    display: flex;
+    overflow: auto;
+    height: 100%;
+    padding: 10px;
+}
+.background .modal .modal-actions {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    height: 60px;
+    padding: 20px;
+}
+.modal-actions button {
+    margin: 0 10px;
+    height: 35px;
+    width: 80%;
+    cursor: pointer;
+    border-radius: 50px;
+}
+.btn-primary {
+    background: #3990C5;
+    color: #fff;
+}
+.btn-cancel {
+    background: #C2595B;
+    color: #fff;
+}

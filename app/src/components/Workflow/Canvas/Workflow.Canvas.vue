@@ -13,46 +13,33 @@
                         <datalist :id="tab.tags[index]">
                             <option :value="tag" v-for="tag in tags.filter(f => f != 'No Tags')"></option>
                         </datalist>
-                        <span class="material-symbols-outlined" style="color: #BC0F26;" @click="tab.tags.splice(index, 1)">close</span>
+                        <span class="material-symbols-outlined" style="color: #BC0F26;"
+                            @click="tab.tags.splice(index, 1)">close</span>
                     </div>
                 </div>
             </div>
             <div class="description">
                 <input type="text" v-model="tab.description" placeholder="Enter Description">
             </div>
-            <div class="type">
-                <a @click="toggleTypeModal">
-                    Change Workflow Type
-                </a>
-            </div>
         </div>
-        <div class="content">
+        <div class="content" id="canvas-content">
             <log-modal :id="id" v-if="tab.showLogModal" />
-            <process-type-modal :id="id" ref="typemodal" />
             <sidebar />
-            <VueFlow
-                class="vue-flow-container"
-                tabindex="0"
-                v-model:nodes="tab.nodes"
-                v-model:edges="tab.edges"
-                :only-render-visible-elements="false"
-                :node-types="nodeTypes"
-                :edge-types="edgeTypes"
-                :snapToGrid="true"
-                @connect="WorkflowCanvas.onConnectEdge($event, props.id)"
-                @drop="WorkflowCanvas.onDrop($event, props.id)"
-                @dragover="WorkflowCanvas.onDragOver($event)"
+            <Modal title="Process Type" caption="Please select the workflow process type." v-model:visible="show">
+                <WorkflowProcessTypeModal :id="tab.id" />
+            </Modal>
+            <VueFlow class="vue-flow-container" tabindex="0" v-model:nodes="tab.nodes" v-model:edges="tab.edges"
+                :id="tab.id" :only-render-visible-elements="false" :node-types="nodeTypes" :edge-types="edgeTypes"
+                :snapToGrid="true" @connect="WorkflowCanvas.onConnectEdge($event, props.id)"
+                @drop="WorkflowCanvas.onDrop($event, props.id)" @dragover="WorkflowCanvas.onDragOver($event)"
                 @dragleave="WorkflowCanvas.onDragLeave()"
                 @node-drag-stop="WorkflowCanvas.onNodeDragEnd($event, props.id)"
-                @move="WorkflowCanvas.onBackgroundMove($event)"
-                @mousemove="WorkflowCanvas.onMouseMove($event)"
-                @keydown="onKeyDown($event)"
-                delete-key-code="false"
-                no-wheel-class-name="no-scroll">
-                <DropzoneBackground
-                    :style="{
+                @move="WorkflowCanvas.onBackgroundMove($event)" @mousemove="WorkflowCanvas.onMouseMove($event)"
+                @keydown="onKeyDown($event)" delete-key-code="false" no-wheel-class-name="no-scroll">
+                <DropzoneBackground :style="{
                     backgroundColor: isDragOver ? '#e7f3ff' : 'transparent',
-                    transition: 'background-color 0.2s ease', height: '100%'}">
+                    transition: 'background-color 0.2s ease', height: '100%'
+                }">
                     <h2 v-if="isDragOver">DRAG AREA</h2>
                 </DropzoneBackground>
                 <MiniMap />
@@ -61,10 +48,12 @@
                         <span class="material-symbols-outlined">refresh</span>
                     </ControlButton>
                     <ControlButton title="Delete">
-                        <span class="material-symbols-outlined" @click="WorkflowCanvas.delete(tab, props.notif)">delete</span>
+                        <span class="material-symbols-outlined"
+                            @click="WorkflowCanvas.delete(tab, props.notif)">delete</span>
                     </ControlButton>
                     <ControlButton title="Save">
-                        <span class="material-symbols-outlined" @click="WorkflowCanvas.save(tab, props.notif)">save</span>
+                        <span class="material-symbols-outlined"
+                            @click="WorkflowCanvas.save(tab, props.notif)">save</span>
                     </ControlButton>
                     <ControlButton title="Run" style="background: #6FA071; color: #fff;">
                         <span class="material-symbols-outlined">play_arrow</span>
@@ -86,10 +75,11 @@ import nodeTypes from "@/components/Workflow/Nodes/node.types";
 import edgeTypes from "@/components/Workflow/Edges/egde.type";
 import DropzoneBackground from './Background/Dropzone.vue';
 import { ControlButton, Controls } from '@vue-flow/controls';
-import ProcessTypeModal from "@/components/Workflow/Modal/Workflow.Process.Type.Modal.vue";
+import Modal from "@/components/Common/UI/Modal.vue"
+import WorkflowProcessTypeModal from '@/components/Workflow/Modal/Workflow.Process.Type.Modal.vue';
 
 const { isDragOver } = WorkflowCanvas.store;
-const { 
+const {
     getSelectedNodes,
     getSelectedEdges,
     addSelectedNodes,
@@ -103,24 +93,12 @@ const onKeyDown = function (event: KeyboardEvent) {
 const resetTransform = function () {
     setViewport({ x: 0, y: 0, zoom: 1 })
 };
-const typemodal = ref<InstanceType<typeof ProcessTypeModal> | null>(null);
-const toggleTypeModal = function () {
-    typemodal.value?.toggleModal();
-};
+const show = ref(false);
+window.addEventListener('type-select', (data: any) => {
+    if (tab.id == data.detail.tabid) {
+        show.value = true;
+    }
+});
 </script>
 
 <style scoped src="./Workflow.Canvas.css"></style>
-<style scoped>
-    .type {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        align-items: center;
-        text-transform: uppercase;
-        gap: 5px;
-    }
-    .type a {
-        cursor: pointer;
-        font-size: 9px;
-    }
-</style>

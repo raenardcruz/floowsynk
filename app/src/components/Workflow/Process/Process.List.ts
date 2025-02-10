@@ -36,7 +36,6 @@ export class ProcessList {
         resp.data.items.forEach((process: any) => {
             processes.value.push(Templates.processFactory(process));
         });
-        console.log("Processes", processes.value);
     }
 
     static cardClicked(process: Process) {
