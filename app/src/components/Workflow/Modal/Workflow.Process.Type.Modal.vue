@@ -33,10 +33,10 @@
                     <label for="name">Name: </label>
                     <input type="text" class="input" id="name" placeholder="Name of webhook"
                         v-model="tab.nodes[0].data.name" v-if="tab.nodes && tab.nodes[0]" />
-                    <label for="url" v-if="tab.nodes && tab.nodes[0] && tab.nodes[0].data.name.length > 0">Webhook Url:
+                    <label for="url" v-if="tab.nodes && tab.nodes[0] && tab.nodes[0].data.name && tab.nodes[0].data.name.length > 0">Webhook Url:
                     </label>
                     <span style="display: flex; align-items: center; position: relative;"
-                        v-if="tab.nodes && tab.nodes[0] && tab.nodes[0].data.name.length > 0">
+                        v-if="tab.nodes && tab.nodes[0] && tab.nodes[0].data.name && tab.nodes[0].data.name.length > 0">
                         <input type="text" class="input" id="url" :value="webhookUrl" readonly />
                         <span class="material-symbols-outlined copy-btn" @click="copyToClipboard">content_copy</span>
                         <span class="tooltip" v-if="showTooltip">URL copied!</span>
@@ -75,6 +75,7 @@ import { defineProps, ref, reactive, computed } from 'vue';
 import WorkflowIcon from '@/components/Workflow/Workflow.Icon.vue';
 import TypeModal from './Workflow.Modal';
 import { startNodes } from '@/components/Workflow/Nodes/node';
+import WorkflowCanvas from "@/components/Workflow/Canvas/Workflow.Canvas";
 
 // Props
 const props = defineProps(['id']);
@@ -97,6 +98,7 @@ const isSelected = (type: string) => tab.type == type;
 const selectNode = (type: string) => {
     if (!tab.nodes) return;
     
+    WorkflowCanvas.saveState(tab.id);
     tab.type = type;
     let tmpNodes = [...tab.nodes];
     tmpNodes[0] = startNodes[type];

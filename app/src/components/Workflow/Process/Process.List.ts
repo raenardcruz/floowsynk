@@ -33,9 +33,11 @@ export class ProcessList {
             }
         });
         processes.value = [];
-        resp.data.items.forEach((process: any) => {
+        if (resp.data && resp.data.items) {
+            resp.data.items.forEach((process: any) => {
             processes.value.push(Templates.processFactory(process));
-        });
+            });
+        }
     }
 
     static cardClicked(process: Process) {

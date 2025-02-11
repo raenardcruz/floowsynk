@@ -91,7 +91,6 @@ const props = defineProps(['id', 'notif']);
 const tab = WorkflowCanvas.findTabById(props.id) || { name: '', tags: [], description: '', nodes: [], edges: [] };
 const tags = ref<string[]>([]);
 const onKeyDown = function (event: KeyboardEvent) {
-    console.log(getSelectedNodes.value)
     WorkflowCanvas.onKeyDown(event, props.id, getSelectedNodes, getSelectedEdges, addSelectedNodes);
 };
 const resetTransform = function () {

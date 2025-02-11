@@ -2,7 +2,7 @@ import Workflow from "@/views/Workflow";
 import { Process } from "@/components/Common/Interfaces";
 import { ref } from "vue";
 import SidebarHelper from "@/components/Workflow/Sidebar/Workflow.Canvas.Sidebar";
-import { useVueFlow } from "@vue-flow/core";
+import { useVueFlow, VueFlow } from "@vue-flow/core";
 import Utilities from "@/components/Common/Utilities";
 import axios from "axios";
 import {ProcessList} from "@/components/Workflow/Process/Process.List";
@@ -105,8 +105,14 @@ export default class WorkflowCanvas {
     redoStack.value.push(currentState);
 
     const previousState = undoStack.value.pop()!;
-    tab.nodes = previousState.nodes;
-    tab.edges = previousState.edges;
+    tab.nodes = []
+    tab.edges = []
+    setTimeout(() => {
+      tab.nodes = previousState.nodes;
+      tab.edges = previousState.edges;
+      const { id } = useVueFlow()
+      document.getElementById(id)?.focus();
+    }, 1);
   }
 
   static redo(tabId: string) {

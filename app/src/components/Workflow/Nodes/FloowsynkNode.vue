@@ -17,18 +17,7 @@
     <Teleport to="#canvas-content">
         <Sidebar :title="label" :caption="node.id" v-model:visible="show">
             <div v-if="node.data">
-                <div class="input" v-for="(value, key) in node.data" :key="key">
-                    <legend class="sidebar-legend">
-                        <div class="checkbox" v-if="(typeof value) == 'boolean'">
-                            <input type="checkbox" v-model="node.data[key]"/>
-                            <div class="label">{{ toSentenceCase(key.toString()) }}</div>
-                        </div>
-                        <span v-else>{{ toSentenceCase(key.toString()) }}</span>
-                    </legend>
-                    <input class="sidebar-input" type="text" v-model="node.data[key]" v-if="(typeof value) == 'string'"/>
-                    <input class="sidebar-input" type="number" v-model="node.data[key]" v-if="(typeof value) == 'number'"/>
-                    {{ node.data }}
-                </div>
+                <WorkflowNodeSidebarFields v-model="node.data" />
             </div>
         </Sidebar>
     </Teleport>
@@ -39,6 +28,7 @@ import { ref, watch } from "vue";
 import { Handle, Position, useNode } from '@vue-flow/core';
 import { Node } from "@/components/Common/Interfaces";
 import Sidebar from "@/components/Common/UI/Sidebar.vue";
+import WorkflowNodeSidebarFields from "../Sidebar/Workflow.Node.Sidebar.Fields.vue";
 
 const {
     node
