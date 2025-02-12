@@ -1,3 +1,4 @@
+
 .node {
     display: flex;
     align-items: center;
@@ -8,7 +9,7 @@
     background: #f0f0f0;
     gap: 20px;
     border-radius: 8px;
-    width: fit-content;
+    width: 100%;
     box-shadow: 3px 3px 5px #868686,-3px -3px 5px #fff;
 }
 
@@ -67,67 +68,4 @@
 }
 .node-selected {
     border: 1px solid #3B90D4;
-}
-.input {
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-    justify-content: left;
-    align-items: baseline;
-    margin-bottom: 10px;
-}
-.sidebar-input {
-    display: flex;
-    position: relative;
-    height: 30px;
-    width: fit-content;
-    min-width: 200px;
-    padding: 5px;
-    border-radius: 50px;
-    border: 1px solid #ccc;
-}
-.sidebar-legend {
-    display: flex;
-    font-size: 13px;
-}
-.checkbox {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-}
-
-.checkbox input[type="checkbox"] {
-    appearance: none;
-    width: 20px;
-    height: 20px;
-    border: 2px solid #ccc;
-    border-radius: 4px;
-    position: relative;
-    outline: none;
-    cursor: pointer;
-    transition: background 0.3s, border-color 0.3s;
-    margin-right: 10px;
-}
-
-.checkbox input[type="checkbox"]:checked {
-    background: #3B90D4;
-    border-color: #3B90D4;
-}
-
-.checkbox input[type="checkbox"]:checked::after {
-    content: '';
-    position: absolute;
-    top: 2px;
-    left: 6px;
-    width: 6px;
-    height: 12px;
-    border: solid white;
-    border-width: 0 2px 2px 0;
-    transform: rotate(45deg);
-}
-
-.checkbox label {
-    margin-left: 8px;
-    font-size: 13px;
-    color: #333;
 }

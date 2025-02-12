@@ -2,7 +2,7 @@ import { Node } from "@/components/Common/Interfaces"
 
 const nodes: Node[] = [
     {
-        id: '', type: 'setVariable', label: 'Set Variable', position: { x: 0, y: 0 },
+        id: '', nodetype: 'setVariable', label: 'Set Variable', position: { x: 0, y: 0 },
         group: [1],
         icon: {
             name: "memory",
@@ -16,7 +16,7 @@ const nodes: Node[] = [
         outputs: ["output"]
     },
     {
-        id: '', type: 'condition', label: 'Condition', position: { x: 0, y: 0 },
+        id: '', nodetype: 'condition', label: 'Condition', position: { x: 0, y: 0 },
         group: [2],
         icon: {
             name: "question_mark",
@@ -29,7 +29,7 @@ const nodes: Node[] = [
         outputs: ["True", "False"]
     },
     {
-        id: '', type: 'loop', label: 'Loop', position: { x: 0, y: 0 },
+        id: '', nodetype: 'loop', label: 'Loop', position: { x: 0, y: 0 },
         group: [2],
         icon: {
             name: "all_inclusive",
@@ -42,7 +42,7 @@ const nodes: Node[] = [
         outputs: ["output"]
     },
     {
-        id: '', type: 'foreach', label: 'For Each', position: { x: 0, y: 0 },
+        id: '', nodetype: 'foreach', label: 'For Each', position: { x: 0, y: 0 },
         group: [2],
         icon: {
             name: "all_inclusive",
@@ -55,7 +55,7 @@ const nodes: Node[] = [
         outputs: ["output"]
     },
     {
-        id: '', type: 'while', label: 'While', position: { x: 0, y: 0 },
+        id: '', nodetype: 'while', label: 'While', position: { x: 0, y: 0 },
         group: [2],
         icon: {
             name: "all_inclusive",
@@ -69,7 +69,7 @@ const nodes: Node[] = [
         outputs: ["output"]
     },
     {
-        id: '', type: 'api', label: 'Rest API', position: { x: 0, y: 0 },
+        id: '', nodetype: 'api', label: 'Rest API', position: { x: 0, y: 0 },
         group: [4],
         icon: {
             name: "language",
@@ -91,7 +91,7 @@ const nodes: Node[] = [
         outputs: ["output"]
     },
     {
-        id: '', type: 'log', label: 'Logging', position: { x: 0, y: 0 },
+        id: '', nodetype: 'log', label: 'Logging', position: { x: 0, y: 0 },
         group: [6],
         icon: {
             name: "edit_document",
@@ -104,7 +104,7 @@ const nodes: Node[] = [
         outputs: ["output"]
     },
     {
-        id: '', type: 'getGuid', label: 'Get Guid', position: { x: 0, y: 0 },
+        id: '', nodetype: 'getGuid', label: 'Get Guid', position: { x: 0, y: 0 },
         group: [1],
         icon: {
             name: "frame_source",
@@ -117,7 +117,7 @@ const nodes: Node[] = [
         outputs: ["output"]
     },
     {
-        id: '', type: 'text', label: 'Text', position: { x: 0, y: 0 },
+        id: '', nodetype: 'text', label: 'Text', position: { x: 0, y: 0 },
         group: [1],
         icon: {
             name: "article",
@@ -131,7 +131,7 @@ const nodes: Node[] = [
         outputs: ["output"]
     },
     {
-        id: '', type: 'math', label: 'math', position: { x: 0, y: 0 },
+        id: '', nodetype: 'math', label: 'math', position: { x: 0, y: 0 },
         group: [1],
         icon: {
             name: "calculate",
@@ -145,14 +145,13 @@ const nodes: Node[] = [
         outputs: ["output"]
     },
     {
-        id: '', type: 'list', label: 'List', position: { x: 0, y: 0 },
+        id: '', nodetype: 'list', label: 'List', position: { x: 0, y: 0 },
         group: [1],
         icon: {
             name: "list",
             color: "#85B158"
         },
         data: {
-            type: "string",
             list: [],
             variable: ""
         },
@@ -160,7 +159,7 @@ const nodes: Node[] = [
         outputs: ["output"]
     },
     {
-        id: '', type: 'count', label: 'List Count', position: { x: 0, y: 0 },
+        id: '', nodetype: 'count', label: 'List Count', position: { x: 0, y: 0 },
         group: [1],
         icon: {
             name: "tag",
@@ -174,7 +173,7 @@ const nodes: Node[] = [
         outputs: ["output"]
     },
     {
-        id: '', type: 'map', label: 'Map', position: { x: 0, y: 0 },
+        id: '', nodetype: 'map', label: 'Map', position: { x: 0, y: 0 },
         group: [3],
         icon: {
             name: "map",
@@ -189,7 +188,7 @@ const nodes: Node[] = [
         outputs: ["output"]
     },
     {
-        id: '', type: 'replace', label: 'Replace', position: { x: 0, y: 0 },
+        id: '', nodetype: 'replace', label: 'Replace', position: { x: 0, y: 0 },
         group: [1],
         icon: {
             name: "swap_horiz",
@@ -205,7 +204,7 @@ const nodes: Node[] = [
         outputs: ["output"]
     },
     {
-        id: '', type: 'regexfind', label: 'Find Regex', position: { x: 0, y: 0 },
+        id: '', nodetype: 'regexfind', label: 'Find Regex', position: { x: 0, y: 0 },
         group: [1],
         icon: {
             name: "find_replace",
@@ -220,7 +219,7 @@ const nodes: Node[] = [
         outputs: ["output"]
     },
     {
-        id: '', type: 'image', label: 'Output Image', position: { x: 0, y: 0 },
+        id: '', nodetype: 'image', label: 'Output Image', position: { x: 0, y: 0 },
         group: [7],
         icon: {
             name: "image",
@@ -233,7 +232,7 @@ const nodes: Node[] = [
         outputs: ["output"]
     },
     {
-        id: '', type: 'subprocess', label: 'Sub Process', position: { x: 0, y: 0 },
+        id: '', nodetype: 'subprocess', label: 'Sub Process', position: { x: 0, y: 0 },
         group: [1],
         icon: {
             name: "account_tree",
@@ -250,7 +249,7 @@ const nodes: Node[] = [
 const startNodesArray: Node[] = [
     {
         id: '0',
-        type: 'defaultnode',
+        nodetype: 'defaultnode',
         label: '',
         draggable: false,
         icon: { name: 'flag_circle', color: '#84ab86' },
@@ -260,7 +259,7 @@ const startNodesArray: Node[] = [
     },
     {
         id: '0',
-        type: 'interval',
+        nodetype: 'interval',
         label: '',
         draggable: false,
         icon: { name: 'calendar_month', color: '#09a6d6' },
@@ -275,7 +274,7 @@ const startNodesArray: Node[] = [
     },
     {
         id: '0',
-        type: 'webhook',
+        nodetype: 'webhook',
         label: '',
         draggable: false,
         icon: { name: 'webhook', color: '#b86a11' },
@@ -288,7 +287,7 @@ const startNodesArray: Node[] = [
     },
     {
         id: '0',
-        type: 'events',
+        nodetype: 'events',
         label: '',
         draggable: false,
         icon: { name: 'event', color: '#A3245B' },
@@ -303,7 +302,7 @@ const startNodesArray: Node[] = [
 
 const startNodes: { [key: string]: Node } = {};
 startNodesArray.forEach(node => {
-    startNodes[node.type] = node;
+    startNodes[node.nodetype] = node;
 });
 
 export {

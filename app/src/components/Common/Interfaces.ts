@@ -21,7 +21,7 @@ export interface Alert {
 
 export interface Node {
     id: string;
-    type: string;
+    nodetype: string;
     label: string;
     group: number[];
     nodestyle?: string;

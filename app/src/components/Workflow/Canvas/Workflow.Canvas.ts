@@ -2,7 +2,7 @@ import Workflow from "@/views/Workflow";
 import { Process } from "@/components/Common/Interfaces";
 import { ref } from "vue";
 import SidebarHelper from "@/components/Workflow/Sidebar/Workflow.Canvas.Sidebar";
-import { useVueFlow } from "@vue-flow/core";
+import { useVueFlow, VueFlow } from "@vue-flow/core";
 import Utilities from "@/components/Common/Utilities";
 import axios from "axios";
 import {ProcessList} from "@/components/Workflow/Process/Process.List";
@@ -105,8 +105,14 @@ export default class WorkflowCanvas {
     redoStack.value.push(currentState);
 
     const previousState = undoStack.value.pop()!;
-    tab.nodes = previousState.nodes;
-    tab.edges = previousState.edges;
+    tab.nodes = []
+    tab.edges = []
+    setTimeout(() => {
+      tab.nodes = previousState.nodes;
+      tab.edges = previousState.edges;
+      const { id } = useVueFlow()
+      document.getElementById(id)?.focus();
+    }, 1);
   }
 
   static redo(tabId: string) {
@@ -126,8 +132,8 @@ export default class WorkflowCanvas {
 
   static copy(selectedNodes: any, selectedEdges: any) {
     clipBoard.value = {
-      nodes: [...selectedNodes.value],
-      edges: [...selectedEdges.value],
+      nodes: selectedNodes.value.map((node: any) => JSON.parse(JSON.stringify(node))),
+      edges: selectedEdges.value.map((edge: any) => JSON.parse(JSON.stringify(edge))),
     };
   }
 
@@ -146,7 +152,13 @@ export default class WorkflowCanvas {
       const position = this.calculateNodePosition(nodeClip, index, referencePos);
       if (!position) return;
 
-      const newNode = this.createPastedNode(nodeClip, position, tab.id);
+      const newNode = {
+        ...JSON.parse(JSON.stringify(nodeClip)),
+        id: Utilities.generateUUID(),
+        position,
+        tabId: tab.id
+      };
+
       if (!tab.nodes) {
         throw new Error(`Tab nodes not found for id ${tabId}`);
       }
@@ -155,25 +167,40 @@ export default class WorkflowCanvas {
     });
 
     // Process edges
-    const edgesJson = JSON.stringify(clipBoard.value.edges);
-    let newEdges = edgesJson;
-    newNodes.forEach(node => {
-      const originalId = clipBoard.value.nodes.find(
-        (n: any) => n.position.x === (node.position.x - (node.position.x - referencePos.x))
-      )?.id;
-      if (originalId) {
-        newEdges = newEdges.replace(originalId.toString(), node.id.toString());
-      }
-    });
-
-    JSON.parse(newEdges).forEach((edgeClip: any) => {
-      if (newNodes.some(n => n.id === edgeClip.target)) {
-        if (!tab.edges) {
-          throw new Error(`Tab edges not found for id ${tabId}`);
+    if (clipBoard.value.edges.length > 0) {
+      const edgeMapping = new Map(
+        clipBoard.value.nodes.map((node: any) => [node.id, ''])
+      );
+      
+      newNodes.forEach(node => {
+        const originalId = clipBoard.value.nodes.find(
+          (n: any) => n.position.x === (node.position.x - (node.position.x - referencePos.x))
+        )?.id;
+        if (originalId) {
+          edgeMapping.set(originalId, node.id);
         }
-        tab.edges.push({ ...edgeClip, tabId: tab.id });
-      }
-    });
+      });
+
+      clipBoard.value.edges.forEach((edgeClip: any) => {
+        const newSource = edgeMapping.get(edgeClip.source);
+        const newTarget = edgeMapping.get(edgeClip.target);
+        
+        if (newSource && newTarget) {
+          const newEdge = {
+            ...JSON.parse(JSON.stringify(edgeClip)),
+            id: Utilities.generateUUID(),
+            source: newSource,
+            target: newTarget,
+            tabId: tab.id
+          };
+          
+          if (!tab.edges) {
+            throw new Error(`Tab edges not found for id ${tabId}`);
+          }
+          tab.edges.push(newEdge);
+        }
+      });
+    }
   }
 
   /*
