@@ -1,5 +1,6 @@
 <template>
-    <div class="input" v-for="(value, key) in props.modelValue" :key="key" v-if="props.modelValue.constructor == Object">
+    <div class="input" v-for="(value, key) in props.modelValue" :key="key"
+        v-if="props.modelValue.constructor == Object">
         <legend class="sidebar-legend">
             <div class="checkbox" v-if="value.constructor == Boolean">
                 <input type="checkbox" v-model="props.modelValue[key]" />
@@ -11,24 +12,37 @@
         <input class="sidebar-input" type="number" v-model="props.modelValue[key]" v-if="value.constructor == Number" />
         <div class="array-container" v-if="value.constructor == Array">
             <div class="child-container" v-for="(v, i) in value" :key="v">
-                <span class="material-symbols-outlined remove-array" @click="removeArrayItem(i, key)" v-if="i != 0">delete</span>
+                <span class="material-symbols-outlined remove-array" @click="removeArrayItem(i, key)">delete</span>
                 <WorkflowNodeSidebarFields v-model="props.modelValue[key][i]" />
             </div>
+            <select class="sidebar-input" v-if="props.modelValue[key].length == 0" v-model="arraytype">
+                <option value="keyvalue">KeyValue</option>
+                <option value="string">String</option>
+                <option value="number">Number</option>
+                <option value="boolean">Boolean</option>
+            </select>
             <div class="btn" @click="addArrayItem(key)">
                 <span class="material-symbols-outlined">add</span>
             </div>
         </div>
     </div>
     <div class="input" v-else>
-        <input class="sidebar-input" type="text" v-model="props.modelValue" v-if="props.modelValue.constructor == String" />
-        <input class="sidebar-input" type="number" v-model="props.modelValue" v-if="props.modelValue.constructor == Number" />
-        <input type="checkbox" v-model="props.modelValue" v-if="props.modelValue.constructor == Boolean" />
+        <input class="sidebar-input" type="text" v-model="props.modelValue" @change="inputHandler"
+            v-if="props.modelValue.constructor == String" />
+        <input class="sidebar-input" type="number" v-model="props.modelValue" @change="inputHandler"
+            v-if="props.modelValue.constructor == Number" />
+        <div v-if="props.modelValue.constructor == Boolean">
+            <input type="checkbox" v-model="props.modelValue" @change="inputHandler" />
+            <label>&nbsp;{{ props.modelValue }}</label>
+        </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { watch } from 'vue';
+import { ref, watch } from 'vue';
 import WorkflowNodeSidebarFields from './Workflow.Node.Sidebar.Fields.vue';
+
+const arraytype = ref('string');
 
 const props = defineProps<{
     modelValue: Record<string, any>;
@@ -40,6 +54,18 @@ watch(() => props.modelValue, (value) => {
     emit('update:modelValue', value);
 })
 
+const inputHandler = function (e: Event) {
+    if (e.target) {
+        let el = (e.target as HTMLInputElement)
+        if (el.type == "checkbox") {
+            emit('update:modelValue', el.checked)
+        } else {
+            emit('update:modelValue', el.value);
+        }
+    }
+}
+
+
 const toSentenceCase = function (str: string): string {
     return str
         .replace(/([a-z])([A-Z])/g, '$1 $2') // insert space between camelCase words
@@ -48,17 +74,45 @@ const toSentenceCase = function (str: string): string {
 }
 
 const addArrayItem = function (key: string) {
-    if (Array.isArray(props.modelValue[key]) && props.modelValue[key].length == 0) {
-        props.modelValue[key].push('');
-    } else if ( props.modelValue[key].length > 0 && props.modelValue[key][0].constructor == Object) {
-        const newItem = JSON.parse(JSON.stringify(props.modelValue[key][0]));
-        for (const prop in newItem) {
-            if (newItem.hasOwnProperty(prop)) {
-            newItem[prop] = '';
-            }
+    if (props.modelValue[key].constructor == Array && props.modelValue[key].length == 0) {
+        switch (arraytype.value) {
+            case 'keyvalue':
+                props.modelValue[key].push({ key: '', value: '' });
+                break;
+            case 'string':
+                props.modelValue[key].push('');
+                break;
+            case 'number':
+                props.modelValue[key].push(0);
+                break;
+            case 'boolean':
+                props.modelValue[key].push(false);
+                break;
         }
-        props.modelValue[key].push(newItem);
+    } else {
+        const firstItemType = props.modelValue[key][0].constructor;
+        switch (firstItemType) {
+            case String:
+                props.modelValue[key].push('');
+                break;
+            case Number:
+                props.modelValue[key].push(0);
+                break;
+            case Object:
+                const newItem = JSON.parse(JSON.stringify(props.modelValue[key][0]));
+                for (const prop in newItem) {
+                    if (newItem.hasOwnProperty(prop)) {
+                        newItem[prop] = '';
+                    }
+                }
+                props.modelValue[key].push(newItem);
+                break;
+            case Boolean:
+                props.modelValue[key].push(false);
+                break;
+        }
     }
+
 }
 
 const removeArrayItem = function (index: any, key: string) {
@@ -77,6 +131,7 @@ const removeArrayItem = function (index: any, key: string) {
     align-items: baseline;
     margin-bottom: 10px;
 }
+
 .sidebar-input {
     display: flex;
     position: relative;
@@ -87,10 +142,12 @@ const removeArrayItem = function (index: any, key: string) {
     border-radius: 50px;
     border: 1px solid #ccc;
 }
+
 .sidebar-legend {
     display: flex;
     font-size: 13px;
 }
+
 .checkbox {
     display: flex;
     align-items: center;
@@ -142,7 +199,11 @@ const removeArrayItem = function (index: any, key: string) {
     height: fit-content;
     width: 100%;
     margin: 10px 0px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 20px;
 }
+
 .array-container .child-container {
     position: relative;
     display: flex;
@@ -151,10 +212,10 @@ const removeArrayItem = function (index: any, key: string) {
     border: 1px solid #ccc;
     border-radius: 10px;
     height: fit-content;
-    min-height: 100px;
     width: 100%;
     padding: 10px;
 }
+
 .btn {
     display: flex;
     align-items: center;
@@ -167,9 +228,11 @@ const removeArrayItem = function (index: any, key: string) {
     cursor: pointer;
     transition: all 0.3s;
 }
+
 .btn:hover {
     box-shadow: inset 3px 3px 5px #868686, inset -3px -3px 5px #fff;
 }
+
 .remove-array {
     display: flex;
     position: absolute;

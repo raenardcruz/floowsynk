@@ -152,7 +152,6 @@ const nodes: Node[] = [
             color: "#85B158"
         },
         data: {
-            type: "string",
             list: [],
             variable: ""
         },
