@@ -391,4 +391,17 @@ export default class WorkflowCanvas {
       notif.error("Failed to delete workflow");
     }
   }
+
+  static async run(tab: Process, notif: any) {
+    let payload: any = {
+      nodes: tab.nodes,
+      edges: tab.edges
+    };
+    let resp = await axios.post(`/api/workflow/${tab.id}/run`, payload, {
+      headers: {
+        "Authorization": `${localStorage.getItem("sessionToken")}`
+      }
+    });
+    notif.success(resp.data.message);
+  }
 }
