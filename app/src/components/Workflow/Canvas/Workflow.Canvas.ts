@@ -240,7 +240,7 @@ export default class WorkflowCanvas {
     const tab = this.findTabById(tabId);
     const { screenToFlowCoordinate } = useVueFlow();
     const node = SidebarHelper.store.draggedNode.value;
-    const newNode: any = { ...node };
+    const newNode: any = JSON.parse(JSON.stringify(node));
     const headerHeight = 159.4;
     const x = (event.clientX - viewportPosition.value.x) / viewportPosition.value.zoom;
     const y = (event.clientY - headerHeight - viewportPosition.value.y) / viewportPosition.value.zoom;

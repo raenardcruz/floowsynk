@@ -2,7 +2,26 @@ package main
 
 import (
 	"sync"
+
+	"github.com/raenardcruz/floowsynk/db"
 )
+
+type NodeList []Node
+type EdgeList []Edge
+
+type User struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Role     string `json:"role"` // Added role field
+}
+
+type Token struct {
+	Token string `json:"token"`
+}
+
+type LoginResponse struct {
+	Token string `json:"token"`
+}
 
 type ValidateResults struct {
 	id       string
@@ -17,9 +36,13 @@ type EventStream struct {
 	mu      sync.Mutex
 }
 
-type WorkflowRunPayload struct {
-	Nodes []Node `json:"nodes"`
-	Edges []Edge `json:"edges"`
+type Workflow struct {
+	Nodes NodeList `json:"nodes"`
+	Edges EdgeList `json:"edges"`
+}
+
+type WorkflowProcessor struct {
+	Workflow *Workflow
 }
 
 type Node struct {
@@ -39,4 +62,8 @@ type Edge struct {
 type KeyValue struct {
 	Key   string `json:"key"`
 	Value string `json:"value"`
+}
+
+type DBConnection struct {
+	*db.DB
 }

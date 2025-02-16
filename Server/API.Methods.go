@@ -1,56 +1,21 @@
 package main
 
 import (
-	"log"
 	"net/http"
 	"time"
-
-	"github.com/raenardcruz/floowsynk/crypto"
-	"github.com/raenardcruz/floowsynk/db"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 )
 
-var jwtKey = []byte("secret_key")
-
-func Login(c *gin.Context) {
-	var user User
-	if err := c.BindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+func Protected(c *gin.Context) {
+	validateResults := validateToken(c)
+	if validateResults.status != http.StatusOK {
+		c.JSON(validateResults.status, gin.H{"error": validateResults.message})
 		return
 	}
 
-	db, err := db.NewDB()
-	if err != nil {
-		log.Fatalf("Error connecting to the database: %v", err)
-		return
-	}
-	defer db.Close()
-
-	dbUser, err := db.GetUserByUsername(user.Username)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error getting user"})
-		return
-	}
-	if dbUser.ID == "" {
-		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
-		return
-	}
-
-	ePassword, err := crypto.EncryptPassword(user.Password)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error encrypting password"})
-		return
-	}
-
-	if dbUser.Password == ePassword {
-		token := generateToken(dbUser.ID, user.Username, dbUser.Role, time.Now().Add(time.Minute*15).UTC().Unix())
-		c.JSON(http.StatusOK, LoginResponse{Token: token})
-		return
-	}
-
-	c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
+	c.JSON(http.StatusOK, gin.H{"message": "Hello, " + validateResults.username + ", your role is " + validateResults.role})
 }
 
 func generateToken(id string, username, role string, expiry int64) string {
@@ -101,3 +66,10 @@ func ExtendToken(c *gin.Context) {
 	token := generateToken(results.id, results.username, results.role, time.Now().Add(time.Minute*15).UTC().Unix())
 	c.JSON(http.StatusOK, LoginResponse{Token: token})
 }
+
+// func test(id string) {
+// 	for i := 0; i < 100; i++ {
+// 		eventStream.SendEvent(id, "Event "+strconv.Itoa(i))
+// 		time.Sleep(time.Second / 10)
+// 	}
+// }

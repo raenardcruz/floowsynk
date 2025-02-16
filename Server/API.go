@@ -1,16 +1,53 @@
 package main
 
 import (
-	"encoding/json"
-	"log"
 	"net/http"
 	"strconv"
+	"time"
+
+	"github.com/raenardcruz/floowsynk/crypto"
+	"github.com/raenardcruz/floowsynk/db"
 
 	"github.com/gin-gonic/gin"
-	"github.com/raenardcruz/floowsynk/db"
 )
 
-func GetWorkflow(c *gin.Context) {
+var jwtKey = []byte("secret_key")
+
+// API Methods --------------------------------------------------------------------------------------------------------
+
+func (dbcon DBConnection) Login(c *gin.Context) {
+	var user User
+	if err := c.BindJSON(&user); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	dbUser, err := dbcon.DB.GetUserByUsername(user.Username)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error getting user"})
+		return
+	}
+	if dbUser.ID == "" {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+
+	ePassword, err := crypto.EncryptPassword(user.Password)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error encrypting password"})
+		return
+	}
+
+	if dbUser.Password == ePassword {
+		token := generateToken(dbUser.ID, user.Username, dbUser.Role, time.Now().Add(time.Minute*15).UTC().Unix())
+		c.JSON(http.StatusOK, LoginResponse{Token: token})
+		return
+	}
+
+	c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
+}
+
+func (dbcon *DBConnection) GetWorkflow(c *gin.Context) {
 	ValidateResults := validateToken(c)
 	if ValidateResults.status != http.StatusOK {
 		c.JSON(ValidateResults.status, gin.H{"error": ValidateResults.message})
@@ -18,7 +55,7 @@ func GetWorkflow(c *gin.Context) {
 	}
 	id := c.Request.PathValue("id")
 
-	w, err := dbcon.GetWorkflow(id)
+	w, err := dbcon.DB.GetWorkflow(id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -26,7 +63,7 @@ func GetWorkflow(c *gin.Context) {
 	c.JSON(http.StatusOK, w)
 }
 
-func PostWorkflow(c *gin.Context) {
+func (dbcon *DBConnection) PostWorkflow(c *gin.Context) {
 	ValidateResults := validateToken(c)
 	if ValidateResults.status != http.StatusOK {
 		c.JSON(ValidateResults.status, gin.H{"error": ValidateResults.message})
@@ -40,7 +77,7 @@ func PostWorkflow(c *gin.Context) {
 	workflow.CreatedBy = ValidateResults.id
 	workflow.UpdatedBy = ValidateResults.id
 
-	if _, err := dbcon.CreateWorkflow(workflow); err != nil {
+	if _, err := dbcon.DB.CreateWorkflow(workflow); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -48,7 +85,7 @@ func PostWorkflow(c *gin.Context) {
 	c.JSON(http.StatusCreated, workflow)
 }
 
-func listWorkflows(c *gin.Context) {
+func (dbcon *DBConnection) ListWorkflows(c *gin.Context) {
 	ValidateResults := validateToken(c)
 	if ValidateResults.status != http.StatusOK {
 		c.JSON(ValidateResults.status, gin.H{"error": ValidateResults.message})
@@ -69,7 +106,7 @@ func listWorkflows(c *gin.Context) {
 		return
 	}
 
-	workflows, err := dbcon.GetWorkflows(limit, offset)
+	workflows, err := dbcon.DB.GetWorkflows(limit, offset)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -77,7 +114,7 @@ func listWorkflows(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"items": workflows})
 }
 
-func UpdateWorkflow(c *gin.Context) {
+func (dbcon *DBConnection) UpdateWorkflow(c *gin.Context) {
 	ValidateResults := validateToken(c)
 	if ValidateResults.status != http.StatusOK {
 		c.JSON(ValidateResults.status, gin.H{"error": ValidateResults.message})
@@ -93,14 +130,14 @@ func UpdateWorkflow(c *gin.Context) {
 	workflow.ID = id
 	workflow.UpdatedBy = ValidateResults.id
 
-	if err := dbcon.UpdateWorkflow(workflow); err != nil {
+	if err := dbcon.DB.UpdateWorkflow(workflow); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, workflow)
 }
 
-func DeleteWorkflow(c *gin.Context) {
+func (dbcon *DBConnection) DeleteWorkflow(c *gin.Context) {
 	ValidateResults := validateToken(c)
 	if ValidateResults.status != http.StatusOK {
 		c.JSON(ValidateResults.status, gin.H{"error": ValidateResults.message})
@@ -108,7 +145,7 @@ func DeleteWorkflow(c *gin.Context) {
 	}
 	id := c.Params.ByName("id")
 
-	if err := dbcon.DeleteWorkflow(id); err != nil {
+	if err := dbcon.DB.DeleteWorkflow(id); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -156,27 +193,13 @@ func RunWorkflow(c *gin.Context) {
 	}
 	//id := c.Params.ByName("id")
 
-	var payload WorkflowRunPayload
+	var payload Workflow
 	if err := c.ShouldBindJSON(&payload); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
-	stepObj := BuildJsonSteps(payload.Nodes, payload.Edges, "0", nil, "output")
-	jsonData, err := json.Marshal(stepObj)
-	if err != nil {
-		log.Printf("Error: failed to marshal JSON data: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-	log.Printf("StepObj: %s", jsonData)
+	workflowProcessor := WorkflowProcessor{Workflow: &payload}
+	workflowProcessor.Process("0")
 
 	c.JSON(http.StatusOK, gin.H{"message": "Workflow run started"})
 }
-
-// func test(id string) {
-// 	for i := 0; i < 100; i++ {
-// 		eventStream.SendEvent(id, "Event "+strconv.Itoa(i))
-// 		time.Sleep(time.Second / 10)
-// 	}
-// }
