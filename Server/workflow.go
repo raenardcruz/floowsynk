@@ -12,11 +12,18 @@ const (
 	conditionType   = "condition"
 	listType        = "list"
 	loopType        = "loop"
-	ForEachType     = "foreach"
+	forEachType     = "foreach"
+	whileType       = "while"
+	apiType         = "api"
+	logType         = "log"
+	guidType        = "getGuid"
+	mathType        = "math"
+	countType       = "count"
 )
 
 var processVariables = make(map[string]interface{})
 var processResults = make(map[string]interface{})
+var loggingData = make([]string, 0)
 
 func (wp *WorkflowProcessor) Process(nodeId string) (err error) {
 	sourceHandle := ""
@@ -49,10 +56,41 @@ func (wp *WorkflowProcessor) Process(nodeId string) (err error) {
 				return err
 			}
 			break
-		case ForEachType:
+		case forEachType:
 			if err := wp.ForEach(node); err != nil {
 				return err
 			}
+			break
+		case whileType:
+			if err := wp.WhileProcess(node); err != nil {
+				return err
+			}
+			break
+		case apiType:
+			if err := wp.ApiProcess(node); err != nil {
+				return err
+			}
+
+		case logType:
+			if err := wp.LogProcess(node); err != nil {
+				return err
+			}
+			break
+		case guidType:
+			if err := wp.GuidProcess(node); err != nil {
+				return err
+			}
+			break
+		case mathType:
+			if err := wp.MathProcess(node); err != nil {
+				return err
+			}
+			break
+		case countType:
+			if err := wp.CountProcess(node); err != nil {
+				return err
+			}
+			break
 		default:
 			return errors.New("unknown node type")
 		}

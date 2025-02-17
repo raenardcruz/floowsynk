@@ -166,7 +166,7 @@ const nodes: Node[] = [
             color: "#979797"
         },
         data: {
-            list: [],
+            listVariable: "",
             variable: ""
         },
         inputs: ["input"],
@@ -180,7 +180,7 @@ const nodes: Node[] = [
             color: "#85B158"
         },
         data: {
-            list: [],
+            listVariable: "",
             template: "",
             variable: ""
         },
