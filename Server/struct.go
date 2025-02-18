@@ -10,7 +10,6 @@ type NodeList []Node
 type EdgeList []Edge
 type KeyValueList []KeyValue
 type Body map[string]interface{}
-type List []interface{}
 
 type User struct {
 	Username string `json:"username"`

@@ -19,6 +19,7 @@ const (
 	guidType        = "getGuid"
 	mathType        = "math"
 	countType       = "count"
+	mapType         = "map"
 )
 
 var processVariables = make(map[string]interface{})
@@ -88,6 +89,11 @@ func (wp *WorkflowProcessor) Process(nodeId string) (err error) {
 			break
 		case countType:
 			if err := wp.CountProcess(node); err != nil {
+				return err
+			}
+			break
+		case mapType:
+			if err := wp.MapProcess(node); err != nil {
 				return err
 			}
 			break
