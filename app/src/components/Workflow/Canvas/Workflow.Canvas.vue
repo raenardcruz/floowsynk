@@ -20,6 +20,7 @@
             </div>
             <div class="description">
                 <input type="text" v-model="tab.description" placeholder="Enter Description">
+                {{ sseMessage }}
             </div>
         </div>
         <div class="content" id="canvas-content">
@@ -56,7 +57,7 @@
                             @click="WorkflowCanvas.save(tab, props.notif)">save</span>
                     </ControlButton>
                     <ControlButton title="Run" style="background: #6FA071; color: #fff;">
-                        <span class="material-symbols-outlined">play_arrow</span>
+                        <span class="material-symbols-outlined" @click="WorkflowCanvas.run(tab, notif)">play_arrow</span>
                     </ControlButton>
                 </Controls>
                 <template #node-default="nodeProps">
@@ -81,6 +82,8 @@ import Modal from "@/components/Common/UI/Modal.vue"
 import WorkflowProcessTypeModal from '@/components/Workflow/Modal/Workflow.Process.Type.Modal.vue';
 import FloowsynkNode from "../Nodes/FloowsynkNode.vue";
 
+const sseMessage = ref('initial message');
+
 const { isDragOver } = WorkflowCanvas.store;
 const {
     getSelectedNodes,
@@ -101,6 +104,11 @@ window.addEventListener('type-select', (data: any) => {
     if (tab.id == data.detail.tabid) {
         show.value = true;
     }
+});
+
+const eventSource = new EventSource(`/api/workflow/${tab.id}/events`);
+eventSource.addEventListener('message', (event: any) => {
+    sseMessage.value = event.data;
 });
 </script>
 

@@ -240,7 +240,7 @@ export default class WorkflowCanvas {
     const tab = this.findTabById(tabId);
     const { screenToFlowCoordinate } = useVueFlow();
     const node = SidebarHelper.store.draggedNode.value;
-    const newNode: any = { ...node };
+    const newNode: any = JSON.parse(JSON.stringify(node));
     const headerHeight = 159.4;
     const x = (event.clientX - viewportPosition.value.x) / viewportPosition.value.zoom;
     const y = (event.clientY - headerHeight - viewportPosition.value.y) / viewportPosition.value.zoom;
@@ -390,5 +390,18 @@ export default class WorkflowCanvas {
     catch (error) {
       notif.error("Failed to delete workflow");
     }
+  }
+
+  static async run(tab: Process, notif: any) {
+    let payload: any = {
+      nodes: tab.nodes,
+      edges: tab.edges
+    };
+    let resp = await axios.post(`/api/workflow/${tab.id}/run`, payload, {
+      headers: {
+        "Authorization": `${localStorage.getItem("sessionToken")}`
+      }
+    });
+    notif.success(resp.data.message);
   }
 }

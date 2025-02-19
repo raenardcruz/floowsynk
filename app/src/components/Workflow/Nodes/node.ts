@@ -166,7 +166,7 @@ const nodes: Node[] = [
             color: "#979797"
         },
         data: {
-            list: [],
+            listVariable: "",
             variable: ""
         },
         inputs: ["input"],
@@ -180,7 +180,7 @@ const nodes: Node[] = [
             color: "#85B158"
         },
         data: {
-            list: [],
+            listVariable: "",
             template: "",
             variable: ""
         },
@@ -204,7 +204,7 @@ const nodes: Node[] = [
         outputs: ["output"]
     },
     {
-        id: '', nodetype: 'regexfind', label: 'Find Regex', position: { x: 0, y: 0 },
+        id: '', nodetype: 'findAll', label: 'Find All', position: { x: 0, y: 0 },
         group: [1],
         icon: {
             name: "find_replace",
@@ -219,6 +219,7 @@ const nodes: Node[] = [
         outputs: ["output"]
     },
     {
+        // Implement logic on Front End
         id: '', nodetype: 'image', label: 'Output Image', position: { x: 0, y: 0 },
         group: [7],
         icon: {
@@ -232,6 +233,7 @@ const nodes: Node[] = [
         outputs: ["output"]
     },
     {
+        // Implement Logic
         id: '', nodetype: 'subprocess', label: 'Sub Process', position: { x: 0, y: 0 },
         group: [1],
         icon: {
@@ -239,7 +241,7 @@ const nodes: Node[] = [
             color: "#1986BD"
         },
         data: {
-            value: ""
+            subProcessId: ""
         },
         inputs: ["input"],
         outputs: ["output"]

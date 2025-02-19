@@ -2,7 +2,6 @@ import { ref, computed } from "vue";
 import { nodes } from "@/components/Workflow/Nodes/node";
 import { Node } from "@/components/Common/Interfaces"
 import groups from "@/components/Workflow/Nodes/node.groups";
-import { stringify } from "querystring";
 import CanvasHelper from "@/components/Workflow/Canvas/Workflow.Canvas";
 
 const showSideBar = ref<boolean>(false);
@@ -11,7 +10,7 @@ const draggedNode = ref<Node | null>(null);
 const expandGroup = ref<string[]>([]);
 
 const searchNode = computed(() => {
-    return nodes.filter(f => f.type.toLowerCase().includes(search.value))
+    return nodes.filter(f => f.nodetype.toLowerCase().includes(search.value) || f.label.toLowerCase().includes(search.value))
 })
 
 export default class WorkflowCanvasSidebar {
