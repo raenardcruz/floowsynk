@@ -66,10 +66,3 @@ func ExtendToken(c *gin.Context) {
 	token := generateToken(results.id, results.username, results.role, time.Now().Add(time.Minute*15).UTC().Unix())
 	c.JSON(http.StatusOK, LoginResponse{Token: token})
 }
-
-// func test(id string) {
-// 	for i := 0; i < 100; i++ {
-// 		eventStream.SendEvent(id, "Event "+strconv.Itoa(i))
-// 		time.Sleep(time.Second / 10)
-// 	}
-// }

@@ -185,7 +185,7 @@ func SseHandler(c *gin.Context) {
 	}
 }
 
-func RunWorkflow(c *gin.Context) {
+func (dbcon *DBConnection) RunWorkflow(c *gin.Context) {
 	ValidateResults := validateToken(c)
 	if ValidateResults.status != http.StatusOK {
 		c.JSON(ValidateResults.status, gin.H{"error": ValidateResults.message})
@@ -198,7 +198,13 @@ func RunWorkflow(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	workflowProcessor := WorkflowProcessor{Workflow: &payload}
+	workflowProcessor := WorkflowProcessor{
+		Workflow:         &payload,
+		dbcon:            dbcon,
+		processVariables: make(map[string]interface{}),
+		processResults:   make(map[string]interface{}),
+		loggingData:      make([]string, 0),
+	}
 	workflowProcessor.Process("0")
 
 	c.JSON(http.StatusOK, gin.H{"message": "Workflow run started"})

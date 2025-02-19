@@ -20,11 +20,10 @@ const (
 	mathType        = "math"
 	countType       = "count"
 	mapType         = "map"
+	replaceType     = "replace"
+	findAllType     = "findAll"
+	subprocessType  = "subprocess"
 )
-
-var processVariables = make(map[string]interface{})
-var processResults = make(map[string]interface{})
-var loggingData = make([]string, 0)
 
 func (wp *WorkflowProcessor) Process(nodeId string) (err error) {
 	sourceHandle := ""
@@ -94,6 +93,21 @@ func (wp *WorkflowProcessor) Process(nodeId string) (err error) {
 			break
 		case mapType:
 			if err := wp.MapProcess(node); err != nil {
+				return err
+			}
+			break
+		case replaceType:
+			if err := wp.ReplaceProcess(node); err != nil {
+				return err
+			}
+			break
+		case findAllType:
+			if err := wp.FindAllProcess(node); err != nil {
+				return err
+			}
+			break
+		case subprocessType:
+			if err := wp.SubProcess(node); err != nil {
 				return err
 			}
 			break

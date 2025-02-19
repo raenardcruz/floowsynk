@@ -29,7 +29,7 @@ func main() {
 	r.PUT("/api/workflow/:id", dbcon.UpdateWorkflow)
 	r.DELETE("/api/workflow/:id", dbcon.DeleteWorkflow)
 	r.GET("/api/workflow/:id/events", SseHandler)
-	r.POST("/api/workflow/:id/run", RunWorkflow)
+	r.POST("/api/workflow/:id/run", dbcon.RunWorkflow)
 
 	log.Fatal(r.Run(":8080"))
 }

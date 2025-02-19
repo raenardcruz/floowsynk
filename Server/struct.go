@@ -44,7 +44,11 @@ type Workflow struct {
 }
 
 type WorkflowProcessor struct {
-	Workflow *Workflow
+	Workflow         *Workflow
+	dbcon            *DBConnection
+	processVariables map[string]interface{}
+	processResults   map[string]interface{}
+	loggingData      []string
 }
 
 type Node struct {
