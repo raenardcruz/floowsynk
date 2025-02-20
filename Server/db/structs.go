@@ -32,7 +32,7 @@ type WorkflowModel struct {
 	UpdatedBy   string        `json:"updated_by"`
 }
 
-type WprkflowProfileModel struct {
+type WorkflowProfileModel struct {
 	ID         string
 	WorkflowId string
 	Name       string

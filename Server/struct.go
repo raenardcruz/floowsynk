@@ -43,12 +43,20 @@ type Workflow struct {
 	Edges EdgeList `json:"edges"`
 }
 
+type LogData struct {
+	ProcessID string `json:"processId"`
+	NodeID    string `json:"nodeId"`
+	Message   string `json:"message"`
+	Type      string `json:"type"`
+}
+
 type WorkflowProcessor struct {
+	ProcessID        string
 	Workflow         *Workflow
-	dbcon            *DBConnection
-	processVariables map[string]interface{}
-	processResults   map[string]interface{}
-	loggingData      []string
+	Dbcon            *DBConnection
+	ProcessVariables map[string]interface{}
+	ProcessResults   map[string]interface{}
+	LoggingData      []LogData
 }
 
 type Node struct {
