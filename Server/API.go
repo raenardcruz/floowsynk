@@ -191,7 +191,7 @@ func (dbcon *DBConnection) RunWorkflow(c *gin.Context) {
 		c.JSON(ValidateResults.status, gin.H{"error": ValidateResults.message})
 		return
 	}
-	//id := c.Params.ByName("id")
+	id := c.Params.ByName("id")
 
 	var payload Workflow
 	if err := c.ShouldBindJSON(&payload); err != nil {
@@ -199,11 +199,12 @@ func (dbcon *DBConnection) RunWorkflow(c *gin.Context) {
 		return
 	}
 	workflowProcessor := WorkflowProcessor{
+		ProcessID:        id,
 		Workflow:         &payload,
-		dbcon:            dbcon,
-		processVariables: make(map[string]interface{}),
-		processResults:   make(map[string]interface{}),
-		loggingData:      make([]string, 0),
+		Dbcon:            dbcon,
+		ProcessVariables: make(map[string]interface{}),
+		ProcessResults:   make(map[string]interface{}),
+		LoggingData:      make([]LogData, 0),
 	}
 	workflowProcessor.Process("0")
 
