@@ -20,10 +20,9 @@
             </div>
             <div class="description">
                 <input type="text" v-model="tab.description" placeholder="Enter Description">
-                {{ sseMessage }}
             </div>
         </div>
-        <div class="content" id="canvas-content">
+        <div class="content" :id="canvasId">
             <log-modal :id="id" v-if="tab.showLogModal" />
             <sidebar />
             <Modal title="Process Type" caption="Please select the workflow process type." v-model:visible="show">
@@ -81,8 +80,7 @@ import { ControlButton, Controls } from '@vue-flow/controls';
 import Modal from "@/components/Common/UI/Modal.vue"
 import WorkflowProcessTypeModal from '@/components/Workflow/Modal/Workflow.Process.Type.Modal.vue';
 import FloowsynkNode from "../Nodes/FloowsynkNode.vue";
-
-const sseMessage = ref('initial message');
+import { queueStatusUpdate } from './Workflow.Canvas';
 
 const { isDragOver } = WorkflowCanvas.store;
 const {
@@ -107,9 +105,14 @@ window.addEventListener('type-select', (data: any) => {
 });
 
 const eventSource = new EventSource(`/api/workflow/${tab.id}/events`);
-eventSource.addEventListener('message', (event: any) => {
-    sseMessage.value = event.data;
+eventSource.addEventListener('Complete', (event: any) => {
+    props.notif?.success(`Process Completed. ${event.data}`);
 });
+eventSource.addEventListener('NodeStatus', (event: any) => {
+    let nodeData = JSON.parse(event.data);
+    queueStatusUpdate(nodeData.nodeId, nodeData.status);
+});
+const canvasId = btoa(tab.id);
 </script>
 
 <style scoped src="./Workflow.Canvas.css"></style>

@@ -1,11 +1,11 @@
 <template>
-    <div class="node no-scroll nopan" :style="nodestyle" :class="{ 'node-selected': node.selected }" @click="clickhandler">
+    <div class="node no-scroll nopan" :style="nodestyle" :class="{ 'node-selected': node.selected, [nodestatus]: true }" @click="clickhandler">
         <div class="icon" :style="{ background: icon.color }">
             <span class="material-symbols-outlined">{{ icon.name }}</span>
         </div>
         <div class="content">
             <div class="label" v-if="label.length > 0">{{ label }}</div>
-            <div class="type">{{ nodetype }}</div>
+            <div class="type">{{ toSentenceCase(nodetype) }}</div>
         </div>
         <Handle class="handle-input" v-if="outputs" v-for="(input, index) in inputs" :key="input" :id="input"
             :data-output="input" type="target" :position="Position.Left"
@@ -14,7 +14,7 @@
             :data-output="output" type="source" :position="Position.Right"
             :style="{ top: `${(100 / (outputs.length + 1)) * (index + 1)}%` }" />
     </div>
-    <Teleport to="#canvas-content">
+    <Teleport :to="'#' + canvasId">
         <Sidebar :title="label" :caption="node.id" v-model:visible="show">
             <div v-if="node.data">
                 <WorkflowNodeSidebarFields v-model="node.data" />
@@ -24,12 +24,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { ref, watch, computed } from "vue";
 import { Handle, Position, useNode } from '@vue-flow/core';
 import { Node } from "@/components/Common/Interfaces";
 import Sidebar from "@/components/Common/UI/Sidebar.vue";
 import WorkflowNodeSidebarFields from "../Sidebar/Workflow.Node.Sidebar.Fields.vue";
+import WorkflowCanvas from "@/components/Workflow/Canvas/Workflow.Canvas";
 
+const {nodeStatuses} = WorkflowCanvas.store;
 const {
     node
 } = useNode()
@@ -39,6 +41,7 @@ const props = defineProps<{
 }>();
 
 const show = ref(false);
+const canvasId = btoa(props.tabid);
 
 const toSentenceCase = function (str: string): string {
     return str
@@ -67,6 +70,13 @@ const clickhandler = () => {
         show.value = true;
     }
 }
+
+const nodestatus = computed(() => {
+    if (node.id === '0') {
+        return '';
+    }
+    return nodeStatuses.value[node.id] || '';
+})
 
 const { icon, nodetype, label, outputs, inputs, nodestyle } = node as unknown as Node;
 </script>

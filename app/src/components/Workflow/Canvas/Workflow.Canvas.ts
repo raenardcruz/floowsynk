@@ -1,8 +1,8 @@
 import Workflow from "@/views/Workflow";
 import { Process } from "@/components/Common/Interfaces";
-import { ref } from "vue";
+import { ref, shallowRef } from "vue";
 import SidebarHelper from "@/components/Workflow/Sidebar/Workflow.Canvas.Sidebar";
-import { useVueFlow, VueFlow } from "@vue-flow/core";
+import { useVueFlow } from "@vue-flow/core";
 import Utilities from "@/components/Common/Utilities";
 import axios from "axios";
 import {ProcessList} from "@/components/Workflow/Process/Process.List";
@@ -18,6 +18,28 @@ const mousePosition = ref({ x: 0, y: 0 });
 const MAX_HISTORY_SIZE = 20;
 const undoStack = ref<{ nodes: any[], edges: any[] }[]>([]);
 const redoStack = ref<{ nodes: any[], edges: any[] }[]>([]);
+const nodeStatuses = shallowRef<{ [key: string]: string }>({});
+let pendingUpdates: { [key: string]: string } = {};
+let updateScheduled = false;
+
+const processStatusUpdates = () => {
+  if (Object.keys(pendingUpdates).length > 0) {
+    nodeStatuses.value = {
+      ...nodeStatuses.value,
+      ...pendingUpdates
+    };
+    pendingUpdates = {};
+  }
+  updateScheduled = false;
+};
+
+const queueStatusUpdate = (nodeId: string, status: string) => {
+  pendingUpdates[nodeId] = status;
+  if (!updateScheduled) {
+    updateScheduled = true;
+    requestAnimationFrame(processStatusUpdates);
+  }
+};
 
 export default class WorkflowCanvas {
   static readonly store = {
@@ -25,6 +47,7 @@ export default class WorkflowCanvas {
     tabs: Workflow.store.tabs,
     isDragOver,
     viewportPosition,
+    nodeStatuses,
   }
 
   /*
@@ -393,6 +416,8 @@ export default class WorkflowCanvas {
   }
 
   static async run(tab: Process, notif: any) {
+    nodeStatuses.value = {};
+    pendingUpdates = {};
     let payload: any = {
       nodes: tab.nodes,
       edges: tab.edges
@@ -405,3 +430,6 @@ export default class WorkflowCanvas {
     notif.success(resp.data.message);
   }
 }
+
+// Export for use in other components
+export { queueStatusUpdate };

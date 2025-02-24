@@ -69,3 +69,78 @@
 .node-selected {
     border: 1px solid #3B90D4;
 }
+.node.running {
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+}
+.node.success {
+    box-shadow: 0 4px 8px rgba(73, 178, 29, 0.3);
+}
+.node.error {
+    box-shadow: 0 4px 8px rgba(245, 54, 92, 0.695);
+  }
+  
+  /* Rotating Gradient Border */
+  .node.running::before {
+    content: "";
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border-radius: 10px;
+    background: linear-gradient(90deg, #007bff, #66a3ff, #007bff); /* Gradient colors */
+    background-size: 200% 200%; /* Make gradient larger than the border */
+    animation: rotateGradient 2s linear infinite;
+    z-index: -1; /* Place behind the node content */
+  }
+  
+  @keyframes rotateGradient {
+    0% {
+      background-position: 0% 50%; /* Start position */
+    }
+    100% {
+      background-position: 200% 50%; /* End position */
+    }
+  }
+  
+  /* Optional: Adding a subtle background pulse */
+  .node.running {
+    animation: backgroundPulse 2s ease-in-out infinite;
+  }
+  
+  @keyframes backgroundPulse {
+    0%, 100% {
+      background-color: #f0f0f0;
+    }
+    50% {
+      background-color: #e6f7ff;
+    }
+  }
+  /* Success State */
+.node.success::before {
+    content: "";
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border-radius: 10px;
+    background: linear-gradient(90deg, #56D072, #269840, #b8e7ef); /* Gradient colors */
+    background-size: 200% 200%; /* Make gradient larger than the border */
+    z-index: -1; /* Place behind the node content */
+}
+
+.node.error::before {
+    content: "";
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border-radius: 10px;
+    background: linear-gradient(90deg, #cf8889, #db2458, #ce209f); /* Gradient colors */
+    background-size: 200% 200%; /* Make gradient larger than the border */
+    z-index: -1; /* Place behind the node content */
+}
+  
+ 
