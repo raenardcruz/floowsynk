@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"regexp"
 	"strings"
@@ -82,7 +83,7 @@ func (wp *WorkflowProcessor) ForEachNodeProcess(node Node) error {
 
 func (wp *WorkflowProcessor) WhileNodeProcess(node Node) error {
 	expression := wp.populateTemplate(node.Data["expression"].(string), nil)
-	limit := node.Data["limit"].(int)
+	limit := int(node.Data["limit"].(float64))
 	cur := 0
 	res, err := m.EvaluateBoolean(expression)
 	if err != nil {
@@ -90,7 +91,7 @@ func (wp *WorkflowProcessor) WhileNodeProcess(node Node) error {
 		return err
 	}
 	for res && cur < limit {
-		wp.Log(&node, fmt.Sprintf("While %s is %b", expression, res), Info)
+		wp.Log(&node, fmt.Sprintf("While %s is %t", expression, res), Info)
 		if err := wp.nextProcess(node.Id, ""); err != nil {
 			wp.Log(&node, fmt.Sprintf("Error processing while %s: %v", expression, err), Error)
 			return err
@@ -100,6 +101,7 @@ func (wp *WorkflowProcessor) WhileNodeProcess(node Node) error {
 			wp.Log(&node, fmt.Sprintf("Error evaluating while %s: %v", expression, err), Error)
 			return err
 		}
+		expression = wp.populateTemplate(node.Data["expression"].(string), nil)
 		cur++
 	}
 	return nil
@@ -243,6 +245,7 @@ func (wp *WorkflowProcessor) SubProcessNodeProcess(node Node) error {
 		Edges: convertToEdgeList(w.Edges),
 	}
 	subProcessor := &WorkflowProcessor{
+		ProcessID:        wp.ProcessID,
 		Workflow:         &worklfow,
 		Dbcon:            wp.Dbcon,
 		ProcessVariables: wp.ProcessVariables,
@@ -318,12 +321,19 @@ func (wp *WorkflowProcessor) setVariable(name string, value interface{}) {
 }
 
 func (wp *WorkflowProcessor) Log(node *Node, message string, level string) {
-	wp.LoggingData = append(wp.LoggingData, LogData{
+	logData := LogData{
 		ProcessID: wp.ProcessID,
 		NodeID:    node.Id,
 		Message:   message,
 		Type:      level,
-	})
+	}
+	wp.LoggingData = append(wp.LoggingData, logData)
+	logDataStr, err := json.Marshal(logData)
+	if err != nil {
+		return
+	}
+	eventStream.SendEvent(wp.ProcessID, "LogEvent", string(logDataStr))
+	log.Default().Println(message)
 }
 
 func generateGUID() string {
@@ -447,4 +457,27 @@ func convertToEdgeList(edges []interface{}) EdgeList {
 		edgeList = append(edgeList, e)
 	}
 	return edgeList
+}
+
+func (wp *WorkflowProcessor) NodeInProgress(nodeId string) {
+	sendEvent(wp.ProcessID, nodeId, "running")
+}
+
+func (wp *WorkflowProcessor) NodeSuccess(nodeId string) {
+	sendEvent(wp.ProcessID, nodeId, "success")
+}
+
+func (wp *WorkflowProcessor) NodeFailed(nodeId string) {
+	sendEvent(wp.ProcessID, nodeId, "error")
+}
+
+func sendEvent(processID string, nodeId string, status string) {
+	nodeStatus := make(map[string]string, 0)
+	nodeStatus["nodeId"] = nodeId
+	nodeStatus["status"] = status
+	nodeStatusStr, err := json.Marshal(nodeStatus)
+	if err != nil {
+		return
+	}
+	eventStream.SendEvent(processID, "NodeStatus", string(nodeStatusStr))
 }

@@ -33,8 +33,17 @@ type ValidateResults struct {
 	status   int
 }
 
+type StreamData struct {
+	Obj string `json:"obj"`
+}
+
+type StreamMessage struct {
+	Event string     `json:"event"`
+	Data  StreamData `json:"data"`
+}
+
 type EventStream struct {
-	clients map[string]chan string
+	clients map[string]chan StreamMessage
 	mu      sync.Mutex
 }
 
@@ -81,3 +90,13 @@ type KeyValue struct {
 type DBConnection struct {
 	*db.DB
 }
+
+type CurrentNode struct {
+	Id string `json:"id"`
+}
+
+const (
+	success    = "success"
+	failed     = "failed"
+	inProgress = "inProgress"
+)

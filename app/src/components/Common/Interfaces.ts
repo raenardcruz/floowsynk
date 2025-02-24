@@ -34,6 +34,7 @@ export interface Node {
         y: number;
     };
     data?: any;
+    nodestatus?: string;
 }
 
 export interface Group {
@@ -41,4 +42,9 @@ export interface Group {
     name: string;
     description: string;
     icon: string;
+}
+
+export interface NodeStatus {
+    id: string;
+    status: string;
 }

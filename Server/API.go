@@ -172,8 +172,8 @@ func SseHandler(c *gin.Context) {
 	for {
 		select {
 		case msg := <-clientChan:
-			c.Writer.Write([]byte("event: message\n"))
-			c.Writer.Write([]byte("data: " + msg + "\n\n"))
+			c.Writer.Write([]byte("event: " + msg.Event + "\n"))
+			c.Writer.Write([]byte("data: " + msg.Data.Obj + "\n\n"))
 			c.Writer.Flush()
 		case <-c.Writer.CloseNotify():
 			eventStream.removeClient(id)
@@ -206,7 +206,9 @@ func (dbcon *DBConnection) RunWorkflow(c *gin.Context) {
 		ProcessResults:   make(map[string]interface{}),
 		LoggingData:      make([]LogData, 0),
 	}
-	workflowProcessor.Process("0")
+	go func() {
+		workflowProcessor.StartWorkflow()
+	}()
 
 	c.JSON(http.StatusOK, gin.H{"message": "Workflow run started"})
 }
