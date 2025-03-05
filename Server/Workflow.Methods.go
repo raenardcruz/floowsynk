@@ -56,10 +56,10 @@ func (wp *WorkflowProcessor) ConditionNodeProcess(node Node) (retVal string, err
 		wp.Log(&node, fmt.Sprintf("Condition %s processed: %s", expression, retVal), Info)
 	}()
 	if expression == "" {
-		return TRUE, errors.New("condition not found")
+		return FALSE, errors.New("condition not found")
 	}
 	if res, _ := m.EvaluateBoolean(expression); res {
-		return FALSE, nil
+		return TRUE, nil
 	} else {
 		return FALSE, nil
 	}
