@@ -33,13 +33,13 @@ type ValidateResults struct {
 	status   int
 }
 
-type StreamData struct {
-	Obj string `json:"obj"`
-}
-
 type StreamMessage struct {
 	Event string     `json:"event"`
 	Data  StreamData `json:"data"`
+}
+
+type StreamData struct {
+	Obj string `json:"obj"`
 }
 
 type EventStream struct {

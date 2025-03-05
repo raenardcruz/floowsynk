@@ -502,6 +502,7 @@ func (wp *WorkflowProcessor) Log(node *Node, message string, level string) {
 		Message:   message,
 		Type:      level,
 	}
+
 	wp.LoggingData = append(wp.LoggingData, logData)
 	logDataStr, err := json.Marshal(logData)
 	if err != nil {

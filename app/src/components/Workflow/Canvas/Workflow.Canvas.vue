@@ -112,6 +112,13 @@ eventSource.addEventListener('NodeStatus', (event: any) => {
     let nodeData = JSON.parse(event.data);
     queueStatusUpdate(nodeData.nodeId, nodeData.status);
 });
+eventSource.addEventListener('Complete', (event: any) => {
+    props.notif?.success(`Process Completed. ${event.data}`);
+});
+eventSource.addEventListener('NodeStatus', (event: any) => {
+    let nodeData = JSON.parse(event.data);
+    queueStatusUpdate(nodeData.nodeId, nodeData.status);
+});
 eventSource.addEventListener('Replay', (event: any) => {
     console.log(event);
 });
