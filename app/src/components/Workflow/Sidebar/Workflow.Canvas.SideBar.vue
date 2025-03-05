@@ -78,4 +78,4 @@ const {
 } = Sidebar.store;
 </script>
 
-<style scoped src="./Workflow.Canvas.SideBar.css"></style>
+<style scoped src="./Workflow.Canvas.Sidebar.css"></style>
