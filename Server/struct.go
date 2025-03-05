@@ -95,6 +95,11 @@ type CurrentNode struct {
 	Id string `json:"id"`
 }
 
+type ReplayData struct {
+	NodeID string                 `json:"nodeId"`
+	Data   map[string]interface{} `json:"data"`
+}
+
 const (
 	success    = "success"
 	failed     = "failed"

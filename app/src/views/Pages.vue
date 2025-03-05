@@ -6,14 +6,15 @@
 <script setup>
 import EditorJS from '@editorjs/editorjs';
 import Header from '@editorjs/header'; 
-import List from '@editorjs/list'; 
+import List from '@editorjs/list';
+import MyTool from '@/components/Page/Tools/CustomTool';
 
 const editor = new EditorJS({
-    holder: 'editorjs', 
-  
+  holder: 'editorjs', 
   tools: { 
-    header: Header, 
-    list: List 
+    myCustomTool: {
+        class: MyTool,
+    },
   },
 });
 </script>

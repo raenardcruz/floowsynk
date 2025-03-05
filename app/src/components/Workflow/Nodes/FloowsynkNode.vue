@@ -17,7 +17,7 @@
     <Teleport :to="'#' + canvasId">
         <Sidebar :title="label" :caption="node.id" v-model:visible="show">
             <div v-if="node.data">
-                <WorkflowNodeSidebarFields v-model="node.data" />
+                <WorkflowNodeSidebarFields :nodeType="nodetype" v-model="node.data" :tabid="props.tabid" />
             </div>
         </Sidebar>
     </Teleport>

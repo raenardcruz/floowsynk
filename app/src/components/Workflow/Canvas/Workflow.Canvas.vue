@@ -112,6 +112,9 @@ eventSource.addEventListener('NodeStatus', (event: any) => {
     let nodeData = JSON.parse(event.data);
     queueStatusUpdate(nodeData.nodeId, nodeData.status);
 });
+eventSource.addEventListener('Replay', (event: any) => {
+    console.log(event);
+});
 const canvasId = btoa(tab.id);
 </script>
 

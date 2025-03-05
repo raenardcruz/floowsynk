@@ -23,40 +23,80 @@ const (
 
 func (wp *WorkflowProcessor) SetVariableNodeProcess(node Node) error {
 	wp.Log(&node, "Setting variable", Info)
-	name := node.Data["name"]
-	value := node.Data["value"]
+	name := node.Data[NAME]
+	value := node.Data[VALUE]
+	defer func() {
+		wp.sendRepplayEvent(ReplayData{
+			NodeID: node.Id,
+			Data: map[string]interface{}{
+				INPUT:  wp.ProcessVariables[CURRENT],
+				OUTPUT: value,
+				NAME:   name,
+				VALUE:  value,
+			},
+		})
+		wp.Log(&node, fmt.Sprintf("Variable %s set to %v", name, value), Info)
+	}()
 	wp.setVariable(name.(string), value)
-	wp.Log(&node, fmt.Sprintf("Variable %s set to %v", name, value), Info)
 	return nil
 }
 
-func (wp *WorkflowProcessor) ConditionNodeProcess(node Node) (string, error) {
+func (wp *WorkflowProcessor) ConditionNodeProcess(node Node) (retVal string, err error) {
 	wp.Log(&node, "Processing condition", Info)
-	expression := wp.populateTemplate(node.Data["expression"].(string), nil)
+	expression := wp.populateTemplate(node.Data[EXPRESSION].(string), nil)
+	defer func() {
+		wp.sendRepplayEvent(ReplayData{
+			NodeID: node.Id,
+			Data: map[string]interface{}{
+				INPUT:      wp.ProcessVariables[CURRENT],
+				OUTPUT:     wp.ProcessVariables[CURRENT],
+				EXPRESSION: expression,
+			},
+		})
+		wp.Log(&node, fmt.Sprintf("Condition %s processed: %s", expression, retVal), Info)
+	}()
 	if expression == "" {
-		wp.Log(&node, "Condition not found", Error)
-		return "False", errors.New("condition not found")
+		return TRUE, errors.New("condition not found")
 	}
 	if res, _ := m.EvaluateBoolean(expression); res {
-		wp.Log(&node, "Condition is True", Info)
-		return "True", nil
+		return FALSE, nil
 	} else {
-		wp.Log(&node, "Condition is False", Info)
-		return "False", nil
+		return FALSE, nil
 	}
 }
 
 func (wp *WorkflowProcessor) TextNodeProcess(node Node) error {
 	wp.Log(&node, "Processing text", Info)
-	text := wp.populateTemplate(node.Data["message"].(string), nil)
-	varName := node.Data["variable"].(string)
+	text := wp.populateTemplate(node.Data[MESSAGE].(string), nil)
+	varName := node.Data[VARIABLE].(string)
+	defer func() {
+		wp.sendRepplayEvent(ReplayData{
+			NodeID: node.Id,
+			Data: map[string]interface{}{
+				INPUT:    wp.ProcessVariables[CURRENT],
+				OUTPUT:   text,
+				MESSAGE:  text,
+				VARIABLE: varName,
+			},
+		})
+		wp.Log(&node, fmt.Sprintf("Text %s set to %s", varName, text), Info)
+	}()
 	wp.setVariable(varName, text)
-	wp.Log(&node, fmt.Sprintf("Text %s set to %s", varName, text), Info)
 	return nil
 }
 
 func (wp *WorkflowProcessor) LoopNodeProcess(node Node) error {
-	iteration := node.Data["iteration"].(int)
+	iteration := node.Data[ITERATION].(int)
+	defer func() {
+		wp.sendRepplayEvent(ReplayData{
+			NodeID: node.Id,
+			Data: map[string]interface{}{
+				INPUT:     wp.ProcessVariables[CURRENT],
+				OUTPUT:    wp.ProcessVariables[CURRENT],
+				ITERATION: iteration,
+			},
+		})
+	}()
 	for i := 0; i < iteration; i++ {
 		wp.Log(&node, fmt.Sprintf("Loop iteration %d", i), Info)
 		if err := wp.nextProcess(node.Id, ""); err != nil {
@@ -68,8 +108,19 @@ func (wp *WorkflowProcessor) LoopNodeProcess(node Node) error {
 }
 
 func (wp *WorkflowProcessor) ForEachNodeProcess(node Node) error {
-	listvar := node.Data["listVariable"].(string)
+	listvar := node.Data[LISTVARIABLE].(string)
 	listitems := wp.ProcessVariables[listvar].([]interface{})
+	defer func() {
+		wp.sendRepplayEvent(ReplayData{
+			NodeID: node.Id,
+			Data: map[string]interface{}{
+				INPUT:        wp.ProcessVariables[CURRENT],
+				OUTPUT:       wp.ProcessVariables[CURRENT],
+				LISTVARIABLE: listvar,
+				"listItems":  listitems,
+			},
+		})
+	}()
 	for _, item := range listitems {
 		wp.Log(&node, fmt.Sprintf("Processing item %v", item), Info)
 		wp.ProcessVariables[fmt.Sprintf("%s.item", listvar)] = item
@@ -82,8 +133,8 @@ func (wp *WorkflowProcessor) ForEachNodeProcess(node Node) error {
 }
 
 func (wp *WorkflowProcessor) WhileNodeProcess(node Node) error {
-	expression := wp.populateTemplate(node.Data["expression"].(string), nil)
-	limit := int(node.Data["limit"].(float64))
+	expression := wp.populateTemplate(node.Data[EXPRESSION].(string), nil)
+	limit := int(node.Data[LIMIT].(float64))
 	cur := 0
 	res, err := m.EvaluateBoolean(expression)
 	if err != nil {
@@ -91,6 +142,16 @@ func (wp *WorkflowProcessor) WhileNodeProcess(node Node) error {
 		return err
 	}
 	for res && cur < limit {
+		wp.sendRepplayEvent(ReplayData{
+			NodeID: node.Id,
+			Data: map[string]interface{}{
+				INPUT:       wp.ProcessVariables[CURRENT],
+				OUTPUT:      wp.ProcessVariables[CURRENT],
+				EXPRESSION:  expression,
+				LIMIT:       limit,
+				"iteration": cur,
+			},
+		})
 		wp.Log(&node, fmt.Sprintf("While %s is %t", expression, res), Info)
 		if err := wp.nextProcess(node.Id, ""); err != nil {
 			wp.Log(&node, fmt.Sprintf("Error processing while %s: %v", expression, err), Error)
@@ -109,24 +170,35 @@ func (wp *WorkflowProcessor) WhileNodeProcess(node Node) error {
 
 func (wp *WorkflowProcessor) ListNodeProcess(node Node) error {
 	wp.Log(&node, "Processing list", Info)
-	listitems, ok := node.Data["list"].([]interface{})
+	listitems, ok := node.Data[LIST].([]interface{})
 	if !ok {
 		wp.Log(&node, "List data not found or is not a valid List", Error)
 		return errors.New("list data not found or is not a valid List")
 	}
-	varName := node.Data["variable"].(string)
+	varName := node.Data[VARIABLE].(string)
+	defer func() {
+		wp.sendRepplayEvent(ReplayData{
+			NodeID: node.Id,
+			Data: map[string]interface{}{
+				INPUT:    wp.ProcessVariables[CURRENT],
+				OUTPUT:   listitems,
+				LIST:     listitems,
+				VARIABLE: varName,
+			},
+		})
+		wp.Log(&node, fmt.Sprintf("List %s set to %v", varName, listitems), Info)
+	}()
 	wp.setVariable(varName, listitems)
-	wp.Log(&node, fmt.Sprintf("List %s set to %v", varName, listitems), Info)
 	return nil
 }
 
 func (wp *WorkflowProcessor) ApiNodeProcess(node Node) error {
 	wp.Log(&node, "Processing API", Info)
-	url := wp.populateTemplate(node.Data["url"].(string), nil)
-	method := node.Data["method"].(string)
-	headers := node.Data["headers"].(KeyValueList)
-	payloadStr := wp.populateTemplate(node.Data["payload"].(string), nil)
-	variable := node.Data["variable"].(string)
+	url := wp.populateTemplate(node.Data[URL].(string), nil)
+	method := node.Data[METHOD].(string)
+	headers := node.Data[HEADERS].(KeyValueList)
+	payloadStr := wp.populateTemplate(node.Data[PAYLOAD].(string), nil)
+	variable := node.Data[VARIABLE].(string)
 	var payload Body
 	json.Unmarshal([]byte(payloadStr), &payload)
 	response, err := wp.makeRequest(url, method, headers, payload)
@@ -134,45 +206,102 @@ func (wp *WorkflowProcessor) ApiNodeProcess(node Node) error {
 		wp.Log(&node, fmt.Sprintf("Error processing API %s: %v", url, err), Error)
 		return err
 	}
+	defer func() {
+		wp.sendRepplayEvent(ReplayData{
+			NodeID: node.Id,
+			Data: map[string]interface{}{
+				INPUT:    wp.ProcessVariables[CURRENT],
+				OUTPUT:   response,
+				URL:      url,
+				METHOD:   method,
+				HEADERS:  headers,
+				PAYLOAD:  payloadStr,
+				VARIABLE: variable,
+			},
+		})
+		wp.Log(&node, fmt.Sprintf("API %s processed successfully", url), Info)
+	}()
 	wp.setVariable(variable, response)
-	wp.Log(&node, fmt.Sprintf("API %s processed successfully", url), Info)
 	return nil
 }
 
 func (wp *WorkflowProcessor) LogNodeProcess(node Node) error {
-	message := wp.populateTemplate(node.Data["message"].(string), nil)
-	wp.Log(&node, message, Debug)
+	message := wp.populateTemplate(node.Data[MESSAGE].(string), nil)
+	defer func() {
+		wp.sendRepplayEvent(ReplayData{
+			NodeID: node.Id,
+			Data: map[string]interface{}{
+				INPUT:   wp.ProcessVariables[CURRENT],
+				OUTPUT:  wp.ProcessVariables[CURRENT],
+				MESSAGE: message,
+			},
+		})
+		wp.Log(&node, message, Debug)
+	}()
 	return nil
 }
 
 func (wp *WorkflowProcessor) GuidNodeProcess(node Node) error {
 	wp.Log(&node, "Generating GUID", Info)
-	varName := node.Data["variable"].(string)
+	varName := node.Data[VARIABLE].(string)
 	newGuid := generateGUID()
+	defer func() {
+		wp.sendRepplayEvent(ReplayData{
+			NodeID: node.Id,
+			Data: map[string]interface{}{
+				INPUT:    wp.ProcessVariables[CURRENT],
+				OUTPUT:   newGuid,
+				VARIABLE: varName,
+			},
+		})
+		wp.Log(&node, fmt.Sprintf("GUID %s generated", newGuid), Info)
+	}()
 	wp.setVariable(varName, newGuid)
-	wp.Log(&node, fmt.Sprintf("GUID %s generated", newGuid), Info)
 	return nil
 }
 
 func (wp *WorkflowProcessor) MathNodeProcess(node Node) error {
 	wp.Log(&node, "Processing Math", Info)
-	expression := wp.populateTemplate(node.Data["expression"].(string), nil)
-	varName := node.Data["variable"].(string)
+	expression := wp.populateTemplate(node.Data[EXPRESSION].(string), nil)
+	varName := node.Data[VARIABLE].(string)
 	res, err := m.EvaluateNumeric(expression)
 	if err != nil {
 		wp.Log(&node, fmt.Sprintf("Error processing Math %s: %v", expression, err), Error)
 		return err
 	}
+	defer func() {
+		wp.sendRepplayEvent(ReplayData{
+			NodeID: node.Id,
+			Data: map[string]interface{}{
+				INPUT:      wp.ProcessVariables[CURRENT],
+				OUTPUT:     res,
+				EXPRESSION: expression,
+				VARIABLE:   varName,
+			},
+		})
+		wp.Log(&node, fmt.Sprintf("Math %s processed successfully witha a value of %f", expression, res), Info)
+	}()
 	wp.setVariable(varName, res)
-	wp.Log(&node, fmt.Sprintf("Math %s processed successfully witha a value of %f", expression, res), Info)
 	return nil
 }
 
 func (wp *WorkflowProcessor) CountNodeProcess(node Node) error {
 	wp.Log(&node, "Processing Count", Info)
-	varName := node.Data["variable"].(string)
-	listVar := node.Data["listVariable"].(string)
+	varName := node.Data[VARIABLE].(string)
+	listVar := node.Data[LISTVARIABLE].(string)
 	count := 0
+	defer func() {
+		wp.sendRepplayEvent(ReplayData{
+			NodeID: node.Id,
+			Data: map[string]interface{}{
+				INPUT:        wp.ProcessVariables[CURRENT],
+				OUTPUT:       count,
+				LISTVARIABLE: listVar,
+				VARIABLE:     varName,
+			},
+		})
+		wp.Log(&node, fmt.Sprintf("Count %s processed successfully with a value of %d", varName, count), Info)
+	}()
 	if listVarValue, ok := wp.ProcessVariables[listVar].([]interface{}); ok {
 		count = count + len(listVarValue)
 	} else {
@@ -180,21 +309,33 @@ func (wp *WorkflowProcessor) CountNodeProcess(node Node) error {
 		return errors.New("list variable not found or is not a valid List")
 	}
 	wp.setVariable(varName, count)
-	wp.Log(&node, fmt.Sprintf("Count %s processed successfully with a value of %d", varName, count), Info)
 	return nil
 }
 
 func (wp *WorkflowProcessor) MapNodeProcess(node Node) error {
 	wp.Log(&node, "Processing Map", Info)
 	mappedList := make([]interface{}, 0)
-	listVar := node.Data["listVariable"].(string)
-	variable := node.Data["variable"].(string)
-	templateStr := node.Data["template"].(string)
+	listVar := node.Data[LISTVARIABLE].(string)
+	variable := node.Data[VARIABLE].(string)
+	templateStr := node.Data[TEMPLATE].(string)
 	listVarValue, ok := wp.ProcessVariables[listVar].([]interface{})
 	if !ok {
 		wp.Log(&node, "List variable not found or is not a valid List", Error)
 		return errors.New("list variable not found or is not a valid List")
 	}
+	defer func() {
+		wp.sendRepplayEvent(ReplayData{
+			NodeID: node.Id,
+			Data: map[string]interface{}{
+				INPUT:        wp.ProcessVariables[CURRENT],
+				OUTPUT:       mappedList,
+				LISTVARIABLE: listVar,
+				VARIABLE:     variable,
+				TEMPLATE:     templateStr,
+			},
+		})
+		wp.Log(&node, fmt.Sprintf("Map %s processed successfully with a value of %v", variable, mappedList), Info)
+	}()
 	for _, item := range listVarValue {
 		mappedItemStr := wp.populateTemplate(templateStr, item.(map[string]interface{}))
 		var mappedItem interface{}
@@ -204,36 +345,71 @@ func (wp *WorkflowProcessor) MapNodeProcess(node Node) error {
 		mappedList = append(mappedList, mappedItem)
 	}
 	wp.setVariable(variable, mappedList)
-	wp.Log(&node, fmt.Sprintf("Map %s processed successfully with a value of %v", variable, mappedList), Info)
 	return nil
 }
 
 func (wp *WorkflowProcessor) ReplaceNodeProcess(node Node) error {
 	wp.Log(&node, "Processing Replace", Info)
-	text := wp.populateTemplate(node.Data["text"].(string), nil)
-	pattern := wp.populateTemplate(node.Data["pattern"].(string), nil)
-	replaceText := wp.populateTemplate(node.Data["replaceText"].(string), nil)
-	varName := node.Data["variable"].(string)
+	text := wp.populateTemplate(node.Data[TEXT].(string), nil)
+	pattern := wp.populateTemplate(node.Data[PATTERN].(string), nil)
+	replaceText := wp.populateTemplate(node.Data[REPLACETEXT].(string), nil)
+	varName := node.Data[VARIABLE].(string)
 	newText := RegexReplaceAll(text, pattern, replaceText)
+	defer func() {
+		wp.sendRepplayEvent(ReplayData{
+			NodeID: node.Id,
+			Data: map[string]interface{}{
+				INPUT:       wp.ProcessVariables[CURRENT],
+				OUTPUT:      newText,
+				TEXT:        text,
+				PATTERN:     pattern,
+				REPLACETEXT: replaceText,
+				VARIABLE:    varName,
+			},
+		})
+		wp.Log(&node, fmt.Sprintf("Replace %s processed successfully with a value of %s", varName, newText), Info)
+	}()
 	wp.setVariable(varName, newText)
-	wp.Log(&node, fmt.Sprintf("Replace %s processed successfully with a value of %s", varName, newText), Info)
 	return nil
 }
 
 func (wp *WorkflowProcessor) FindAllNodeProcess(node Node) error {
 	wp.Log(&node, "Processing FindAll", Info)
-	text := wp.populateTemplate(node.Data["text"].(string), nil)
-	pattern := wp.populateTemplate(node.Data["pattern"].(string), nil)
-	varName := node.Data["variable"].(string)
+	text := wp.populateTemplate(node.Data[TEXT].(string), nil)
+	pattern := wp.populateTemplate(node.Data[PATTERN].(string), nil)
+	varName := node.Data[VARIABLE].(string)
 	re := regexp.MustCompile(pattern)
 	matches := re.FindAllString(text, -1)
+	defer func() {
+		wp.sendRepplayEvent(ReplayData{
+			NodeID: node.Id,
+			Data: map[string]interface{}{
+				INPUT:    wp.ProcessVariables[CURRENT],
+				OUTPUT:   matches,
+				TEXT:     text,
+				PATTERN:  pattern,
+				VARIABLE: varName,
+			},
+		})
+		wp.Log(&node, fmt.Sprintf("FindAll %s processed successfully with a value of %v", varName, matches), Info)
+	}()
 	wp.setVariable(varName, matches)
-	wp.Log(&node, fmt.Sprintf("FindAll %s processed successfully with a value of %v", varName, matches), Info)
 	return nil
 }
 
 func (wp *WorkflowProcessor) SubProcessNodeProcess(node Node) error {
-	subProcessId := node.Data["subProcessId"].(string)
+	subProcessId := node.Data[SUBPROCESSID].(string)
+	defer func() {
+		wp.sendRepplayEvent(ReplayData{
+			NodeID: node.Id,
+			Data: map[string]interface{}{
+				INPUT:        wp.ProcessVariables[CURRENT],
+				OUTPUT:       wp.ProcessVariables[CURRENT],
+				SUBPROCESSID: subProcessId,
+			},
+		})
+		wp.Log(&node, "SubProcess processed successfully", Info)
+	}()
 	wp.Log(&node, fmt.Sprintf("Processing SubProcess %s", subProcessId), Info)
 	w, err := wp.Dbcon.DB.GetWorkflow(subProcessId)
 	if err != nil {
@@ -253,7 +429,6 @@ func (wp *WorkflowProcessor) SubProcessNodeProcess(node Node) error {
 		ProcessResults:   wp.ProcessResults,
 	}
 	subProcessor.Process("0")
-	wp.Log(&node, "SubProcess processed successfully", Info)
 	return nil
 }
 
@@ -460,18 +635,18 @@ func convertToEdgeList(edges []interface{}) EdgeList {
 }
 
 func (wp *WorkflowProcessor) NodeInProgress(nodeId string) {
-	sendEvent(wp.ProcessID, nodeId, "running")
+	wp.sendEvent(nodeId, "running")
 }
 
 func (wp *WorkflowProcessor) NodeSuccess(nodeId string) {
-	sendEvent(wp.ProcessID, nodeId, "success")
+	wp.sendEvent(nodeId, "success")
 }
 
 func (wp *WorkflowProcessor) NodeFailed(nodeId string) {
-	sendEvent(wp.ProcessID, nodeId, "error")
+	wp.sendEvent(nodeId, "error")
 }
 
-func sendEvent(processID string, nodeId string, status string) {
+func (wp *WorkflowProcessor) sendEvent(nodeId string, status string) {
 	nodeStatus := make(map[string]string, 0)
 	nodeStatus["nodeId"] = nodeId
 	nodeStatus["status"] = status
@@ -479,5 +654,13 @@ func sendEvent(processID string, nodeId string, status string) {
 	if err != nil {
 		return
 	}
-	eventStream.SendEvent(processID, "NodeStatus", string(nodeStatusStr))
+	eventStream.SendEvent(wp.ProcessID, "NodeStatus", string(nodeStatusStr))
+}
+
+func (wp *WorkflowProcessor) sendRepplayEvent(replayData ReplayData) {
+	dataStr, err := json.Marshal(replayData)
+	if err != nil {
+		return
+	}
+	eventStream.SendEvent(wp.ProcessID, "Replay", string(dataStr))
 }

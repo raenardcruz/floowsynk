@@ -1,6 +1,11 @@
 <template>
+    <div class="input" v-if="props.nodeType == 'subprocess'">
+        <select class="sidebar-input" v-model="props.modelValue.subProcessId">
+            <option v-for="process in filteredProcesses" :value="process.id">{{ process.title }}</option>
+        </select>
+    </div>
     <div class="input" v-for="(value, key) in props.modelValue" :key="key"
-        v-if="props.modelValue.constructor == Object">
+        v-else-if="props.modelValue.constructor == Object">
         <legend class="sidebar-legend">
             <div class="checkbox" v-if="value.constructor == Boolean">
                 <input type="checkbox" v-model="props.modelValue[key]" />
@@ -8,12 +13,25 @@
             </div>
             <span v-else>{{ toSentenceCase(key.toString()) }}</span>
         </legend>
-        <input class="sidebar-input" type="text" v-model="props.modelValue[key]" v-if="value.constructor == String" />
+        <span v-if="value.constructor == String">
+            <span v-if="modalStates[key]">test</span>
+            <Teleport to=".content" v-if="modalStates[key]">
+                <Modal 
+                    :title="toSentenceCase(key.toString())" 
+                    caption="" 
+                    v-model:visible="modalStates[key]"
+                >
+                    <MonacoEditor v-model="props.modelValue[key]" :variables="variables" />
+                </Modal>
+            </Teleport>
+            <input class="sidebar-input" type="text" v-model="props.modelValue[key]" />
+            <span class="material-symbols-outlined show-code-btn" @click="showModal(key)">developer_mode_tv</span>
+        </span>
         <input class="sidebar-input" type="number" v-model="props.modelValue[key]" v-if="value.constructor == Number" />
         <div class="array-container" v-if="value.constructor == Array">
             <div class="child-container" v-for="(v, i) in value" :key="v">
                 <span class="material-symbols-outlined remove-array" @click="removeArrayItem(i, key)">delete</span>
-                <WorkflowNodeSidebarFields v-model="props.modelValue[key][i]" />
+                <WorkflowNodeSidebarFields :nodeType="props.nodeType" v-model="props.modelValue[key][i]" :tabid="props.tabid" />
             </div>
             <select class="sidebar-input" v-if="props.modelValue[key].length == 0" v-model="arraytype">
                 <option value="keyvalue">KeyValue</option>
@@ -39,14 +57,44 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, watch, computed } from 'vue';
 import WorkflowNodeSidebarFields from './Workflow.Node.Sidebar.Fields.vue';
-
-const arraytype = ref('string');
+import {ProcessList} from "@/components/Workflow/Process/Process.List"
+import {Process} from "@/components/Common/Interfaces"
+import MonacoEditor from "@/components/Common/UI/MonacoEditor.vue"
+import Modal from "@/components/Common/UI/Modal.vue"
+import WorkflowCanvas from "@/components/Workflow/Canvas/Workflow.Canvas";
 
 const props = defineProps<{
+    nodeType: string;
     modelValue: Record<string, any>;
+    tabid: string;
 }>();
+
+const arraytype = ref('string');
+const modalStates = ref<Record<string, boolean>>({});
+
+const showModal = (key: string) => {
+    modalStates.value[key] = true;
+};
+
+const { processes } = ProcessList.store;
+const tab = WorkflowCanvas.findTabById(props.tabid) || { name: '', tags: [], description: '', nodes: [], edges: [] };
+
+const variables = (tab?.nodes || [])
+  .map(node => {
+    if (node.nodetype === 'setVariable' && node.data?.name) {
+      return node.data.name;
+    } else if (node.data?.variable) {
+      return node.data.variable;
+    }
+    return null;
+  })
+  .filter(val => val !== null);
+
+const filteredProcesses = computed(() => {
+    return processes.value.filter((process: Process) => process.type == "default");
+})
 
 const emit = defineEmits(['update:modelValue']);
 
@@ -64,7 +112,6 @@ const inputHandler = function (e: Event) {
         }
     }
 }
-
 
 const toSentenceCase = function (str: string): string {
     return str
@@ -240,6 +287,15 @@ const removeArrayItem = function (index: any, key: string) {
     right: 5px;
     cursor: pointer;
     color: #BC0F26;
+    z-index: 100;
+}
+.show-code-btn {
+    display: flex;
+    position: absolute;
+    top: 22px;
+    right: 35px;
+    cursor: pointer;
+    color: #3B90D4;
     z-index: 100;
 }
 </style>
