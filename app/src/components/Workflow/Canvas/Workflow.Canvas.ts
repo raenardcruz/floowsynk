@@ -14,7 +14,7 @@ const clipBoard = ref({
 });
 const viewportPosition = ref({ x: 0, y: 0, zoom: 1 });
 const mousePosition = ref({ x: 0, y: 0 });
-
+const runningTabs = ref<string[]>([]);
 const MAX_HISTORY_SIZE = 20;
 const undoStack = ref<{ nodes: any[], edges: any[] }[]>([]);
 const redoStack = ref<{ nodes: any[], edges: any[] }[]>([]);
@@ -48,6 +48,7 @@ export default class WorkflowCanvas {
     isDragOver,
     viewportPosition,
     nodeStatuses,
+    runningTabs,
   }
 
   /*
@@ -418,6 +419,7 @@ export default class WorkflowCanvas {
   static async run(tab: Process, notif: any) {
     nodeStatuses.value = {};
     pendingUpdates = {};
+    runningTabs.value.push(tab.id);
     let payload: any = {
       nodes: tab.nodes,
       edges: tab.edges

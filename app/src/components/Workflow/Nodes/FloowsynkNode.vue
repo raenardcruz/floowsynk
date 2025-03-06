@@ -31,7 +31,10 @@ import Sidebar from "@/components/Common/UI/Sidebar.vue";
 import WorkflowNodeSidebarFields from "../Sidebar/Workflow.Node.Sidebar.Fields.vue";
 import WorkflowCanvas from "@/components/Workflow/Canvas/Workflow.Canvas";
 
-const {nodeStatuses} = WorkflowCanvas.store;
+const {
+    nodeStatuses,
+    runningTabs,
+} = WorkflowCanvas.store;
 const {
     node
 } = useNode()
@@ -72,10 +75,17 @@ const clickhandler = () => {
 }
 
 const nodestatus = computed(() => {
+    if (!isRunning.value) {
+        return '';
+    }
     if (node.id === '0') {
         return '';
     }
     return nodeStatuses.value[node.id] || '';
+})
+
+const isRunning = computed(() => {
+    return runningTabs.value.includes(props.tabid);
 })
 
 const { icon, nodetype, label, outputs, inputs, nodestyle } = node as unknown as Node;
