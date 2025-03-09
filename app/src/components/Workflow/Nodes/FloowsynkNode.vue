@@ -16,11 +16,17 @@
             :style="{ top: `${(100 / (outputs.length + 1)) * (index + 1)}%` }" />
     </div>
     <Teleport :to="'#' + canvasId">
-        <SideBar :title="label" :caption="node.id" v-model:visible="show">
+        <SideBar :title="label" :caption="node.id" v-model:visible="showSidebar">
             <div v-if="node.data">
                 <WorkflowNodeSidebarFields :nodeType="nodetype" v-model="node.data" :tabid="props.tabid" />
             </div>
         </SideBar>
+    </Teleport>
+    <Teleport :to="`#${canvasId}`">
+        <Modal title="Select Process Type" caption="Select the type of process you want to create"
+            v-model:visible="showModal">
+            <ProcessTypeModal :id="props.tabid" />
+        </Modal>
     </Teleport>
 </template>
 
@@ -28,19 +34,22 @@
 import { ref } from "vue";
 import { Handle, Position, useNode } from '@vue-flow/core';
 import { SideBar } from "@/components/Composable/UI";
-import {SidebarCanvasFields as WorkflowNodeSidebarFields} from "@/components/Workflow/Sidebar"
+import { SidebarCanvasFields as WorkflowNodeSidebarFields } from "@/components/Workflow/Sidebar"
 import { NodeProps } from './FloowsynkNode.types'
 import { useFloowsynkNodeHooks, useFloowsynkNodeWatchers } from './FloowsynkNode.hooks'
 import { clickhandler } from './FloowsynkNode.helper'
 import { Node } from '@/views/Workflow'
 import { toSentenceCase } from "@/components/Composable/Utilities";
+import ProcessTypeModal from '@/components/Workflow/Modal/ProcessType/Workflow.Modal.ProcessType.vue'
+import { Modal } from '@/components/Composable/UI'
 
 const props = defineProps<NodeProps>();
 const { node } = useNode()
 const { canvasId } = useFloowsynkNodeHooks(props.tabid)
-const show = ref(false);
-const { nodestatus } = useFloowsynkNodeWatchers(props.tabid, node, show)
-const clickHandler = () => clickhandler(node, props.tabid, show)
+const showSidebar = ref(false);
+const showModal = ref(false);
+const { nodestatus } = useFloowsynkNodeWatchers(props.tabid, node, showSidebar)
+const clickHandler = () => clickhandler(node, props.tabid, showSidebar, showModal)
 const { icon, nodetype, label, outputs, inputs, nodestyle } = node as unknown as Node;
 </script>
 

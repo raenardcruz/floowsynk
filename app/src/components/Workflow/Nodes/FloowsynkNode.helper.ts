@@ -1,11 +1,10 @@
 import { Ref } from 'vue'
 import { GraphNode } from "@vue-flow/core";
 
-export const clickhandler = (node: GraphNode<any, any, string>, tabid: string, show: Ref<boolean>) => {
+export const clickhandler = (node: GraphNode<any, any, string>, tabid: string, showSidebar: Ref<boolean>, showModal: Ref<boolean>) => {
     if (node.id == '0') {
-        const event = new CustomEvent('type-select', { detail: { tabid } });
-        window.dispatchEvent(event);
+        showModal.value = true
     } else {
-        show.value = true;
+        showSidebar.value = true;
     }
 }

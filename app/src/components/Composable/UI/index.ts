@@ -1,2 +1,3 @@
 import SideBar from './Sidebar/Sidebar.vue'
-export { SideBar }
+import Modal from './Modal/Modal.vue'
+export { SideBar, Modal }

@@ -1,5 +1,5 @@
 .modalcontent {
-    position: relative;
+    position: absolute;
     display: flex;
     overflow: auto;
     height: 100%;
