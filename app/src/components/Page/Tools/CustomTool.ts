@@ -1,9 +1,7 @@
-// MyTool.ts
 import { h, render } from 'vue'
 import CustomTool from "@/components/Page/Tools/CustomTool.vue"
-// Define the custom tool class
+
 export default class MyTool {
-  // Toolbox settings for Editor.js (toolbar appearance)
   static get toolbox() {
     return {
       title: 'My Tool',
@@ -11,9 +9,7 @@ export default class MyTool {
     }
   }
   
-  // Data held by the tool
   data: string
-  // The container element where the Vue component will be mounted
   container: HTMLElement | null
 
   constructor({ data }: { data: string }) {
@@ -21,7 +17,6 @@ export default class MyTool {
     this.container = null
   }
 
-  // Render method mounts the Vue component into a container div
   render(): HTMLElement {
     this.container = document.createElement('div')
     const vueVNode = h(CustomTool, {
@@ -34,7 +29,6 @@ export default class MyTool {
     return this.container
   }
 
-  // Save method returns the current data
   save(): string {
     return this.data
   }

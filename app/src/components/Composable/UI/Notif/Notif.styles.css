@@ -1,0 +1,48 @@
+.alert {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  border-radius: 10px;
+  height: fit-content;
+  width: fit-content;
+  min-width: 100px;
+  background: rgb(198, 111, 58);
+  font-size: 15px;
+  color: #fff;
+  justify-self: center;
+  z-index: 10;
+  animation: alert-entry 5.5s;
+}
+.info {
+  background: #6199B9;
+}
+.success {
+  background: #7AB961;
+}
+.error {
+  background: #B96461;
+}
+
+@keyframes alert-entry {
+  0% {
+      opacity: 0;
+      transform: translateY(20px);
+  }
+
+  20% {
+      opacity: 1;
+      transform: translateY(0px);
+  }
+
+  80% {
+      opacity: 1;
+      transform: translateY(0px);
+  }
+
+  100% {
+      opacity: 0;
+      transform: translateY(20px);
+  }
+}

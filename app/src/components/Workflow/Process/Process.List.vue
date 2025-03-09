@@ -10,9 +10,9 @@
             <input class="search-box" type="search" placeholder="Search" v-model="search">
         </div>
         <div class="cards-gallery">
-            <div class="create" @click="ProcessList.createProcess"></div>
+            <div class="create" @click="createProcess"></div>
             <div class="card" v-for="process in filteredProcesses" :key="process.id" :class="process.type"
-                @click="ProcessList.cardClicked(process)">
+                @click="cardClicked(process)">
                 <div class="type">
                     <workflow-icon :type="process.type" />
                     <span class="type-text">{{ process.type }}</span>
@@ -30,10 +30,13 @@
 </template>
 
 <script setup lang="ts">
-import { ProcessList } from "./Process.List"
+import { createProcess, cardClicked, initWorkflows } from './Process.List.helper'
 import WorkflowIcon from "@/components/Workflow/Workflow.Icon.vue";
-const { search, filteredProcesses } = ProcessList.store;
-ProcessList.init();
+import { useProcessListStore, useProcessListHooks } from './Process.List.hooks'
+
+const { search } = useProcessListStore();
+const { filteredProcesses } = useProcessListHooks();
+initWorkflows();
 </script>
 
-<style scoped src="./Process.List.css"></style>
+<style scoped src="./Process.List.styles.css"></style>
