@@ -8,7 +8,6 @@ const clipBoard = ref({
   nodes: [] as any[],
   edges: [] as any[],
 });
-const viewportPosition = ref({ x: 0, y: 0, zoom: 1 });
 const mousePosition = ref({ x: 0, y: 0 });
 const runningTabs = ref<string[]>([]);
 const undoStack = ref<{ nodes: any[], edges: any[] }[]>([]);
@@ -19,7 +18,6 @@ export const useWorkflowCanvasStore= () => {
     return {
         isDragOver,
         clipBoard,
-        viewportPosition,
         mousePosition,
         runningTabs,
         undoStack,

@@ -1,5 +1,5 @@
-import { useSidebarNodeStore } from './Workflow.Sidebar.Node.hooks'
-import { SidebarNodeProps } from './Workflow.Sidebar.Node.types'
+import { useSidebarNodeStore } from '../Workflow.Sidebar.Node.hooks'
+import { SidebarNodeProps } from '../Workflow.Sidebar.Node.types'
 import { EMIT_MODEL } from './Workflow.Sidebar.Node.Fields.constants'
 
 const { modalStates, arraytype } = useSidebarNodeStore();

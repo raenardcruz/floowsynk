@@ -10,7 +10,6 @@ export function useNotif(options: NotifOptions) {
 
   const container = document.createElement('div');
   targetElement.appendChild(container);
-  console.log(notificationsStack)
   const index = notificationsStack.length;
   notificationsStack.push(container);
 

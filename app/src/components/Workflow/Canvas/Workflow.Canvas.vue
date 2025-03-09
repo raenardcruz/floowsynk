@@ -4,7 +4,7 @@
             <div class="title">
                 <input type="text" v-model="tab.title" placeholder="Enter Process Title">
                 <div class="tags">
-                    <div class="tag btn" @click="tab.tags.push('')">
+                    <div class="tag btn" @click="addTag">
                         <span class="material-symbols-outlined">add</span>
                         <span>Add Tag</span>
                     </div>
@@ -14,7 +14,7 @@
                             <option :value="tag" v-for="tag in tab.tags.filter(f => f != 'No Tags')"></option>
                         </datalist>
                         <span class="material-symbols-outlined" style="color: #BC0F26;"
-                            @click="tab.tags.splice(index, 1)">close</span>
+                            @click="removeTag(index)">close</span>
                     </div>
                 </div>
             </div>
@@ -34,7 +34,7 @@
                 @drop="onDrop($event)" @dragover="onDragOver($event)"
                 @dragleave="onDragLeave()"
                 @node-drag-stop="onNodeDragEnd($event)"
-                @move="onBackgroundMove($event)" @mousemove="onMouseMove($event)"
+                @mousemove="onMouseMove($event)"
                 @keydown="onKeyDown($event)" delete-key-code="false" no-wheel-class-name="no-scroll">
                 <DropzoneBackground :style="{
                     backgroundColor: isDragOver ? '#e7f3ff' : 'transparent',
@@ -83,17 +83,18 @@ import DropzoneBackground from './Background'
 import { MiniMap } from '@vue-flow/minimap';
 import { ControlButton, Controls } from '@vue-flow/controls';
 import FloowsynkNode from '@/components/Workflow/Nodes'
+import { useWorkflowCanvasHelperMethods } from './Helper/Workflow.Canvas.Helper'
 
 const props = defineProps<WorkflowCanvasProps>()
 const { tab, canvasId } = useWorkflowCanvasHooks(props.id)
 const show = ref(false);
+const { addTag, removeTag } = useWorkflowCanvasHelperMethods(props.id, useVueFlow())
 const {
     onConnectEdge,
     onDrop,
     onDragOver,
     onDragLeave,
     onNodeDragEnd,
-    onBackgroundMove,
     onMouseMove,
     onKeyDown,
 } = useWorkflowCanvasVueFlowEvents(props, useVueFlow())

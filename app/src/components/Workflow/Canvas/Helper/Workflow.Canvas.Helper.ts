@@ -1,12 +1,11 @@
-import {useWorkflowCanvasHooks, useWorkflowCanvasStore} from '../Workflow.Canvas.hooks'
-import {MAX_HISTORY_SIZE} from '../Workflow.canvas.constants'
+import { useWorkflowCanvasHooks, useWorkflowCanvasStore } from '../Workflow.Canvas.hooks'
+import { MAX_HISTORY_SIZE } from '../Workflow.canvas.constants'
 import { generateUUID } from '@/components/Composable/Utilities';
 
 const {
-    undoStack,
-    redoStack,
-    mousePosition,
-    viewportPosition } = useWorkflowCanvasStore();
+  undoStack,
+  redoStack,
+  mousePosition } = useWorkflowCanvasStore();
 
 export const useWorkflowCanvasHelperMethods = (tabId: string, vueFlowInstance: any) => {
   const { tab } = useWorkflowCanvasHooks(tabId);
@@ -16,7 +15,7 @@ export const useWorkflowCanvasHelperMethods = (tabId: string, vueFlowInstance: a
       nodes: JSON.parse(JSON.stringify(tab.value.nodes || [])),
       edges: JSON.parse(JSON.stringify(tab.value.edges || []))
     };
-    
+
     undoStack.value.push(state);
     if (undoStack.value.length > MAX_HISTORY_SIZE) {
       undoStack.value.shift();
@@ -25,8 +24,8 @@ export const useWorkflowCanvasHelperMethods = (tabId: string, vueFlowInstance: a
   }
   // Method: Calculate Node Position
   const calculateNodePosition = (nodeClip: any, counter: number, referencePos: any) => {
-    const x = (mousePosition.value.x - viewportPosition.value.x) / viewportPosition.value.zoom;
-    const y = (mousePosition.value.y - viewportPosition.value.y) / viewportPosition.value.zoom;
+    const x = mousePosition.value.x;
+    const y = mousePosition.value.y;
 
     if (isNaN(x) || isNaN(y)) {
       return null;
@@ -54,9 +53,28 @@ export const useWorkflowCanvasHelperMethods = (tabId: string, vueFlowInstance: a
     };
   }
 
+  const addTag = () => {
+    let tags = tab.value.tags || [];
+    tab.value = {
+      ...tab.value,
+      tags: [...tags, '']
+    }
+  }
+
+  const removeTag = (index: number) => {
+    const newTags = [...tab.value.tags]
+    newTags.splice(index, 1)
+    tab.value = {
+      ...tab.value,
+      tags: newTags
+    }
+  }
+
   return {
     saveState,
     calculateNodePosition,
-    createPastedNode
+    createPastedNode,
+    addTag,
+    removeTag
   }
 }

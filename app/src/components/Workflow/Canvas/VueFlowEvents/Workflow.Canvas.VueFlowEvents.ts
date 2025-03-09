@@ -4,6 +4,9 @@ import { useWorkflowCanvasHelperMethods } from '../Helper/Workflow.Canvas.Helper
 import { useWorkflowStore } from '@/views/Workflow';
 import { generateUUID } from '@/components/Composable/Utilities';
 import { useWorkflowCanvasKeyboardActions } from '../KeyboardActions/Workflow.Canvas.KeyboardActions';
+import { useSidebarCanvasStore } from '@/components/Workflow/Sidebar/Canvas/Workflow.Sidebar.Canvas.hooks';
+
+const { draggedNode } = useSidebarCanvasStore();
 
 export const useWorkflowCanvasVueFlowEvents = (props: WorkflowCanvasProps, vueFlowInstance: any) => {
     const { activeTab } = useWorkflowStore();
@@ -11,7 +14,6 @@ export const useWorkflowCanvasVueFlowEvents = (props: WorkflowCanvasProps, vueFl
     const { saveState } = useWorkflowCanvasHelperMethods(props.id, vueFlowInstance);
     const {
       isDragOver,
-      viewportPosition,
       mousePosition,
   } = useWorkflowCanvasStore();
     // Method: On Connect Edge
@@ -43,11 +45,10 @@ export const useWorkflowCanvasVueFlowEvents = (props: WorkflowCanvasProps, vueFl
     const onDrop = (event: any) => {
       saveState();
       const { screenToFlowCoordinate } = vueFlowInstance;
-      const node = ""//SidebarHelper.store.draggedNode.value; TODO: CHANGE ME
+      const node = draggedNode.value;
       const newNode: any = JSON.parse(JSON.stringify(node));
-      const headerHeight = 159.4;
-      const x = (event.clientX - viewportPosition.value.x) / viewportPosition.value.zoom;
-      const y = (event.clientY - headerHeight - viewportPosition.value.y) / viewportPosition.value.zoom;
+      const x = event.clientX;
+      const y = event.clientY;
       if (isNaN(x) || isNaN(y)) {
         return;
       }
@@ -78,18 +79,13 @@ export const useWorkflowCanvasVueFlowEvents = (props: WorkflowCanvasProps, vueFl
       if (nodeIndex === -1) {
         throw new Error(`Node not found for id ${event.id}`);
       }
-      const headerHeight = 159.4;
       const x = event.clientX;
-      const y = event.clientY - headerHeight;
+      const y = event.clientY;
       if (isNaN(x) || isNaN(y)) {
         return;
       }
       const position = screenToFlowCoordinate({ x, y });
       tab.value.nodes[nodeIndex].position = position;
-    }
-    // Method: On Background Move
-    const onBackgroundMove = (event: any) => {
-      viewportPosition.value = event.flowTransform;
     }
     // Method: On Mouse Move
     const onMouseMove = (event: any) => {
@@ -150,7 +146,6 @@ export const useWorkflowCanvasVueFlowEvents = (props: WorkflowCanvasProps, vueFl
       onDragLeave,
       onDrop,
       onNodeDragEnd,
-      onBackgroundMove,
       onMouseMove,
       onKeyDown
     }

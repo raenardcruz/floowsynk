@@ -1,6 +1,6 @@
 import { useWorkflowCanvasHooks, useWorkflowCanvasStore } from '../Workflow.Canvas.hooks'
 import { WorkflowCanvasProps } from '../Workflow.Canvas.types'
-import { useNotif, NotifOptions } from '@/components/Composable/UI/Notif'
+import { useNotif, NotifOptions, STATUS_ERROR, STATUS_INFO, STATUS_SUCCESS } from '@/components/Composable/UI/Notif'
 import { initWorkflows } from '@/components/Workflow/Process'
 import { useWorkflowStore } from '@/views/Workflow'
 import {
@@ -32,15 +32,17 @@ export const useWorkflowCanvasControlButtonActions = (props: WorkflowCanvasProps
       }
       useNotif({
         duration: 5000,
-        teleportTarget: `#${tab.value.id}`,
-        message: "Workflow saved successfully"
+        teleportTarget: `#${btoa(tab.value.id)}`,
+        message: "Workflow saved successfully",
+        status: STATUS_SUCCESS
       } as NotifOptions);
     }
     catch (error) {
       useNotif({
         duration: 5000,
-        teleportTarget: `#${tab.value.id}`,
-        message: "Failed to save workflow"
+        teleportTarget: `#${btoa(tab.value.id)}`,
+        message: "Failed to save workflow",
+        status: STATUS_ERROR
       } as NotifOptions);
     }
   }
@@ -50,8 +52,9 @@ export const useWorkflowCanvasControlButtonActions = (props: WorkflowCanvasProps
       await deleteProcess(tab.value);
       useNotif({
         duration: 5000,
-        teleportTarget: `#${tab.value.id}`,
-        message: "Workflow deleted successfully"
+        teleportTarget: `#${btoa(tab.value.id)}`,
+        message: "Workflow deleted successfully",
+        status: STATUS_INFO
       } as NotifOptions);
       await initWorkflows();
       tabs.value.splice(tabs.value.indexOf(tab.value), 1);
@@ -60,20 +63,22 @@ export const useWorkflowCanvasControlButtonActions = (props: WorkflowCanvasProps
     catch (error) {
       useNotif({
         duration: 5000,
-        teleportTarget: `#${tab.value.id}`,
-        message: "Failed to delete workflow"
+        teleportTarget: `#${btoa(tab.value.id)}`,
+        message: "Failed to delete workflow",
+        status: STATUS_ERROR
       } as NotifOptions);
     }
   }
 
   const runProcess = async () => {
-    nodeStatuses.value = new Map<string, string>();
+    nodeStatuses.value = {};
     runningTabs.value.push(tab.value.id);
     let resp = await executeProcess(tab.value);
     useNotif({
       duration: 5000,
       teleportTarget: `#${btoa(tab.value.id)}`,
-      message: "Workflow started successfully: " + resp.data.message
+      message: "Workflow started successfully: " + resp.data.message,
+      status: STATUS_INFO
     } as NotifOptions);
   }
 

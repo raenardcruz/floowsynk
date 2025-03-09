@@ -58,8 +58,8 @@
 
 <script setup lang="ts">
 import { defineEmits } from 'vue'
-import { SidebarNodeProps } from './Workflow.Sidebar.Node.types'
-import { useSidebarNodeHooks, useSidebarNodeStore } from './Workflow.Sidebar.Node.hooks'
+import { SidebarNodeProps } from '../Workflow.Sidebar.Node.types'
+import { useSidebarNodeHooks, useSidebarNodeStore } from '../Workflow.Sidebar.Node.hooks'
 import { toSentenceCase } from '@/components/Composable/Utilities'
 import { showModal, useSidebarNodeFieldsHelper, inputHandler } from './Workflow.Sidebar.Node.helper'
 import { EMIT_MODEL } from './Workflow.Sidebar.Node.Fields.constants'
