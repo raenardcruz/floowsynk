@@ -33,6 +33,7 @@
                 :snapToGrid="true" @connect="onConnectEdge($event)"
                 @drop="onDrop($event)" @dragover="onDragOver($event)"
                 @dragleave="onDragLeave()"
+                @node-drag-start="onNodeDragStart($event)"
                 @node-drag-stop="onNodeDragEnd($event)"
                 @mousemove="onMouseMove($event)"
                 @keydown="onKeyDown($event)" delete-key-code="false" no-wheel-class-name="no-scroll">
@@ -97,6 +98,7 @@ const {
     onNodeDragEnd,
     onMouseMove,
     onKeyDown,
+    onNodeDragStart
 } = useWorkflowCanvasVueFlowEvents(props, useVueFlow())
 const { resetTransform, removeProcess, saveProcess, runProcess } = useWorkflowCanvasControlButtonActions(props, useVueFlow())
 const { 

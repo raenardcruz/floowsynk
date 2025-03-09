@@ -68,9 +68,11 @@ export const useWorkflowCanvasVueFlowEvents = (props: WorkflowCanvasProps, vueFl
         throw new Error("Tab nodes not found");
       }
     }
+    const onNodeDragStart = (_: any) => {
+      saveState();
+    }
   // Method: On Node Drag End
     const onNodeDragEnd = (event: any) => {
-      saveState();
       const { screenToFlowCoordinate } = vueFlowInstance;
       if (!tab.value.nodes) {
         throw new Error("Tab nodes not found");
@@ -147,6 +149,7 @@ export const useWorkflowCanvasVueFlowEvents = (props: WorkflowCanvasProps, vueFl
       onDrop,
       onNodeDragEnd,
       onMouseMove,
-      onKeyDown
+      onKeyDown,
+      onNodeDragStart
     }
   }

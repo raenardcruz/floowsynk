@@ -19,17 +19,14 @@ export const useWorkflowCanvasKeyboardActions = (props: WorkflowCanvasProps, vue
       edges: JSON.parse(JSON.stringify(tab.value.edges || []))
     };
     redoStack.value.push(currentState);
+    if (redoStack.value.length > 200) redoStack.value.shift();
 
     const previousState = undoStack.value.pop()!;
-    // Check if we still need this?
-    tab.value.nodes = []
-    tab.value.edges = []
-    setTimeout(() => {
-      tab.value.nodes = previousState.nodes;
-      tab.value.edges = previousState.edges;
-      const { id } = vueFlowInstance
-      document.getElementById(id)?.focus();
-    }, 1);
+    tab.value = {
+      ...tab.value,
+      nodes: previousState.nodes,
+      edges: previousState.edges
+    }
   }
   // Method: Redo
   const redo = () => {
@@ -40,6 +37,7 @@ export const useWorkflowCanvasKeyboardActions = (props: WorkflowCanvasProps, vue
       edges: JSON.parse(JSON.stringify(tab.value.edges || []))
     };
     undoStack.value.push(currentState);
+    if (undoStack.value.length > 200) undoStack.value.shift();
 
     const nextState = redoStack.value.pop()!;
     tab.value.nodes = nextState.nodes;
