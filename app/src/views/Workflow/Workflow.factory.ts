@@ -1,15 +1,19 @@
-import { Process } from '@/views/Workflow'
+import { Workflow, Node, Edge } from 'proto/floowsynk_pb'
 import {generateUUID} from "@/components/Composable/Utilities"
 
-export const newProcess = (): Process => {
+export const newProcess = (): Workflow.AsObject => {
     return {
         id: generateUUID(),
         type: 'default',
-        title: 'Untitled',
+        name: 'Untitled',
         description: '',
-        nodes: [],
-        edges: [],
-        tags: [],
-        isnew: true
+        nodesList: [] as Node.AsObject[],
+        edgesList: [] as Edge.AsObject[],
+        tagsList: [],
+        isnew: true,
+        createdat: new Date().toISOString(),
+        updatedat: new Date().toISOString(),
+        createdby: 'system',
+        updatedby: 'system'
     }
 }

@@ -1,10 +1,13 @@
-import axios from 'axios'
+import { WorkflowServicePromiseClient } from 'proto/floowsynk_grpc_web_pb'
+import { PageRequest, WorkflowList } from 'proto/floowsynk_pb'
+import { getApiUrl } from '@/components/Composable/constants'
 
-export const getAllWorkflows = async () => {
-    let data = {
-        headers: {
-            "Authorization": `${localStorage.getItem("sessionToken")}`
-        }
-    };
-    return await axios.get("api/workflows", data);
+export const getAllWorkflows = async (limit: number, offset: number): Promise<WorkflowList> => {
+    const client = new WorkflowServicePromiseClient(getApiUrl());
+    const request = new PageRequest();
+    request.setLimit(limit);
+    request.setOffset(offset);
+    return await client.listWorkflows(request, {
+        'Authorization': `${localStorage.getItem("sessionToken")}`
+    });
 }

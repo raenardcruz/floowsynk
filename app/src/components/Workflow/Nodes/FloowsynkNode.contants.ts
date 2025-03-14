@@ -1,4 +1,5 @@
-import { Group, Node } from '@/views/Workflow'
+import { Group } from '@/views/Workflow'
+import { Node, NodeData } from 'proto/floowsynk_pb'
 
 export const groups: Group[] = [
     {
@@ -45,10 +46,10 @@ export const groups: Group[] = [
     }
 ]
 
-export const nodes: Node[] = [
+export const nodes: Node.AsObject[] = [
     {
         id: '', nodetype: 'setVariable', label: 'Set Variable', position: { x: 0, y: 0 },
-        group: [1],
+        groupList: [1],
         icon: {
             name: "memory",
             color: "green"
@@ -57,12 +58,12 @@ export const nodes: Node[] = [
             name: "",
             value: ""
         },
-        inputs: ["input"],
-        outputs: ["output"]
-    },
+        inputsList: ["input"],
+        outputsList: ["output"]
+    } as Node.AsObject,
     {
         id: '', nodetype: 'condition', label: 'Condition', position: { x: 0, y: 0 },
-        group: [2],
+        groupList: [2],
         icon: {
             name: "question_mark",
             color: "red"
@@ -70,12 +71,12 @@ export const nodes: Node[] = [
         data: {
             expression: ""
         },
-        inputs: ["input"],
-        outputs: ["True", "False"]
-    },
+        inputsList: ["input"],
+        outputsList: ["True", "False"]
+    } as Node.AsObject,
     {
         id: '', nodetype: 'loop', label: 'Loop', position: { x: 0, y: 0 },
-        group: [2],
+        groupList: [2],
         icon: {
             name: "all_inclusive",
             color: "#2864A9"
@@ -83,12 +84,12 @@ export const nodes: Node[] = [
         data: {
             iteration: 1
         },
-        inputs: ["input"],
-        outputs: ["output"]
-    },
+        inputsList: ["input"],
+        outputsList: ["output"]
+    } as Node.AsObject,
     {
         id: '', nodetype: 'foreach', label: 'For Each', position: { x: 0, y: 0 },
-        group: [2],
+        groupList: [2],
         icon: {
             name: "all_inclusive",
             color: "#2864A9"
@@ -96,12 +97,12 @@ export const nodes: Node[] = [
         data: {
             listvar: ""
         },
-        inputs: ["input"],
-        outputs: ["output"]
-    },
+        inputsList: ["input"],
+        outputsList: ["output"]
+    } as Node.AsObject,
     {
         id: '', nodetype: 'while', label: 'While', position: { x: 0, y: 0 },
-        group: [2],
+        groupList: [2],
         icon: {
             name: "all_inclusive",
             color: "#2864A9"
@@ -110,12 +111,12 @@ export const nodes: Node[] = [
             expression: "",
             limit: 1000
         },
-        inputs: ["input"],
-        outputs: ["output"]
-    },
+        inputsList: ["input"],
+        outputsList: ["output"]
+    } as Node.AsObject,
     {
         id: '', nodetype: 'api', label: 'Rest API', position: { x: 0, y: 0 },
-        group: [4],
+        groupList: [4],
         icon: {
             name: "language",
             color: "#87B359"
@@ -123,7 +124,7 @@ export const nodes: Node[] = [
         data: {
             url: "",
             method: "GET",
-            headers: [
+            headersList: [
                 {
                     key: "Content-Type",
                     value: "application/json"
@@ -132,12 +133,12 @@ export const nodes: Node[] = [
             payload: "",
             variable: ""
         },
-        inputs: ["input"],
-        outputs: ["output"]
-    },
+        inputsList: ["input"],
+        outputsList: ["output"]
+    } as Node.AsObject,
     {
         id: '', nodetype: 'log', label: 'Logging', position: { x: 0, y: 0 },
-        group: [6],
+        groupList: [6],
         icon: {
             name: "edit_document",
             color: "#222"
@@ -145,12 +146,12 @@ export const nodes: Node[] = [
         data: {
             message: ""
         },
-        inputs: ["input"],
-        outputs: ["output"]
-    },
+        inputsList: ["input"],
+        outputsList: ["output"]
+    } as Node.AsObject,
     {
         id: '', nodetype: 'getGuid', label: 'Get Guid', position: { x: 0, y: 0 },
-        group: [1],
+        groupList: [1],
         icon: {
             name: "frame_source",
             color: "#3477B9"
@@ -158,12 +159,12 @@ export const nodes: Node[] = [
         data: {
             variable: ""
         },
-        inputs: ["input"],
-        outputs: ["output"]
-    },
+        inputsList: ["input"],
+        outputsList: ["output"]
+    } as Node.AsObject,
     {
         id: '', nodetype: 'text', label: 'Text', position: { x: 0, y: 0 },
-        group: [1],
+        groupList: [1],
         icon: {
             name: "article",
             color: "#9A9A9A"
@@ -172,12 +173,12 @@ export const nodes: Node[] = [
             message: "",
             variable: ""
         },
-        inputs: ["input"],
-        outputs: ["output"]
-    },
+        inputsList: ["input"],
+        outputsList: ["output"]
+    } as Node.AsObject,
     {
         id: '', nodetype: 'math', label: 'math', position: { x: 0, y: 0 },
-        group: [1],
+        groupList: [1],
         icon: {
             name: "calculate",
             color: "#D36C6C"
@@ -186,55 +187,55 @@ export const nodes: Node[] = [
             expression: "",
             variable: ""
         },
-        inputs: ["input"],
-        outputs: ["output"]
-    },
+        inputsList: ["input"],
+        outputsList: ["output"]
+    } as Node.AsObject,
     {
         id: '', nodetype: 'list', label: 'List', position: { x: 0, y: 0 },
-        group: [1],
+        groupList: [1],
         icon: {
             name: "list",
             color: "#85B158"
         },
         data: {
-            list: [],
+            listList: [] as string[],
             variable: ""
         },
-        inputs: ["input"],
-        outputs: ["output"]
-    },
+        inputsList: ["input"],
+        outputsList: ["output"]
+    } as Node.AsObject,
     {
         id: '', nodetype: 'count', label: 'List Count', position: { x: 0, y: 0 },
-        group: [1],
+        groupList: [1],
         icon: {
             name: "tag",
             color: "#979797"
         },
         data: {
-            listVariable: "",
+            listvariable: "",
             variable: ""
         },
-        inputs: ["input"],
-        outputs: ["output"]
-    },
+        inputsList: ["input"],
+        outputsList: ["output"]
+    } as Node.AsObject,
     {
         id: '', nodetype: 'map', label: 'Map', position: { x: 0, y: 0 },
-        group: [3],
+        groupList: [3],
         icon: {
             name: "map",
             color: "#85B158"
         },
         data: {
-            listVariable: "",
+            listvariable: "",
             template: "",
             variable: ""
         },
-        inputs: ["input"],
-        outputs: ["output"]
-    },
+        inputsList: ["input"],
+        outputsList: ["output"]
+    } as Node.AsObject,
     {
         id: '', nodetype: 'replace', label: 'Replace', position: { x: 0, y: 0 },
-        group: [1],
+        groupList: [1],
         icon: {
             name: "swap_horiz",
             color: "#77584C"
@@ -242,15 +243,15 @@ export const nodes: Node[] = [
         data: {
             text: "",
             pattern: "",
-            replaceText: "",
+            replacetext: "",
             variable: ""
         },
-        inputs: ["input"],
-        outputs: ["output"]
-    },
+        inputsList: ["input"],
+        outputsList: ["output"]
+    } as Node.AsObject,
     {
         id: '', nodetype: 'findAll', label: 'Find All', position: { x: 0, y: 0 },
-        group: [1],
+        groupList: [1],
         icon: {
             name: "find_replace",
             color: "#057D72"
@@ -260,13 +261,13 @@ export const nodes: Node[] = [
             pattern: "",
             variable: ""
         },
-        inputs: ["input"],
-        outputs: ["output"]
-    },
+        inputsList: ["input"],
+        outputsList: ["output"]
+    } as Node.AsObject,
     {
         // Implement logic on Front End
         id: '', nodetype: 'image', label: 'Output Image', position: { x: 0, y: 0 },
-        group: [7],
+        groupList: [7],
         icon: {
             name: "image",
             color: "#98BC18"
@@ -274,36 +275,36 @@ export const nodes: Node[] = [
         data: {
             value: ""
         },
-        inputs: ["input"],
-        outputs: ["output"]
-    },
+        inputsList: ["input"],
+        outputsList: ["output"]
+    } as Node.AsObject,
     {
         // Implement Logic
         id: '', nodetype: 'subprocess', label: 'Sub Process', position: { x: 0, y: 0 },
-        group: [1],
+        groupList: [1],
         icon: {
             name: "account_tree",
             color: "#1986BD"
         },
         data: {
-            subProcessId: ""
+            subprocessid: ""
         },
-        inputs: ["input"],
-        outputs: ["output"]
-    }
+        inputsList: ["input"],
+        outputsList: ["output"]
+    } as Node.AsObject
 ]
 
-const startNodesArray: Node[] = [
+const startNodesArray: Node.AsObject[] = [
     {
         id: '0',
         nodetype: 'defaultnode',
         label: '',
         draggable: false,
         icon: { name: 'flag_circle', color: '#84ab86' },
-        outputs: ['output'],
-        group: [1],
+        outputsList: ['output'],
+        groupList: [1],
         position: { x: 100, y: 100 },
-    },
+    } as Node.AsObject,
     {
         id: '0',
         nodetype: 'interval',
@@ -313,12 +314,12 @@ const startNodesArray: Node[] = [
         data: {
             type: 'seconds',
             interval: 1,
-            weeks: [true, true, true, true, true, true, true],
-        },
-        outputs: ['output'],
-        group: [1],
+            weeksList: [true, true, true, true, true, true, true],
+        } as NodeData.AsObject,
+        outputsList: ['output'],
+        groupList: [1],
         position: { x: 100, y: 100 },
-    },
+    } as Node.AsObject,
     {
         id: '0',
         nodetype: 'webhook',
@@ -327,11 +328,11 @@ const startNodesArray: Node[] = [
         icon: { name: 'webhook', color: '#b86a11' },
         data: {
             name: ''
-        },
-        outputs: ['output'],
-        group: [1],
+        } as NodeData.AsObject,
+        outputsList: ['output'],
+        groupList: [1],
         position: { x: 100, y: 100 },
-    },
+    } as Node.AsObject,
     {
         id: '0',
         nodetype: 'events',
@@ -340,14 +341,14 @@ const startNodesArray: Node[] = [
         icon: { name: 'event', color: '#A3245B' },
         data: {
             name: ''
-        },
-        outputs: ['output'],
-        group: [1],
+        } as NodeData.AsObject,
+        outputsList: ['output'],
+        groupList: [1],
         position: { x: 100, y: 100 },
-    },
+    } as Node.AsObject,
 ]
 
-const startNodes: { [key: string]: Node } = {};
+const startNodes: { [key: string]: Node.AsObject } = {};
 startNodesArray.forEach(node => {
     startNodes[node.nodetype] = node;
 });

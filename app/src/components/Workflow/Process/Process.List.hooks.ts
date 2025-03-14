@@ -1,7 +1,7 @@
 import { ref, computed } from 'vue'
-import { Process } from '@/views/Workflow'
+import { Workflow } from 'proto/floowsynk_pb'
 
-const processes = ref<Process[]>([]);
+const processes = ref<Workflow.AsObject[]>([]);
 const search = ref<string>("");
 
 export const useProcessListStore = () => {
@@ -12,12 +12,12 @@ export const useProcessListStore = () => {
 }
 
 export const useProcessListHooks = () => {
-    const filteredProcesses = computed<Process[]>(() => {
+    const filteredProcesses = computed<Workflow.AsObject[]>(() => {
         if (search.value === "") {
             return processes.value;
         }
         return processes.value.filter((process) =>
-            process.title.toLowerCase().includes(search.value.toLowerCase())
+            process.name.toLowerCase().includes(search.value.toLowerCase())
         );
     });
 

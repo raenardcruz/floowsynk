@@ -23,10 +23,10 @@ export const useWorkflowCanvasVueFlowEvents = (props: WorkflowCanvasProps, vueFl
       edge.type = "custom";
       edge.animated = true;
       edge.tabId = tab.value.id;
-      if (tab.value.edges) {
-        const edgeExists = tab.value.edges.some(e => e.source === edge.source && e.target === edge.target);
+      if (tab.value.edgesList) {
+        const edgeExists = tab.value.edgesList.some(e => e.source === edge.source && e.target === edge.target);
         if (!edgeExists) {
-          tab.value.edges.push(edge);
+          tab.value.edgesList.push(edge);
         }
       } else {
         throw new Error(`Tab edges not found for id ${tab.value.id}`);
@@ -62,8 +62,8 @@ export const useWorkflowCanvasVueFlowEvents = (props: WorkflowCanvasProps, vueFl
       } else {
         throw new Error("Dragged node is null");
       }
-      if (tab.value.nodes) {
-        tab.value.nodes.push(newNode);
+      if (tab.value.nodesList) {
+        tab.value.nodesList.push(newNode);
       } else {
         throw new Error("Tab nodes not found");
       }
@@ -74,10 +74,10 @@ export const useWorkflowCanvasVueFlowEvents = (props: WorkflowCanvasProps, vueFl
   // Method: On Node Drag End
     const onNodeDragEnd = (event: any) => {
       const { screenToFlowCoordinate } = vueFlowInstance;
-      if (!tab.value.nodes) {
+      if (!tab.value.nodesList) {
         throw new Error("Tab nodes not found");
       }
-      const nodeIndex = tab.value.nodes.findIndex(node => node.id === event.node.id);
+      const nodeIndex = tab.value.nodesList.findIndex(node => node.id === event.node.id);
       if (nodeIndex === -1) {
         throw new Error(`Node not found for id ${event.id}`);
       }
@@ -87,7 +87,7 @@ export const useWorkflowCanvasVueFlowEvents = (props: WorkflowCanvasProps, vueFl
         return;
       }
       const position = screenToFlowCoordinate({ x, y });
-      tab.value.nodes[nodeIndex].position = position;
+      tab.value.nodesList[nodeIndex].position = position;
     }
     // Method: On Mouse Move
     const onMouseMove = (event: any) => {
@@ -123,8 +123,8 @@ export const useWorkflowCanvasVueFlowEvents = (props: WorkflowCanvasProps, vueFl
           break;
         case 'a':
           event.preventDefault();
-          if (tab.value.nodes) {
-            addSelectedNodes(tab.value.nodes.filter(f => f.id != "1") as any);
+          if (tab.value.nodesList) {
+            addSelectedNodes(tab.value.nodesList.filter(f => f.id != "1") as any);
           } else {
             throw new Error(`Tab nodes not found for id ${tab.value.id}`);
           }
@@ -132,9 +132,9 @@ export const useWorkflowCanvasVueFlowEvents = (props: WorkflowCanvasProps, vueFl
         case 'Delete':
         case 'Backspace':
           event.preventDefault();
-          if (tab.value.nodes) {
+          if (tab.value.nodesList) {
               const nodesToDelete = getSelectedNodes.value.filter((node: any) => node.type !== 'start');
-              tab.value.nodes = tab.value.nodes.filter((node: any) => !nodesToDelete.includes(node));
+              tab.value.nodesList = tab.value.nodesList.filter((node: any) => !nodesToDelete.includes(node));
           } else {
               throw new Error(`Tab nodes not found for id ${tab.value.id}`);
           }

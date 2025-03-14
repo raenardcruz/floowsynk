@@ -8,7 +8,7 @@
             <div class="tab" v-for="tab in tabs" :key="tab.id"
                 :class="{ 'nav-active': activeTab == tab.id }"
                 @click="activeTab = tab.id">
-                {{ tab.title }}
+                {{ tab.name }}
                 <div @click.stop="closeTabById(tab.id)">
                     <span class="material-symbols-outlined close" style="color: red;">close</span>
                 </div>

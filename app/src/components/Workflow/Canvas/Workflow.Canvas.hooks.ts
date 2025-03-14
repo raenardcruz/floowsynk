@@ -1,7 +1,5 @@
 import { ref, computed } from 'vue';
 import { useTab } from '@/views/Workflow'
-import { WorkflowCanvasProps } from './Workflow.Canvas.types'
-import { NotifOptions, useNotif } from '@/components/Composable/UI/Notif'
 
 const isDragOver = ref(false);
 const clipBoard = ref({
@@ -34,48 +32,3 @@ export const useWorkflowCanvasHooks = (tabId: string) => {
         canvasId,
     }
 }
-
-export const useWorkflowCanvasEvents = (props: WorkflowCanvasProps) => {
-    const { tab } = useWorkflowCanvasHooks(props.id);
-    const eventSource = new EventSource(`/api/workflow/${tab.value.id}/events`);
-    eventSource.addEventListener('Complete', (event: any) => {
-        useNotif({
-            message: `Process Completed. ${event.data}`,
-            duration: 5000,
-            teleportTarget: `#${tab.value.id}`,
-        } as NotifOptions)
-    });
-    eventSource.addEventListener('NodeStatus', (event: any) => {
-        let nodeData = JSON.parse(event.data);
-        // queueStatusUpdate(nodeData.nodeId, nodeData.status);
-        nodeStatuses.value = {
-            ...nodeStatuses.value,
-            [nodeData.nodeId]: nodeData.status
-        };
-    });
-    eventSource.addEventListener('Replay', (event: any) => {
-        console.log(event);
-    });
-}
-
-  // let pendingUpdates: { [key: string]: string } = {};
-// let updateScheduled = false;
-
-// const processStatusUpdates = () => {
-//   if (Object.keys(pendingUpdates).length > 0) {
-//     nodeStatuses.value = {
-//       ...nodeStatuses.value,
-//       ...pendingUpdates
-//     };
-//     pendingUpdates = {};
-//   }
-//   updateScheduled = false;
-// };
-
-// export const queueStatusUpdate = (nodeId: string, status: string) => {
-//   pendingUpdates[nodeId] = status;
-//   if (!updateScheduled) {
-//     updateScheduled = true;
-//     requestAnimationFrame(processStatusUpdates);
-//   }
-// };

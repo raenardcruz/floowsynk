@@ -411,14 +411,14 @@ func (wp *WorkflowProcessor) SubProcessNodeProcess(node Node) error {
 		wp.Log(&node, "SubProcess processed successfully", Info)
 	}()
 	wp.Log(&node, fmt.Sprintf("Processing SubProcess %s", subProcessId), Info)
-	w, err := wp.Dbcon.DB.GetWorkflow(subProcessId)
+	_, err := wp.Dbcon.DB.GetWorkflow(subProcessId)
 	if err != nil {
 		wp.Log(&node, fmt.Sprintf("Error getting SubProcess %s: %v", subProcessId, err), Error)
 		return err
 	}
 	worklfow := Workflow{
-		Nodes: convertToNodeList(w.Nodes),
-		Edges: convertToEdgeList(w.Edges),
+		// Nodes: convertToNodeList(w.Nodes),
+		// Edges: convertToEdgeList(w.Edges),
 	}
 	subProcessor := &WorkflowProcessor{
 		ProcessID:        wp.ProcessID,
@@ -504,11 +504,11 @@ func (wp *WorkflowProcessor) Log(node *Node, message string, level string) {
 	}
 
 	wp.LoggingData = append(wp.LoggingData, logData)
-	logDataStr, err := json.Marshal(logData)
-	if err != nil {
-		return
-	}
-	eventStream.SendEvent(wp.ProcessID, "LogEvent", string(logDataStr))
+	// logDataStr, err := json.Marshal(logData)
+	// if err != nil {
+	// 	return
+	// }
+	//eventStream.SendEvent(wp.ProcessID, "LogEvent", string(logDataStr))
 	log.Default().Println(message)
 }
 
@@ -651,17 +651,17 @@ func (wp *WorkflowProcessor) sendEvent(nodeId string, status string) {
 	nodeStatus := make(map[string]string, 0)
 	nodeStatus["nodeId"] = nodeId
 	nodeStatus["status"] = status
-	nodeStatusStr, err := json.Marshal(nodeStatus)
-	if err != nil {
-		return
-	}
-	eventStream.SendEvent(wp.ProcessID, "NodeStatus", string(nodeStatusStr))
+	// nodeStatusStr, err := json.Marshal(nodeStatus)
+	// if err != nil {
+	// 	return
+	// }
+	// eventStream.SendEvent(wp.ProcessID, "NodeStatus", string(nodeStatusStr))
 }
 
 func (wp *WorkflowProcessor) sendRepplayEvent(replayData ReplayData) {
-	dataStr, err := json.Marshal(replayData)
-	if err != nil {
-		return
-	}
-	eventStream.SendEvent(wp.ProcessID, "Replay", string(dataStr))
+	// dataStr, err := json.Marshal(replayData)
+	// if err != nil {
+	// 	return
+	// }
+	// eventStream.SendEvent(wp.ProcessID, "Replay", string(dataStr))
 }

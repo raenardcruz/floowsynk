@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount, defineEmits } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { MonacoEditorProps } from './MonacoEditor.types'
 import { registerCustomLanguage, initMonacoEditor, disposeMonacoEditor } from './MonacoEditor.helper'
 import { EMIT_MODAL } from './MonacoEditor.contants'

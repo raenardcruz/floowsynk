@@ -57,7 +57,6 @@
 </template>
 
 <script setup lang="ts">
-import { defineEmits } from 'vue'
 import { SidebarNodeProps } from '../Workflow.Sidebar.Node.types'
 import { useSidebarNodeHooks, useSidebarNodeStore } from '../Workflow.Sidebar.Node.hooks'
 import { toSentenceCase } from '@/components/Composable/Utilities'

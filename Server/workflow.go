@@ -2,8 +2,6 @@ package main
 
 import (
 	"errors"
-	"fmt"
-	"time"
 )
 
 const (
@@ -30,10 +28,10 @@ const (
 )
 
 func (wp *WorkflowProcessor) StartWorkflow() (err error) {
-	start := time.Now()
+	//start := time.Now()
 	wp.Process("0")
-	elapsed := time.Since(start)
-	eventStream.SendEvent(wp.ProcessID, "Complete", fmt.Sprintf("Elapsed Time: %s", elapsed))
+	//elapsed := time.Since(start)
+	//eventStream.SendEvent(wp.ProcessID, "Complete", fmt.Sprintf("Elapsed Time: %s", elapsed))
 	return nil
 }
 

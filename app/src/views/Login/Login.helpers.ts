@@ -8,6 +8,7 @@ import {
     ERROR_SESSION_EXTENSION,
     ERROR_USER_PASS } from './Login.constants';
 import { LoginRequest, LoginRequestUserPass } from './Login.api'
+import { Token } from '@/proto/floowsynk_pb'
 
 const {
     username,
@@ -35,19 +36,14 @@ const checkInactivity = () => {
 const loginHandler = async (usePass: boolean) => {
     const { session } = App.store;
     try {
-            let resp: any = usePass ? await LoginRequestUserPass(username.value, password.value) : await LoginRequest(session.value);
-            if (resp.status === 200) {
-            const token = resp.data.token;
-            const expiryDate = new Date();
-            expiryDate.setMinutes(expiryDate.getMinutes() + 15);
-            session.value = token;
-            localStorage.setItem(SESSION_TOKEN_KEY, token);
-            localStorage.setItem(SESSION_EXPIRY_KEY, expiryDate.toISOString());
-            router.push({ path: '/' });
-        } else {
-            loginError.value = true;
-            loginErrorMessage.value = usePass ? ERROR_USER_PASS : ERROR_SESSION_EXTENSION;
-        }
+        let resp: Token = usePass ? await LoginRequestUserPass(username.value, password.value) : await LoginRequest(session.value);
+        const token = resp.getToken();
+        const expiryDate = new Date();
+        expiryDate.setMinutes(expiryDate.getMinutes() + 15);
+        session.value = token;
+        localStorage.setItem(SESSION_TOKEN_KEY, token);
+        localStorage.setItem(SESSION_EXPIRY_KEY, expiryDate.toISOString());
+        router.push({ path: '/' });
     } catch (err) {
         loginError.value = true;
         loginErrorMessage.value = usePass ? ERROR_USER_PASS : ERROR_SESSION_EXTENSION + ': ' + err;

@@ -15,8 +15,8 @@ export const useWorkflowCanvasKeyboardActions = (props: WorkflowCanvasProps, vue
     if (undoStack.value.length === 0) return;
 
     const currentState = {
-      nodes: JSON.parse(JSON.stringify(tab.value.nodes || [])),
-      edges: JSON.parse(JSON.stringify(tab.value.edges || []))
+      nodes: JSON.parse(JSON.stringify(tab.value.nodesList || [])),
+      edges: JSON.parse(JSON.stringify(tab.value.edgesList || []))
     };
     redoStack.value.push(currentState);
     if (redoStack.value.length > 200) redoStack.value.shift();
@@ -24,8 +24,8 @@ export const useWorkflowCanvasKeyboardActions = (props: WorkflowCanvasProps, vue
     const previousState = undoStack.value.pop()!;
     tab.value = {
       ...tab.value,
-      nodes: previousState.nodes,
-      edges: previousState.edges
+      nodesList: previousState.nodes,
+      edgesList: previousState.edges
     }
   }
   // Method: Redo
@@ -33,15 +33,15 @@ export const useWorkflowCanvasKeyboardActions = (props: WorkflowCanvasProps, vue
     if (redoStack.value.length === 0) return;
 
     const currentState = {
-      nodes: JSON.parse(JSON.stringify(tab.value.nodes || [])),
-      edges: JSON.parse(JSON.stringify(tab.value.edges || []))
+      nodes: JSON.parse(JSON.stringify(tab.value.nodesList || [])),
+      edges: JSON.parse(JSON.stringify(tab.value.edgesList || []))
     };
     undoStack.value.push(currentState);
     if (undoStack.value.length > 200) undoStack.value.shift();
 
     const nextState = redoStack.value.pop()!;
-    tab.value.nodes = nextState.nodes;
-    tab.value.edges = nextState.edges;
+    tab.value.nodesList = nextState.nodes;
+    tab.value.edgesList = nextState.edges;
   }
   // Method: copy
   const copy = (selectedNodes: any, selectedEdges: any) => {
@@ -73,10 +73,10 @@ export const useWorkflowCanvasKeyboardActions = (props: WorkflowCanvasProps, vue
         tabId: tab.value.id
       };
 
-      if (!tab.value.nodes) {
+      if (!tab.value.nodesList) {
         throw new Error(`Tab nodes not found for id ${tab.value.id}`);
       }
-      tab.value.nodes.push(newNode);
+      tab.value.nodesList.push(newNode);
       newNodes.push(newNode);
     });
 
@@ -108,10 +108,10 @@ export const useWorkflowCanvasKeyboardActions = (props: WorkflowCanvasProps, vue
             tabId: tab.value.id
           };
           
-          if (!tab.value.edges) {
+          if (!tab.value.edgesList) {
             throw new Error(`Tab edges not found for id ${tab.value.id}`);
           }
-          tab.value.edges.push(newEdge);
+          tab.value.edgesList.push(newEdge);
         }
       });
     }

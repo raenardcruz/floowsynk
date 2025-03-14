@@ -24,7 +24,6 @@
 </template>
 
 <script lang="ts" setup>
-import {defineEmits} from 'vue'
 import { ModalProps } from './Modal.types'
 import { useModalHooks } from './Modal.hooks'
 import { EMMIT_VISIBLE } from './Modal.contants'

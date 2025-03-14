@@ -1,0 +1,158 @@
+syntax = "proto3";
+package proto;
+
+option go_package = "./proto";
+
+service LoginService {
+    rpc Login(Credential) returns (Token);
+    rpc ExtendToken(Empty) returns (Token);
+}
+
+service WorkflowService {
+    rpc GetWorkflow(GetWorkflowRequest) returns (Workflow);
+    rpc ListWorkflows(PageRequest) returns (WorkflowList);
+    rpc UpdateWorkflow(Workflow) returns (Workflow);
+    rpc CreateWorkflow(Workflow) returns (Workflow);
+    rpc DeleteWorkflow(Workflow) returns (Empty);
+}
+
+message Empty {}
+
+message PageRequest {
+    int32 limit = 1;
+    int32 offset = 2;
+}
+
+message Credential {
+    string username = 1;
+    string password = 2;
+}
+
+message Token {
+    string token = 1;
+}
+
+message GetWorkflowRequest {
+    string id = 1;
+}
+
+message WorkflowList {
+    int32 total = 1;
+    repeated Workflow workflows = 2;
+}
+
+message Workflow {
+    string id = 1;
+    string name = 2;
+    string description = 3;
+    repeated Node nodes = 4;
+    repeated Edge edges = 5;
+    string type = 6;
+    string createdAt = 7;
+    string updatedAt = 8;
+    string createdBy = 9;
+    string updatedBy = 10;
+    repeated string tags = 11;
+    optional bool isNew = 12;
+}
+
+message Edge {
+    string id = 1;
+    string type = 2;
+    string label = 3;
+    string tabId = 4;
+    string source = 5;
+    string target = 6;
+    float sourceX = 7;
+    float sourceY = 8;
+    float targetX = 9;
+    float targetY = 10;
+    bool animated = 11;
+    Node sourceNode = 12;
+    Node targetNode = 13;
+    string sourceHandle = 14;
+    string targetHandle = 15;
+  }
+
+message Node {
+    string id = 1;
+    string nodetype = 2;
+    string label = 3;
+    optional NodeData data = 4;
+    repeated int32 group = 5;
+    optional string nodestyle = 6;
+    repeated string inputs = 7;
+    repeated string outputs = 8;
+    optional bool draggable = 9;
+    optional NodeIcon icon = 10;
+    optional NodePosition position = 11;
+    optional string nodestatus = 12;
+    optional string type =  13;
+    NodeDimensions dimensions = 14;
+    NodeHandleBounds handleBounds = 15;
+    NodePosition computedPosition = 16;
+    bool isParent = 17;
+}
+
+
+message NodeData {
+    optional string name = 1;
+    optional string value = 2;
+    optional string expression = 3;
+    optional int32 iteration = 4;
+    optional string listvar = 5;
+    optional int32 limit = 6;
+    optional string url = 7;
+    optional string method = 8;
+    repeated KeyValue headers = 9;
+    optional string payload = 10;
+    optional string variable = 11;
+    optional string message = 12;
+    repeated string list = 13;
+    optional string listVariable = 14;
+    optional string template = 15;
+    optional string text = 16;
+    optional string pattern = 17;
+    optional string replaceText = 18;
+    optional string subProcessId = 19;
+    optional string type = 20;
+    optional int32 interval = 21;
+    repeated bool weeks = 22;
+}
+
+message NodeIcon {
+    string name = 1;
+    string color = 2;
+}
+
+message NodeDimensions {
+    float width = 1;
+    float height = 2;
+}
+
+message NodePosition {
+    float x = 1;
+    float y = 2;
+    optional int32 z = 3;
+}
+
+message KeyValue {
+    string key = 1;
+    string value = 2;
+}
+
+message NodeHandleBounds {
+    repeated Handle source = 1;
+    repeated Handle target = 2;
+}
+
+message Handle {
+    float x = 1;
+    float y = 2;
+    string id = 3;
+    string type = 4;
+    float width = 5;
+    float height = 6;
+    string nodeId = 7;
+    string position = 8;
+}

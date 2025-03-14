@@ -2,21 +2,21 @@ import { useTab } from '@/views/Workflow'
 import { useWorkflowCanvasHelperMethods } from '@/components/Workflow/Canvas'
 import { startNodes } from '@/components/Workflow/Nodes';
 import { useProcessTypeHooks, useProcessTypeStore } from './Workflow.Modal.ProcessTab.hooks'
-import { Node } from '@/views/Workflow'
+import { Node } from 'proto/floowsynk_pb'
 
 export const useProcessTypeHelpers = (tabId: string) => {
     const { tab } = useTab(tabId)
     const { saveState } = useWorkflowCanvasHelperMethods(tabId, null)
     const selectNode = (type: string) => {
-        if (!tab.value.nodes) return;
+        if (!tab.value.nodesList) return;
     
         saveState();
-        let tmpNodes = JSON.parse(JSON.stringify(tab.value.nodes));
+        let tmpNodes = JSON.parse(JSON.stringify(tab.value.nodesList));
         tmpNodes[0] = startNodes[type];
         tab.value = {
             ...tab.value,
             type,
-            nodes: tmpNodes as Node[]
+            nodesList: tmpNodes as Node.AsObject[]
         };
     };
 

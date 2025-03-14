@@ -13,8 +13,8 @@ export const useProcessTypeHooks = (tabId: string) => {
     const { tab } = useTab(tabId)
     const baseurl = window.location.origin;
     const webhookUrl = computed(() =>
-        tab.value.nodes && tab.value.nodes[0]
-            ? `${baseurl}/api/webhook/${encodeURIComponent(tab.value.nodes[0].data.name)}`
+        tab.value.nodesList && tab.value.nodesList[0]
+            ? `${baseurl}/api/webhook/${encodeURIComponent(tab.value.nodesList[0].data?.name || '')}`
             : ''
     );
     const isSelected = (type: string) => tab.value.type == type;

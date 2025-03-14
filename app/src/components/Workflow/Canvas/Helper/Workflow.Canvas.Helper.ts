@@ -12,8 +12,8 @@ export const useWorkflowCanvasHelperMethods = (tabId: string, vueFlowInstance: a
   // Method: Save State
   const saveState = () => {
     const state = {
-      nodes: JSON.parse(JSON.stringify(tab.value.nodes || [])),
-      edges: JSON.parse(JSON.stringify(tab.value.edges || []))
+      nodes: JSON.parse(JSON.stringify(tab.value.nodesList || [])),
+      edges: JSON.parse(JSON.stringify(tab.value.edgesList || []))
     };
 
     undoStack.value.push(state);
@@ -54,19 +54,19 @@ export const useWorkflowCanvasHelperMethods = (tabId: string, vueFlowInstance: a
   }
 
   const addTag = () => {
-    let tags = tab.value.tags || [];
+    let tags = tab.value.tagsList || [];
     tab.value = {
       ...tab.value,
-      tags: [...tags, '']
+      tagsList: [...tags, '']
     }
   }
 
   const removeTag = (index: number) => {
-    const newTags = [...tab.value.tags]
+    const newTags = [...tab.value.tagsList]
     newTags.splice(index, 1)
     tab.value = {
       ...tab.value,
-      tags: newTags
+      tagsList: newTags
     }
   }
 

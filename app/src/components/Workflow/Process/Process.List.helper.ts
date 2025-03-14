@@ -1,21 +1,24 @@
 import { useProcessListStore } from './Process.List.hooks'
 import { getAllWorkflows } from './Process.List.api'
-import { Process } from '@/views/Workflow'
 import { useWorkflowStore, newProcess } from '@/views/Workflow'
 import { startNodes } from '@/components/Workflow/Nodes/FloowsynkNode.contants'
+import { WorkflowList, Workflow } from 'proto/floowsynk_pb'
 
 export const initWorkflows = async () => {
     const { processes } = useProcessListStore();
-    let resp: any = await getAllWorkflows();
     processes.value = [];
-    if (resp.data && resp.data.items) {
-        resp.data.items.forEach((process: any) => {
-            processes.value.push({ title: process.name, isnew: false, ...process });
-        });
-    }
+    let resp: WorkflowList = await getAllWorkflows(10, 0);
+    const workflows: Workflow[] = resp.getWorkflowsList();
+    
+    if (!workflows || workflows.length === 0) return;
+    
+    workflows.forEach((process: Workflow) => {
+        const p = process.toObject();
+        processes.value.push({ isnew: false, ...p });
+    });
 }
 
-export const cardClicked = (process: Process) => {
+export const cardClicked = (process: Workflow.AsObject) => {
     const { tabs, activeTab } = useWorkflowStore();
     if (!tabs.value.some(existingTab => existingTab.id === process.id)) {
         tabs.value.push(process);
@@ -26,8 +29,8 @@ export const cardClicked = (process: Process) => {
 export const createProcess = () => {
     const { tabs, activeTab } = useWorkflowStore();
     let newProc = newProcess();
-    if (newProc.nodes) {
-        newProc.nodes.push(startNodes["defaultnode"]);
+    if (newProc.nodesList) {
+        newProc.nodesList.push(startNodes["defaultnode"]);
     }
     tabs.value.push(newProc);
     activeTab.value = newProc.id;

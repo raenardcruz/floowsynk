@@ -8,12 +8,12 @@
             <div class="label" v-if="label.length > 0">{{ label }}</div>
             <div class="type">{{ toSentenceCase(nodetype) }}</div>
         </div>
-        <Handle class="handle-input" v-if="outputs" v-for="(input, index) in inputs" :key="input" :id="input"
+        <Handle class="handle-input" v-if="outputsList" v-for="(input, index) in inputsList" :key="input" :id="input"
             :data-output="input" type="target" :position="Position.Left"
-            :style="{ top: `${(100 / (outputs.length + 1)) * (index + 1)}%` }" />
-        <Handle class="handle-output" v-if="outputs" v-for="(output, index) in outputs" :key="output" :id="output"
+            :style="{ top: `${(100 / (outputsList.length + 1)) * (index + 1)}%` }" />
+        <Handle class="handle-output" v-if="outputsList" v-for="(output, index) in outputsList" :key="output" :id="output"
             :data-output="output" type="source" :position="Position.Right"
-            :style="{ top: `${(100 / (outputs.length + 1)) * (index + 1)}%` }" />
+            :style="{ top: `${(100 / (outputsList.length + 1)) * (index + 1)}%` }" />
     </div>
     <Teleport :to="'#' + canvasId">
         <SideBar :title="label" :caption="node.id" v-model:visible="showSidebar">
@@ -38,7 +38,7 @@ import { SidebarCanvasFields as WorkflowNodeSidebarFields } from "@/components/W
 import { NodeProps } from './FloowsynkNode.types'
 import { useFloowsynkNodeHooks, useFloowsynkNodeWatchers } from './FloowsynkNode.hooks'
 import { clickhandler } from './FloowsynkNode.helper'
-import { Node } from '@/views/Workflow'
+import { Node } from 'proto/floowsynk_pb'
 import { toSentenceCase } from "@/components/Composable/Utilities";
 import ProcessTypeModal from '@/components/Workflow/Modal/ProcessType/Workflow.Modal.ProcessType.vue'
 import { Modal } from '@/components/Composable/UI'
@@ -49,8 +49,8 @@ const { canvasId } = useFloowsynkNodeHooks(props.tabid)
 const showSidebar = ref(false);
 const showModal = ref(false);
 const { nodestatus } = useFloowsynkNodeWatchers(props.tabid, node, showSidebar)
-const clickHandler = () => clickhandler(node, props.tabid, showSidebar, showModal)
-const { icon, nodetype, label, outputs, inputs, nodestyle } = node as unknown as Node;
+const clickHandler = () => clickhandler(node, showSidebar, showModal)
+const { icon, nodetype, label, outputsList, inputsList, nodestyle } = node as unknown as Node.AsObject;
 </script>
 
 <style scoped src="./FloowsynkNode.styles.css"></style>

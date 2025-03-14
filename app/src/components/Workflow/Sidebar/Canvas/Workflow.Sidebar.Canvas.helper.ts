@@ -1,9 +1,9 @@
 import { useSidebarCanvasStore } from './Workflow.Sidebar.Canvas.hooks'
 import { useWorkflowCanvasStore } from '@/components/Workflow/Canvas'
 import { nodes } from '@/components/Workflow/Nodes'
-import { Node } from '@/views/Workflow'
+import { Node } from 'proto/floowsynk_pb'
 
-export const onDragStart = (node: Node) => {
+export const onDragStart = (node: Node.AsObject) => {
     const {
         draggedNode,
     } = useSidebarCanvasStore();
@@ -31,6 +31,6 @@ export const expandToggle = (name: string) => {
         expandGroup.value.push(name)
 }
 
-export const groupNodes = (id: number): Node[] => {
-    return nodes.filter(f => f.group.includes(id))
+export const groupNodes = (id: number): Node.AsObject[] => {
+    return nodes.filter(f => f.groupList.includes(id))
 }

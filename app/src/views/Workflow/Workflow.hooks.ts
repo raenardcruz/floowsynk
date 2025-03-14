@@ -1,9 +1,9 @@
 import { ref, computed } from "vue";
-import { Process } from "./Workflow.types";
+import { Workflow } from 'proto/floowsynk_pb';
 import { newProcess } from "./Workflow.factory";
 
 const activeTab = ref<string>('main');
-const tabs = ref<Process[]>([]);
+const tabs = ref<Workflow.AsObject[]>([]);
 
 export const useWorkflowStore = () => {
     return {
@@ -13,7 +13,7 @@ export const useWorkflowStore = () => {
 }
 
 export const useTab = (tabId: string) => {
-    const tab = computed<Process>({
+    const tab = computed<Workflow.AsObject>({
         get() {
             return tabs.value.find(tab => tab.id === tabId) || newProcess();
         },
