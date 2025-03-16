@@ -46,7 +46,7 @@ export const groups: Group[] = [
     }
 ]
 
-export const nodes: Node.AsObject[] = [
+export const nodes: any[] = [
     {
         id: '', nodetype: 'setVariable', label: 'Set Variable', position: { x: 0, y: 0 },
         groupList: [1],
@@ -60,7 +60,7 @@ export const nodes: Node.AsObject[] = [
         },
         inputsList: ["input"],
         outputsList: ["output"]
-    } as Node.AsObject,
+    } as any,
     {
         id: '', nodetype: 'condition', label: 'Condition', position: { x: 0, y: 0 },
         groupList: [2],
@@ -73,7 +73,7 @@ export const nodes: Node.AsObject[] = [
         },
         inputsList: ["input"],
         outputsList: ["True", "False"]
-    } as Node.AsObject,
+    } as any,
     {
         id: '', nodetype: 'loop', label: 'Loop', position: { x: 0, y: 0 },
         groupList: [2],
@@ -86,7 +86,7 @@ export const nodes: Node.AsObject[] = [
         },
         inputsList: ["input"],
         outputsList: ["output"]
-    } as Node.AsObject,
+    } as any,
     {
         id: '', nodetype: 'foreach', label: 'For Each', position: { x: 0, y: 0 },
         groupList: [2],
@@ -99,7 +99,7 @@ export const nodes: Node.AsObject[] = [
         },
         inputsList: ["input"],
         outputsList: ["output"]
-    } as Node.AsObject,
+    } as any,
     {
         id: '', nodetype: 'while', label: 'While', position: { x: 0, y: 0 },
         groupList: [2],
@@ -113,7 +113,7 @@ export const nodes: Node.AsObject[] = [
         },
         inputsList: ["input"],
         outputsList: ["output"]
-    } as Node.AsObject,
+    } as any,
     {
         id: '', nodetype: 'api', label: 'Rest API', position: { x: 0, y: 0 },
         groupList: [4],
@@ -135,7 +135,7 @@ export const nodes: Node.AsObject[] = [
         },
         inputsList: ["input"],
         outputsList: ["output"]
-    } as Node.AsObject,
+    } as any,
     {
         id: '', nodetype: 'log', label: 'Logging', position: { x: 0, y: 0 },
         groupList: [6],
@@ -148,7 +148,7 @@ export const nodes: Node.AsObject[] = [
         },
         inputsList: ["input"],
         outputsList: ["output"]
-    } as Node.AsObject,
+    } as any,
     {
         id: '', nodetype: 'getGuid', label: 'Get Guid', position: { x: 0, y: 0 },
         groupList: [1],
@@ -161,7 +161,7 @@ export const nodes: Node.AsObject[] = [
         },
         inputsList: ["input"],
         outputsList: ["output"]
-    } as Node.AsObject,
+    } as any,
     {
         id: '', nodetype: 'text', label: 'Text', position: { x: 0, y: 0 },
         groupList: [1],
@@ -175,7 +175,7 @@ export const nodes: Node.AsObject[] = [
         },
         inputsList: ["input"],
         outputsList: ["output"]
-    } as Node.AsObject,
+    } as any,
     {
         id: '', nodetype: 'math', label: 'math', position: { x: 0, y: 0 },
         groupList: [1],
@@ -189,7 +189,7 @@ export const nodes: Node.AsObject[] = [
         },
         inputsList: ["input"],
         outputsList: ["output"]
-    } as Node.AsObject,
+    } as any,
     {
         id: '', nodetype: 'list', label: 'List', position: { x: 0, y: 0 },
         groupList: [1],
@@ -203,7 +203,7 @@ export const nodes: Node.AsObject[] = [
         },
         inputsList: ["input"],
         outputsList: ["output"]
-    } as Node.AsObject,
+    } as any,
     {
         id: '', nodetype: 'count', label: 'List Count', position: { x: 0, y: 0 },
         groupList: [1],
@@ -217,7 +217,7 @@ export const nodes: Node.AsObject[] = [
         },
         inputsList: ["input"],
         outputsList: ["output"]
-    } as Node.AsObject,
+    } as any,
     {
         id: '', nodetype: 'map', label: 'Map', position: { x: 0, y: 0 },
         groupList: [3],
@@ -232,7 +232,7 @@ export const nodes: Node.AsObject[] = [
         },
         inputsList: ["input"],
         outputsList: ["output"]
-    } as Node.AsObject,
+    } as any,
     {
         id: '', nodetype: 'replace', label: 'Replace', position: { x: 0, y: 0 },
         groupList: [1],
@@ -248,7 +248,7 @@ export const nodes: Node.AsObject[] = [
         },
         inputsList: ["input"],
         outputsList: ["output"]
-    } as Node.AsObject,
+    } as any,
     {
         id: '', nodetype: 'findAll', label: 'Find All', position: { x: 0, y: 0 },
         groupList: [1],
@@ -263,7 +263,7 @@ export const nodes: Node.AsObject[] = [
         },
         inputsList: ["input"],
         outputsList: ["output"]
-    } as Node.AsObject,
+    } as any,
     {
         // Implement logic on Front End
         id: '', nodetype: 'image', label: 'Output Image', position: { x: 0, y: 0 },
@@ -277,7 +277,7 @@ export const nodes: Node.AsObject[] = [
         },
         inputsList: ["input"],
         outputsList: ["output"]
-    } as Node.AsObject,
+    } as any,
     {
         // Implement Logic
         id: '', nodetype: 'subprocess', label: 'Sub Process', position: { x: 0, y: 0 },
@@ -291,10 +291,10 @@ export const nodes: Node.AsObject[] = [
         },
         inputsList: ["input"],
         outputsList: ["output"]
-    } as Node.AsObject
+    } as any
 ]
 
-const startNodesArray: Node.AsObject[] = [
+const startNodesArray: any[] = [
     {
         id: '0',
         nodetype: 'defaultnode',
@@ -304,7 +304,7 @@ const startNodesArray: Node.AsObject[] = [
         outputsList: ['output'],
         groupList: [1],
         position: { x: 100, y: 100 },
-    } as Node.AsObject,
+    } as any,
     {
         id: '0',
         nodetype: 'interval',
@@ -319,7 +319,7 @@ const startNodesArray: Node.AsObject[] = [
         outputsList: ['output'],
         groupList: [1],
         position: { x: 100, y: 100 },
-    } as Node.AsObject,
+    } as any,
     {
         id: '0',
         nodetype: 'webhook',
@@ -332,7 +332,7 @@ const startNodesArray: Node.AsObject[] = [
         outputsList: ['output'],
         groupList: [1],
         position: { x: 100, y: 100 },
-    } as Node.AsObject,
+    } as any,
     {
         id: '0',
         nodetype: 'events',
@@ -345,10 +345,10 @@ const startNodesArray: Node.AsObject[] = [
         outputsList: ['output'],
         groupList: [1],
         position: { x: 100, y: 100 },
-    } as Node.AsObject,
+    } as any,
 ]
 
-const startNodes: { [key: string]: Node.AsObject } = {};
+const startNodes: { [key: string]: any } = {};
 startNodesArray.forEach(node => {
     startNodes[node.nodetype] = node;
 });

@@ -1,33 +1,33 @@
-import axios from 'axios';
 import { Workflow } from 'proto/floowsynk_pb';
-
-const getHeaders = () => {
-    let headers = {
-        headers: {
-            'Authorization': `${localStorage.getItem('sessionToken')}`,
-            'Content-Type': 'application/json'
-        }
-    }
-
-    return headers
-}
+import { WorkflowServicePromiseClient } from 'proto/floowsynk_grpc_web_pb';
+import { getApiUrl } from '@/components/Composable/constants'
+import { workflowFromObject } from '@/components/Composable/protoTransformers'
 
 export const updateProcess = async (process: Workflow.AsObject) => {
-    const headers = getHeaders();
-    return axios.put(`/api/workflow/${process.id}`, process, headers);
+   const client = new WorkflowServicePromiseClient(getApiUrl());
+   const workflow = workflowFromObject(process);
+    return client.updateWorkflow(workflow, {
+        'Authorization': `${localStorage.getItem('sessionToken')}`
+    });
 }
 
 export const createProcess = async (process: Workflow.AsObject) => {
-    const headers = getHeaders();
-    return axios.post(`/api/workflow`, process, headers);
+    const client = new WorkflowServicePromiseClient(getApiUrl());
+    const workflow = workflowFromObject(process);
+    return client.createWorkflow(workflow, {
+        'Authorization': `${localStorage.getItem('sessionToken')}`
+    });
 }
 
 export const deleteProcess = async (process: Workflow.AsObject) => {
-    const headers = getHeaders();
-    return axios.delete(`/api/workflow/${process.id}`, headers);
+    const client = new WorkflowServicePromiseClient(getApiUrl());
+    const workflow = workflowFromObject(process);
+    return client.deleteWorkflow(workflow, {
+        'Authorization': `${localStorage.getItem('sessionToken')}`
+    });
 }
 
-export const executeProcess = async (process: Workflow.AsObject) => {
-    const headers = getHeaders();
-    return axios.post(`/api/workflow/${process.id}/run`, process, headers);
+export const executeProcess = async (_: Workflow.AsObject) => {
+    // const headers = getHeaders();
+    // return axios.post(`/api/workflow/${process.id}/run`, process, headers);
 }

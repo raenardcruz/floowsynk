@@ -20,8 +20,8 @@ export const useSidebarNodeHooks = (tabId: string) => {
         return processes.value.filter((process: Workflow.AsObject) => process.type == "default");
     })
 
-    const variables = computed(() => {
-        (tab.value.nodesList || [])
+    const variables = computed(() : Array<any> => {
+        return (tab.value.nodesList || [])
             .map(node => {
                 if (node.nodetype === 'setVariable' && node.data?.name) {
                     return node.data.name;

@@ -41,7 +41,7 @@ export const useWorkflowCanvasControlButtonActions = (props: WorkflowCanvasProps
       useNotif({
         duration: 5000,
         teleportTarget: `#${btoa(tab.value.id)}`,
-        message: "Failed to save workflow",
+        message: "Failed to save workflow: " + error,
         status: STATUS_ERROR
       } as NotifOptions);
     }

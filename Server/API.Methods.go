@@ -105,6 +105,23 @@ func ListWorkflows(offset int32, limit int32) (wl *pb.WorkflowList, err error) {
 	}
 	return wl, nil
 }
+func UpdateWorkflow(workflow *pb.Workflow) (w *pb.Workflow, err error) {
+	if err := dbcon.DB.UpdateWorkflow(workflow); err != nil {
+		return nil, err
+	}
+	return workflow, nil
+}
+func CreateWorkflow(workflow *pb.Workflow) (*pb.Workflow, error) {
+	id, err := dbcon.DB.CreateWorkflow(workflow)
+	if err != nil {
+		return nil, err
+	}
+	workflow.Id = id
+	return workflow, nil
+}
+func DeleteWorkflow(id string) error {
+	return dbcon.DB.DeleteWorkflow(id)
+}
 
 // func Protected(c *gin.Context) {
 // 	validateResults := validateToken(c)
@@ -114,29 +131,4 @@ func ListWorkflows(offset int32, limit int32) (wl *pb.WorkflowList, err error) {
 // 	}
 
 // 	c.JSON(http.StatusOK, gin.H{"message": "Hello, " + validateResults.username + ", your role is " + validateResults.role})
-// }
-
-// func validateToken(c *gin.Context) *ValidateResults {
-// 	tokenString := c.GetHeader("Authorization")
-// 	if tokenString == "" {
-// 		return &ValidateResults{status: http.StatusUnauthorized, message: "Unauthorized"}
-// 	}
-
-// 	token, err := jwt.ParseWithClaims(tokenString, jwt.MapClaims{}, func(token *jwt.Token) (interface{}, error) {
-// 		return jwtKey, nil
-// 	})
-// 	if err != nil {
-// 		return &ValidateResults{status: http.StatusUnauthorized, message: err.Error()}
-// 	}
-
-// 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-// 		return &ValidateResults{
-// 			id:       claims["id"].(string),
-// 			username: claims["username"].(string),
-// 			role:     claims["role"].(string),
-// 			status:   http.StatusOK,
-// 		}
-// 	}
-
-// 	return &ValidateResults{status: http.StatusUnauthorized, message: "Invalid token"}
 // }

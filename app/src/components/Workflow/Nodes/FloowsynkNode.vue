@@ -1,8 +1,8 @@
 <template>
     <div class="node no-scroll nopan" :style="nodestyle" :class="{ 'node-selected': node.selected, [nodestatus]: true }"
         @click="clickHandler()">
-        <div class="icon" :style="{ background: icon.color }">
-            <span class="material-symbols-outlined">{{ icon.name }}</span>
+        <div class="icon" :style="{ background: icon?.color }">
+            <span class="material-symbols-outlined">{{ icon?.name }}</span>
         </div>
         <div class="content">
             <div class="label" v-if="label.length > 0">{{ label }}</div>

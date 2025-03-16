@@ -66,6 +66,56 @@ func (s *WorkflowServer) ListWorkflows(ctx context.Context, req *proto.PageReque
 	return wl, nil
 }
 
+func (s *WorkflowServer) UpdateWorkflow(ctx context.Context, req *proto.Workflow) (wl *proto.Workflow, err error) {
+	token, err := getTokenFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	validateResults := validateToken(token)
+	if validateResults.status != http.StatusOK {
+		return nil, fmt.Errorf(validateResults.message)
+	}
+	req.UpdatedBy = validateResults.id
+
+	if wl, err = UpdateWorkflow(req); err != nil {
+		return nil, err
+	}
+	return wl, nil
+}
+
+func (s *WorkflowServer) CreateWorkflow(ctx context.Context, req *proto.Workflow) (wl *proto.Workflow, err error) {
+	token, err := getTokenFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	validateResults := validateToken(token)
+	if validateResults.status != http.StatusOK {
+		return nil, fmt.Errorf(validateResults.message)
+	}
+	req.CreatedBy = validateResults.id
+	req.UpdatedBy = validateResults.id
+
+	if wl, err = CreateWorkflow(req); err != nil {
+		return nil, err
+	}
+	return wl, nil
+}
+
+func (s *WorkflowServer) DeleteWorkflow(ctx context.Context, req *proto.Workflow) (*proto.Empty, error) {
+	token, err := getTokenFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	validateResults := validateToken(token)
+	if validateResults.status != http.StatusOK {
+		return nil, fmt.Errorf(validateResults.message)
+	}
+	if err := DeleteWorkflow(req.Id); err != nil {
+		return nil, err
+	}
+	return &proto.Empty{}, nil
+}
+
 // API Methods --------------------------------------------------------------------------------------------------------
 
 // func (dbcon *DBConnection) PostWorkflow(c *gin.Context) {

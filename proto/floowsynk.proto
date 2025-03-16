@@ -104,11 +104,11 @@ message NodeData {
     optional int32 limit = 6;
     optional string url = 7;
     optional string method = 8;
-    repeated KeyValue headers = 9;
+    optional NodeDataArray headers = 9;
     optional string payload = 10;
     optional string variable = 11;
     optional string message = 12;
-    repeated string list = 13;
+    optional NodeDataArray list = 13;
     optional string listVariable = 14;
     optional string template = 15;
     optional string text = 16;
@@ -117,7 +117,22 @@ message NodeData {
     optional string subProcessId = 19;
     optional string type = 20;
     optional int32 interval = 21;
-    repeated bool weeks = 22;
+    optional NodeDataArray weeks = 22;
+}
+
+enum ArrayDataType {
+    STRING = 0;
+    INT = 1;
+    BOOL = 2;
+    KEYVALUE = 3;
+}
+
+message NodeDataArray {
+    ArrayDataType type = 1;
+    repeated KeyValue keyValueItems = 2;
+    repeated string stringItems = 3;
+    repeated int32 intItems = 4;
+    repeated bool boolItems = 5;
 }
 
 message NodeIcon {

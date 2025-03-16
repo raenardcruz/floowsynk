@@ -30,15 +30,24 @@ func (db *DB) CreateWorkflow(workflow *pb.Workflow) (string, error) {
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW(), NOW()) 
 		RETURNING id`
 
+	nodes, err := json.Marshal(workflow.Nodes)
+	if err != nil {
+		return "", err
+	}
+	edges, err := json.Marshal(workflow.Edges)
+	if err != nil {
+		return "", err
+	}
+
 	var id string
-	err := db.conn.QueryRow(
+	err = db.conn.QueryRow(
 		query,
 		workflow.Id,
 		workflow.Name,
 		workflow.Type,
 		workflow.Description,
-		workflow.Nodes,
-		workflow.Edges,
+		nodes,
+		edges,
 		workflow.CreatedBy,
 		workflow.UpdatedBy,
 	).Scan(&id)
@@ -146,12 +155,21 @@ func (db *DB) UpdateWorkflow(workflow *pb.Workflow) (err error) {
 		SET name = $1, description = $2, nodes = $3, edges = $4, updated_by = $5, type = $6, updated_at = NOW()
 		WHERE id = $7`
 
+	nodes, err := json.Marshal(workflow.Nodes)
+	if err != nil {
+		return err
+	}
+	edges, err := json.Marshal(workflow.Edges)
+	if err != nil {
+		return err
+	}
+
 	_, err = db.conn.Exec(
 		query,
 		workflow.Name,
 		workflow.Description,
-		workflow.Nodes,
-		workflow.Edges,
+		nodes,
+		edges,
 		workflow.UpdatedBy,
 		workflow.Type,
 		workflow.Id,
