@@ -33,8 +33,8 @@ const (
 
 const (
 	CURRENT = "current"
-	TRUE    = "true"
-	FALSE   = "false"
+	TRUE    = "True"
+	FALSE   = "False"
 )
 
 type WorkflowProcessor struct {
