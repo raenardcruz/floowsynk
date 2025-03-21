@@ -3,6 +3,7 @@ import { WorkflowCanvasProps } from '../Workflow.Canvas.types'
 import { useNotif, NotifOptions, STATUS_ERROR, STATUS_INFO, STATUS_SUCCESS } from '@/components/Composable/UI/Notif'
 import { initWorkflows } from '@/components/Workflow/Process'
 import { useWorkflowStore } from '@/views/Workflow'
+import { StreamType, NodeStatus } from 'proto/floowsynk_pb'
 import {
   createProcess,
   updateProcess,
@@ -73,13 +74,28 @@ export const useWorkflowCanvasControlButtonActions = (props: WorkflowCanvasProps
   const runProcess = async () => {
     nodeStatuses.value = {};
     runningTabs.value.push(tab.value.id);
-    let resp = await executeProcess(tab.value);
+    let stream = await executeProcess(tab.value);
     useNotif({
       duration: 5000,
       teleportTarget: `#${btoa(tab.value.id)}`,
-      message: "Workflow started successfully: " + resp.data.message,
+      message: "Workflow started successfully: ",
       status: STATUS_INFO
     } as NotifOptions);
+    stream.on('data', (response) => {
+      if (response.getStreamtype() == StreamType.STATUS) {
+        switch (response.getStatus()) {
+          case NodeStatus.RUNNING:
+            nodeStatuses.value[response.getNodeid()] = 'running';
+            break;
+          case NodeStatus.COMPLETED:
+            nodeStatuses.value[response.getNodeid()] = 'success';
+            break;
+          case NodeStatus.FAILED:
+            nodeStatuses.value[response.getNodeid()] = 'error';
+            break;
+        }
+      }
+    });
   }
 
   const resetTransform = function () {

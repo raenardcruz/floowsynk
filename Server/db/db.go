@@ -71,6 +71,7 @@ func (db *DB) InitDB() error {
 			type VARCHAR(50) NOT NULL DEFAULT 'defaultnode',
 			nodes JSONB,
 			edges JSONB,
+			tags TEXT[],
 			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 			updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 			created_by UUID NOT NULL,

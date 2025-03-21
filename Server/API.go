@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/raenardcruz/floowsynk/proto"
+	"github.com/raenardcruz/floowsynk/workflow"
 )
 
 var jwtKey = []byte("secret_key")
@@ -116,125 +117,22 @@ func (s *WorkflowServer) DeleteWorkflow(ctx context.Context, req *proto.Workflow
 	return &proto.Empty{}, nil
 }
 
-// API Methods --------------------------------------------------------------------------------------------------------
-
-// func (dbcon *DBConnection) PostWorkflow(c *gin.Context) {
-// 	ValidateResults := validateToken("'")
-// 	if ValidateResults.status != http.StatusOK {
-// 		c.JSON(ValidateResults.status, gin.H{"error": ValidateResults.message})
-// 		return
-// 	}
-// 	var workflow db.WorkflowModel
-// 	if err := c.ShouldBindJSON(&workflow); err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-// 		return
-// 	}
-// 	workflow.CreatedBy = ValidateResults.id
-// 	workflow.UpdatedBy = ValidateResults.id
-
-// 	if _, err := dbcon.DB.CreateWorkflow(workflow); err != nil {
-// 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-// 		return
-// 	}
-
-// 	c.JSON(http.StatusCreated, workflow)
-// }
-
-// func (dbcon *DBConnection) UpdateWorkflow(c *gin.Context) {
-// 	ValidateResults := validateToken("")
-// 	if ValidateResults.status != http.StatusOK {
-// 		c.JSON(ValidateResults.status, gin.H{"error": ValidateResults.message})
-// 		return
-// 	}
-// 	id := c.Params.ByName("id")
-
-// 	var workflow db.WorkflowModel
-// 	if err := c.ShouldBindJSON(&workflow); err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-// 		return
-// 	}
-// 	workflow.ID = id
-// 	workflow.UpdatedBy = ValidateResults.id
-
-// 	if err := dbcon.DB.UpdateWorkflow(workflow); err != nil {
-// 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-// 		return
-// 	}
-// 	c.JSON(http.StatusOK, workflow)
-// }
-
-// func (dbcon *DBConnection) DeleteWorkflow(c *gin.Context) {
-// 	ValidateResults := validateToken("")
-// 	if ValidateResults.status != http.StatusOK {
-// 		c.JSON(ValidateResults.status, gin.H{"error": ValidateResults.message})
-// 		return
-// 	}
-// 	id := c.Params.ByName("id")
-
-// 	if err := dbcon.DB.DeleteWorkflow(id); err != nil {
-// 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-// 		return
-// 	}
-// 	c.JSON(http.StatusOK, gin.H{"message": "Workflow deleted"})
-// }
-
-// func SseHandler(c *gin.Context) {
-// 	id := c.Params.ByName("id")
-
-// 	eventStream.mu.Lock()
-// 	_, ok := eventStream.clients[id]
-// 	eventStream.mu.Unlock()
-
-// 	if !ok {
-// 		eventStream.addClient(id)
-// 	}
-
-// 	c.Writer.Header().Set("Content-Type", "text/event-stream")
-// 	c.Writer.Header().Set("Cache-Control", "no-cache")
-// 	c.Writer.Header().Set("Connection", "keep-alive")
-// 	c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
-
-// 	clientChan := eventStream.clients[id]
-// 	for {
-// 		select {
-// 		case msg := <-clientChan:
-// 			c.Writer.Write([]byte("event: " + msg.Event + "\n"))
-// 			c.Writer.Write([]byte("data: " + msg.Data.Obj + "\n\n"))
-// 			c.Writer.Flush()
-// 		case <-c.Writer.CloseNotify():
-// 			eventStream.removeClient(id)
-// 			return
-// 		case <-c.Request.Context().Done():
-// 			eventStream.removeClient(id)
-// 			return
-// 		}
-// 	}
-// }
-
-// func (dbcon *DBConnection) RunWorkflow(c *gin.Context) {
-// 	ValidateResults := validateToken("")
-// 	if ValidateResults.status != http.StatusOK {
-// 		c.JSON(ValidateResults.status, gin.H{"error": ValidateResults.message})
-// 		return
-// 	}
-// 	id := c.Params.ByName("id")
-
-// 	var payload Workflow
-// 	if err := c.ShouldBindJSON(&payload); err != nil {
-// 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-// 		return
-// 	}
-// 	workflowProcessor := WorkflowProcessor{
-// 		ProcessID:        id,
-// 		Workflow:         &payload,
-// 		Dbcon:            dbcon,
-// 		ProcessVariables: make(map[string]interface{}),
-// 		ProcessResults:   make(map[string]interface{}),
-// 		LoggingData:      make([]LogData, 0),
-// 	}
-// 	go func() {
-// 		workflowProcessor.StartWorkflow()
-// 	}()
-
-// 	c.JSON(http.StatusOK, gin.H{"message": "Workflow run started"})
-// }
+func (s *WorkflowServer) RunWorkflow(req *proto.Workflow, stream proto.WorkflowService_RunWorkflowServer) error {
+	ctx := stream.Context()
+	token, err := getTokenFromContext(ctx)
+	if err != nil {
+		return err
+	}
+	validateResults := validateToken(token)
+	if validateResults.status != http.StatusOK {
+		return fmt.Errorf(validateResults.message)
+	}
+	processor := workflow.WorkflowProcessor{
+		Stream:           stream,
+		Workflow:         req,
+		ProcessVariables: make(map[string]interface{}),
+		DBcon:            *dbcon.DB,
+	}
+	processor.StartWorkflow()
+	return nil
+}

@@ -2,6 +2,65 @@ import * as jspb from 'google-protobuf'
 
 
 
+export class RunWorkflowResponse extends jspb.Message {
+  getNodeid(): string;
+  setNodeid(value: string): RunWorkflowResponse;
+
+  getStreamtype(): StreamType;
+  setStreamtype(value: StreamType): RunWorkflowResponse;
+
+  getReplaynode(): Node | undefined;
+  setReplaynode(value?: Node): RunWorkflowResponse;
+  hasReplaynode(): boolean;
+  clearReplaynode(): RunWorkflowResponse;
+
+  getLogmessage(): string;
+  setLogmessage(value: string): RunWorkflowResponse;
+
+  getStatus(): NodeStatus;
+  setStatus(value: NodeStatus): RunWorkflowResponse;
+  hasStatus(): boolean;
+  clearStatus(): RunWorkflowResponse;
+
+  getLogstatus(): LogStatus;
+  setLogstatus(value: LogStatus): RunWorkflowResponse;
+  hasLogstatus(): boolean;
+  clearLogstatus(): RunWorkflowResponse;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): RunWorkflowResponse.AsObject;
+  static toObject(includeInstance: boolean, msg: RunWorkflowResponse): RunWorkflowResponse.AsObject;
+  static serializeBinaryToWriter(message: RunWorkflowResponse, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): RunWorkflowResponse;
+  static deserializeBinaryFromReader(message: RunWorkflowResponse, reader: jspb.BinaryReader): RunWorkflowResponse;
+}
+
+export namespace RunWorkflowResponse {
+  export type AsObject = {
+    nodeid: string,
+    streamtype: StreamType,
+    replaynode?: Node.AsObject,
+    logmessage: string,
+    status?: NodeStatus,
+    logstatus?: LogStatus,
+  }
+
+  export enum ReplaynodeCase { 
+    _REPLAYNODE_NOT_SET = 0,
+    REPLAYNODE = 3,
+  }
+
+  export enum StatusCase { 
+    _STATUS_NOT_SET = 0,
+    STATUS = 5,
+  }
+
+  export enum LogstatusCase { 
+    _LOGSTATUS_NOT_SET = 0,
+    LOGSTATUS = 6,
+  }
+}
+
 export class Empty extends jspb.Message {
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): Empty.AsObject;
@@ -348,8 +407,15 @@ export class Node extends jspb.Message {
   hasComputedposition(): boolean;
   clearComputedposition(): Node;
 
-  getIsparent(): boolean;
-  setIsparent(value: boolean): Node;
+  getInput(): string;
+  setInput(value: string): Node;
+  hasInput(): boolean;
+  clearInput(): Node;
+
+  getOutput(): string;
+  setOutput(value: string): Node;
+  hasOutput(): boolean;
+  clearOutput(): Node;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): Node.AsObject;
@@ -377,7 +443,8 @@ export namespace Node {
     dimensions?: NodeDimensions.AsObject,
     handlebounds?: NodeHandleBounds.AsObject,
     computedposition?: NodePosition.AsObject,
-    isparent: boolean,
+    input?: string,
+    output?: string,
   }
 
   export enum DataCase { 
@@ -413,6 +480,16 @@ export namespace Node {
   export enum TypeCase { 
     _TYPE_NOT_SET = 0,
     TYPE = 13,
+  }
+
+  export enum InputCase { 
+    _INPUT_NOT_SET = 0,
+    INPUT = 17,
+  }
+
+  export enum OutputCase { 
+    _OUTPUT_NOT_SET = 0,
+    OUTPUT = 18,
   }
 }
 
@@ -457,10 +534,10 @@ export class NodeData extends jspb.Message {
   hasMethod(): boolean;
   clearMethod(): NodeData;
 
-  getHeadersList(): Array<KeyValue>;
-  setHeadersList(value: Array<KeyValue>): NodeData;
-  clearHeadersList(): NodeData;
-  addHeaders(value?: KeyValue, index?: number): KeyValue;
+  getHeaders(): NodeDataArray | undefined;
+  setHeaders(value?: NodeDataArray): NodeData;
+  hasHeaders(): boolean;
+  clearHeaders(): NodeData;
 
   getPayload(): string;
   setPayload(value: string): NodeData;
@@ -477,10 +554,10 @@ export class NodeData extends jspb.Message {
   hasMessage(): boolean;
   clearMessage(): NodeData;
 
-  getListList(): Array<string>;
-  setListList(value: Array<string>): NodeData;
-  clearListList(): NodeData;
-  addList(value: string, index?: number): NodeData;
+  getList(): NodeDataArray | undefined;
+  setList(value?: NodeDataArray): NodeData;
+  hasList(): boolean;
+  clearList(): NodeData;
 
   getListvariable(): string;
   setListvariable(value: string): NodeData;
@@ -522,10 +599,10 @@ export class NodeData extends jspb.Message {
   hasInterval(): boolean;
   clearInterval(): NodeData;
 
-  getWeeksList(): Array<boolean>;
-  setWeeksList(value: Array<boolean>): NodeData;
-  clearWeeksList(): NodeData;
-  addWeeks(value: boolean, index?: number): NodeData;
+  getWeeks(): NodeDataArray | undefined;
+  setWeeks(value?: NodeDataArray): NodeData;
+  hasWeeks(): boolean;
+  clearWeeks(): NodeData;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): NodeData.AsObject;
@@ -545,11 +622,11 @@ export namespace NodeData {
     limit?: number,
     url?: string,
     method?: string,
-    headersList: Array<KeyValue.AsObject>,
+    headers?: NodeDataArray.AsObject,
     payload?: string,
     variable?: string,
     message?: string,
-    listList: Array<string>,
+    list?: NodeDataArray.AsObject,
     listvariable?: string,
     template?: string,
     text?: string,
@@ -558,7 +635,7 @@ export namespace NodeData {
     subprocessid?: string,
     type?: string,
     interval?: number,
-    weeksList: Array<boolean>,
+    weeks?: NodeDataArray.AsObject,
   }
 
   export enum NameCase { 
@@ -601,6 +678,11 @@ export namespace NodeData {
     METHOD = 8,
   }
 
+  export enum HeadersCase { 
+    _HEADERS_NOT_SET = 0,
+    HEADERS = 9,
+  }
+
   export enum PayloadCase { 
     _PAYLOAD_NOT_SET = 0,
     PAYLOAD = 10,
@@ -614,6 +696,11 @@ export namespace NodeData {
   export enum MessageCase { 
     _MESSAGE_NOT_SET = 0,
     MESSAGE = 12,
+  }
+
+  export enum ListCase { 
+    _LIST_NOT_SET = 0,
+    LIST = 13,
   }
 
   export enum ListvariableCase { 
@@ -654,6 +741,53 @@ export namespace NodeData {
   export enum IntervalCase { 
     _INTERVAL_NOT_SET = 0,
     INTERVAL = 21,
+  }
+
+  export enum WeeksCase { 
+    _WEEKS_NOT_SET = 0,
+    WEEKS = 22,
+  }
+}
+
+export class NodeDataArray extends jspb.Message {
+  getType(): ArrayDataType;
+  setType(value: ArrayDataType): NodeDataArray;
+
+  getKeyvalueitemsList(): Array<KeyValue>;
+  setKeyvalueitemsList(value: Array<KeyValue>): NodeDataArray;
+  clearKeyvalueitemsList(): NodeDataArray;
+  addKeyvalueitems(value?: KeyValue, index?: number): KeyValue;
+
+  getStringitemsList(): Array<string>;
+  setStringitemsList(value: Array<string>): NodeDataArray;
+  clearStringitemsList(): NodeDataArray;
+  addStringitems(value: string, index?: number): NodeDataArray;
+
+  getIntitemsList(): Array<number>;
+  setIntitemsList(value: Array<number>): NodeDataArray;
+  clearIntitemsList(): NodeDataArray;
+  addIntitems(value: number, index?: number): NodeDataArray;
+
+  getBoolitemsList(): Array<boolean>;
+  setBoolitemsList(value: Array<boolean>): NodeDataArray;
+  clearBoolitemsList(): NodeDataArray;
+  addBoolitems(value: boolean, index?: number): NodeDataArray;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): NodeDataArray.AsObject;
+  static toObject(includeInstance: boolean, msg: NodeDataArray): NodeDataArray.AsObject;
+  static serializeBinaryToWriter(message: NodeDataArray, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): NodeDataArray;
+  static deserializeBinaryFromReader(message: NodeDataArray, reader: jspb.BinaryReader): NodeDataArray;
+}
+
+export namespace NodeDataArray {
+  export type AsObject = {
+    type: ArrayDataType,
+    keyvalueitemsList: Array<KeyValue.AsObject>,
+    stringitemsList: Array<string>,
+    intitemsList: Array<number>,
+    boolitemsList: Array<boolean>,
   }
 }
 
@@ -828,3 +962,25 @@ export namespace Handle {
   }
 }
 
+export enum ArrayDataType { 
+  STRING = 0,
+  INT = 1,
+  BOOL = 2,
+  KEYVALUE = 3,
+}
+export enum StreamType { 
+  REPLAY = 0,
+  LOGS = 1,
+  STATUS = 2,
+}
+export enum NodeStatus { 
+  PENDING = 0,
+  RUNNING = 1,
+  COMPLETED = 2,
+  FAILED = 3,
+}
+export enum LogStatus { 
+  INFO = 0,
+  WARN = 1,
+  ERROR = 2,
+}

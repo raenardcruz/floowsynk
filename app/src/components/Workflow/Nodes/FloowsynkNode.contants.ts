@@ -1,5 +1,9 @@
 import { Group } from '@/views/Workflow'
-import { Node, NodeData } from 'proto/floowsynk_pb'
+import {
+    Node,
+    NodeDataArray,
+    ArrayDataType 
+} from 'proto/floowsynk_pb'
 
 export const groups: Group[] = [
     {
@@ -46,7 +50,7 @@ export const groups: Group[] = [
     }
 ]
 
-export const nodes: any[] = [
+export const nodes: Node.AsObject[] = [
     {
         id: '', nodetype: 'setVariable', label: 'Set Variable', position: { x: 0, y: 0 },
         groupList: [1],
@@ -60,7 +64,7 @@ export const nodes: any[] = [
         },
         inputsList: ["input"],
         outputsList: ["output"]
-    } as any,
+    },
     {
         id: '', nodetype: 'condition', label: 'Condition', position: { x: 0, y: 0 },
         groupList: [2],
@@ -73,7 +77,7 @@ export const nodes: any[] = [
         },
         inputsList: ["input"],
         outputsList: ["True", "False"]
-    } as any,
+    },
     {
         id: '', nodetype: 'loop', label: 'Loop', position: { x: 0, y: 0 },
         groupList: [2],
@@ -86,7 +90,7 @@ export const nodes: any[] = [
         },
         inputsList: ["input"],
         outputsList: ["output"]
-    } as any,
+    },
     {
         id: '', nodetype: 'foreach', label: 'For Each', position: { x: 0, y: 0 },
         groupList: [2],
@@ -99,7 +103,7 @@ export const nodes: any[] = [
         },
         inputsList: ["input"],
         outputsList: ["output"]
-    } as any,
+    },
     {
         id: '', nodetype: 'while', label: 'While', position: { x: 0, y: 0 },
         groupList: [2],
@@ -113,7 +117,7 @@ export const nodes: any[] = [
         },
         inputsList: ["input"],
         outputsList: ["output"]
-    } as any,
+    },
     {
         id: '', nodetype: 'api', label: 'Rest API', position: { x: 0, y: 0 },
         groupList: [4],
@@ -124,18 +128,21 @@ export const nodes: any[] = [
         data: {
             url: "",
             method: "GET",
-            headersList: [
-                {
-                    key: "Content-Type",
-                    value: "application/json"
-                }
-            ],
+            headers: {
+                type: 3,
+                keyvalueitemsList: [
+                    {
+                        key: "Content-Type",
+                        value: "application/json"
+                    }
+                ],
+            },
             payload: "",
             variable: ""
         },
         inputsList: ["input"],
         outputsList: ["output"]
-    } as any,
+    },
     {
         id: '', nodetype: 'log', label: 'Logging', position: { x: 0, y: 0 },
         groupList: [6],
@@ -148,7 +155,7 @@ export const nodes: any[] = [
         },
         inputsList: ["input"],
         outputsList: ["output"]
-    } as any,
+    },
     {
         id: '', nodetype: 'getGuid', label: 'Get Guid', position: { x: 0, y: 0 },
         groupList: [1],
@@ -175,7 +182,7 @@ export const nodes: any[] = [
         },
         inputsList: ["input"],
         outputsList: ["output"]
-    } as any,
+    },
     {
         id: '', nodetype: 'math', label: 'math', position: { x: 0, y: 0 },
         groupList: [1],
@@ -189,7 +196,7 @@ export const nodes: any[] = [
         },
         inputsList: ["input"],
         outputsList: ["output"]
-    } as any,
+    },
     {
         id: '', nodetype: 'list', label: 'List', position: { x: 0, y: 0 },
         groupList: [1],
@@ -198,12 +205,14 @@ export const nodes: any[] = [
             color: "#85B158"
         },
         data: {
-            listList: [] as string[],
+            list: {
+                type: ArrayDataType.STRING
+            },
             variable: ""
         },
         inputsList: ["input"],
         outputsList: ["output"]
-    } as any,
+    },
     {
         id: '', nodetype: 'count', label: 'List Count', position: { x: 0, y: 0 },
         groupList: [1],
@@ -217,7 +226,7 @@ export const nodes: any[] = [
         },
         inputsList: ["input"],
         outputsList: ["output"]
-    } as any,
+    },
     {
         id: '', nodetype: 'map', label: 'Map', position: { x: 0, y: 0 },
         groupList: [3],
@@ -232,7 +241,7 @@ export const nodes: any[] = [
         },
         inputsList: ["input"],
         outputsList: ["output"]
-    } as any,
+    },
     {
         id: '', nodetype: 'replace', label: 'Replace', position: { x: 0, y: 0 },
         groupList: [1],
@@ -248,7 +257,7 @@ export const nodes: any[] = [
         },
         inputsList: ["input"],
         outputsList: ["output"]
-    } as any,
+    },
     {
         id: '', nodetype: 'findAll', label: 'Find All', position: { x: 0, y: 0 },
         groupList: [1],
@@ -263,7 +272,7 @@ export const nodes: any[] = [
         },
         inputsList: ["input"],
         outputsList: ["output"]
-    } as any,
+    },
     {
         // Implement logic on Front End
         id: '', nodetype: 'image', label: 'Output Image', position: { x: 0, y: 0 },
@@ -277,7 +286,7 @@ export const nodes: any[] = [
         },
         inputsList: ["input"],
         outputsList: ["output"]
-    } as any,
+    },
     {
         // Implement Logic
         id: '', nodetype: 'subprocess', label: 'Sub Process', position: { x: 0, y: 0 },
@@ -291,10 +300,10 @@ export const nodes: any[] = [
         },
         inputsList: ["input"],
         outputsList: ["output"]
-    } as any
+    }
 ]
 
-const startNodesArray: any[] = [
+const startNodesArray: Node.AsObject[] = [
     {
         id: '0',
         nodetype: 'defaultnode',
@@ -304,7 +313,8 @@ const startNodesArray: any[] = [
         outputsList: ['output'],
         groupList: [1],
         position: { x: 100, y: 100 },
-    } as any,
+        inputsList: []
+    },
     {
         id: '0',
         nodetype: 'interval',
@@ -314,12 +324,16 @@ const startNodesArray: any[] = [
         data: {
             type: 'seconds',
             interval: 1,
-            weeksList: [true, true, true, true, true, true, true],
-        } as NodeData.AsObject,
+            weeks: {
+                type: ArrayDataType.BOOL,
+                boolitemsList: [true, true, true, true, true, true, true]
+            } as NodeDataArray.AsObject,
+        },
+        inputsList: [],
         outputsList: ['output'],
         groupList: [1],
         position: { x: 100, y: 100 },
-    } as any,
+    },
     {
         id: '0',
         nodetype: 'webhook',
@@ -328,11 +342,12 @@ const startNodesArray: any[] = [
         icon: { name: 'webhook', color: '#b86a11' },
         data: {
             name: ''
-        } as NodeData.AsObject,
+        },
+        inputsList: [],
         outputsList: ['output'],
         groupList: [1],
         position: { x: 100, y: 100 },
-    } as any,
+    },
     {
         id: '0',
         nodetype: 'events',
@@ -341,14 +356,15 @@ const startNodesArray: any[] = [
         icon: { name: 'event', color: '#A3245B' },
         data: {
             name: ''
-        } as NodeData.AsObject,
+        },
+        inputsList: [],
         outputsList: ['output'],
         groupList: [1],
         position: { x: 100, y: 100 },
-    } as any,
+    },
 ]
 
-const startNodes: { [key: string]: any } = {};
+const startNodes: { [key: string]: Node.AsObject } = {};
 startNodesArray.forEach(node => {
     startNodes[node.nodetype] = node;
 });

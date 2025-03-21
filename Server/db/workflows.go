@@ -5,6 +5,7 @@ import (
 	"errors"
 	"log"
 
+	"github.com/lib/pq"
 	pb "github.com/raenardcruz/floowsynk/proto"
 )
 
@@ -26,8 +27,8 @@ func (j *JSONB) Scan(value interface{}) error {
 
 func (db *DB) CreateWorkflow(workflow *pb.Workflow) (string, error) {
 	query := `
-		INSERT INTO workflows (id, name, type, description, nodes, edges, created_by, updated_by, created_at, updated_at) 
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW(), NOW()) 
+		INSERT INTO workflows (id, name, type, description, nodes, edges, created_by, updated_by, tags, created_at, updated_at) 
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW(), NOW()) 
 		RETURNING id`
 
 	nodes, err := json.Marshal(workflow.Nodes)
@@ -50,6 +51,7 @@ func (db *DB) CreateWorkflow(workflow *pb.Workflow) (string, error) {
 		edges,
 		workflow.CreatedBy,
 		workflow.UpdatedBy,
+		pq.Array(workflow.Tags),
 	).Scan(&id)
 	if err != nil {
 		return "", err
@@ -69,7 +71,7 @@ func (db *DB) GetWorkflows(limit, offset int) (wl *pb.WorkflowList, err error) {
 	}
 
 	query := `
-		SELECT id, type, name, description, nodes, edges, created_at, updated_at 
+		SELECT id, type, name, description, nodes, edges, created_at, updated_at, tags
 		FROM workflows
 		ORDER BY id
 		LIMIT $1 OFFSET $2`
@@ -93,6 +95,7 @@ func (db *DB) GetWorkflows(limit, offset int) (wl *pb.WorkflowList, err error) {
 			&edges,
 			&workflow.CreatedAt,
 			&workflow.UpdatedAt,
+			pq.Array(&workflow.Tags),
 		)
 		if err != nil {
 			log.Printf("Error scanning workflow: %v", err)
@@ -118,7 +121,7 @@ func (db *DB) GetWorkflows(limit, offset int) (wl *pb.WorkflowList, err error) {
 
 func (db *DB) GetWorkflow(id string) (workflow *pb.Workflow, err error) {
 	query := `
-		SELECT id, name, description, nodes, edges, created_at, updated_at 
+		SELECT id, name, description, nodes, edges, created_at, updated_at, tags
 		FROM workflows 
 		WHERE id = $1`
 
@@ -132,6 +135,7 @@ func (db *DB) GetWorkflow(id string) (workflow *pb.Workflow, err error) {
 		&edges,
 		&workflow.CreatedAt,
 		&workflow.UpdatedAt,
+		pq.Array(&workflow.Tags),
 	)
 	if err != nil {
 		log.Printf("Error scanning workflow: %v", err)
@@ -152,7 +156,7 @@ func (db *DB) GetWorkflow(id string) (workflow *pb.Workflow, err error) {
 func (db *DB) UpdateWorkflow(workflow *pb.Workflow) (err error) {
 	query := `
 		UPDATE workflows 
-		SET name = $1, description = $2, nodes = $3, edges = $4, updated_by = $5, type = $6, updated_at = NOW()
+		SET name = $1, description = $2, nodes = $3, edges = $4, updated_by = $5, type = $6, tags = $8, updated_at = NOW()
 		WHERE id = $7`
 
 	nodes, err := json.Marshal(workflow.Nodes)
@@ -173,6 +177,7 @@ func (db *DB) UpdateWorkflow(workflow *pb.Workflow) (err error) {
 		workflow.UpdatedBy,
 		workflow.Type,
 		workflow.Id,
+		pq.Array(workflow.Tags),
 	)
 	return err
 }

@@ -1,5 +1,6 @@
 import { ref, computed } from 'vue';
 import { useTab } from '@/views/Workflow'
+import { DenormalizeVueFlowObject } from '@/components/Composable/protoTransformers'
 
 const isDragOver = ref(false);
 const clipBoard = ref({
@@ -26,9 +27,19 @@ export const useWorkflowCanvasStore= () => {
 export const useWorkflowCanvasHooks = (tabId: string) => {
     const { tab } = useTab(tabId);
     const canvasId = computed(() => btoa(tab.value.id));
+    const node = computed({
+        get: () => tab.value.nodesList.map(node => DenormalizeVueFlowObject(node)),
+        set: (newNodes) => { tab.value.nodesList = newNodes; }
+    });
+    const edge = computed({
+        get: () => tab.value.edgesList.map(edge => DenormalizeVueFlowObject(edge)),
+        set: (newEdges) => { tab.value.edgesList = newEdges; }
+    });
 
     return {
         tab,
         canvasId,
+        node,
+        edge,
     }
 }

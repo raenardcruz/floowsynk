@@ -4,9 +4,8 @@
             <option v-for="process in filteredProcesses" :value="process.id">{{ process.name }}</option>
         </select>
     </div>
-    <div class="input" v-for="(value, key) in props.modelValue" :key="key"
-        v-else-if="props.modelValue.constructor == Object">
-        <span v-if="value != null">
+    <span v-for="(value, key) in props.modelValue" :key="key" v-else-if="props.modelValue.constructor == Object">
+        <div class="input" v-if="value != null">
             <legend class="sidebar-legend" v-if="props.modelValue[key].length > 0 || value.constructor != Array">
                 <div class="checkbox" v-if="value.constructor == Boolean">
                     <input type="checkbox" v-model="props.modelValue[key]" />
@@ -25,24 +24,25 @@
             </span>
             <input class="sidebar-input" type="number" v-model="props.modelValue[key]"
                 v-if="value.constructor == Number" />
-            <div class="array-container" v-if="value.constructor == Array && props.modelValue[key].length > 0">
-                <div class="child-container" v-for="(v, i) in props.modelValue[key]" :key="v">
-                    <span class="material-symbols-outlined remove-array" v-if="i > 0" @click="removeArrayItem(i, key)">delete</span>
-                    <WorkflowNodeSidebarFields :nodeType="props.nodeType" v-model="props.modelValue[key][i]"
-                        :tabid="props.tabid" />
+            <div class="array-container" v-if="isNodeArray(value)">
+                <div class="child-container" v-for="(v, i) in getArrayData(props.modelValue[key] as NodeDataArray)" :key="v">
+                    <span class="material-symbols-outlined remove-array" v-if="i > 0"
+                        @click="removeArrayItem(i, key)">delete</span>
+                    <WorkflowNodeSidebarFields :nodeType="props.nodeType"
+                        v-model="getArrayData(props.modelValue[key] as NodeDataArray)[i]" :tabid="props.tabid" />
                 </div>
-                <select class="sidebar-input" v-if="value.length == 0" v-model="arraytype">
-                    <option value="keyvalue">KeyValue</option>
-                    <option value="string">String</option>
-                    <option value="number">Number</option>
-                    <option value="boolean">Boolean</option>
+                <select class="sidebar-input" v-model="props.modelValue[key].type">
+                    <option :value="ArrayDataType.KEYVALUE">KeyValue</option>
+                    <option :value="ArrayDataType.STRING">String</option>
+                    <option :value="ArrayDataType.INT">Number</option>
+                    <option :value="ArrayDataType.BOOL">Boolean</option>
                 </select>
                 <div class="btn" @click="addArrayItem(key)">
                     <span class="material-symbols-outlined">add</span>
                 </div>
             </div>
-        </span>
-    </div>
+        </div>
+    </span>
     <div class="input" v-else>
         <input class="sidebar-input" type="text" v-model="props.modelValue" @change="inputHandler($event, emit)"
             v-if="props.modelValue.constructor == String" />
@@ -64,12 +64,36 @@ import { useSidebarNodeHooks, useSidebarNodeStore } from '../Workflow.Sidebar.No
 import { toSentenceCase } from '@/components/Composable/Utilities'
 import { showModal, useSidebarNodeFieldsHelper, inputHandler } from './Workflow.Sidebar.Node.helper'
 import { EMIT_MODEL } from './Workflow.Sidebar.Node.Fields.constants'
+import { NodeDataArray, ArrayDataType } from 'proto/floowsynk_pb'
 
 const props = defineProps<SidebarNodeProps>()
 const emit = defineEmits([EMIT_MODEL])
 const { modalStates, arraytype } = useSidebarNodeStore()
 const { filteredProcesses, variables } = useSidebarNodeHooks(props.tabid)
 const { removeArrayItem, addArrayItem } = useSidebarNodeFieldsHelper(props)
+const isNodeArray = (obj: any): boolean => {
+    try {
+        return (
+            typeof obj.type == 'number'
+        )
+    } catch {
+        return false
+    }
+}
+const getArrayData = (obj: NodeDataArray.AsObject): any[] => {
+    switch (obj.type) {
+        case ArrayDataType.KEYVALUE:
+            return obj.keyvalueitemsList
+        case ArrayDataType.STRING:
+            return obj.stringitemsList
+        case ArrayDataType.INT:
+            return obj.intitemsList
+        case ArrayDataType.BOOL:
+            return obj.boolitemsList
+        default:
+            return []
+    }
+}
 </script>
 
 <style scoped src="./Workflow.Sidebar.Node.Fields.styles.css"></style>

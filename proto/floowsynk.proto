@@ -3,6 +3,31 @@ package proto;
 
 option go_package = "./proto";
 
+enum ArrayDataType {
+    STRING = 0;
+    INT = 1;
+    BOOL = 2;
+    KEYVALUE = 3;
+}
+
+enum StreamType {
+    REPLAY = 0;
+    LOGS = 1;
+    STATUS = 2;
+}
+
+enum NodeStatus {
+    PENDING = 0;
+    RUNNING = 1;
+    COMPLETED = 2;
+    FAILED = 3;
+}
+enum LogStatus {
+    INFO = 0;
+    WARN = 1;
+    ERROR = 2;
+}
+
 service LoginService {
     rpc Login(Credential) returns (Token);
     rpc ExtendToken(Empty) returns (Token);
@@ -14,6 +39,16 @@ service WorkflowService {
     rpc UpdateWorkflow(Workflow) returns (Workflow);
     rpc CreateWorkflow(Workflow) returns (Workflow);
     rpc DeleteWorkflow(Workflow) returns (Empty);
+    rpc RunWorkflow(Workflow) returns (stream RunWorkflowResponse);
+}
+
+message RunWorkflowResponse {
+    string nodeId = 1;
+    StreamType streamType = 2;
+    optional Node replayNode = 3;
+    string logMessage = 4;
+    optional NodeStatus status = 5;
+    optional LogStatus logStatus = 6;
 }
 
 message Empty {}
@@ -60,18 +95,18 @@ message Edge {
     string id = 1;
     string type = 2;
     string label = 3;
-    string tabId = 4;
+    string tabid = 4;
     string source = 5;
     string target = 6;
-    float sourceX = 7;
-    float sourceY = 8;
-    float targetX = 9;
-    float targetY = 10;
+    float sourcex = 7;
+    float sourcey = 8;
+    float targetx = 9;
+    float targety = 10;
     bool animated = 11;
-    Node sourceNode = 12;
-    Node targetNode = 13;
-    string sourceHandle = 14;
-    string targetHandle = 15;
+    Node sourcenode = 12;
+    Node targetnode = 13;
+    string sourcehandle = 14;
+    string targethandle = 15;
   }
 
 message Node {
@@ -91,7 +126,8 @@ message Node {
     NodeDimensions dimensions = 14;
     NodeHandleBounds handleBounds = 15;
     NodePosition computedPosition = 16;
-    bool isParent = 17;
+    optional string input = 17;
+    optional string output = 18;
 }
 
 
@@ -118,13 +154,6 @@ message NodeData {
     optional string type = 20;
     optional int32 interval = 21;
     optional NodeDataArray weeks = 22;
-}
-
-enum ArrayDataType {
-    STRING = 0;
-    INT = 1;
-    BOOL = 2;
-    KEYVALUE = 3;
 }
 
 message NodeDataArray {

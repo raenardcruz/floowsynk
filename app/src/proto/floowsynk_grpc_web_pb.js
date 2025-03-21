@@ -553,5 +553,61 @@ proto.proto.WorkflowServicePromiseClient.prototype.deleteWorkflow =
 };
 
 
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.proto.Workflow,
+ *   !proto.proto.RunWorkflowResponse>}
+ */
+const methodDescriptor_WorkflowService_RunWorkflow = new grpc.web.MethodDescriptor(
+  '/proto.WorkflowService/RunWorkflow',
+  grpc.web.MethodType.SERVER_STREAMING,
+  proto.proto.Workflow,
+  proto.proto.RunWorkflowResponse,
+  /**
+   * @param {!proto.proto.Workflow} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.proto.RunWorkflowResponse.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.proto.Workflow} request The request proto
+ * @param {?Object<string, string>=} metadata User defined
+ *     call metadata
+ * @return {!grpc.web.ClientReadableStream<!proto.proto.RunWorkflowResponse>}
+ *     The XHR Node Readable Stream
+ */
+proto.proto.WorkflowServiceClient.prototype.runWorkflow =
+    function(request, metadata) {
+  return this.client_.serverStreaming(this.hostname_ +
+      '/proto.WorkflowService/RunWorkflow',
+      request,
+      metadata || {},
+      methodDescriptor_WorkflowService_RunWorkflow);
+};
+
+
+/**
+ * @param {!proto.proto.Workflow} request The request proto
+ * @param {?Object<string, string>=} metadata User defined
+ *     call metadata
+ * @return {!grpc.web.ClientReadableStream<!proto.proto.RunWorkflowResponse>}
+ *     The XHR Node Readable Stream
+ */
+proto.proto.WorkflowServicePromiseClient.prototype.runWorkflow =
+    function(request, metadata) {
+  return this.client_.serverStreaming(this.hostname_ +
+      '/proto.WorkflowService/RunWorkflow',
+      request,
+      metadata || {},
+      methodDescriptor_WorkflowService_RunWorkflow);
+};
+
+
 module.exports = proto.proto;
 

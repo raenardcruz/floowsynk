@@ -1,7 +1,11 @@
-package main
+package workflow
 
 import (
 	"errors"
+	"time"
+
+	"github.com/raenardcruz/floowsynk/db"
+	"github.com/raenardcruz/floowsynk/proto"
 )
 
 const (
@@ -27,143 +31,154 @@ const (
 	subprocessType  = "subprocess"
 )
 
+const (
+	CURRENT = "current"
+	TRUE    = "true"
+	FALSE   = "false"
+)
+
+type WorkflowProcessor struct {
+	Stream           proto.WorkflowService_RunWorkflowServer
+	Workflow         *proto.Workflow
+	ProcessVariables map[string]interface{}
+	DBcon            db.DB
+}
+
 func (wp *WorkflowProcessor) StartWorkflow() (err error) {
-	//start := time.Now()
+	start := time.Now()
 	wp.Process("0")
-	//elapsed := time.Since(start)
-	//eventStream.SendEvent(wp.ProcessID, "Complete", fmt.Sprintf("Elapsed Time: %s", elapsed))
+	time.Since(start)
 	return nil
 }
 
 func (wp *WorkflowProcessor) Process(nodeId string) (err error) {
-	wp.NodeInProgress(nodeId)
 	sourceHandle := ""
-
-	node, exist := wp.Workflow.Nodes.getNodeById(nodeId)
+	wp.UpdateStatus(nodeId, proto.NodeStatus_RUNNING)
+	node, exist := getNodeById(wp.Workflow.Nodes, nodeId)
 	if !exist {
 		return nil
 	}
 
 	var processErr error
-	switch node.Type {
+	switch node.Nodetype {
 	case defaultnodeType, intervalType, webhookType, eventsType:
-		wp.NodeSuccess(nodeId)
+		wp.UpdateStatus(nodeId, proto.NodeStatus_COMPLETED)
 
 	case setVariabletype:
 		if processErr = wp.SetVariableNodeProcess(node); processErr != nil {
-			wp.NodeFailed(nodeId)
+			wp.UpdateStatus(nodeId, proto.NodeStatus_FAILED)
 			return processErr
 		}
-		wp.NodeSuccess(nodeId)
+		wp.UpdateStatus(nodeId, proto.NodeStatus_COMPLETED)
 
 	case textType:
 		if processErr = wp.TextNodeProcess(node); processErr != nil {
-			wp.NodeFailed(nodeId)
+			wp.UpdateStatus(nodeId, proto.NodeStatus_FAILED)
 			return processErr
 		}
-		wp.NodeSuccess(nodeId)
+		wp.UpdateStatus(nodeId, proto.NodeStatus_COMPLETED)
 
 	case conditionType:
 		if sourceHandle, processErr = wp.ConditionNodeProcess(node); processErr != nil {
-			wp.NodeFailed(nodeId)
+			wp.UpdateStatus(nodeId, proto.NodeStatus_FAILED)
 			return processErr
 		}
-		wp.NodeSuccess(nodeId)
+		wp.UpdateStatus(nodeId, proto.NodeStatus_COMPLETED)
 
 	case listType:
 		if processErr = wp.ListNodeProcess(node); processErr != nil {
-			wp.NodeFailed(nodeId)
+			wp.UpdateStatus(nodeId, proto.NodeStatus_FAILED)
 			return processErr
 		}
-		wp.NodeSuccess(nodeId)
+		wp.UpdateStatus(nodeId, proto.NodeStatus_COMPLETED)
 
 	case loopType:
 		if processErr = wp.LoopNodeProcess(node); processErr != nil {
-			wp.NodeFailed(nodeId)
+			wp.UpdateStatus(nodeId, proto.NodeStatus_FAILED)
 			return processErr
 		}
-		wp.NodeSuccess(nodeId)
+		wp.UpdateStatus(nodeId, proto.NodeStatus_COMPLETED)
 
 	case forEachType:
 		if processErr = wp.ForEachNodeProcess(node); processErr != nil {
-			wp.NodeFailed(nodeId)
+			wp.UpdateStatus(nodeId, proto.NodeStatus_FAILED)
 			return processErr
 		}
-		wp.NodeSuccess(nodeId)
+		wp.UpdateStatus(nodeId, proto.NodeStatus_COMPLETED)
 
 	case whileType:
 		if processErr = wp.WhileNodeProcess(node); processErr != nil {
-			wp.NodeFailed(nodeId)
+			wp.UpdateStatus(nodeId, proto.NodeStatus_FAILED)
 			return processErr
 		}
-		wp.NodeSuccess(nodeId)
+		wp.UpdateStatus(nodeId, proto.NodeStatus_COMPLETED)
 
 	case apiType:
 		if processErr = wp.ApiNodeProcess(node); processErr != nil {
-			wp.NodeFailed(nodeId)
+			wp.UpdateStatus(nodeId, proto.NodeStatus_FAILED)
 			return processErr
 		}
-		wp.NodeSuccess(nodeId)
+		wp.UpdateStatus(nodeId, proto.NodeStatus_COMPLETED)
 
 	case logType:
 		if processErr = wp.LogNodeProcess(node); processErr != nil {
-			wp.NodeFailed(nodeId)
+			wp.UpdateStatus(nodeId, proto.NodeStatus_FAILED)
 			return processErr
 		}
-		wp.NodeSuccess(nodeId)
+		wp.UpdateStatus(nodeId, proto.NodeStatus_COMPLETED)
 
 	case guidType:
 		if processErr = wp.GuidNodeProcess(node); processErr != nil {
-			wp.NodeFailed(nodeId)
+			wp.UpdateStatus(nodeId, proto.NodeStatus_FAILED)
 			return processErr
 		}
-		wp.NodeSuccess(nodeId)
+		wp.UpdateStatus(nodeId, proto.NodeStatus_COMPLETED)
 
 	case mathType:
 		if processErr = wp.MathNodeProcess(node); processErr != nil {
-			wp.NodeFailed(nodeId)
+			wp.UpdateStatus(nodeId, proto.NodeStatus_FAILED)
 			return processErr
 		}
-		wp.NodeSuccess(nodeId)
+		wp.UpdateStatus(nodeId, proto.NodeStatus_COMPLETED)
 
 	case countType:
 		if processErr = wp.CountNodeProcess(node); processErr != nil {
-			wp.NodeFailed(nodeId)
+			wp.UpdateStatus(nodeId, proto.NodeStatus_FAILED)
 			return processErr
 		}
-		wp.NodeSuccess(nodeId)
+		wp.UpdateStatus(nodeId, proto.NodeStatus_COMPLETED)
 
 	case mapType:
 		if processErr = wp.MapNodeProcess(node); processErr != nil {
-			wp.NodeFailed(nodeId)
+			wp.UpdateStatus(nodeId, proto.NodeStatus_FAILED)
 			return processErr
 		}
-		wp.NodeSuccess(nodeId)
+		wp.UpdateStatus(nodeId, proto.NodeStatus_COMPLETED)
 
 	case replaceType:
 		if processErr = wp.ReplaceNodeProcess(node); processErr != nil {
-			wp.NodeFailed(nodeId)
+			wp.UpdateStatus(nodeId, proto.NodeStatus_FAILED)
 			return processErr
 		}
-		wp.NodeSuccess(nodeId)
+		wp.UpdateStatus(nodeId, proto.NodeStatus_COMPLETED)
 
 	case findAllType:
 		if processErr = wp.FindAllNodeProcess(node); processErr != nil {
-			wp.NodeFailed(nodeId)
+			wp.UpdateStatus(nodeId, proto.NodeStatus_FAILED)
 			return processErr
 		}
-		wp.NodeSuccess(nodeId)
+		wp.UpdateStatus(nodeId, proto.NodeStatus_COMPLETED)
 
 	case subprocessType:
 		if processErr = wp.SubProcessNodeProcess(node); processErr != nil {
-			wp.NodeFailed(nodeId)
+			wp.UpdateStatus(nodeId, proto.NodeStatus_FAILED)
 			return processErr
 		}
-		wp.NodeSuccess(nodeId)
+		wp.UpdateStatus(nodeId, proto.NodeStatus_COMPLETED)
 
 	default:
 		processErr = errors.New("unknown node type")
-		wp.NodeFailed(nodeId)
+		wp.UpdateStatus(nodeId, proto.NodeStatus_FAILED)
 		return processErr
 	}
 

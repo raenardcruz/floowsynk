@@ -13,374 +13,441 @@ import {
     NodePosition,
     KeyValue,
     NodeHandleBounds,
-    Handle
+    Handle,
+    NodeDataArray,
+    ArrayDataType,
  } from 'proto/floowsynk_pb'
- 
- export function handleFromObject(obj: Handle.AsObject): Handle {
+ import type { Node as vfNode, Edge as vfEdge } from '@vue-flow/core'
+
+function normalizeObject(obj: any): any {
+    return Object.keys(obj).reduce((acc, key) => {
+        acc[key.toLowerCase()] = obj[key];
+        return acc;
+    }, {} as any);
+}
+
+export function ToVueFlowNode(node: any): vfNode {
+  const normalizedNodeData = Object.keys(node).reduce((acc, key) => {
+    acc[key.toLowerCase()] = node[key];
+    return acc;
+  }, {} as Record<string, any>) as vfNode;
+  return normalizedNodeData;
+}
+
+export function DenormalizeVueFlowObject(obj: any): any {
+  const edgeTypeMap = {
+    "sourcehandle": "sourceHandle",
+    "targethandle": "targetHandle",
+    "interactionwidth": "interactionWidth",
+    "tabid": "tabId",
+    "sourcenode": "sourceNode",
+    "targetnode": "targetNode",
+    "sourcex": "sourceX",
+    "sourcey": "sourceY",
+    "targetx": "targetX",
+    "targety": "targetY"
+  }
+  const normalizedEdgeData = Object.keys(obj).reduce((acc, key) => {
+    acc[edgeTypeMap[key as keyof typeof edgeTypeMap] || key] = obj[key];
+    return acc;
+  }, {} as any) ;
+  return normalizedEdgeData;
+}
+
+export function handleFromObject(obj: any): Handle {
     const msg = new Handle();
-    if (obj.x !== undefined) {
-      msg.setX(obj.x);
+    const normalizedObj = normalizeObject(obj);
+    if (normalizedObj.x !== undefined) {
+      msg.setX(normalizedObj.x);
     }
-    if (obj.y !== undefined) {
-      msg.setY(obj.y);
+    if (normalizedObj.y !== undefined) {
+      msg.setY(normalizedObj.y);
     }
-    if (obj.id !== undefined) {
-      msg.setId(obj.id);
+    if (normalizedObj.id !== undefined) {
+      msg.setId(normalizedObj.id);
     }
-    if (obj.type !== undefined) {
-      msg.setType(obj.type);
+    if (normalizedObj.type !== undefined) {
+      msg.setType(normalizedObj.type);
     }
-    if (obj.width !== undefined) {
-      msg.setWidth(obj.width);
+    if (normalizedObj.width !== undefined) {
+      msg.setWidth(normalizedObj.width);
     }
-    if (obj.height !== undefined) {
-      msg.setHeight(obj.height);
+    if (normalizedObj.height !== undefined) {
+      msg.setHeight(normalizedObj.height);
     }
-    if (obj.nodeid !== undefined) {
-      msg.setNodeid(obj.nodeid);
+    if (normalizedObj.nodeid !== undefined) {
+      msg.setNodeid(normalizedObj.nodeid);
     }
-    if (obj.position !== undefined) {
-      msg.setPosition(obj.position);
+    if (normalizedObj.position !== undefined) {
+      msg.setPosition(normalizedObj.position);
     }
     return msg;
   }
 
- export function nodeHandleBoundsFromObject(obj: NodeHandleBounds.AsObject): NodeHandleBounds {
+export function nodeHandleBoundsFromObject(obj: any): NodeHandleBounds {
     const msg = new NodeHandleBounds();
-    if (obj.sourceList !== undefined) {
-      const source = obj.sourceList.map(handleFromObject);
+    const normalizedObj = normalizeObject(obj);
+    if (normalizedObj.sourcelist !== undefined) {
+      const source = normalizedObj.sourcelist.map(handleFromObject);
       msg.setSourceList(source);
     }
-    if (obj.targetList !== undefined) {
-      const target = obj.targetList.map(handleFromObject);
+    if (normalizedObj.targetlist !== undefined) {
+      const target = normalizedObj.targetlist.map(handleFromObject);
       msg.setTargetList(target);
     }
     return msg;
   }
 
- export function keyValueFromObject(obj: KeyValue.AsObject): KeyValue {
+export function keyValueFromObject(obj: any): KeyValue {
     const msg = new KeyValue();
-    if (obj.key !== undefined) {
-      msg.setKey(obj.key);
+    const normalizedObj = normalizeObject(obj);
+    if (normalizedObj.key !== undefined) {
+      msg.setKey(normalizedObj.key);
     }
-    if (obj.value !== undefined) {
-      msg.setValue(obj.value);
+    if (normalizedObj.value !== undefined) {
+      msg.setValue(normalizedObj.value);
     }
     return msg;
   }
 
- export function nodePositionFromObject(obj: NodePosition.AsObject): NodePosition {
+export function nodePositionFromObject(obj: any): NodePosition {
     const msg = new NodePosition();
-    if (obj.x !== undefined) {
-      msg.setX(obj.x);
+    const normalizedObj = normalizeObject(obj);
+    if (normalizedObj.x !== undefined) {
+      msg.setX(normalizedObj.x);
     }
-    if (obj.y !== undefined) {
-      msg.setY(obj.y);
+    if (normalizedObj.y !== undefined) {
+      msg.setY(normalizedObj.y);
     }
-    if (obj.z !== undefined) {
-      msg.setZ(obj.z);
+    if (normalizedObj.z !== undefined) {
+      msg.setZ(normalizedObj.z);
     }
     return msg;
   }
 
- export function nodeDimensionsFromObject(obj: NodeDimensions.AsObject): NodeDimensions {
+export function nodeDimensionsFromObject(obj: any): NodeDimensions {
     const msg = new NodeDimensions();
-    if (obj.width !== undefined) {
-      msg.setWidth(obj.width);
+    const normalizedObj = normalizeObject(obj);
+    if (normalizedObj.width !== undefined) {
+      msg.setWidth(normalizedObj.width);
     }
-    if (obj.height !== undefined) {
-      msg.setHeight(obj.height);
+    if (normalizedObj.height !== undefined) {
+      msg.setHeight(normalizedObj.height);
     }
     return msg;
   }
 
- export function nodeIconFromObject(obj: NodeIcon.AsObject): NodeIcon {
+export function nodeIconFromObject(obj: any): NodeIcon {
     const msg = new NodeIcon();
-    if (obj.name !== undefined) {
-      msg.setName(obj.name);
+    const normalizedObj = normalizeObject(obj);
+    if (normalizedObj.name !== undefined) {
+      msg.setName(normalizedObj.name);
     }
-    if (obj.color !== undefined) {
-      msg.setColor(obj.color);
+    if (normalizedObj.color !== undefined) {
+      msg.setColor(normalizedObj.color);
     }
     return msg;
   }
 
- export function nodeDataFromObject(obj: NodeData.AsObject): NodeData {
+export function nodeDataArrayFromObject(obj: any): NodeDataArray {
+    const msg = new NodeDataArray();
+    const normalizedObj = normalizeObject(obj);
+    msg.setType(normalizedObj.type);
+    msg.setStringitemsList(normalizedObj.stringitemslist);
+    if (normalizedObj.keyvalueitemslist !== undefined) {
+      msg.setKeyvalueitemsList(normalizedObj.keyvalueitemslist.map(keyValueFromObject));
+    }
+    msg.setBoolitemsList(normalizedObj.boolitemslist);
+    msg.setIntitemsList(normalizedObj.intitemslist);
+    return msg;
+  }
+
+export function nodeDataFromObject(obj: any): NodeData {
     const msg = new NodeData();
-    if (obj.name !== undefined) {
-      msg.setName(obj.name);
+    const normalizedObj = normalizeObject(obj);
+    if (normalizedObj.name !== undefined) {
+      msg.setName(normalizedObj.name);
     }
-    if (obj.value !== undefined) {
-      msg.setValue(obj.value);
+    if (normalizedObj.value !== undefined) {
+      msg.setValue(normalizedObj.value);
     }
-    if (obj.expression !== undefined) {
-      msg.setExpression(obj.expression);
+    if (normalizedObj.expression !== undefined) {
+      msg.setExpression(normalizedObj.expression);
     }
-    if (obj.iteration !== undefined) {
-      msg.setIteration(obj.iteration);
+    if (normalizedObj.iteration !== undefined) {
+      msg.setIteration(normalizedObj.iteration);
     }
-    if (obj.listvar !== undefined) {
-      msg.setListvar(obj.listvar);
+    if (normalizedObj.listvar !== undefined) {
+      msg.setListvar(normalizedObj.listvar);
     }
-    if (obj.limit !== undefined) {
-      msg.setLimit(obj.limit);
+    if (normalizedObj.limit !== undefined) {
+      msg.setLimit(normalizedObj.limit);
     }
-    if (obj.url !== undefined) {
-      msg.setUrl(obj.url);
+    if (normalizedObj.url !== undefined) {
+      msg.setUrl(normalizedObj.url);
     }
-    if (obj.method !== undefined) {
-      msg.setMethod(obj.method);
+    if (normalizedObj.method !== undefined) {
+      msg.setMethod(normalizedObj.method);
     }
-    if (obj.headersList !== undefined) {
-      const headers = obj.headersList.map(keyValueFromObject);
-      msg.setHeadersList(headers);
+    if (normalizedObj.headers !== undefined) {
+      const headers = normalizedObj.headers.keyvalueitemslist.map(keyValueFromObject);
+      const nodeDataArray: NodeDataArray = new NodeDataArray();
+      nodeDataArray.setKeyvalueitemsList(headers);
+      nodeDataArray.setType(ArrayDataType.KEYVALUE);
+      msg.setHeaders(nodeDataArray);
     }
-    if (obj.payload !== undefined) {
-      msg.setPayload(obj.payload);
+    if (normalizedObj.payload !== undefined) {
+      msg.setPayload(normalizedObj.payload);
     }
-    if (obj.variable !== undefined) {
-      msg.setVariable(obj.variable);
+    if (normalizedObj.variable !== undefined) {
+      msg.setVariable(normalizedObj.variable);
     }
-    if (obj.message !== undefined) {
-      msg.setMessage(obj.message);
+    if (normalizedObj.message !== undefined) {
+      msg.setMessage(normalizedObj.message);
     }
-    if (obj.listList !== undefined) {
-      msg.setListList(obj.listList);
+    if (normalizedObj.list !== undefined) {
+      const nodeDataArray = nodeDataArrayFromObject(normalizedObj.list);
+      msg.setList(nodeDataArray);
     }
-    if (obj.listvariable !== undefined) {
-      msg.setListvariable(obj.listvariable);
+    if (normalizedObj.listvariable !== undefined) {
+      msg.setListvariable(normalizedObj.listvariable);
     }
-    if (obj.template !== undefined) {
-      msg.setTemplate(obj.template);
+    if (normalizedObj.template !== undefined) {
+      msg.setTemplate(normalizedObj.template);
     }
-    if (obj.text !== undefined) {
-      msg.setText(obj.text);
+    if (normalizedObj.text !== undefined) {
+      msg.setText(normalizedObj.text);
     }
-    if (obj.pattern !== undefined) {
-      msg.setPattern(obj.pattern);
+    if (normalizedObj.pattern !== undefined) {
+      msg.setPattern(normalizedObj.pattern);
     }
-    if (obj.replacetext !== undefined) {
-      msg.setReplacetext(obj.replacetext);
+    if (normalizedObj.replacetext !== undefined) {
+      msg.setReplacetext(normalizedObj.replacetext);
     }
-    if (obj.subprocessid !== undefined) {
-      msg.setSubprocessid(obj.subprocessid);
+    if (normalizedObj.subprocessid !== undefined) {
+      msg.setSubprocessid(normalizedObj.subprocessid);
     }
-    if (obj.type !== undefined) {
-      msg.setType(obj.type);
+    if (normalizedObj.type !== undefined) {
+      msg.setType(normalizedObj.type);
     }
-    if (obj.interval !== undefined) {
-      msg.setInterval(obj.interval);
+    if (normalizedObj.interval !== undefined) {
+      msg.setInterval(normalizedObj.interval);
     }
-    if (obj.weeksList !== undefined) {
-      msg.setWeeksList(obj.weeksList);
+    if (normalizedObj.weeks !== undefined) {
+      const nodeDataArray = nodeDataArrayFromObject(normalizedObj.weeks);
+      msg.setWeeks(nodeDataArray);
     }
     return msg;
   }
 
- export function nodeFromObject(obj: Node.AsObject): Node {
+export function nodeFromObject(obj: any): Node {
     const msg = new Node();
-    if (obj.id !== undefined) {
-      msg.setId(obj.id);
+    const normalizedObj = normalizeObject(obj);
+    if (normalizedObj.id !== undefined) {
+      msg.setId(normalizedObj.id);
     }
-    if (obj.nodetype !== undefined) {
-      msg.setNodetype(obj.nodetype);
+    if (normalizedObj.nodetype !== undefined) {
+      msg.setNodetype(normalizedObj.nodetype);
     }
-    if (obj.label !== undefined) {
-      msg.setLabel(obj.label);
+    if (normalizedObj.label !== undefined) {
+      msg.setLabel(normalizedObj.label);
     }
-    if (obj.data !== undefined) {
-      const data = nodeDataFromObject(obj.data);
+    if (normalizedObj.data !== undefined) {
+      const data = nodeDataFromObject(normalizedObj.data);
       msg.setData(data);
     }
-    if (obj.groupList !== undefined) {
-      msg.setGroupList(obj.groupList);
+    if (normalizedObj.grouplist !== undefined) {
+      msg.setGroupList(normalizedObj.grouplist);
     }
-    if (obj.nodestyle !== undefined) {
-      msg.setNodestyle(obj.nodestyle);
+    if (normalizedObj.nodestyle !== undefined) {
+      msg.setNodestyle(normalizedObj.nodestyle);
     }
-    if (obj.inputsList !== undefined) {
-      msg.setInputsList(obj.inputsList);
+    if (normalizedObj.inputslist !== undefined) {
+      msg.setInputsList(normalizedObj.inputslist);
     }
-    if (obj.outputsList !== undefined) {
-      msg.setOutputsList(obj.outputsList);
+    if (normalizedObj.outputslist !== undefined) {
+      msg.setOutputsList(normalizedObj.outputslist);
     }
-    if (obj.draggable !== undefined) {
-      msg.setDraggable(obj.draggable);
+    if (normalizedObj.draggable !== undefined) {
+      msg.setDraggable(normalizedObj.draggable);
     }
-    if (obj.icon !== undefined) {
-      const icon = nodeIconFromObject(obj.icon);
+    if (normalizedObj.icon !== undefined) {
+      const icon = nodeIconFromObject(normalizedObj.icon);
       msg.setIcon(icon);
     }
-    if (obj.position !== undefined) {
-      const position = nodePositionFromObject(obj.position);
+    if (normalizedObj.position !== undefined) {
+      const position = nodePositionFromObject(normalizedObj.position);
       msg.setPosition(position);
     }
-    if (obj.nodestatus !== undefined) {
-      msg.setNodestatus(obj.nodestatus);
+    if (normalizedObj.nodestatus !== undefined) {
+      msg.setNodestatus(normalizedObj.nodestatus);
     }
-    if (obj.type !== undefined) {
-      msg.setType(obj.type);
+    if (normalizedObj.type !== undefined) {
+      msg.setType(normalizedObj.type);
     }
-    if (obj.dimensions !== undefined) {
-      const dimensions = nodeDimensionsFromObject(obj.dimensions);
+    if (normalizedObj.dimensions !== undefined) {
+      const dimensions = nodeDimensionsFromObject(normalizedObj.dimensions);
       msg.setDimensions(dimensions);
     }
-    if (obj.handlebounds !== undefined) {
-      const handleBounds = nodeHandleBoundsFromObject(obj.handlebounds);
+    if (normalizedObj.handlebounds !== undefined) {
+      const handleBounds = nodeHandleBoundsFromObject(normalizedObj.handlebounds);
       msg.setHandlebounds(handleBounds);
     }
-    if (obj.computedposition !== undefined) {
-      const computedPosition = nodePositionFromObject(obj.computedposition);
+    if (normalizedObj.computedposition !== undefined) {
+      const computedPosition = nodePositionFromObject(normalizedObj.computedposition);
       msg.setComputedposition(computedPosition);
     }
-    if (obj.isparent !== undefined) {
-      msg.setIsparent(obj.isparent);
-    }
     return msg;
   }
 
- export function edgeFromObject(obj: Edge.AsObject): Edge {
+export function edgeFromObject(obj: any): Edge {
     const msg = new Edge();
-    if (obj.id !== undefined) {
-      msg.setId(obj.id);
+    const normalizedObj = normalizeObject(obj);
+    if (normalizedObj.id !== undefined) {
+      msg.setId(normalizedObj.id);
     }
-    if (obj.type !== undefined) {
-      msg.setType(obj.type);
+    if (normalizedObj.type !== undefined) {
+      msg.setType(normalizedObj.type);
     }
-    if (obj.label !== undefined) {
-      msg.setLabel(obj.label);
+    if (normalizedObj.label !== undefined) {
+      msg.setLabel(normalizedObj.label);
     }
-    if (obj.tabid !== undefined) {
-      msg.setTabid(obj.tabid);
+    if (normalizedObj.tabid !== undefined) {
+      msg.setTabid(normalizedObj.tabid);
     }
-    if (obj.source !== undefined) {
-      msg.setSource(obj.source);
+    if (normalizedObj.source !== undefined) {
+      msg.setSource(normalizedObj.source);
     }
-    if (obj.target !== undefined) {
-      msg.setTarget(obj.target);
+    if (normalizedObj.target !== undefined) {
+      msg.setTarget(normalizedObj.target);
     }
-    if (obj.sourcex !== undefined) {
-      msg.setSourcex(obj.sourcex);
+    if (normalizedObj.sourcex !== undefined) {
+      msg.setSourcex(normalizedObj.sourcex);
     }
-    if (obj.sourcey !== undefined) {
-      msg.setSourcey(obj.sourcey);
+    if (normalizedObj.sourcey !== undefined) {
+      msg.setSourcey(normalizedObj.sourcey);
     }
-    if (obj.targetx !== undefined) {
-      msg.setTargetx(obj.targetx);
+    if (normalizedObj.targetx !== undefined) {
+      msg.setTargetx(normalizedObj.targetx);
     }
-    if (obj.targety !== undefined) {
-      msg.setTargety(obj.targety);
+    if (normalizedObj.targety !== undefined) {
+      msg.setTargety(normalizedObj.targety);
     }
-    if (obj.animated !== undefined) {
-      msg.setAnimated(obj.animated);
+    if (normalizedObj.animated !== undefined) {
+      msg.setAnimated(normalizedObj.animated);
     }
-    if (obj.sourcenode !== undefined) {
-      const sourceNode = nodeFromObject(obj.sourcenode);
+    if (normalizedObj.sourcenode !== undefined) {
+      const sourceNode = nodeFromObject(normalizedObj.sourcenode);
       msg.setSourcenode(sourceNode);
     }
-    if (obj.targetnode !== undefined) {
-      const targetNode = nodeFromObject(obj.targetnode);
+    if (normalizedObj.targetnode !== undefined) {
+      const targetNode = nodeFromObject(normalizedObj.targetnode);
       msg.setTargetnode(targetNode);
     }
-    if (obj.sourcehandle !== undefined) {
-      msg.setSourcehandle(obj.sourcehandle);
+    if (normalizedObj.sourcehandle !== undefined) {
+      msg.setSourcehandle(normalizedObj.sourcehandle);
     }
-    if (obj.targethandle !== undefined) {
-      msg.setTargethandle(obj.targethandle);
+    if (normalizedObj.targethandle !== undefined) {
+      msg.setTargethandle(normalizedObj.targethandle);
     }
     return msg;
   }
 
- export function workflowFromObject(obj: Workflow.AsObject): Workflow {
+export function workflowFromObject(obj: any): Workflow {
     const msg = new Workflow();
-    if (obj.id !== undefined) {
-      msg.setId(obj.id);
+    const normalizedObj = normalizeObject(obj);
+    if (normalizedObj.id !== undefined) {
+      msg.setId(normalizedObj.id);
     }
-    if (obj.name !== undefined) {
-      msg.setName(obj.name);
+    if (normalizedObj.name !== undefined) {
+      msg.setName(normalizedObj.name);
     }
-    if (obj.description !== undefined) {
-      msg.setDescription(obj.description);
+    if (normalizedObj.description !== undefined) {
+      msg.setDescription(normalizedObj.description);
     }
-    if (obj.nodesList !== undefined) {
-      const nodes = obj.nodesList.map(nodeFromObject);
+    if (normalizedObj.nodeslist !== undefined) {
+      const nodes = normalizedObj.nodeslist.map(nodeFromObject);
       msg.setNodesList(nodes);
     }
-    if (obj.edgesList !== undefined) {
-      const edges = obj.edgesList.map(edgeFromObject);
+    if (normalizedObj.edgeslist !== undefined) {
+      const edges = normalizedObj.edgeslist.map(edgeFromObject);
       msg.setEdgesList(edges);
     }
-    if (obj.type !== undefined) {
-      msg.setType(obj.type);
+    if (normalizedObj.type !== undefined) {
+      msg.setType(normalizedObj.type);
     }
-    if (obj.createdat !== undefined) {
-      msg.setCreatedat(obj.createdat);
+    if (normalizedObj.createdat !== undefined) {
+      msg.setCreatedat(normalizedObj.createdat);
     }
-    if (obj.updatedat !== undefined) {
-      msg.setUpdatedat(obj.updatedat);
+    if (normalizedObj.updatedat !== undefined) {
+      msg.setUpdatedat(normalizedObj.updatedat);
     }
-    if (obj.createdby !== undefined) {
-      msg.setCreatedby(obj.createdby);
+    if (normalizedObj.createdby !== undefined) {
+      msg.setCreatedby(normalizedObj.createdby);
     }
-    if (obj.updatedby !== undefined) {
-      msg.setUpdatedby(obj.updatedby);
+    if (normalizedObj.updatedby !== undefined) {
+      msg.setUpdatedby(normalizedObj.updatedby);
     }
-    if (obj.tagsList !== undefined) {
-      msg.setTagsList(obj.tagsList);
+    if (normalizedObj.tagslist !== undefined) {
+      msg.setTagsList(normalizedObj.tagslist);
     }
-    if (obj.isnew !== undefined) {
-      msg.setIsnew(obj.isnew);
+    if (normalizedObj.isnew !== undefined) {
+      msg.setIsnew(normalizedObj.isnew);
     }
     return msg;
   }
 
- export function workflowListFromObject(obj: WorkflowList.AsObject): WorkflowList {
+export function workflowListFromObject(obj: any): WorkflowList {
     const msg = new WorkflowList();
-    if (obj.total !== undefined) {
-      msg.setTotal(obj.total);
+    const normalizedObj = normalizeObject(obj);
+    if (normalizedObj.total !== undefined) {
+      msg.setTotal(normalizedObj.total);
     }
-    if (obj.workflowsList !== undefined) {
-      const workflows = obj.workflowsList.map(workflowFromObject);
+    if (normalizedObj.workflowslist !== undefined) {
+      const workflows = normalizedObj.workflowslist.map(workflowFromObject);
       msg.setWorkflowsList(workflows);
     }
     return msg;
   }
 
- export function getWorkflowRequestFromObject(obj: GetWorkflowRequest.AsObject): GetWorkflowRequest {
+export function getWorkflowRequestFromObject(obj: any): GetWorkflowRequest {
     const msg = new GetWorkflowRequest();
-    if (obj.id !== undefined) {
-      msg.setId(obj.id);
+    const normalizedObj = normalizeObject(obj);
+    if (normalizedObj.id !== undefined) {
+      msg.setId(normalizedObj.id);
     }
     return msg;
   }
 
-
-export function pageRequestFromObject(obj: PageRequest.AsObject): PageRequest {
+export function pageRequestFromObject(obj: any): PageRequest {
     const msg = new PageRequest();
-    if (obj.limit !== undefined) {
-      msg.setLimit(obj.limit);
+    const normalizedObj = normalizeObject(obj);
+    if (normalizedObj.limit !== undefined) {
+      msg.setLimit(normalizedObj.limit);
     }
-    if (obj.offset !== undefined) {
-      msg.setOffset(obj.offset);
+    if (normalizedObj.offset !== undefined) {
+      msg.setOffset(normalizedObj.offset);
     }
     return msg;
   }
 
-  export function credentialFromObject(obj: Credential.AsObject): Credential {
+export function credentialFromObject(obj: any): Credential {
     const msg = new Credential();
-    if (obj.username !== undefined) {
-      msg.setUsername(obj.username);
+    const normalizedObj = normalizeObject(obj);
+    if (normalizedObj.username !== undefined) {
+      msg.setUsername(normalizedObj.username);
     }
-    if (obj.password !== undefined) {
-      msg.setPassword(obj.password);
+    if (normalizedObj.password !== undefined) {
+      msg.setPassword(normalizedObj.password);
     }
     return msg;
   }
 
-  export function tokenFromObject(obj: Token.AsObject): Token {
+export function tokenFromObject(obj: any): Token {
     const msg = new Token();
-    if (obj.token !== undefined) {
-      msg.setToken(obj.token);
+    const normalizedObj = normalizeObject(obj);
+    if (normalizedObj.token !== undefined) {
+      msg.setToken(normalizedObj.token);
     }
     return msg;
   }

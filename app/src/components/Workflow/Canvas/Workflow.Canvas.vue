@@ -27,7 +27,7 @@
             <Modal title="Process Type" caption="Please select the workflow process type." v-model:visible="show">
                 <ProcessTypeModal :id="tab.id" />
             </Modal>
-            <VueFlow class="vue-flow-container" tabindex="0" v-model:nodes="tab.nodesList as Node<any, any, string>[]" v-model:edges="tab.edgesList as Edge<any, any, string>[]"
+            <VueFlow class="vue-flow-container" tabindex="0" v-model:nodes="node as Node<any, any, string>[]" v-model:edges="edge as Edge<any, any, string>[]"
                 :only-render-visible-elements="false" :edge-types="edgeTypes"
                 :snapToGrid="true" @connect="onConnectEdge($event)"
                 @drop="onDrop($event)" @dragover="onDragOver($event)"
@@ -86,7 +86,7 @@ import FloowsynkNode from '@/components/Workflow/Nodes'
 import { useWorkflowCanvasHelperMethods } from './Helper/Workflow.Canvas.Helper'
 
 const props = defineProps<WorkflowCanvasProps>()
-const { tab, canvasId } = useWorkflowCanvasHooks(props.id)
+const { tab, canvasId, node, edge } = useWorkflowCanvasHooks(props.id)
 const show = ref(false);
 const { addTag, removeTag } = useWorkflowCanvasHelperMethods(props.id, useVueFlow())
 const {

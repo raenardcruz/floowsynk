@@ -28,6 +28,9 @@ export const deleteProcess = async (process: Workflow.AsObject) => {
 }
 
 export const executeProcess = async (_: Workflow.AsObject) => {
-    // const headers = getHeaders();
-    // return axios.post(`/api/workflow/${process.id}/run`, process, headers);
+    const client = new WorkflowServicePromiseClient(getApiUrl());
+    const workflow = workflowFromObject(_);
+    return client.runWorkflow(workflow, {
+        'Authorization': `${localStorage.getItem('sessionToken')}`
+    });
 }

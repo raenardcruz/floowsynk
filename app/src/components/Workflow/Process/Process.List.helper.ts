@@ -11,7 +11,6 @@ export const initWorkflows = async () => {
     const workflows: Workflow[] = resp.getWorkflowsList();
     
     if (!workflows || workflows.length === 0) return;
-    
     workflows.forEach((process: Workflow) => {
         const p = process.toObject();
         processes.value.push({ isnew: false, ...p });
