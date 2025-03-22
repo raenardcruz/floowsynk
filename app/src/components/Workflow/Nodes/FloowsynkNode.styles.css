@@ -1,16 +1,17 @@
 .node {
+  position: relative;
     display: flex;
     align-items: center;
     justify-content: left;
-    padding: 5px 15px 5px 5px;
     border: 1px solid #ccc;
     cursor: pointer;
     background: linear-gradient(135deg, #fff, #f0f0f0);
-    gap: 20px;
+    gap: 8px;
     border-radius: 8px;
     width: 100%;
     box-shadow: 3px 3px 5px #868686,-3px -3px 5px #fff;
     transition: all 0.3s ease;
+    min-width: 180px;
 }
 
 .node:hover {
@@ -22,17 +23,19 @@
     display: flex;
     position: relative;
     font-size: 24px;
-    height: 40px;
-    width: 40px;
+    height: 60px;
+    width: 60px;
     color: #fff;
     justify-content: center;
     align-items: center;
-    border-radius: 50px;
+    border-radius: 8px 50px 0 8px;
+    box-shadow: 2px 1px 8px grey;
 }
 
 .content {
     display: flex;
     flex-direction: column;
+    padding: 8px;
 }
 
 .label {
