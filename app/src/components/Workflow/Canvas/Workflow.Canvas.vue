@@ -47,16 +47,19 @@
                     <ControlButton title="Reset Transform" @click="resetTransform">
                         <span class="material-symbols-outlined">refresh</span>
                     </ControlButton>
-                    <ControlButton title="Delete">
+                    <ControlButton title="Delete" v-if="!isRunning">
                         <span class="material-symbols-outlined"
                             @click="removeProcess()">delete</span>
                     </ControlButton>
-                    <ControlButton title="Save">
+                    <ControlButton title="Save" v-if="!isRunning">
                         <span class="material-symbols-outlined"
                             @click="saveProcess()">save</span>
                     </ControlButton>
-                    <ControlButton title="Run" style="background: #6FA071; color: #fff;">
+                    <ControlButton title="Run" style="background: #6FA071; color: #fff;" v-if="!isRunning">
                         <span class="material-symbols-outlined" @click="runProcess()">play_arrow</span>
+                    </ControlButton>
+                    <ControlButton title="Exit Run Mode" style="background: #e30b57; color: #fff;" v-else>
+                        <span class="material-symbols-outlined" @click="exitRunMode()">close</span>
                     </ControlButton>
                 </Controls>
                 <template #node-default="nodeProps">
@@ -86,7 +89,7 @@ import FloowsynkNode from '@/components/Workflow/Nodes'
 import { useWorkflowCanvasHelperMethods } from './Helper/Workflow.Canvas.Helper'
 
 const props = defineProps<WorkflowCanvasProps>()
-const { tab, canvasId, node, edge } = useWorkflowCanvasHooks(props.id)
+const { tab, canvasId, node, edge, isRunning } = useWorkflowCanvasHooks(props.id)
 const show = ref(false);
 const { addTag, removeTag } = useWorkflowCanvasHelperMethods(props.id, useVueFlow())
 const {
@@ -99,7 +102,7 @@ const {
     onKeyDown,
     onNodeDragStart
 } = useWorkflowCanvasVueFlowEvents(props, useVueFlow())
-const { resetTransform, removeProcess, saveProcess, runProcess } = useWorkflowCanvasControlButtonActions(props, useVueFlow())
+const { resetTransform, removeProcess, saveProcess, runProcess, exitRunMode } = useWorkflowCanvasControlButtonActions(props, useVueFlow())
 const { 
     isDragOver,
 } = useWorkflowCanvasStore()
