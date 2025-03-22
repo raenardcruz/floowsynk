@@ -33,13 +33,13 @@ type ValidateResults struct {
 	status   int
 }
 
-type StreamData struct {
-	Obj string `json:"obj"`
-}
-
 type StreamMessage struct {
 	Event string     `json:"event"`
 	Data  StreamData `json:"data"`
+}
+
+type StreamData struct {
+	Obj string `json:"obj"`
 }
 
 type EventStream struct {
@@ -93,6 +93,11 @@ type DBConnection struct {
 
 type CurrentNode struct {
 	Id string `json:"id"`
+}
+
+type ReplayData struct {
+	NodeID string                 `json:"nodeId"`
+	Data   map[string]interface{} `json:"data"`
 }
 
 const (

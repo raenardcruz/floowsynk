@@ -22,39 +22,39 @@ const checkSession = () => {
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
-    component: () => import(/* webpackChunkName: "home" */ '@/views/Home.vue'),
+    component: () => import('@/views/Home'),
     children: [
       {
         path: "",
-        component: () => import(/* webpackChunkName: "dashboard" */ /* webpackPrefetch: true */ '@/views/Dashboard.vue')
+        component: () => import('@/views/Dashboard')
       },
       {
         path: "pages",
-        component: () => import(/* webpackChunkName: "pages" */ /* webpackPrefetch: true */ '@/views/Pages.vue')
+        component: () => import('@/views/Pages')
       },
       {
         path: "workflow",
-        component: () => import(/* webpackChunkName: "workflow" */ /* webpackPrefetch: true */ '@/views/Workflow.vue')
+        component: () => import('@/views/Workflow')
       },
       {
         path: "connectors",
-        component: () => import(/* webpackChunkName: "connectors" */ /* webpackPrefetch: true */ '@/views/Connectors.vue')
+        component: () => import('@/views/Connectors')
       },
       {
         path: "reviews",
-        component: () => import(/* webpackChunkName: "reviews" */ /* webpackPrefetch: true */ '@/views/Reviews.vue')
+        component: () => import('@/views/Reviews')
       },
       {
         path: "accounts",
-        component: () => import(/* webpackChunkName: "accounts" */ /* webpackPrefetch: true */ '@/views/Accounts.vue')
+        component: () => import('@/views/Accounts')
       },
       {
         path: "logs",
-        component: () => import(/* webpackChunkName: "logs" */ /* webpackPrefetch: true */ '@/views/Logs.vue')
+        component: () => import('@/views/Logs')
       },
       {
         path: "settings",
-        component: () => import(/* webpackChunkName: "settings" */ /* webpackPrefetch: true */ '@/views/Settings.vue')
+        component: () => import('@/views/Settings')
       },
     ],
     beforeEnter: (_, __, next) => {
@@ -67,7 +67,7 @@ const routes: RouteRecordRaw[] = [
   },
   {
     path: '/login',
-    component: () => import(/* webpackChunkName: "login" */ /* webpackPrefetch: true */ '@/views/Login.vue'),
+    component: () => import('@/views/Login'),
     beforeEnter: (_, __, next) => {
       if (session.value || checkSession()) {
         next({ path: '/' });

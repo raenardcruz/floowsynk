@@ -1,214 +1,138 @@
 package main
 
 import (
+	"context"
+	"fmt"
 	"net/http"
-	"strconv"
-	"time"
 
-	"github.com/raenardcruz/floowsynk/crypto"
-	"github.com/raenardcruz/floowsynk/db"
-
-	"github.com/gin-gonic/gin"
+	"github.com/raenardcruz/floowsynk/proto"
+	"github.com/raenardcruz/floowsynk/workflow"
 )
 
 var jwtKey = []byte("secret_key")
+var dbcon DBConnection
 
-// API Methods --------------------------------------------------------------------------------------------------------
-
-func (dbcon DBConnection) Login(c *gin.Context) {
-	var user User
-	if err := c.BindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	dbUser, err := dbcon.DB.GetUserByUsername(user.Username)
+func (s *LoginServer) Login(ctx context.Context, in *proto.Credential) (*proto.Token, error) {
+	token, err := Login(in.Username, in.Password)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error getting user"})
-		return
+		return nil, err
 	}
-	if dbUser.ID == "" {
-		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
-		return
-	}
+	return &proto.Token{
+		Token: token,
+	}, nil
+}
 
-	ePassword, err := crypto.EncryptPassword(user.Password)
+func (s *LoginServer) ExtendToken(ctx context.Context, _ *proto.Empty) (token *proto.Token, err error) {
+	oldToken, err := getTokenFromContext(ctx)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error encrypting password"})
-		return
+		return nil, err
 	}
-
-	if dbUser.Password == ePassword {
-		token := generateToken(dbUser.ID, user.Username, dbUser.Role, time.Now().Add(time.Minute*15).UTC().Unix())
-		c.JSON(http.StatusOK, LoginResponse{Token: token})
-		return
-	}
-
-	c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
-}
-
-func (dbcon *DBConnection) GetWorkflow(c *gin.Context) {
-	ValidateResults := validateToken(c)
-	if ValidateResults.status != http.StatusOK {
-		c.JSON(ValidateResults.status, gin.H{"error": ValidateResults.message})
-		return
-	}
-	id := c.Request.PathValue("id")
-
-	w, err := dbcon.DB.GetWorkflow(id)
+	newToken, err := ExtendToken(oldToken)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
+		return nil, err
 	}
-	c.JSON(http.StatusOK, w)
+	token = &proto.Token{Token: newToken}
+	return token, nil
 }
 
-func (dbcon *DBConnection) PostWorkflow(c *gin.Context) {
-	ValidateResults := validateToken(c)
-	if ValidateResults.status != http.StatusOK {
-		c.JSON(ValidateResults.status, gin.H{"error": ValidateResults.message})
-		return
-	}
-	var workflow db.WorkflowModel
-	if err := c.ShouldBindJSON(&workflow); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	workflow.CreatedBy = ValidateResults.id
-	workflow.UpdatedBy = ValidateResults.id
-
-	if _, err := dbcon.DB.CreateWorkflow(workflow); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusCreated, workflow)
-}
-
-func (dbcon *DBConnection) ListWorkflows(c *gin.Context) {
-	ValidateResults := validateToken(c)
-	if ValidateResults.status != http.StatusOK {
-		c.JSON(ValidateResults.status, gin.H{"error": ValidateResults.message})
-		return
-	}
-	offsetStr := c.DefaultQuery("offset", "0")
-	limitStr := c.DefaultQuery("limit", "10")
-
-	offset, err := strconv.Atoi(offsetStr)
+func (s *WorkflowServer) GetWorkflow(ctx context.Context, req *proto.GetWorkflowRequest) (workflow *proto.Workflow, err error) {
+	token, err := getTokenFromContext(ctx)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid offset value"})
-		return
+		return nil, err
 	}
-
-	limit, err := strconv.Atoi(limitStr)
+	validateResults := validateToken(token)
+	if validateResults.status != http.StatusOK {
+		return nil, fmt.Errorf(validateResults.message)
+	}
+	workflow, err = GetWorkflow(req.Id)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid limit value"})
-		return
+		return nil, err
 	}
+	return workflow, nil
+}
 
-	workflows, err := dbcon.DB.GetWorkflows(limit, offset)
+func (s *WorkflowServer) ListWorkflows(ctx context.Context, req *proto.PageRequest) (wl *proto.WorkflowList, err error) {
+	token, err := getTokenFromContext(ctx)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
+		return nil, err
 	}
-	c.JSON(http.StatusOK, gin.H{"items": workflows})
+	validateResults := validateToken(token)
+	if validateResults.status != http.StatusOK {
+		return nil, fmt.Errorf(validateResults.message)
+	}
+	wl, err = ListWorkflows(req.Offset, req.Limit)
+	if err != nil {
+		return nil, err
+	}
+	return wl, nil
 }
 
-func (dbcon *DBConnection) UpdateWorkflow(c *gin.Context) {
-	ValidateResults := validateToken(c)
-	if ValidateResults.status != http.StatusOK {
-		c.JSON(ValidateResults.status, gin.H{"error": ValidateResults.message})
-		return
+func (s *WorkflowServer) UpdateWorkflow(ctx context.Context, req *proto.Workflow) (wl *proto.Workflow, err error) {
+	token, err := getTokenFromContext(ctx)
+	if err != nil {
+		return nil, err
 	}
-	id := c.Params.ByName("id")
+	validateResults := validateToken(token)
+	if validateResults.status != http.StatusOK {
+		return nil, fmt.Errorf(validateResults.message)
+	}
+	req.UpdatedBy = validateResults.id
 
-	var workflow db.WorkflowModel
-	if err := c.ShouldBindJSON(&workflow); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
+	if wl, err = UpdateWorkflow(req); err != nil {
+		return nil, err
 	}
-	workflow.ID = id
-	workflow.UpdatedBy = ValidateResults.id
-
-	if err := dbcon.DB.UpdateWorkflow(workflow); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-	c.JSON(http.StatusOK, workflow)
+	return wl, nil
 }
 
-func (dbcon *DBConnection) DeleteWorkflow(c *gin.Context) {
-	ValidateResults := validateToken(c)
-	if ValidateResults.status != http.StatusOK {
-		c.JSON(ValidateResults.status, gin.H{"error": ValidateResults.message})
-		return
+func (s *WorkflowServer) CreateWorkflow(ctx context.Context, req *proto.Workflow) (wl *proto.Workflow, err error) {
+	token, err := getTokenFromContext(ctx)
+	if err != nil {
+		return nil, err
 	}
-	id := c.Params.ByName("id")
+	validateResults := validateToken(token)
+	if validateResults.status != http.StatusOK {
+		return nil, fmt.Errorf(validateResults.message)
+	}
+	req.CreatedBy = validateResults.id
+	req.UpdatedBy = validateResults.id
 
-	if err := dbcon.DB.DeleteWorkflow(id); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
+	if wl, err = CreateWorkflow(req); err != nil {
+		return nil, err
 	}
-	c.JSON(http.StatusOK, gin.H{"message": "Workflow deleted"})
+	return wl, nil
 }
 
-func SseHandler(c *gin.Context) {
-	id := c.Params.ByName("id")
-
-	eventStream.mu.Lock()
-	_, ok := eventStream.clients[id]
-	eventStream.mu.Unlock()
-
-	if !ok {
-		eventStream.addClient(id)
+func (s *WorkflowServer) DeleteWorkflow(ctx context.Context, req *proto.Workflow) (*proto.Empty, error) {
+	token, err := getTokenFromContext(ctx)
+	if err != nil {
+		return nil, err
 	}
-
-	c.Writer.Header().Set("Content-Type", "text/event-stream")
-	c.Writer.Header().Set("Cache-Control", "no-cache")
-	c.Writer.Header().Set("Connection", "keep-alive")
-	c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
-
-	clientChan := eventStream.clients[id]
-	for {
-		select {
-		case msg := <-clientChan:
-			c.Writer.Write([]byte("event: " + msg.Event + "\n"))
-			c.Writer.Write([]byte("data: " + msg.Data.Obj + "\n\n"))
-			c.Writer.Flush()
-		case <-c.Writer.CloseNotify():
-			eventStream.removeClient(id)
-			return
-		case <-c.Request.Context().Done():
-			eventStream.removeClient(id)
-			return
-		}
+	validateResults := validateToken(token)
+	if validateResults.status != http.StatusOK {
+		return nil, fmt.Errorf(validateResults.message)
 	}
+	if err := DeleteWorkflow(req.Id); err != nil {
+		return nil, err
+	}
+	return &proto.Empty{}, nil
 }
 
-func (dbcon *DBConnection) RunWorkflow(c *gin.Context) {
-	ValidateResults := validateToken(c)
-	if ValidateResults.status != http.StatusOK {
-		c.JSON(ValidateResults.status, gin.H{"error": ValidateResults.message})
-		return
+func (s *WorkflowServer) RunWorkflow(req *proto.Workflow, stream proto.WorkflowService_RunWorkflowServer) error {
+	ctx := stream.Context()
+	token, err := getTokenFromContext(ctx)
+	if err != nil {
+		return err
 	}
-	id := c.Params.ByName("id")
-
-	var payload Workflow
-	if err := c.ShouldBindJSON(&payload); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
+	validateResults := validateToken(token)
+	if validateResults.status != http.StatusOK {
+		return fmt.Errorf(validateResults.message)
 	}
-	workflowProcessor := WorkflowProcessor{
-		ProcessID:        id,
-		Workflow:         &payload,
-		Dbcon:            dbcon,
+	processor := workflow.WorkflowProcessor{
+		Stream:           stream,
+		Workflow:         req,
 		ProcessVariables: make(map[string]interface{}),
-		ProcessResults:   make(map[string]interface{}),
-		LoggingData:      make([]LogData, 0),
+		DBcon:            *dbcon.DB,
 	}
-	go func() {
-		workflowProcessor.StartWorkflow()
-	}()
-
-	c.JSON(http.StatusOK, gin.H{"message": "Workflow run started"})
+	processor.StartWorkflow()
+	return nil
 }
