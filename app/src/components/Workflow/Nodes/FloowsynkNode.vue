@@ -53,6 +53,9 @@ const { nodestatus } = useFloowsynkNodeWatchers(props.tabid, node, showSidebar)
 const clickHandler = () => clickhandler(node, showSidebar, showModal)
 const { icon, nodetype, label, outputsList, inputsList, nodestyle } = node as unknown as Node.AsObject;
 const { isRunning } = useWorkflowCanvasHooks(props.tabid)
+node.draggable = !isRunning
+node.deletable = !isRunning
+node.connectable = !isRunning
 </script>
 
 <style scoped src="./FloowsynkNode.styles.css"></style>

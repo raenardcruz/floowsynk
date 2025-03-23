@@ -6,7 +6,7 @@
     height: 100%;
     width: 100%;
     padding: 30px;
-    background: #f0f0f0;
+    background: var(--white-2);
 
 }
 .gallery-box {
@@ -21,11 +21,11 @@
 }
 .page-title {
     font-size: 41px;
-    color: #797272;
+    color: var(--grey-2);
 }
 .page-info {
     font-size: 15px;
-    color: #AD9A9A;
+    color: var(--grey-2);
 }
 .page-info *  {
     margin-right: 5px;
@@ -38,7 +38,7 @@
     height: 30px;
     border-radius: 20px;
     margin-top: 30px;
-    box-shadow: 2px 2px 3px grey;
+    box-shadow: 2px 2px 3px var(--grey-3);
 }
 .gallery-search .search-box {
     width: 100%;
@@ -65,14 +65,14 @@
     justify-content: center;
     align-items: center;
     border-radius: 8px;
-    color: #8E8B8B;
+    color: var(--white-1);
     cursor: pointer;
     overflow: hidden;
     transition: 0.3s ease-in-out;
     background: url('/src/components/Icons/add.svg');
     background-size: contain;
     background-position: center;
-    background-color: rgba(255, 255, 255, 0.5);
+    background-color: var(--black-translucent);
     background-blend-mode: multiply;
     background-repeat: no-repeat;
 }

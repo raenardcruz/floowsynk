@@ -21,11 +21,11 @@
     justify-content: center;
     align-items: center;
     border-radius: 60px;
-    background: linear-gradient(45deg, #3AA9B6, #14376B, #513C75, #C4597D, #FC930F);
+    background: linear-gradient(45deg, var(--blue-4), var(--blue-1), var(--violet-1), var(--pink-3), var(--orange-3));
     height: 350px;
     width: 350px;
-    border: 1px solid #ccc;
-    box-shadow: 0 30px 16px rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--grey-4);
+    box-shadow: 0 30px 16px var(--black-translucent-2);
     transform: rotate(15deg);
 }
 .bg-2 {
@@ -33,11 +33,11 @@
     justify-content: center;
     align-items: center;
     border-radius: 60px;
-    background: linear-gradient(45deg, #3AA9B6, #14376B, #513C75, #C4597D, #FC930F);
+    background: linear-gradient(45deg,var(--blue-4), var(--blue-1), var(--violet-1), var(--pink-3), var(--orange-3));
     height: 350px;
     width: 350px;
-    border: 1px solid #ccc;
-    box-shadow: 0 30px 16px rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--grey-4);
+    box-shadow: 0 30px 16px var(--black-translucent-2);
     transform: rotate(40deg);
 }
 .login-card {
@@ -46,15 +46,15 @@
     align-items: center;
     border-radius: 10px;
     flex-direction: column;
-    background: #fff;
+    background: var(--white-1);
     padding: 20px;
     transform: rotate(-55deg);
-    box-shadow: inset 8px 8px 16px rgba(0, 0, 0, 0.2), inset -8px -8px 16px rgba(255, 255, 255, 0.7);
+    box-shadow: inset 10px -11px 16px var(--white-translucent), inset 4px -8px 16px var(--black-translucent);
 }
 .form-group {
     margin: 10px 0;
     padding: 5px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--grey-4);
     border-radius: 20px;
 }
 input {
@@ -91,13 +91,13 @@ input:focus {
     transition: box-shadow 0.3s ease;
 }
 .other-login button img:hover {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 8px var(--black-translucent);
 }
 .forgot-password {
     margin: 10px 0;
 }
 .tooltip {
-    color: red;
+    color: var(--red-2);
     margin-top: 10px;
     font-size: 0.9em;
 }

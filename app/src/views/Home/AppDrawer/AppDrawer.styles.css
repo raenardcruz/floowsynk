@@ -3,7 +3,7 @@
     position: absolute;
     height: 100%;
     width: 100%;
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--glass-black);
     opacity: 0;
     backdrop-filter: blur(8px);
     transition: all 0.3s;
@@ -18,7 +18,7 @@
     transform: translateY(0px);
 }
 .close {
-    color: #fff;
+    color: var(--white-3);
     display: flex;
     position: absolute;
     right: 10px;
@@ -41,7 +41,7 @@
     transform: scale(1);
 }
 .apps-container .app {
-    background: #DCDCDD;
+    background: linear-gradient(135deg, var(--white-4), var(--white-1));
     height: 100px;
     width: 100px;
     border-radius: 20px;
@@ -50,12 +50,12 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), 0 6px 20px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 8px var(--grey-3), 0 6px 20px var(--grey-3);
     cursor: pointer;
     transition: all 0.3s;
 }
 .apps-container .app:hover {
-    box-shadow: 10px 10px 8px #545B62;
+    box-shadow: 10px 10px 8px var(--grey-3);
     transform: scale(1.05);
 }
 .apps-container .app img {
@@ -65,7 +65,7 @@
 .iconfooter {
     position: absolute;
     bottom: 10px;
-    color: #fff;
+    color: var(--white-1);
     font-size: 8px;
     left: 10px;
 }

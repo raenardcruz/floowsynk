@@ -16,7 +16,7 @@
     height: 100%;
     width: 100%;
     padding: 0;
-    border-top: 1px solid rgb(217, 212, 212);
+    border-top: 1px solid var(--grey-4);
     overflow: hidden;
 }
 
@@ -43,10 +43,10 @@
     align-items: center;
     padding: 10px;
     transition: 0.5s;
-    border: 1px solid grey;
+    border: 1px solid var(--grey-3);
     border-bottom: none;
     cursor: pointer;
-    background: #e0e0e0;
+    background: var(--grey-5);
     border-top-right-radius: 5px;
     border-top-left-radius: 5px;
 }
@@ -54,8 +54,8 @@
     filter: brightness(1.1);
 }
 .tabs .tab.nav-active {
-    background: #3990C5;
-    color: #fff;
+    background: var(--blue-2);
+    color: var(--white-1);
 }
 .close {
     margin-left: 5px;

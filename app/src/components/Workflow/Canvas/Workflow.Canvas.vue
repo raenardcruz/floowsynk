@@ -28,7 +28,7 @@
                 <ProcessTypeModal :id="tab.id" />
             </Modal>
             <VueFlow class="vue-flow-container" tabindex="0" v-model:nodes="node as Node<any, any, string>[]" v-model:edges="edge as Edge<any, any, string>[]"
-                :only-render-visible-elements="false" :edge-types="edgeTypes"
+                :only-render-visible-elements="false"
                 :snapToGrid="true" @connect="onConnectEdge($event)"
                 @drop="onDrop($event)" @dragover="onDragOver($event)"
                 @dragleave="onDragLeave()"
@@ -65,6 +65,9 @@
                 <template #node-default="nodeProps">
                     <FloowsynkNode v-bind="nodeProps" :tabid="tab.id" />
                 </template>
+                <template #edge-custom="edgeProps">
+                    <CustomEdge v-bind="edgeProps" :tabId="tab.id" />
+                </template>
             </VueFlow>
         </div>
     </div>
@@ -76,7 +79,6 @@ import type { Node, Edge } from '@vue-flow/core';
 import { VueFlow, useVueFlow } from '@vue-flow/core';
 import { WorkflowCanvasProps } from './Workflow.Canvas.types'
 import { useWorkflowCanvasHooks, useWorkflowCanvasStore } from './Workflow.Canvas.hooks'
-import edgeTypes from "@/components/Workflow/Edges/Edge.type";
 import { useWorkflowCanvasVueFlowEvents } from './VueFlowEvents/Workflow.Canvas.VueFlowEvents'
 import { useWorkflowCanvasControlButtonActions } from './ButtonActions/Workflow.Canvas.ButtonActions'
 import { SidebarCanvas } from '@/components/Workflow/Sidebar'
@@ -87,6 +89,7 @@ import { MiniMap } from '@vue-flow/minimap';
 import { ControlButton, Controls } from '@vue-flow/controls';
 import FloowsynkNode from '@/components/Workflow/Nodes'
 import { useWorkflowCanvasHelperMethods } from './Helper/Workflow.Canvas.Helper'
+import CustomEdge from '@/components/Workflow/Edges/CustomEdge.vue'
 
 const props = defineProps<WorkflowCanvasProps>()
 const { tab, canvasId, node, edge, isRunning } = useWorkflowCanvasHooks(props.id)

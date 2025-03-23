@@ -12,7 +12,6 @@
     align-items: center;
     width: 100%;
     height: 100%;
-    border-top: solid 1px grey;
 }
 
 .content .type-content {
@@ -36,17 +35,17 @@
     background: #f5f5f5;
     padding: 20px;
     border-radius: 5px;
-    box-shadow: 3px 3px 5px #868686, -3px -3px 5px #fff;
+    box-shadow: 3px 3px 5px var(--grey-3), -3px -3px 5px var(--white-1);
     cursor: pointer;
     transition: all 0.3s ease;
 }
 
 .content .type-content .card:hover {
-    box-shadow: 3px 3px 10px #868686, -3px -3px 10px #fff;
+    box-shadow: 3px 3px 10px var(--grey-3), -3px -3px 10px var(--white-1);
 }
 
 .content .type-content .card.selected {
-    box-shadow: inset 3px 3px 5px #868686, inset -3px -3px 5px #fff !important;
+    box-shadow: inset 3px 3px 5px var(--grey-3), inset -3px -3px 5px var(--white-1) !important;
 }
 
 .content .field-content {
@@ -56,7 +55,7 @@
     align-items: center;
     width: 100%;
     height: 100%;
-    border-left: solid 1px grey;
+    border-left: solid 1px var(--grey-4);
     padding: 10px;
 }
 
@@ -77,9 +76,9 @@
     display: block;
     width: 100%;
     padding: 10px;
-    border: solid 1px grey;
+    border: solid 1px var(--grey-4);
     border-radius: 50px;
-    box-shadow: inset 3px 3px 5px #868686, inset -3px -3px 5px #fff;
+    box-shadow: inset 3px 3px 5px var(--grey-3), inset -3px -3px 5px var(--white-1);
     transition: all 0.3s ease;
 }
 
@@ -122,18 +121,18 @@
     width: 100%;
     height: 100%;
     border-radius: 50%;
-    background: #f5f5f5;
-    box-shadow: 3px 3px 5px #868686, -3px -3px 5px #fff;
+    background: var(--white-4);
+    box-shadow: 3px 3px 5px var(--grey-3), -3px -3px 5px var(--white-1);
     transition: all 0.3s ease;
 }
 
 .day-box input[type="checkbox"]:checked+.day-label {
-    box-shadow: inset 3px 3px 5px #868686, inset -3px -3px 5px #fff;
-    color: #4a90e2;
+    box-shadow: inset 3px 3px 5px var(--grey-3), inset -3px -3px 5px var(--white-1);
+    color: var(--blue-3);
 }
 
 .day-box:hover .day-label {
-    box-shadow: 3px 3px 10px #868686, -3px -3px 10px #fff;
+    box-shadow: 3px 3px 10px var(--grey-3), -3px -3px 10px var(--white-1);
 }
 
 .copy-btn {
@@ -145,8 +144,8 @@
     right: -50px;
     top: 150%;
     transform: translateY(-50%);
-    background: rgba(0, 0, 0, 0.8);
-    color: white;
+    background: var(--black-translucent);
+    color: var(--white-1);
     padding: 5px 10px;
     border-radius: 4px;
     font-size: 12px;
@@ -161,5 +160,5 @@
     transform: translateY(-50%);
     border-width: 5px;
     border-style: solid;
-    border-color: transparent rgba(0, 0, 0, 0.8) transparent transparent;
+    border-color: transparent var(--black-translucent) transparent transparent;
 }
