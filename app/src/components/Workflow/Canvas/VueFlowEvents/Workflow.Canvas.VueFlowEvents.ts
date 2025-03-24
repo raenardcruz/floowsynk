@@ -140,7 +140,7 @@ export const useWorkflowCanvasVueFlowEvents = (props: WorkflowCanvasProps, vueFl
           if (isRunning.value) return;
           event.preventDefault();
           if (tab.value.nodesList) {
-              const nodesToDelete = getSelectedNodes.value.filter((node: any) => node.type !== 'start');
+              const nodesToDelete = getSelectedNodes.value.filter((node: any) => node.id !== '0');
               tab.value.nodesList = tab.value.nodesList.filter((node: any) => !nodesToDelete.includes(node));
           } else {
               throw new Error(`Tab nodes not found for id ${tab.value.id}`);

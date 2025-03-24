@@ -51,7 +51,7 @@ const showSidebar = ref(false);
 const showModal = ref(false);
 const { nodestatus } = useFloowsynkNodeWatchers(props.tabid, node, showSidebar)
 const clickHandler = () => clickhandler(node, showSidebar, showModal)
-const { icon, nodetype, label, outputsList, inputsList, nodestyle } = node as unknown as Node.AsObject;
+const { icon, nodetype, label, outputsList, inputsList, nodestyle, id } = node as unknown as Node.AsObject;
 const { isRunning } = useWorkflowCanvasHooks(props.tabid)
 node.draggable = !isRunning
 node.deletable = !isRunning

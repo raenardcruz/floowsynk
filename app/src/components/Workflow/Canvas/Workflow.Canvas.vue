@@ -8,12 +8,12 @@
                         <span class="material-symbols-outlined">add</span>
                         <span>Add Tag</span>
                     </div>
-                    <div class="tag" style="background: #0088C2;" v-for="(_, index) in tab.tagsList">
+                    <div class="tag" style="background: var(--blue-2);" v-for="(_, index) in tab.tagsList">
                         <input type="text" placeholder="New Tag" v-model="tab.tagsList[index]" :list="tab.tagsList[index]">
                         <datalist :id="tab.tagsList[index]">
                             <option :value="tag" v-for="tag in tab.tagsList.filter((f: string) => f != 'No Tags')"></option>
                         </datalist>
-                        <span class="material-symbols-outlined" style="color: #BC0F26;"
+                        <span class="material-symbols-outlined" style="color: var(--red-2);"
                             @click="removeTag(index)">close</span>
                     </div>
                 </div>
@@ -55,10 +55,10 @@
                         <span class="material-symbols-outlined"
                             @click="saveProcess()">save</span>
                     </ControlButton>
-                    <ControlButton title="Run" style="background: #6FA071; color: #fff;" v-if="!isRunning">
+                    <ControlButton title="Run" style="background: var(--green-2); color: var(--white-1);" v-if="!isRunning">
                         <span class="material-symbols-outlined" @click="runProcess()">play_arrow</span>
                     </ControlButton>
-                    <ControlButton title="Exit Run Mode" style="background: #e30b57; color: #fff;" v-else>
+                    <ControlButton title="Exit Run Mode" style="background: var(--red-2); color: var(--white-1);" v-else>
                         <span class="material-symbols-outlined" @click="exitRunMode()">close</span>
                     </ControlButton>
                 </Controls>
