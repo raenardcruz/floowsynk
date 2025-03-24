@@ -103,10 +103,15 @@ export const useWorkflowCanvasControlButtonActions = (props: WorkflowCanvasProps
     setViewport({ x: 0, y: 0, zoom: 1 })
   };
 
+  const exitRunMode = function () {
+    runningTabs.value.splice(runningTabs.value.indexOf(tab.value.id), 1);
+  }
+
   return {
     saveProcess,
     removeProcess,
     runProcess,
-    resetTransform
+    resetTransform,
+    exitRunMode,
   }
 }

@@ -10,14 +10,16 @@ const { draggedNode } = useSidebarCanvasStore();
 
 export const useWorkflowCanvasVueFlowEvents = (props: WorkflowCanvasProps, vueFlowInstance: any) => {
     const { activeTab } = useWorkflowStore();
-    const { tab } = useWorkflowCanvasHooks(props.id);
+    const { tab, isRunning } = useWorkflowCanvasHooks(props.id);
     const { saveState } = useWorkflowCanvasHelperMethods(props.id, vueFlowInstance);
     const {
       isDragOver,
       mousePosition,
   } = useWorkflowCanvasStore();
+  
     // Method: On Connect Edge
     const onConnectEdge = (edge: any) => {
+      if (isRunning.value) return;
       if (activeTab.value != tab.value.id) return;
       saveState();
       edge.type = "custom";
@@ -43,6 +45,7 @@ export const useWorkflowCanvasVueFlowEvents = (props: WorkflowCanvasProps, vueFl
     }
     // Method: On Drop
     const onDrop = (event: any) => {
+      if (isRunning.value) return;
       saveState();
       const { screenToFlowCoordinate } = vueFlowInstance;
       const node = draggedNode.value;
@@ -110,15 +113,18 @@ export const useWorkflowCanvasVueFlowEvents = (props: WorkflowCanvasProps, vueFl
       } = useWorkflowCanvasKeyboardActions(props, vueFlowInstance);
       switch (event.key) {
         case 'z':
+          if (isRunning.value) return;
           undo();
           break;
         case 'y':
+          if (isRunning.value) return;
           redo();
           break;
         case 'c':
           copy(getSelectedNodes, getSelectedEdges);
           break;
         case 'v':
+          if (isRunning.value) return;
           paste();
           break;
         case 'a':
@@ -131,9 +137,10 @@ export const useWorkflowCanvasVueFlowEvents = (props: WorkflowCanvasProps, vueFl
           break;
         case 'Delete':
         case 'Backspace':
+          if (isRunning.value) return;
           event.preventDefault();
           if (tab.value.nodesList) {
-              const nodesToDelete = getSelectedNodes.value.filter((node: any) => node.type !== 'start');
+              const nodesToDelete = getSelectedNodes.value.filter((node: any) => node.id !== '0');
               tab.value.nodesList = tab.value.nodesList.filter((node: any) => !nodesToDelete.includes(node));
           } else {
               throw new Error(`Tab nodes not found for id ${tab.value.id}`);

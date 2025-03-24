@@ -35,11 +35,13 @@ export const useWorkflowCanvasHooks = (tabId: string) => {
         get: () => tab.value.edgesList.map(edge => DenormalizeVueFlowObject(edge)),
         set: (newEdges) => { tab.value.edgesList = newEdges; }
     });
+    const isRunning = computed(() => runningTabs.value.includes(tab.value.id));
 
     return {
         tab,
         canvasId,
         node,
         edge,
+        isRunning,
     }
 }

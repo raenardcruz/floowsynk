@@ -11,8 +11,8 @@
             <div class="nodes expand">
                 <div class="node" v-for="node in searchNode" :key="node.id" :draggable="true"
                     @dragstart="onDragStart(node)" v-if="search.length > 0">
-                    <div class="node-icon" :style="'color:' + node.icon.color">
-                        <span class="material-symbols-outlined">{{ node.icon.name }}</span>
+                    <div class="node-icon">
+                        <span class="material-symbols-outlined">{{ node.icon?.name || "indeterminate_question_box" }}</span>
                     </div>
                     <div class="node-type">
                         {{ node.nodetype }}
@@ -30,8 +30,8 @@
                 <div class="nodes" :class="{ 'expand': expandGroup.includes('all') }">
                     <div class="node" v-for="node in nodes" :key="node.id" :draggable="true"
                         @dragstart="onDragStart(node)" @click.stop>
-                        <div class="node-icon" :style="'color:' + node.icon.color">
-                            <span class="material-symbols-outlined">{{ node.icon.name }}</span>
+                        <div class="node-icon" >
+                            <span class="material-symbols-outlined">{{ node.icon?.name || "indeterminate_question_box" }}</span>
                         </div>
                         <div class="node-type">
                             {{ node.nodetype }}
@@ -51,8 +51,8 @@
                 <div class="nodes" :class="{ 'expand': expandGroup.includes(group.name) }">
                     <div class="node" v-for="node in groupNodes(group.id)" :key="node.id" :draggable="true"
                         @dragstart="onDragStart(node)" @click.stop>
-                        <div class="node-icon" :style="'color:' + node.icon.color">
-                            <span class="material-symbols-outlined">{{ node.icon.name }}</span>
+                        <div class="node-icon">
+                            <span class="material-symbols-outlined">{{ node.icon?.name || "indeterminate_question_box" }}</span>
                         </div>
                         <div class="node-type">
                             {{ node.nodetype }}

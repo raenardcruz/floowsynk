@@ -56,7 +56,7 @@ export const nodes: Node.AsObject[] = [
         groupList: [1],
         icon: {
             name: "memory",
-            color: "green"
+            color: "linear-gradient(135deg, var(--green-1), var(--green-5))" // green
         },
         data: {
             name: "",
@@ -70,7 +70,7 @@ export const nodes: Node.AsObject[] = [
         groupList: [2],
         icon: {
             name: "question_mark",
-            color: "red"
+            color: "linear-gradient(135deg, var(--red-1), var(--red-5))" // red
         },
         data: {
             expression: ""
@@ -83,7 +83,7 @@ export const nodes: Node.AsObject[] = [
         groupList: [2],
         icon: {
             name: "all_inclusive",
-            color: "#2864A9"
+            color: "linear-gradient(135deg, var(--blue-1), var(--blue-5))" // blue
         },
         data: {
             iteration: 1
@@ -96,7 +96,7 @@ export const nodes: Node.AsObject[] = [
         groupList: [2],
         icon: {
             name: "all_inclusive",
-            color: "#2864A9"
+            color: "linear-gradient(135deg, var(--blue-1), var(--blue-5))" // blue
         },
         data: {
             listvar: ""
@@ -109,7 +109,7 @@ export const nodes: Node.AsObject[] = [
         groupList: [2],
         icon: {
             name: "all_inclusive",
-            color: "#2864A9"
+            color: "linear-gradient(135deg, var(--blue-1), var(--blue-5))" // blue
         },
         data: {
             expression: "",
@@ -123,7 +123,7 @@ export const nodes: Node.AsObject[] = [
         groupList: [4],
         icon: {
             name: "language",
-            color: "#87B359"
+            color: "linear-gradient(135deg, var(--green-3), var(--green-5))" // light green
         },
         data: {
             url: "",
@@ -148,7 +148,7 @@ export const nodes: Node.AsObject[] = [
         groupList: [6],
         icon: {
             name: "edit_document",
-            color: "#222"
+            color: "linear-gradient(135deg, var(--grey-1), var(--grey-5))" // grey
         },
         data: {
             message: ""
@@ -161,7 +161,7 @@ export const nodes: Node.AsObject[] = [
         groupList: [1],
         icon: {
             name: "frame_source",
-            color: "#3477B9"
+            color: "linear-gradient(135deg, var(--blue-3), var(--blue-5))" // light blue
         },
         data: {
             variable: ""
@@ -174,7 +174,7 @@ export const nodes: Node.AsObject[] = [
         groupList: [1],
         icon: {
             name: "article",
-            color: "#9A9A9A"
+            color: "linear-gradient(135deg, var(--grey-1), var(--grey-5))" // grey
         },
         data: {
             message: "",
@@ -188,7 +188,7 @@ export const nodes: Node.AsObject[] = [
         groupList: [1],
         icon: {
             name: "calculate",
-            color: "#D36C6C"
+            color: "linear-gradient(135deg, var(--red-1), var(--red-5))" // red
         },
         data: {
             expression: "",
@@ -202,7 +202,7 @@ export const nodes: Node.AsObject[] = [
         groupList: [1],
         icon: {
             name: "list",
-            color: "#85B158"
+            color: "linear-gradient(135deg, var(--green-3), var(--green-5))" // light green
         },
         data: {
             list: {
@@ -218,7 +218,7 @@ export const nodes: Node.AsObject[] = [
         groupList: [1],
         icon: {
             name: "tag",
-            color: "#979797"
+            color: "linear-gradient(135deg, var(--grey-1), var(--grey-5))" // grey
         },
         data: {
             listvariable: "",
@@ -232,7 +232,7 @@ export const nodes: Node.AsObject[] = [
         groupList: [3],
         icon: {
             name: "map",
-            color: "#85B158"
+            color: "linear-gradient(135deg, var(--green-3), var(--green-5))" // light green
         },
         data: {
             listvariable: "",
@@ -247,7 +247,7 @@ export const nodes: Node.AsObject[] = [
         groupList: [1],
         icon: {
             name: "swap_horiz",
-            color: "#77584C"
+            color: "linear-gradient(135deg, var(--brown-1), var(--brown-5))" // brown
         },
         data: {
             text: "",
@@ -263,7 +263,7 @@ export const nodes: Node.AsObject[] = [
         groupList: [1],
         icon: {
             name: "find_replace",
-            color: "#057D72"
+            color: "linear-gradient(135deg, var(--blue-2), var(--blue-5))" // teal
         },
         data: {
             text: "",
@@ -279,7 +279,7 @@ export const nodes: Node.AsObject[] = [
         groupList: [7],
         icon: {
             name: "image",
-            color: "#98BC18"
+            color: "linear-gradient(135deg, var(--green-4), var(--green-5))" // lime
         },
         data: {
             value: ""
@@ -293,7 +293,7 @@ export const nodes: Node.AsObject[] = [
         groupList: [1],
         icon: {
             name: "account_tree",
-            color: "#1986BD"
+            color: "linear-gradient(135deg, var(--blue-2), var(--blue-5))" // blue
         },
         data: {
             subprocessid: ""
@@ -309,7 +309,7 @@ const startNodesArray: Node.AsObject[] = [
         nodetype: 'defaultnode',
         label: '',
         draggable: false,
-        icon: { name: 'flag_circle', color: '#84ab86' },
+        icon: { name: 'flag_circle', color: 'var(--green-2)' }, // green
         outputsList: ['output'],
         groupList: [1],
         position: { x: 100, y: 100 },
@@ -320,7 +320,7 @@ const startNodesArray: Node.AsObject[] = [
         nodetype: 'interval',
         label: '',
         draggable: false,
-        icon: { name: 'calendar_month', color: '#09a6d6' },
+        icon: { name: 'calendar_month', color: 'var(--blue-3)' }, // light blue
         data: {
             type: 'seconds',
             interval: 1,
@@ -339,7 +339,7 @@ const startNodesArray: Node.AsObject[] = [
         nodetype: 'webhook',
         label: '',
         draggable: false,
-        icon: { name: 'webhook', color: '#b86a11' },
+        icon: { name: 'webhook', color: 'var(--orange-2)' }, // orange
         data: {
             name: ''
         },
@@ -353,7 +353,7 @@ const startNodesArray: Node.AsObject[] = [
         nodetype: 'events',
         label: '',
         draggable: false,
-        icon: { name: 'event', color: '#A3245B' },
+        icon: { name: 'event', color: 'var(--pink-2)' }, // pink
         data: {
             name: ''
         },

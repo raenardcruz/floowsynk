@@ -1,5 +1,5 @@
 <template>
-    <div class="node no-scroll nopan" :style="nodestyle" :class="{ 'node-selected': node.selected, [nodestatus]: true }"
+    <div class="node no-scroll nopan" :style="nodestyle" :class="{ 'node-selected': node.selected, [nodestatus]: isRunning }"
         @click="clickHandler()">
         <div class="icon" :style="{ background: icon?.color }">
             <span class="material-symbols-outlined">{{ icon?.name }}</span>
@@ -42,6 +42,7 @@ import { Node } from 'proto/floowsynk_pb'
 import { toSentenceCase } from "@/components/Composable/Utilities";
 import ProcessTypeModal from '@/components/Workflow/Modal/ProcessType/Workflow.Modal.ProcessType.vue'
 import { Modal } from '@/components/Composable/UI'
+import { useWorkflowCanvasHooks } from '@/components/Workflow/Canvas/Workflow.Canvas.hooks'
 
 const props = defineProps<NodeProps>();
 const { node } = useNode()
@@ -50,7 +51,11 @@ const showSidebar = ref(false);
 const showModal = ref(false);
 const { nodestatus } = useFloowsynkNodeWatchers(props.tabid, node, showSidebar)
 const clickHandler = () => clickhandler(node, showSidebar, showModal)
-const { icon, nodetype, label, outputsList, inputsList, nodestyle } = node as unknown as Node.AsObject;
+const { icon, nodetype, label, outputsList, inputsList, nodestyle, id } = node as unknown as Node.AsObject;
+const { isRunning } = useWorkflowCanvasHooks(props.tabid)
+node.draggable = !isRunning
+node.deletable = !isRunning
+node.connectable = !isRunning
 </script>
 
 <style scoped src="./FloowsynkNode.styles.css"></style>

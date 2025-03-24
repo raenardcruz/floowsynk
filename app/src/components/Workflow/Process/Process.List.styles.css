@@ -6,7 +6,7 @@
     height: 100%;
     width: 100%;
     padding: 30px;
-    background: #f0f0f0;
+    background: var(--white-2);
 
 }
 .gallery-box {
@@ -21,11 +21,11 @@
 }
 .page-title {
     font-size: 41px;
-    color: #797272;
+    color: var(--grey-2);
 }
 .page-info {
     font-size: 15px;
-    color: #AD9A9A;
+    color: var(--grey-2);
 }
 .page-info *  {
     margin-right: 5px;
@@ -38,7 +38,7 @@
     height: 30px;
     border-radius: 20px;
     margin-top: 30px;
-    box-shadow: 2px 2px 3px grey;
+    box-shadow: 2px 2px 3px var(--grey-3);
 }
 .gallery-search .search-box {
     width: 100%;
@@ -65,19 +65,20 @@
     justify-content: center;
     align-items: center;
     border-radius: 8px;
-    color: #8E8B8B;
+    color: var(--white-1);
     cursor: pointer;
     overflow: hidden;
     transition: 0.3s ease-in-out;
-    background: url('/src/components/Icons/add.svg');
     background-size: contain;
     background-position: center;
-    background-color: rgba(255, 255, 255, 0.5);
-    background-blend-mode: multiply;
-    background-repeat: no-repeat;
+    background: var(--grey-4);
+}
+.create img {
+    width: 100px;
+    height: 100px;
 }
 .cards-gallery .create:hover {
-    box-shadow: 4px 4px 4px grey;
+    box-shadow: 4px 4px 4px var(--grey-3);
 }
 .cards-gallery .card {
     position: relative;
@@ -91,43 +92,39 @@
     border-radius: 8px;
     cursor: pointer;
     overflow: hidden;
-    box-shadow: 2px 2px 2px grey;
+    box-shadow: 2px 2px 2px var(--grey-3);
     transition: 0.3s ease-in-out;
 }
 .card.default {
-    background: url('/src/components/Icons/default.svg');
     background-size: contain;
     background-position: center;
-    background-color: rgba(208, 249, 185, 0.5);
+    background-color: var(--green-5);
     background-blend-mode: multiply;
     background-repeat: no-repeat;
 }
 .card.webhook {
-    background: url('/src/components/Icons/webhook.svg');
     background-size: contain;
     background-position: center;
-    background-color: rgba(250, 218, 187, 0.5);
+    background-color: var(--brown-5);
     background-blend-mode: multiply;
     background-repeat: no-repeat;
 }
 .card.events {
-    background: url('/src/components/Icons/event.svg');
     background-size: contain;
     background-position: center;
-    background-color: rgba(253, 221, 236, 0.5);
+    background-color: var(--pink-5);
     background-blend-mode: multiply;
     background-repeat: no-repeat;
 }
 .card.interval {
-    background: url('/src/components/Icons/timer.svg');
     background-size: contain;
     background-position: center;
-    background-color: rgba(187, 243, 239, 0.5);
+    background-color: var(--blue-5);
     background-blend-mode: multiply;
     background-repeat: no-repeat;
 }
 .cards-gallery .card:hover {
-    box-shadow: 6px 6px 6px rgb(116, 116, 116);
+    box-shadow: 6px 6px 6px var(--grey-3);
 }
 .cards-gallery .card .type {
     position: relative;
@@ -143,7 +140,7 @@
 }
 .cards-gallery .card .card-description {
     font-size: 10px;
-    color: grey;
+    color: var(--grey-2);
 }
 .tags {
     position: relative;
@@ -157,9 +154,9 @@
     display: flex;
     font-size: 10px;
     padding: 0 10px 0 10px;
-    background: #3489CD;
+    background: var(--blue-2);
     border-radius: 20px;
-    color: #fff;
+    color: var(--white-1);
 }
 .tag-actions {
     position: relative;
@@ -179,9 +176,9 @@
     padding: 1px 10px 1px 10px;
     cursor: pointer;
     border-radius: 20px;
-    box-shadow: 3px 3px 5px #868686, -3px -3px 5px #ffffff;
+    box-shadow: 3px 3px 5px var(--grey-3), -3px -3px 5px var(--white-1);
     transition: all 0.3s linear;
 }
 .tag-actions .tag-btn:hover {
-    box-shadow: inset 3px 3px 5px #868686, inset -3px -3px 5px #ffffff;
+    box-shadow: inset 3px 3px 5px var(--grey-3), inset -3px -3px 5px var(--white-1);
 }

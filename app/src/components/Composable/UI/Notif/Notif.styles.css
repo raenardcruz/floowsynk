@@ -8,21 +8,21 @@
   height: fit-content;
   width: fit-content;
   min-width: 100px;
-  background: rgb(198, 111, 58);
+  background: var(--orange-2);
   font-size: 15px;
-  color: #fff;
+  color: var(--white-1);
   justify-self: center;
   z-index: 10;
   animation: alert-entry 5.5s;
 }
 .info {
-  background: #6199B9;
+  background: var(--blue-3);
 }
 .success {
-  background: #7AB961;
+  background: var(--green-5);
 }
 .error {
-  background: #B96461;
+  background: var(--red-3);
 }
 
 @keyframes alert-entry {

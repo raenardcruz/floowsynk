@@ -16,13 +16,83 @@
   margin: 0;
 }
 
+:root {
+  --blue-1: #14376B;
+  --blue-2: #3B82F6;
+  --blue-3: #60A5FA;
+  --blue-4: #3AA9B6;
+  --blue-5: #BFDBFE;
+  --blue-6: #b3e5fc;
+  --blue-7: #e0f7ff;
+
+  --grey-1: #111827;
+  --grey-2: #374151;
+  --grey-3: #6B7280;
+  --grey-4: #D1D5DB;
+  --grey-5: #F3F4F6;
+
+  --white-1: #FFFFFF;
+  --white-2: #F9FAFB;
+  --white-3: #F3F4F6;
+  --white-4: #E5E7EB;
+  --white-5: #D1D5DB;
+
+  --green-1: #064E3B;
+  --green-2: #10B981;
+  --green-3: #34D399;
+  --green-4: #6EE7B7;
+  --green-5: #A7F3D0;
+
+  --violet-1: #4C1D95;
+  --violet-2: #8B5CF6;
+  --violet-3: #A78BFA;
+  --violet-4: #C4B5FD;
+  --violet-5: #DDD6FE;
+
+  --orange-1: #FF6F00;
+  --orange-2: #FF8F00;
+  --orange-3: #FC930F;
+  --orange-4: #FFB300;
+  --orange-5: #FFC107;
+
+  --red-1: #B91C1C;
+  --red-2: #EF4444;
+  --red-3: #F87171;
+  --red-4: #FCA5A5;
+  --red-5: #FECACA;
+
+  --pink-1: #AD1457;
+  --pink-2: #D81B60;
+  --pink-3: #C4597D;
+  --pink-4: #F48FB1;
+  --pink-5: #F8BBD0;
+
+  --brown-1: #4E342E;
+  --brown-2: #6D4C41;
+  --brown-3: #8D6E63;
+  --brown-4: #A1887F;
+  --brown-5: #D7CCC8;
+
+  --black-translucent: rgba(0, 0, 0, 0.5);
+  --black-translucent-2: rgba(0, 0, 0, 0.2);
+  --black-translucent-3: rgba(0, 0, 0, 0.1);
+  --white-translucent: rgba(255, 255, 255, 0.5);
+  --blue-translucent: rgba(30, 58, 138, 0.5);
+  --grey-translucent: rgba(17, 24, 39, 0.5);
+  --green-translucent: rgba(6, 78, 59, 0.5);
+  --violet-translucent: rgba(76, 29, 149, 0.5);
+  --orange-translucent: rgba(255, 111, 0, 0.5);
+  --red-translucent: rgba(185, 28, 28, 0.5);
+  --brown-translucent: rgba(78, 52, 46, 0.5);
+}
+
 /* Font family */
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   font-size: 16px;
   line-height: 1.5;
-  color: #333;
-  background-color: #E6E5E5;
+  color: var(--grey-1);
+  background-color: var(--white-2);
   height: 100vh;
   width: 100vw;
 }
@@ -37,11 +107,12 @@ body #app {
 /* Link styling */
 a {
   text-decoration: none;
-  color: #337ab7;
+  color: var(--blue-1);
+  transition: all 0.3s;
 }
 
 a:hover {
-  color: #23527c;
+  color: var(--blue-2);
 }
 
 /* Button styling */
@@ -55,27 +126,8 @@ button {
 }
 
 button:hover {
-  background-color: #337ab7;
-  color: #fff;
-}
-
-/* Header */
-.header {
-  background-color: #337ab7;
-  color: #fff;
-  padding: 16px;
-  border-bottom: 1px solid #337ab7;
-}
-
-.header h1 {
-  margin: 0;
-}
-
-/* Code block */
-.code-block {
-  background-color: #f7f7f7;
-  padding: 16px;
-  border: 1px solid #ddd;
+  background-color: var(--blue-2);
+  color: var(--white-2);
 }
 
 @keyframes fadeInFromTop {
@@ -111,7 +163,7 @@ button:hover {
 }
 
 .vue-flow__handle {
-  background: #72716E;
+  background: var(--grey-3);
   height:12px;
   width:5px;
   border-radius: 2px;

@@ -1,6 +1,7 @@
 import { computed } from 'vue'
 import { CustomEdgeProps } from './CustomEdge.types'
 import { getSmoothStepPath } from '@vue-flow/core'
+import { useWorkflowCanvasStore } from '@/components/Workflow/Canvas'
 
 export const useCustomEdgeHooks = (props: CustomEdgeProps) => {
     const path = computed(() => getSmoothStepPath({
@@ -12,14 +13,21 @@ export const useCustomEdgeHooks = (props: CustomEdgeProps) => {
         targetPosition: props.targetPosition as any,
     }))
     const edgeStyling = computed(() => {
+        const { nodeStatuses } = useWorkflowCanvasStore();
+        const sourceStatus = nodeStatuses.value[props.source];
+        const targetStatus = nodeStatuses.value[props.target];
+        const isExecuted = !!sourceStatus && !!targetStatus;
+        console.log('isExecuted', props)
         return ({
             ...props.style,
-            stroke: 'grey'
+            stroke: isExecuted ? 'black' : 'grey',
+            strokeWidth: isExecuted ? 2 : 1,
+            strokeDasharray: isExecuted ? '3' : '5',
         })
     })
 
     return {
         path,
-        edgeStyling
+        edgeStyling,
     }
 }
