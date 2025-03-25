@@ -33,10 +33,7 @@ export const useWorkflowCanvasHooks = (tabId: string) => {
     const node = computed({
         get: () => tab.value.nodesList.map(node => DenormalizeVueFlowObject(node)),
         set: (newNodes) => { 
-            tab.value.nodesList = []; // Replace the array to trigger reactivity
-            setTimeout(() => {
-                tab.value.nodesList = newNodes
-            }, 100);
+            tab.value.nodesList = [...newNodes];
         }
     });
     const edge = computed({
