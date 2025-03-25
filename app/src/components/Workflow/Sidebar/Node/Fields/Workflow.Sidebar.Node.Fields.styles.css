@@ -12,8 +12,7 @@
     display: flex;
     position: relative;
     height: 30px;
-    width: fit-content;
-    min-width: 200px;
+    width: 100%;
     padding: 5px;
     border-radius: 50px;
     border: 1px solid var(--grey-4);
@@ -112,18 +111,45 @@
 .remove-array {
     display: flex;
     position: absolute;
-    top: 5px;
-    right: 5px;
     cursor: pointer;
     color: var(--red-2);
     z-index: 100;
+    top: -12px;
+    right: -12px;
+    border-radius: 50%;
+    padding: 2px;
 }
 .show-code-btn {
     display: flex;
     position: absolute;
     top: 22px;
-    right: 35px;
+    right: 8px;
     cursor: pointer;
     color: var(--blue-2);
     z-index: 100;
+    border-radius: 50%;
+    padding: 2px;
+    transition: all 0.3s;
+}
+.show-code-btn:hover {
+    color: var(--orange-2);
+}
+.show-code-btn::after {
+    content: 'Code Modal';
+    position: absolute;
+    top: -25px;
+    right: 0;
+    background: var(--grey-2);
+    color: var(--white-1);
+    font-size: 8px;
+    padding: 5px 8px;
+    border-radius: 4px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+}
+
+.show-code-btn:hover::after {
+    opacity: 1;
+    visibility: visible;
 }

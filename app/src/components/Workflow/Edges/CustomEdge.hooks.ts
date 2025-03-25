@@ -17,7 +17,6 @@ export const useCustomEdgeHooks = (props: CustomEdgeProps) => {
         const sourceStatus = nodeStatuses.value[props.source];
         const targetStatus = nodeStatuses.value[props.target];
         const isExecuted = !!sourceStatus && !!targetStatus;
-        console.log('isExecuted', props)
         return ({
             ...props.style,
             stroke: isExecuted ? 'black' : 'grey',

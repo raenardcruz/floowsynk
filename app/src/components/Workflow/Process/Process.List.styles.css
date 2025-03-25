@@ -102,6 +102,13 @@
     background-blend-mode: multiply;
     background-repeat: no-repeat;
 }
+.card.defaultnode {
+    background-size: contain;
+    background-position: center;
+    background-color: var(--green-5);
+    background-blend-mode: multiply;
+    background-repeat: no-repeat;
+}
 .card.webhook {
     background-size: contain;
     background-position: center;

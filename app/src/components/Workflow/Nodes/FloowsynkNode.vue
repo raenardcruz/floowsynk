@@ -17,8 +17,8 @@
     </div>
     <Teleport :to="'#' + canvasId">
         <SideBar :title="label" :caption="node.id" v-model:visible="showSidebar">
-            <div v-if="node.data">
-                <WorkflowNodeSidebarFields :nodeType="nodetype" v-model="node.data" :tabid="props.tabid" />
+            <div v-if="nodeData">
+                <WorkflowNodeSidebarFields :nodeType="nodetype" v-model="nodeData" :tabid="props.tabid" />
             </div>
         </SideBar>
     </Teleport>
@@ -49,7 +49,7 @@ const { node } = useNode()
 const { canvasId } = useFloowsynkNodeHooks(props.tabid)
 const showSidebar = ref(false);
 const showModal = ref(false);
-const { nodestatus } = useFloowsynkNodeWatchers(props.tabid, node, showSidebar)
+const { nodestatus, nodeData } = useFloowsynkNodeWatchers(props.tabid, node, showSidebar)
 const clickHandler = () => clickhandler(node, showSidebar, showModal)
 const { icon, nodetype, label, outputsList, inputsList, nodestyle, id } = node as unknown as Node.AsObject;
 const { isRunning } = useWorkflowCanvasHooks(props.tabid)

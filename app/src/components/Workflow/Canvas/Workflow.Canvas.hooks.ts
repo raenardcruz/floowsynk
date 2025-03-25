@@ -1,6 +1,7 @@
 import { ref, computed } from 'vue';
 import { useTab } from '@/views/Workflow'
 import { DenormalizeVueFlowObject } from '@/components/Composable/protoTransformers'
+import { Node } from 'proto/floowsynk_pb'
 
 const isDragOver = ref(false);
 const clipBoard = ref({
@@ -12,6 +13,7 @@ const runningTabs = ref<string[]>([]);
 const undoStack = ref<{ nodes: any[], edges: any[] }[]>([]);
 const redoStack = ref<{ nodes: any[], edges: any[] }[]>([]);
 const nodeStatuses = ref<Record<string, string>>({});
+const replayNodes =ref<Node.AsObject[]>([]);
 
 export const useWorkflowCanvasStore= () => {
     return {
@@ -22,6 +24,7 @@ export const useWorkflowCanvasStore= () => {
         undoStack,
         redoStack,
         nodeStatuses,
+        replayNodes
     }
 }
 export const useWorkflowCanvasHooks = (tabId: string) => {
@@ -29,11 +32,18 @@ export const useWorkflowCanvasHooks = (tabId: string) => {
     const canvasId = computed(() => btoa(tab.value.id));
     const node = computed({
         get: () => tab.value.nodesList.map(node => DenormalizeVueFlowObject(node)),
-        set: (newNodes) => { tab.value.nodesList = newNodes; }
+        set: (newNodes) => { 
+            tab.value.nodesList = []; // Replace the array to trigger reactivity
+            setTimeout(() => {
+                tab.value.nodesList = newNodes
+            }, 100);
+        }
     });
     const edge = computed({
         get: () => tab.value.edgesList.map(edge => DenormalizeVueFlowObject(edge)),
-        set: (newEdges) => { tab.value.edgesList = newEdges; }
+        set: (newEdges) => { 
+            tab.value.edgesList = [...newEdges];
+        }
     });
     const isRunning = computed(() => runningTabs.value.includes(tab.value.id));
 

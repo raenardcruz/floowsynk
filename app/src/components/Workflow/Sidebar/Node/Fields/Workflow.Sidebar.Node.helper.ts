@@ -1,6 +1,7 @@
 import { useSidebarNodeStore } from '../Workflow.Sidebar.Node.hooks'
 import { SidebarNodeProps } from '../Workflow.Sidebar.Node.types'
 import { EMIT_MODEL } from './Workflow.Sidebar.Node.Fields.constants'
+import { NodeDataArray, ArrayDataType } from 'proto/floowsynk_pb'
 
 const { modalStates, arraytype } = useSidebarNodeStore();
 
@@ -21,46 +22,49 @@ export const inputHandler = function (e: Event, emit: (event: "update:modelValue
 
 export const useSidebarNodeFieldsHelper = (props: SidebarNodeProps) => {
     const removeArrayItem = function (index: any, key: string) {
-        props.modelValue[key].splice(index, 1);
+        let listObj = props.modelValue[key] as NodeDataArray.AsObject;
+        switch (listObj.type) {
+            case ArrayDataType.STRING:
+                listObj.stringitemsList?.splice(index, 1);
+                break;
+            case ArrayDataType.INT:
+                listObj.intitemsList?.splice(index, 1);
+                break;
+            case ArrayDataType.BOOL:
+                listObj.boolitemsList?.splice(index, 1);
+                break;
+            case ArrayDataType.KEYVALUE:
+                listObj.keyvalueitemsList?.splice(index, 1);
+                break;
+            default:
+                throw new Error('Invalid ArrayDataType');
+        }
     }
     const addArrayItem = function (key: string) {
-        if (props.modelValue[key].constructor == Array && props.modelValue[key].length == 0) {
-            switch (arraytype.value) {
-                case 'keyvalue':
-                    props.modelValue[key].push({ key: '', value: '' });
-                    break;
-                case 'string':
-                    props.modelValue[key].push('');
-                    break;
-                case 'number':
-                    props.modelValue[key].push(0);
-                    break;
-                case 'boolean':
-                    props.modelValue[key].push(false);
-                    break;
-            }
-        } else {
-            const firstItemType = props.modelValue[key][0].constructor;
-            switch (firstItemType) {
-                case String:
-                    props.modelValue[key].push('');
-                    break;
-                case Number:
-                    props.modelValue[key].push(0);
-                    break;
-                case Object:
-                    const newItem = JSON.parse(JSON.stringify(props.modelValue[key][0]));
-                    for (const prop in newItem) {
-                        if (newItem.hasOwnProperty(prop)) {
-                            newItem[prop] = '';
-                        }
-                    }
-                    props.modelValue[key].push(newItem);
-                    break;
-                case Boolean:
-                    props.modelValue[key].push(false);
-                    break;
-            }
+        let listObj = props.modelValue[key] as NodeDataArray.AsObject;
+        switch (listObj.type) {
+            case ArrayDataType.STRING:
+                if (!listObj.stringitemsList)
+                    listObj.stringitemsList = [];
+                listObj.stringitemsList.push('');
+                break;
+            case ArrayDataType.INT:
+                if (!listObj.intitemsList)
+                    listObj.intitemsList = [];
+                listObj.intitemsList.push(0);
+                break;
+            case ArrayDataType.BOOL:
+                if (!listObj.boolitemsList)
+                    listObj.boolitemsList = [];
+                listObj.boolitemsList.push(true);
+                break;
+            case ArrayDataType.KEYVALUE:
+                if (!listObj.keyvalueitemsList)
+                    listObj.keyvalueitemsList = [];
+                listObj.keyvalueitemsList.push({ key: '', value: '' });
+                break;
+            default:
+                throw new Error('Invalid ArrayDataType');
         }
     }
 

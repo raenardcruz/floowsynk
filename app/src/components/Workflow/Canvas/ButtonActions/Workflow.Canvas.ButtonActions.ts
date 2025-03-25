@@ -19,6 +19,7 @@ export const useWorkflowCanvasControlButtonActions = (props: WorkflowCanvasProps
   const {
     nodeStatuses,
     runningTabs,
+    replayNodes,
   } = useWorkflowCanvasStore();
   const { tab } = useWorkflowCanvasHooks(props.id);
   // Method: Save
@@ -82,18 +83,25 @@ export const useWorkflowCanvasControlButtonActions = (props: WorkflowCanvasProps
       status: STATUS_INFO
     } as NotifOptions);
     stream.on('data', (response) => {
-      if (response.getStreamtype() == StreamType.STATUS) {
-        switch (response.getStatus()) {
-          case NodeStatus.RUNNING:
-            nodeStatuses.value[response.getNodeid()] = 'running';
-            break;
-          case NodeStatus.COMPLETED:
-            nodeStatuses.value[response.getNodeid()] = 'success';
-            break;
-          case NodeStatus.FAILED:
-            nodeStatuses.value[response.getNodeid()] = 'error';
-            break;
-        }
+      switch (response.getStreamtype()) {
+        case StreamType.STATUS:
+          switch (response.getStatus()) {
+            case NodeStatus.RUNNING:
+              nodeStatuses.value[response.getNodeid()] = 'running';
+              break;
+            case NodeStatus.COMPLETED:
+              nodeStatuses.value[response.getNodeid()] = 'success';
+              break;
+            case NodeStatus.FAILED:
+              nodeStatuses.value[response.getNodeid()] = 'error';
+              break;
+          }
+          break;
+        case StreamType.REPLAY:
+          const replayNode = response.getReplaynode();
+          if (!!replayNode && replayNodes.value.findIndex((node) => node.id === replayNode?.toObject().id) === -1)
+            replayNodes.value.push(replayNode.toObject());
+          break;
       }
     });
   }
@@ -105,6 +113,10 @@ export const useWorkflowCanvasControlButtonActions = (props: WorkflowCanvasProps
 
   const exitRunMode = function () {
     runningTabs.value.splice(runningTabs.value.indexOf(tab.value.id), 1);
+    tab.value.nodesList.forEach((node) => {
+      nodeStatuses.value[node.id] = '';
+    })
+    console.log(replayNodes.value)
   }
 
   return {

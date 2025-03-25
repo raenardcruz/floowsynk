@@ -45,11 +45,11 @@
                         v-if="tab.nodesList && tab.nodesList[0] && tab.nodesList[0].data" />
                     <label
                         for="url"
-                        v-if="tab.nodesList && tab.nodesList[0] && tab.nodesList[0].data?.name && tab.nodesList[0].data.name.length > 0">
+                        v-if="tab.nodesList && tab.nodesList[0].data && tab.nodesList[0].data.name && tab.nodesList[0].data.name.length > 0">
                         Webhook Url:
                     </label>
                     <span style="display: flex; align-items: center; position: relative;"
-                        v-if="tab.nodesList && tab.nodesList[0] && tab.nodesList[0].data?.name && tab.nodesList[0].data.name.length > 0">
+                        v-if="tab.nodesList && tab.nodesList[0].data && tab.nodesList[0].data.name && tab.nodesList[0].data.name.length > 0">
                         <input type="text" class="input" id="url" :value="webhookUrl" readonly />
                         <span class="material-symbols-outlined copy-btn" @click="copyToClipboard(id)">content_copy</span>
                         <span class="tooltip" v-if="showTooltip">URL copied!</span>
@@ -60,7 +60,7 @@
                     <select
                     class="input"
                     v-model="tab.nodesList[0].data.type"
-                    v-if="tab.nodesList && tab.nodesList[0] && tab.nodesList[0].data">
+                    v-if="tab.nodesList[0].data">
                         <option value="seconds">Seconds</option>
                         <option value="minutes">Minutes</option>
                         <option value="hours">Hours</option>
@@ -68,14 +68,14 @@
                     </select>
                     <label for="interval">Interval: </label>
                     <input type="number" class="input" id="interval" placeholder="Interval in seconds"
-                        v-model="tab.nodes[0].data.interval" v-if="tab.nodes && tab.nodes[0]" />
+                        v-model="tab.nodesList[0].data.interval" v-if="tab.nodesList[0].data" />
                     <label>Days of the week:</label>
                     <div class="week">
                         <div class="weekdays">
                             <label v-for="(day, index) in ['S', 'M', 'T', 'W', 'T', 'F', 'S']" :key="day"
                                 class="day-box">
-                                <input type="checkbox" :value="day" v-model="tab.nodes[0].data.weeks[index]"
-                                    v-if="tab.nodes && tab.nodes[0]" />
+                                <input type="checkbox" :value="day" v-model="tab.nodesList[0].data.weeks.boolitemsList[index]"
+                                    v-if="tab.nodesList && tab.nodesList[0].data && tab.nodesList[0].data.weeks" />
                                 <span class="day-label">{{ day }}</span>
                             </label>
                         </div>

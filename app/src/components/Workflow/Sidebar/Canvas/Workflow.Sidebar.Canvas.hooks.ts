@@ -18,7 +18,7 @@ export const useSidebarCanvasStore = () => {
 
 export const useFloowsynkNodeHooks = () => {
     const searchNode = computed(() => {
-        return nodes.filter(f => f.nodetype.toLowerCase().includes(search.value) || f.label.toLowerCase().includes(search.value))
+        return nodes.filter(f => f.nodetype.toLowerCase().includes(search.value))
     })
 
     return {

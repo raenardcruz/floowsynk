@@ -37,7 +37,8 @@ export const initMonacoEditor = (editorContainer: Ref<HTMLDivElement | null>, pr
             cursorBlinking: "phase",
             minimap: {
                 enabled: true
-            }
+            },
+            readOnly: props.disabled || false,
         })
 
         editorInstance.onDidChangeModelContent(() => {
