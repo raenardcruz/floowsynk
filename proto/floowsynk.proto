@@ -10,22 +10,10 @@ enum ArrayDataType {
     KEYVALUE = 3;
 }
 
-enum StreamType {
-    REPLAY = 0;
-    LOGS = 1;
-    STATUS = 2;
-}
-
 enum NodeStatus {
-    PENDING = 0;
-    RUNNING = 1;
-    COMPLETED = 2;
-    FAILED = 3;
-}
-enum LogStatus {
-    INFO = 0;
-    WARN = 1;
-    ERROR = 2;
+    RUNNING = 0;
+    COMPLETED = 1;
+    FAILED = 2;
 }
 
 service LoginService {
@@ -44,11 +32,16 @@ service WorkflowService {
 
 message RunWorkflowResponse {
     string nodeId = 1;
-    StreamType streamType = 2;
-    optional Node replayNode = 3;
-    string logMessage = 4;
-    optional NodeStatus status = 5;
-    optional LogStatus logStatus = 6;
+    NodeStatus status = 2;
+    optional ReplayData data = 3;
+}
+
+message ReplayData {
+    string nodeId = 1;
+    NodeData data = 2;
+    map<string, string> variables = 3;
+    string status = 4;
+    string message = 5;
 }
 
 message Empty {}

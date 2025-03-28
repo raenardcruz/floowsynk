@@ -3,7 +3,7 @@ import { WorkflowCanvasProps } from '../Workflow.Canvas.types'
 import { useNotif, NotifOptions, STATUS_ERROR, STATUS_INFO, STATUS_SUCCESS } from '@/components/Composable/UI/Notif'
 import { initWorkflows } from '@/components/Workflow/Process'
 import { useWorkflowStore } from '@/views/Workflow'
-import { StreamType, NodeStatus } from 'proto/floowsynk_pb'
+import { NodeStatus, RunWorkflowResponse, Node } from 'proto/floowsynk_pb'
 import {
   createProcess,
   updateProcess,
@@ -19,7 +19,8 @@ export const useWorkflowCanvasControlButtonActions = (props: WorkflowCanvasProps
   const {
     nodeStatuses,
     runningTabs,
-    replayNodes,
+    replayData,
+    showReplayData,
   } = useWorkflowCanvasStore();
   const { tab } = useWorkflowCanvasHooks(props.id);
   // Method: Save
@@ -73,6 +74,8 @@ export const useWorkflowCanvasControlButtonActions = (props: WorkflowCanvasProps
   }
 
   const runProcess = async () => {
+    showReplayData.value = false;
+    replayData.value = [];
     nodeStatuses.value = {};
     runningTabs.value.push(tab.value.id);
     let stream = await executeProcess(tab.value);
@@ -82,27 +85,27 @@ export const useWorkflowCanvasControlButtonActions = (props: WorkflowCanvasProps
       message: "Workflow started successfully: ",
       status: STATUS_INFO
     } as NotifOptions);
-    stream.on('data', (response) => {
-      switch (response.getStreamtype()) {
-        case StreamType.STATUS:
-          switch (response.getStatus()) {
-            case NodeStatus.RUNNING:
-              nodeStatuses.value[response.getNodeid()] = 'running';
-              break;
-            case NodeStatus.COMPLETED:
-              nodeStatuses.value[response.getNodeid()] = 'success';
-              break;
-            case NodeStatus.FAILED:
-              nodeStatuses.value[response.getNodeid()] = 'error';
-              break;
-          }
+    stream.on('data', (response: RunWorkflowResponse) => {
+      switch (response.getStatus()) {
+        case NodeStatus.RUNNING:
+          nodeStatuses.value[response.getNodeid()] = 'running';
           break;
-        case StreamType.REPLAY:
-          const replayNode = response.getReplaynode();
-          if (!!replayNode && replayNodes.value.findIndex((node) => node.id === replayNode?.toObject().id) === -1)
-            replayNodes.value.push(replayNode.toObject());
+        case NodeStatus.COMPLETED:
+          nodeStatuses.value[response.getNodeid()] = 'success';
+          break;
+        case NodeStatus.FAILED:
+          nodeStatuses.value[response.getNodeid()] = 'error';
           break;
       }
+      if (response.getData() != undefined) {
+        const data = response.getData()?.toObject();
+        if (data) {
+          replayData.value.push(data);
+        }
+      }
+    });
+    stream.on('end', () => {
+      showReplayData.value = true;
     });
   }
 
@@ -113,10 +116,10 @@ export const useWorkflowCanvasControlButtonActions = (props: WorkflowCanvasProps
 
   const exitRunMode = function () {
     runningTabs.value.splice(runningTabs.value.indexOf(tab.value.id), 1);
-    tab.value.nodesList.forEach((node) => {
+    tab.value.nodesList.forEach((node: Node.AsObject) => {
       nodeStatuses.value[node.id] = '';
     })
-    console.log(replayNodes.value)
+    showReplayData.value = false;
   }
 
   return {
