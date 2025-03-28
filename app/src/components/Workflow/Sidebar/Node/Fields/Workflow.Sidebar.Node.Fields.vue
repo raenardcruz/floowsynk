@@ -14,7 +14,7 @@
                 <span v-else>{{ toSentenceCase(key.toString()) }}</span>
             </legend>
             <span style="width: 100%" v-if="value.constructor == String">
-                <Teleport to=".content" v-if="modalStates[key] && MONACO_EDITOR_DATA_PROPERTIES.includes(key)">
+                <Teleport to=".content" v-if="MONACO_EDITOR_DATA_PROPERTIES.includes(key)">
                     <Modal :title="toSentenceCase(key.toString())" caption="" v-model:visible="modalStates[key]">
                         <MonacoEditor v-model="props.modelValue[key]" :variables="variables" :disabled="isRunning" />
                     </Modal>

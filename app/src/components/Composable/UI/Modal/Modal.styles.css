@@ -6,14 +6,8 @@
     justify-content: center;
     align-items: center;
     background: var(--black-translucent-2);
-    z-index: -1;
-    opacity: 0;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(4px);
-}
-.background.show {
-    opacity: 1;
     z-index: 100;
+    backdrop-filter: blur(4px);
 }
 
 .background .modal {
@@ -27,11 +21,9 @@
     border-radius: 10px;
     background: var(--white-2);
     overflow: auto;
-    animation: modalentry 0.5s;
     user-select: text;
-    transform: translateY(-50px);
-    transition: all 0.5s ease-in-out;
     box-shadow: 4px 4px 8px var(--grey-2);
+    transition-delay: 0.2s;
 }
 .background.show .modal {
     transform: translateY(0);
@@ -60,7 +52,6 @@
     cursor: pointer;
     right: 10px;
     top: 10px;
-    transition: 0.3s;
     z-index: 102;
 }
 
@@ -93,3 +84,26 @@
     background: var(--btn-red-2);
     color: var(--white-1);
 }
+
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+}
+
+.drop-enter-active,
+.drop-leave-active {
+    transition: all 0.3s ease;
+}
+
+.drop-enter-from,
+.drop-leave-to {
+    opacity: 0;
+    transform: translateY(-10px);
+}
+
+/* Ensure these classes are not scoped by Vue's scoped styles */
