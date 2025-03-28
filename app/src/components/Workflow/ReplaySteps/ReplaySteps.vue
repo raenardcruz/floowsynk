@@ -31,7 +31,7 @@ import { useFloowsynkNodeHooks } from '@/components/Workflow/Nodes/FloowsynkNode
 
 const { replayData } = useWorkflowCanvasStore()
 const props = defineProps<ReplayDataProps>()
-const { canvasId } = useFloowsynkNodeHooks(props.tabid)
+const { canvasId } = useFloowsynkNodeHooks(props.tabId)
 </script>
 
 <style scoped src="./ReplaySteps.styles.css"></style>

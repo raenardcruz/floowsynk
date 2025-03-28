@@ -46,10 +46,7 @@ export const useWorkflowCanvasHooks = (tabId: string) => {
             tab.value.edgesList = [...newEdges];
         }
     });
-    const isRunning = computed(() => {
-        console.log('isRunning changed')
-        return runningTabs.value.includes(tab.value.id);
-    });
+    const isRunning = computed(() => runningTabs.value.includes(tab.value.id));
 
     return {
         tab,
