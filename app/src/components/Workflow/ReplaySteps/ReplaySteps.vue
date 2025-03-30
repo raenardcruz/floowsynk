@@ -8,7 +8,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr v-for="(item, index) in replayData" :key="item.nodeid" @click="StepSelected(tabId, index)" :class="{'selected': selectedReplayData === index}">
+            <tr v-for="(item, index) in replayData" :key="item.nodeid" @click="StepSelected(tabId, index)" :class="{'selected': selectedReplayData === index}" ref="replayRows">
                 <td>{{ item.nodeid }}</td>
                 <td>{{ item.message }}</td>
                 <td>{{ item.status }}</td>
@@ -17,7 +17,17 @@
     </table>
     <Teleport :to="'#' + canvasId"> 
         <SideBar title="Replay Data" caption="" visible>
+            <WorkflowNodeSidebarFields nodeType="" :modelValue="replayData[selectedReplayData].nodeid" :tabid="props.tabId" />
             <WorkflowNodeSidebarFields nodeType="" v-model="selectedReplayDataData" :tabid="props.tabId" />
+            <h4>Variables</h4>
+            <table class="replay-data-table">
+                <tbody>
+                    <tr v-for="(item, index) in replayData[selectedReplayData].variablesMap" :key="index">
+                        <td>{{ item[0] }}</td>
+                        <td>{{ item[1] }}</td>
+                    </tr>
+                </tbody>
+            </table>
         </SideBar>
     </Teleport>
 </template>
@@ -30,6 +40,7 @@ import { ReplayDataProps } from './ReplaySteps.types'
 import { useFloowsynkNodeHooks } from '@/components/Workflow/Nodes/FloowsynkNode.hooks'
 import { SidebarCanvasFields as WorkflowNodeSidebarFields } from "@/components/Workflow/Sidebar"
 import { useReplayStoreHooks } from './ReplaySteps.hooks'
+import { onUpdated, ref } from 'vue';
 
 const props = defineProps<ReplayDataProps>()
     const { selectedReplayDataData } = useReplayStoreHooks(props.tabId)
@@ -38,6 +49,14 @@ const { canvasId } = useFloowsynkNodeHooks(props.tabId)
 if (replayData.value.length > 0) {
     selectedReplayData.value = 0
 }
+
+const replayRows = ref<HTMLElement[]>([]);
+
+onUpdated(() => {
+    if (selectedReplayData.value !== null && replayRows.value[selectedReplayData.value]) {
+        replayRows.value[selectedReplayData.value].scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+});
 </script>
 
 <style scoped src="./ReplaySteps.styles.css"></style>

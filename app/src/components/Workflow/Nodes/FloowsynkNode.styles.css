@@ -156,4 +156,3 @@
     background-size: 200% 200%; /* Make gradient larger than the border */
     z-index: -1; /* Place behind the node content */
 }
-

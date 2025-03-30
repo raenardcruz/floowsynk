@@ -11,7 +11,7 @@ export const useFloowsynkNodeHooks = (tabId: string) => {
 }
 
 export const useFloowsynkNodeWatchers = (tabId: string, node: GraphNode<any, any, string>, show: Ref<boolean>) => {
-    const { nodeStatuses } = useWorkflowCanvasStore(tabId);
+    const { nodeStatuses, selectedReplayData, replayData, showReplayData } = useWorkflowCanvasStore(tabId);
     watch(() => node.selected, (value) => {
         if (!value) {
             show.value = false;
@@ -29,8 +29,13 @@ export const useFloowsynkNodeWatchers = (tabId: string, node: GraphNode<any, any
         }
         return nodeStatuses.value[node.id] || '';
     })
+    const isReplayNodeSelected = computed(() => {
+        const replayNode = replayData.value[selectedReplayData.value];
+        return ((replayNode?.nodeid || '') == node.id) && showReplayData.value;
+    })
 
     return {
-        nodestatus
+        nodestatus,
+        isReplayNodeSelected,
     }
 }

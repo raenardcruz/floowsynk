@@ -1,5 +1,5 @@
 <template>
-    <div class="node no-scroll nopan" :style="nodestyle" :class="{ 'node-selected': node.selected, [nodestatus]: isRunning }"
+    <div class="node no-scroll nopan" :style="nodestyle" :class="{ 'node-selected': node.selected || isReplayNodeSelected, [nodestatus]: isRunning }"
         @click="clickHandler()">
         <div class="icon" :style="{ background: icon?.color }">
             <span class="material-symbols-outlined">{{ icon?.name }}</span>
@@ -49,7 +49,7 @@ const { node } = useNode()
 const { canvasId } = useFloowsynkNodeHooks(props.tabid)
 const showSidebar = ref(false);
 const showModal = ref(false);
-const { nodestatus } = useFloowsynkNodeWatchers(props.tabid, node, showSidebar)
+const { nodestatus, isReplayNodeSelected } = useFloowsynkNodeWatchers(props.tabid, node, showSidebar)
 const clickHandler = () => clickhandler(node, showSidebar, showModal)
 const { icon, nodetype, label, outputsList, inputsList, nodestyle } = node as unknown as Node.AsObject;
 const { isRunning } = useWorkflowCanvasStore(props.tabid)
