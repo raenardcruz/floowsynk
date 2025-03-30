@@ -227,3 +227,16 @@ func RegexReplaceAll(text, pattern, replaceText string) string {
 	re := regexp.MustCompile(pattern)
 	return re.ReplaceAllString(text, replaceText)
 }
+
+func CopyNode(n *proto.Node) proto.Node {
+	data, err := json.Marshal(n)
+	if err != nil {
+		return proto.Node{}
+	}
+	var newNode proto.Node
+	err = json.Unmarshal(data, &newNode)
+	if err != nil {
+		return proto.Node{}
+	}
+	return newNode
+}

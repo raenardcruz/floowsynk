@@ -31,7 +31,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { Handle, Position, useNode } from '@vue-flow/core';
 import { SideBar } from "@/components/Composable/UI";
 import { SidebarCanvasFields as WorkflowNodeSidebarFields } from "@/components/Workflow/Sidebar"
@@ -51,11 +51,13 @@ const showSidebar = ref(false);
 const showModal = ref(false);
 const { nodestatus } = useFloowsynkNodeWatchers(props.tabid, node, showSidebar)
 const clickHandler = () => clickhandler(node, showSidebar, showModal)
-const { icon, nodetype, label, outputsList, inputsList, nodestyle, id } = node as unknown as Node.AsObject;
+const { icon, nodetype, label, outputsList, inputsList, nodestyle } = node as unknown as Node.AsObject;
 const { isRunning } = useWorkflowCanvasStore(props.tabid)
-node.draggable = !isRunning
-node.deletable = !isRunning
-node.connectable = !isRunning
+watch(isRunning, (newValue) => {
+    node.draggable = !newValue
+    node.deletable = !newValue
+    node.connectable = !newValue
+})
 </script>
 
 <style scoped src="./FloowsynkNode.styles.css"></style>
