@@ -42,7 +42,7 @@ import { Node } from 'proto/floowsynk_pb'
 import { toSentenceCase } from "@/components/Composable/Utilities";
 import ProcessTypeModal from '@/components/Workflow/Modal/ProcessType/Workflow.Modal.ProcessType.vue'
 import { Modal } from '@/components/Composable/UI'
-import { useWorkflowCanvasHooks } from '@/components/Workflow/Canvas/Workflow.Canvas.hooks'
+import { useWorkflowCanvasStore } from '@/components/Workflow/Canvas/Workflow.Canvas.hooks'
 
 const props = defineProps<NodeProps>();
 const { node } = useNode()
@@ -52,7 +52,7 @@ const showModal = ref(false);
 const { nodestatus } = useFloowsynkNodeWatchers(props.tabid, node, showSidebar)
 const clickHandler = () => clickhandler(node, showSidebar, showModal)
 const { icon, nodetype, label, outputsList, inputsList, nodestyle, id } = node as unknown as Node.AsObject;
-const { isRunning } = useWorkflowCanvasHooks(props.tabid)
+const { isRunning } = useWorkflowCanvasStore(props.tabid)
 node.draggable = !isRunning
 node.deletable = !isRunning
 node.connectable = !isRunning

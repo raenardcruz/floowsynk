@@ -2,12 +2,11 @@ import { useWorkflowCanvasHooks, useWorkflowCanvasStore } from '../Workflow.Canv
 import { MAX_HISTORY_SIZE } from '../Workflow.canvas.constants'
 import { generateUUID } from '@/components/Composable/Utilities';
 
-const {
-  undoStack,
-  redoStack,
-  mousePosition } = useWorkflowCanvasStore();
-
 export const useWorkflowCanvasHelperMethods = (tabId: string, vueFlowInstance: any) => {
+  const {
+    undoStack,
+    redoStack,
+    mousePosition } = useWorkflowCanvasStore(tabId);
   const { tab } = useWorkflowCanvasHooks(tabId);
   // Method: Save State
   const saveState = () => {

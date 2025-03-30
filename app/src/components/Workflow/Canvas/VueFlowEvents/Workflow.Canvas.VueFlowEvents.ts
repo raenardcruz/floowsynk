@@ -1,4 +1,4 @@
-import { useWorkflowCanvasHooks, useWorkflowCanvasStore } from '../Workflow.Canvas.hooks';
+import { useWorkflowCanvasHooks, useWorkflowCanvasStore, useWorkflowCanvasGlbalStore } from '../Workflow.Canvas.hooks';
 import { WorkflowCanvasProps } from '../Workflow.Canvas.types';
 import { useWorkflowCanvasHelperMethods } from '../Helper/Workflow.Canvas.Helper'
 import { useWorkflowStore } from '@/views/Workflow';
@@ -10,12 +10,15 @@ const { draggedNode } = useSidebarCanvasStore();
 
 export const useWorkflowCanvasVueFlowEvents = (props: WorkflowCanvasProps, vueFlowInstance: any) => {
     const { activeTab } = useWorkflowStore();
-    const { tab, isRunning } = useWorkflowCanvasHooks(props.id);
+    const { tab } = useWorkflowCanvasHooks(props.id);
     const { saveState } = useWorkflowCanvasHelperMethods(props.id, vueFlowInstance);
     const {
-      isDragOver,
       mousePosition,
-  } = useWorkflowCanvasStore();
+      selectedReplayData,
+      replayData,
+      isRunning,
+  } = useWorkflowCanvasStore(props.id);
+  const { isDragOver, } = useWorkflowCanvasGlbalStore();
   
     // Method: On Connect Edge
     const onConnectEdge = (edge: any) => {
@@ -111,6 +114,7 @@ export const useWorkflowCanvasVueFlowEvents = (props: WorkflowCanvasProps, vueFl
         redo,
         paste
       } = useWorkflowCanvasKeyboardActions(props, vueFlowInstance);
+      console.log(event.key)
       switch (event.key) {
         case 'z':
           if (isRunning.value) return;
@@ -145,6 +149,14 @@ export const useWorkflowCanvasVueFlowEvents = (props: WorkflowCanvasProps, vueFl
           } else {
               throw new Error(`Tab nodes not found for id ${tab.value.id}`);
           }
+          break;
+        case 'ArrowUp':
+          if (selectedReplayData.value > 0)
+            selectedReplayData.value--;
+          break;
+        case 'ArrowDown':
+          if (selectedReplayData.value < replayData.value.length - 1)
+            selectedReplayData.value++;
           break;
       }
     }

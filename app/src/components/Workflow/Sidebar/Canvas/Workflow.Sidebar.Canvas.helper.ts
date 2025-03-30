@@ -1,5 +1,5 @@
 import { useSidebarCanvasStore } from './Workflow.Sidebar.Canvas.hooks'
-import { useWorkflowCanvasStore } from '@/components/Workflow/Canvas'
+import { useWorkflowCanvasGlbalStore } from '@/components/Workflow/Canvas/Workflow.Canvas.hooks'
 import { nodes } from '@/components/Workflow/Nodes'
 import { Node } from 'proto/floowsynk_pb'
 
@@ -15,7 +15,7 @@ export const onDragEnd = () => {
     const {
         draggedNode,
     } = useSidebarCanvasStore();
-    const { isDragOver } = useWorkflowCanvasStore();
+    const { isDragOver } = useWorkflowCanvasGlbalStore();
     isDragOver.value = false
     draggedNode.value = null
     document.removeEventListener('drop', onDragEnd)

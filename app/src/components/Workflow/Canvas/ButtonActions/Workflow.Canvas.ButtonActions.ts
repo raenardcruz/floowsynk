@@ -18,10 +18,10 @@ export const useWorkflowCanvasControlButtonActions = (props: WorkflowCanvasProps
   } = useWorkflowStore();
   const {
     nodeStatuses,
-    runningTabs,
     replayData,
     showReplayData,
-  } = useWorkflowCanvasStore();
+    isRunning,
+  } = useWorkflowCanvasStore(props.id);
   const { tab } = useWorkflowCanvasHooks(props.id);
   // Method: Save
   const saveProcess = async () => {
@@ -77,7 +77,7 @@ export const useWorkflowCanvasControlButtonActions = (props: WorkflowCanvasProps
     showReplayData.value = false;
     replayData.value = [];
     nodeStatuses.value = {};
-    runningTabs.value.push(tab.value.id);
+    isRunning.value = true;
     let stream = await executeProcess(tab.value);
     useNotif({
       duration: 5000,
@@ -115,7 +115,7 @@ export const useWorkflowCanvasControlButtonActions = (props: WorkflowCanvasProps
   };
 
   const exitRunMode = function () {
-    runningTabs.value.splice(runningTabs.value.indexOf(tab.value.id), 1);
+    isRunning.value = false;
     tab.value.nodesList.forEach((node: Node.AsObject) => {
       nodeStatuses.value[node.id] = '';
     })

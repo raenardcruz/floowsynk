@@ -1,7 +1,6 @@
 import { GraphNode } from '@vue-flow/core';
 import { Ref, computed, watch } from 'vue'
 import { useWorkflowCanvasStore } from '@/components/Workflow/Canvas'
-import { useWorkflowCanvasHooks } from '@/components/Workflow/Canvas/Workflow.Canvas.hooks'
 
 export const useFloowsynkNodeHooks = (tabId: string) => {
     const canvasId = btoa(tabId);
@@ -12,8 +11,7 @@ export const useFloowsynkNodeHooks = (tabId: string) => {
 }
 
 export const useFloowsynkNodeWatchers = (tabId: string, node: GraphNode<any, any, string>, show: Ref<boolean>) => {
-    const { nodeStatuses, selectedReplayData } = useWorkflowCanvasStore();
-    const { isRunning } = useWorkflowCanvasHooks(tabId)
+    const { nodeStatuses } = useWorkflowCanvasStore(tabId);
     watch(() => node.selected, (value) => {
         if (!value) {
             show.value = false;

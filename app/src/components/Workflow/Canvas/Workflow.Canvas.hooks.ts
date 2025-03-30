@@ -3,32 +3,34 @@ import { useTab } from '@/views/Workflow'
 import { DenormalizeVueFlowObject } from '@/components/Composable/protoTransformers'
 import { ReplayData } from 'proto/floowsynk_pb'
 
+// Global Refs
 const isDragOver = ref(false);
 const clipBoard = ref({
-  nodes: [] as any[],
-  edges: [] as any[],
-});
-const mousePosition = ref({ x: 0, y: 0 });
-const runningTabs = ref<string[]>([]);
-const undoStack = ref<{ nodes: any[], edges: any[] }[]>([]);
-const redoStack = ref<{ nodes: any[], edges: any[] }[]>([]);
-const nodeStatuses = ref<Record<string, string>>({});
-const replayData =ref<ReplayData.AsObject[]>([]);
-const selectedReplayData = ref<ReplayData.AsObject | null>(null);
-const showReplayData = ref(false);
+    nodes: [] as any[],
+    edges: [] as any[],
+})
+const tabStores: Record<string, any> = {}; 
 
-export const useWorkflowCanvasStore= () => {
+export const useWorkflowCanvasStore = (tabId: string) => {
+    if (!tabStores[tabId]) {
+        tabStores[tabId] = {
+            mousePosition: ref({ x: 0, y: 0 }),
+            isRunning: ref(false),
+            undoStack: ref<{ nodes: any[], edges: any[] }[]>([]),
+            redoStack: ref<{ nodes: any[], edges: any[] }[]>([]),
+            nodeStatuses: ref<Record<string, string>>({}),
+            replayData: ref<ReplayData.AsObject[]>([]),
+            selectedReplayData: ref<number>(0),
+            showReplayData: ref(false),
+        };
+    }
+
+    return tabStores[tabId];
+};
+export const useWorkflowCanvasGlbalStore = () => {
     return {
         isDragOver,
         clipBoard,
-        mousePosition,
-        runningTabs,
-        undoStack,
-        redoStack,
-        nodeStatuses,
-        replayData,
-        selectedReplayData,
-        showReplayData,
     }
 }
 export const useWorkflowCanvasHooks = (tabId: string) => {
@@ -46,13 +48,11 @@ export const useWorkflowCanvasHooks = (tabId: string) => {
             tab.value.edgesList = [...newEdges];
         }
     });
-    const isRunning = computed(() => runningTabs.value.includes(tab.value.id));
 
     return {
         tab,
         canvasId,
         node,
         edge,
-        isRunning,
     }
 }

@@ -6,8 +6,12 @@
     text-align: left;
 }
 .replay-data-table th, .replay-data-table td {
-    border: 1px solid #ddd;
     padding: 8px;
+    cursor: pointer;
+}
+.replay-data-table tr.selected {
+color: var(--blue-3);
+font-weight: bold;
 }
 .replay-data-table th {
     background-color: #f4f4f4;

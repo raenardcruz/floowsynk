@@ -83,7 +83,7 @@ import { ref } from 'vue';
 import type { Node, Edge } from '@vue-flow/core';
 import { VueFlow, useVueFlow } from '@vue-flow/core';
 import { WorkflowCanvasProps } from './Workflow.Canvas.types'
-import { useWorkflowCanvasHooks, useWorkflowCanvasStore } from './Workflow.Canvas.hooks'
+import { useWorkflowCanvasHooks, useWorkflowCanvasStore, useWorkflowCanvasGlbalStore } from './Workflow.Canvas.hooks'
 import { useWorkflowCanvasVueFlowEvents } from './VueFlowEvents/Workflow.Canvas.VueFlowEvents'
 import { useWorkflowCanvasControlButtonActions } from './ButtonActions/Workflow.Canvas.ButtonActions'
 import { SidebarCanvas } from '@/components/Workflow/Sidebar'
@@ -98,7 +98,7 @@ import CustomEdge from '@/components/Workflow/Edges/CustomEdge.vue'
 import ReplaySteps from '../ReplaySteps';
 
 const props = defineProps<WorkflowCanvasProps>()
-const { tab, canvasId, node, edge, isRunning } = useWorkflowCanvasHooks(props.id)
+const { tab, canvasId, node, edge } = useWorkflowCanvasHooks(props.id)
 const show = ref(false);
 const { addTag, removeTag } = useWorkflowCanvasHelperMethods(props.id, useVueFlow())
 const {
@@ -113,9 +113,10 @@ const {
 } = useWorkflowCanvasVueFlowEvents(props, useVueFlow())
 const { resetTransform, removeProcess, saveProcess, runProcess, exitRunMode } = useWorkflowCanvasControlButtonActions(props, useVueFlow())
 const { 
-    isDragOver,
     showReplayData,
-} = useWorkflowCanvasStore()
+    isRunning,
+} = useWorkflowCanvasStore(props.id)
+const { isDragOver } = useWorkflowCanvasGlbalStore()
 </script>
 
 <style scoped src="./Workflow.Canvas.styles.css"></style>
