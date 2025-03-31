@@ -17,12 +17,12 @@
 import { BaseEdge, EdgeLabelRenderer, useVueFlow } from '@vue-flow/core'
 import { CustomEdgeProps } from './CustomEdge.types'
 import { useCustomEdgeHooks } from './CustomEdge.hooks'
-import { useWorkflowCanvasHooks } from '@/components/Workflow/Canvas/Workflow.Canvas.hooks'
+import { useWorkflowCanvasStore } from '@/components/Workflow/Canvas/Workflow.Canvas.hooks'
 
 const props = defineProps<CustomEdgeProps>()
 const { removeEdges } = useVueFlow()
 const { path, edgeStyling } = useCustomEdgeHooks(props)
-const { isRunning } = useWorkflowCanvasHooks(props.tabId)
+const { isRunning } = useWorkflowCanvasStore(props.tabId)
 </script>
 
 <style scoped src='./CustomEdge.styles.css'></style>

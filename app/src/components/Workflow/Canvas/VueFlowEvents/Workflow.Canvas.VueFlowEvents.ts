@@ -1,21 +1,25 @@
-import { useWorkflowCanvasHooks, useWorkflowCanvasStore } from '../Workflow.Canvas.hooks';
+import { useWorkflowCanvasHooks, useWorkflowCanvasStore, useWorkflowCanvasGlbalStore } from '../Workflow.Canvas.hooks';
 import { WorkflowCanvasProps } from '../Workflow.Canvas.types';
 import { useWorkflowCanvasHelperMethods } from '../Helper/Workflow.Canvas.Helper'
 import { useWorkflowStore } from '@/views/Workflow';
 import { generateUUID } from '@/components/Composable/Utilities';
 import { useWorkflowCanvasKeyboardActions } from '../KeyboardActions/Workflow.Canvas.KeyboardActions';
 import { useSidebarCanvasStore } from '@/components/Workflow/Sidebar/Canvas/Workflow.Sidebar.Canvas.hooks';
+import { watch } from 'vue';
 
 const { draggedNode } = useSidebarCanvasStore();
 
 export const useWorkflowCanvasVueFlowEvents = (props: WorkflowCanvasProps, vueFlowInstance: any) => {
     const { activeTab } = useWorkflowStore();
-    const { tab, isRunning } = useWorkflowCanvasHooks(props.id);
+    const { tab } = useWorkflowCanvasHooks(props.id);
     const { saveState } = useWorkflowCanvasHelperMethods(props.id, vueFlowInstance);
     const {
-      isDragOver,
       mousePosition,
-  } = useWorkflowCanvasStore();
+      selectedReplayData,
+      replayData,
+      isRunning,
+  } = useWorkflowCanvasStore(props.id);
+  const { isDragOver, } = useWorkflowCanvasGlbalStore();
   
     // Method: On Connect Edge
     const onConnectEdge = (edge: any) => {
@@ -146,8 +150,64 @@ export const useWorkflowCanvasVueFlowEvents = (props: WorkflowCanvasProps, vueFl
               throw new Error(`Tab nodes not found for id ${tab.value.id}`);
           }
           break;
+        case 'ArrowUp':
+          if (selectedReplayData.value > 0)
+            selectedReplayData.value--;
+          break;
+        case 'ArrowDown':
+          if (selectedReplayData.value < replayData.value.length - 1)
+            selectedReplayData.value++;
+          break;
       }
     }
+
+    watch(selectedReplayData, (newValue) => {
+      if (newValue >= 0 && newValue < replayData.value.length) {
+        const nodeId = replayData.value[newValue]?.nodeid;
+        if (!nodeId) return;
+    
+        const node = tab.value.nodesList?.find((n: any) => n.id === nodeId);
+        if (!node) {
+          console.warn(`Node with ID ${nodeId} not found`);
+          return;
+        }
+    
+        const { setViewport } = vueFlowInstance;
+        const targetPosition = {
+          x: node.position?.x ?? 0,
+          y: node.position?.y ?? 0,
+        };
+
+        const currentViewport = vueFlowInstance.getViewport();
+        const animationDuration = 300;
+        const frameRate = 60;
+        const totalFrames = (animationDuration / 1000) * frameRate;
+        const deltaX = (-targetPosition.x - currentViewport.x) / totalFrames;
+        const deltaY = (-targetPosition.y - currentViewport.y) / totalFrames;
+        const deltaZoom = (1.5 - currentViewport.zoom) / totalFrames;
+
+        let frame = 0;
+        const animate = () => {
+          if (frame < totalFrames) {
+            setViewport({
+              x: currentViewport.x + deltaX * frame,
+              y: currentViewport.y + deltaY * frame,
+              zoom: currentViewport.zoom + deltaZoom * frame,
+            });
+            frame++;
+            requestAnimationFrame(animate);
+          } else {
+            setViewport({
+              x: -targetPosition.x,
+              y: -targetPosition.y,
+              zoom: 1.5,
+            });
+          }
+        };
+
+        animate();
+      }
+    });
   
     return {
       onConnectEdge,

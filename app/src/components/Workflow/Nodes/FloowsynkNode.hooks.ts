@@ -1,7 +1,6 @@
 import { GraphNode } from '@vue-flow/core';
 import { Ref, computed, watch } from 'vue'
 import { useWorkflowCanvasStore } from '@/components/Workflow/Canvas'
-import { useWorkflowCanvasHooks } from '@/components/Workflow/Canvas/Workflow.Canvas.hooks'
 
 export const useFloowsynkNodeHooks = (tabId: string) => {
     const canvasId = btoa(tabId);
@@ -12,8 +11,7 @@ export const useFloowsynkNodeHooks = (tabId: string) => {
 }
 
 export const useFloowsynkNodeWatchers = (tabId: string, node: GraphNode<any, any, string>, show: Ref<boolean>) => {
-    const { nodeStatuses, replayNodes } = useWorkflowCanvasStore();
-    const { isRunning } = useWorkflowCanvasHooks(tabId)
+    const { nodeStatuses, selectedReplayData, replayData, showReplayData } = useWorkflowCanvasStore(tabId);
     watch(() => node.selected, (value) => {
         if (!value) {
             show.value = false;
@@ -31,29 +29,13 @@ export const useFloowsynkNodeWatchers = (tabId: string, node: GraphNode<any, any
         }
         return nodeStatuses.value[node.id] || '';
     })
-
-
-    const nodeData = computed({
-        get() {
-            if (!isRunning.value) {
-                return node.data;
-            } else {
-                if (replayNodes.value.findIndex(f => f.id === node.id) !== -1) {
-                    return replayNodes.value.find(f => f.id === node.id)?.data ?? node.data;
-                } else {
-                    return node.data;
-                }
-            }
-        },
-        set(value) {
-            if (!isRunning.value) {
-                node.data = value;
-            }
-        }
+    const isReplayNodeSelected = computed(() => {
+        const replayNode = replayData.value[selectedReplayData.value];
+        return ((replayNode?.nodeid || '') == node.id) && showReplayData.value;
     })
 
     return {
         nodestatus,
-        nodeData
+        isReplayNodeSelected,
     }
 }

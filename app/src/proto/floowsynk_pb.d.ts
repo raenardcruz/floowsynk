@@ -6,26 +6,13 @@ export class RunWorkflowResponse extends jspb.Message {
   getNodeid(): string;
   setNodeid(value: string): RunWorkflowResponse;
 
-  getStreamtype(): StreamType;
-  setStreamtype(value: StreamType): RunWorkflowResponse;
-
-  getReplaynode(): Node | undefined;
-  setReplaynode(value?: Node): RunWorkflowResponse;
-  hasReplaynode(): boolean;
-  clearReplaynode(): RunWorkflowResponse;
-
-  getLogmessage(): string;
-  setLogmessage(value: string): RunWorkflowResponse;
-
   getStatus(): NodeStatus;
   setStatus(value: NodeStatus): RunWorkflowResponse;
-  hasStatus(): boolean;
-  clearStatus(): RunWorkflowResponse;
 
-  getLogstatus(): LogStatus;
-  setLogstatus(value: LogStatus): RunWorkflowResponse;
-  hasLogstatus(): boolean;
-  clearLogstatus(): RunWorkflowResponse;
+  getData(): ReplayData | undefined;
+  setData(value?: ReplayData): RunWorkflowResponse;
+  hasData(): boolean;
+  clearData(): RunWorkflowResponse;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): RunWorkflowResponse.AsObject;
@@ -38,26 +25,49 @@ export class RunWorkflowResponse extends jspb.Message {
 export namespace RunWorkflowResponse {
   export type AsObject = {
     nodeid: string,
-    streamtype: StreamType,
-    replaynode?: Node.AsObject,
-    logmessage: string,
-    status?: NodeStatus,
-    logstatus?: LogStatus,
+    status: NodeStatus,
+    data?: ReplayData.AsObject,
   }
 
-  export enum ReplaynodeCase { 
-    _REPLAYNODE_NOT_SET = 0,
-    REPLAYNODE = 3,
+  export enum DataCase { 
+    _DATA_NOT_SET = 0,
+    DATA = 3,
   }
+}
 
-  export enum StatusCase { 
-    _STATUS_NOT_SET = 0,
-    STATUS = 5,
-  }
+export class ReplayData extends jspb.Message {
+  getNodeid(): string;
+  setNodeid(value: string): ReplayData;
 
-  export enum LogstatusCase { 
-    _LOGSTATUS_NOT_SET = 0,
-    LOGSTATUS = 6,
+  getData(): NodeData | undefined;
+  setData(value?: NodeData): ReplayData;
+  hasData(): boolean;
+  clearData(): ReplayData;
+
+  getVariablesMap(): jspb.Map<string, string>;
+  clearVariablesMap(): ReplayData;
+
+  getStatus(): string;
+  setStatus(value: string): ReplayData;
+
+  getMessage(): string;
+  setMessage(value: string): ReplayData;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ReplayData.AsObject;
+  static toObject(includeInstance: boolean, msg: ReplayData): ReplayData.AsObject;
+  static serializeBinaryToWriter(message: ReplayData, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ReplayData;
+  static deserializeBinaryFromReader(message: ReplayData, reader: jspb.BinaryReader): ReplayData;
+}
+
+export namespace ReplayData {
+  export type AsObject = {
+    nodeid: string,
+    data?: NodeData.AsObject,
+    variablesMap: Array<[string, string]>,
+    status: string,
+    message: string,
   }
 }
 
@@ -968,19 +978,8 @@ export enum ArrayDataType {
   BOOL = 2,
   KEYVALUE = 3,
 }
-export enum StreamType { 
-  REPLAY = 0,
-  LOGS = 1,
-  STATUS = 2,
-}
 export enum NodeStatus { 
-  PENDING = 0,
-  RUNNING = 1,
-  COMPLETED = 2,
-  FAILED = 3,
-}
-export enum LogStatus { 
-  INFO = 0,
-  WARN = 1,
-  ERROR = 2,
+  RUNNING = 0,
+  COMPLETED = 1,
+  FAILED = 2,
 }

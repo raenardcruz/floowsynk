@@ -1,15 +1,14 @@
-import { useWorkflowCanvasHooks, useWorkflowCanvasStore } from '../Workflow.Canvas.hooks';
+import { useWorkflowCanvasHooks, useWorkflowCanvasStore, useWorkflowCanvasGlbalStore } from '../Workflow.Canvas.hooks';
 import { WorkflowCanvasProps } from '../Workflow.Canvas.types'
 import { useWorkflowCanvasHelperMethods } from '../Helper/Workflow.Canvas.Helper';
 import { generateUUID } from '@/components/Composable/Utilities';
 
-const {
-    undoStack,
-    redoStack,
-    clipBoard } = useWorkflowCanvasStore();
-
 export const useWorkflowCanvasKeyboardActions = (props: WorkflowCanvasProps, vueFlowInstance: any) => {
+  const {
+    undoStack,
+    redoStack } = useWorkflowCanvasStore(props.id);
   const { tab } = useWorkflowCanvasHooks(props.id);
+  const { clipBoard } = useWorkflowCanvasGlbalStore();
   // Method: Copy
   const undo = () => {
     if (undoStack.value.length === 0) return;
@@ -62,7 +61,7 @@ export const useWorkflowCanvasKeyboardActions = (props: WorkflowCanvasProps, vue
       y: clipBoard.value.nodes[0].position.y
     };
 
-    clipBoard.value.nodes.forEach((nodeClip, index) => {
+    clipBoard.value.nodes.forEach((nodeClip: any, index: number) => {
       const position = calculateNodePosition(nodeClip, index, referencePos);
       if (!position) return;
 

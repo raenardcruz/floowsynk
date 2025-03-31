@@ -14,7 +14,7 @@
                 <span v-else>{{ toSentenceCase(key.toString()) }}</span>
             </legend>
             <span style="width: 100%" v-if="value.constructor == String">
-                <Teleport to=".content" v-if="modalStates[key] && MONACO_EDITOR_DATA_PROPERTIES.includes(key)">
+                <Teleport to=".content" v-if="MONACO_EDITOR_DATA_PROPERTIES.includes(key)">
                     <Modal :title="toSentenceCase(key.toString())" caption="" v-model:visible="modalStates[key]">
                         <MonacoEditor v-model="props.modelValue[key]" :variables="variables" :disabled="isRunning" />
                     </Modal>
@@ -66,7 +66,7 @@ import { toSentenceCase } from '@/components/Composable/Utilities'
 import { showModal, useSidebarNodeFieldsHelper, inputHandler } from './Workflow.Sidebar.Node.helper'
 import { EMIT_MODEL, MONACO_EDITOR_DATA_PROPERTIES } from './Workflow.Sidebar.Node.Fields.constants'
 import { NodeDataArray, ArrayDataType } from 'proto/floowsynk_pb'
-import { useWorkflowCanvasHooks } from '@/components/Workflow/Canvas/Workflow.Canvas.hooks'
+import { useWorkflowCanvasStore } from '@/components/Workflow/Canvas/Workflow.Canvas.hooks'
 
 const props = defineProps<SidebarNodeProps>()
 const emit = defineEmits([EMIT_MODEL])
@@ -96,7 +96,7 @@ const getArrayData = (obj: NodeDataArray.AsObject): any[] => {
             return []
     }
 }
-const { isRunning } = useWorkflowCanvasHooks(props.tabid)
+const { isRunning } = useWorkflowCanvasStore(props.tabid)
 </script>
 
 <style scoped src="./Workflow.Sidebar.Node.Fields.styles.css"></style>

@@ -13,7 +13,7 @@ export const useCustomEdgeHooks = (props: CustomEdgeProps) => {
         targetPosition: props.targetPosition as any,
     }))
     const edgeStyling = computed(() => {
-        const { nodeStatuses } = useWorkflowCanvasStore();
+        const { nodeStatuses } = useWorkflowCanvasStore(props.tabId);
         const sourceStatus = nodeStatuses.value[props.source];
         const targetStatus = nodeStatuses.value[props.target];
         const isExecuted = !!sourceStatus && !!targetStatus;

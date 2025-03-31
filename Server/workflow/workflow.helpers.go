@@ -13,29 +13,29 @@ import (
 	"github.com/raenardcruz/floowsynk/proto"
 )
 
-func (wp *WorkflowProcessor) Log(nodeId string, message string, level proto.LogStatus) {
-	wp.Stream.Send(&proto.RunWorkflowResponse{
-		NodeId:     nodeId,
-		LogStatus:  &level,
-		LogMessage: message,
-		StreamType: proto.StreamType_LOGS,
-	})
+func (wp *WorkflowProcessor) UpdateStatus(node *proto.Node, status proto.NodeStatus, nodeData *proto.NodeData, message string, includeReplayData bool) {
+	res := &proto.RunWorkflowResponse{
+		NodeId: node.Id,
+		Status: status,
+	}
+	if includeReplayData {
+		res.Data = &proto.ReplayData{
+			NodeId:    node.Id,
+			Variables: wp.getVariableMapString(),
+			Data:      nodeData,
+			Status:    getStatusString(status),
+			Message:   message,
+		}
+	}
+	wp.Stream.Send(res)
 }
 
-func (wp *WorkflowProcessor) SendReplay(replayNode *proto.Node) {
-	wp.Stream.Send(&proto.RunWorkflowResponse{
-		NodeId:     replayNode.Id,
-		StreamType: proto.StreamType_REPLAY,
-		ReplayNode: replayNode,
-	})
-}
-
-func (wp *WorkflowProcessor) UpdateStatus(nodeId string, status proto.NodeStatus) {
-	wp.Stream.Send(&proto.RunWorkflowResponse{
-		NodeId:     nodeId,
-		Status:     &status,
-		StreamType: proto.StreamType_STATUS,
-	})
+func (wp *WorkflowProcessor) getVariableMapString() map[string]string {
+	variableMap := make(map[string]string)
+	for k, v := range wp.ProcessVariables {
+		variableMap[k] = fmt.Sprintf("%v", v)
+	}
+	return variableMap
 }
 
 func (wp *WorkflowProcessor) updateNodeCurrentValue(node *proto.Node, newValue interface{}) {
@@ -76,6 +76,19 @@ func (wp *WorkflowProcessor) nextProcess(nodeId string, sourceHandle string) err
 		}
 	}
 	return nil
+}
+
+func getStatusString(status proto.NodeStatus) string {
+	switch status {
+	case proto.NodeStatus_RUNNING:
+		return "Running"
+	case proto.NodeStatus_COMPLETED:
+		return "Success"
+	case proto.NodeStatus_FAILED:
+		return "Failed"
+	default:
+		return "Unknown"
+	}
 }
 
 func getNodeById(n []*proto.Node, id string) (*proto.Node, bool) {
@@ -213,4 +226,17 @@ func getAllJSONPaths(jsonObj interface{}) ([]string, error) {
 func RegexReplaceAll(text, pattern, replaceText string) string {
 	re := regexp.MustCompile(pattern)
 	return re.ReplaceAllString(text, replaceText)
+}
+
+func CopyNode(n *proto.Node) proto.Node {
+	data, err := json.Marshal(n)
+	if err != nil {
+		return proto.Node{}
+	}
+	var newNode proto.Node
+	err = json.Unmarshal(data, &newNode)
+	if err != nil {
+		return proto.Node{}
+	}
+	return newNode
 }

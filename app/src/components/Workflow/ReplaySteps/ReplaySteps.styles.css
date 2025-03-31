@@ -1,0 +1,25 @@
+.replay-data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 16px;
+    text-align: left;
+}
+.replay-data-table th, .replay-data-table td {
+    padding: 8px;
+    cursor: pointer;
+}
+.replay-data-table tr.selected {
+color: var(--blue-3);
+font-weight: bold;
+}
+.replay-data-table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+}
+.replay-data-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+.replay-data-table tr:hover {
+    background-color: #f1f1f1;
+}
