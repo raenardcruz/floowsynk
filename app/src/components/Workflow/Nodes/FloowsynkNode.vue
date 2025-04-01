@@ -51,12 +51,19 @@ const showSidebar = ref(false)
 const showModal = ref(false)
 const { nodestatus, isReplayNodeSelected } = useFloowsynkNodeWatchers(props.tabid, node, showSidebar)
 const clickHandler = () => clickhandler(node, showSidebar, showModal)
-const { icon, nodetype, label, outputsList, inputsList, nodestyle } = node as unknown as Node.AsObject
+let { icon, nodetype, label, outputsList, inputsList, nodestyle } = node as unknown as Node.AsObject
 const { isRunning } = useWorkflowCanvasStore(props.tabid)
 watch(isRunning, (newValue) => {
     node.draggable = !newValue
     node.deletable = !newValue
     node.connectable = !newValue
+})
+watch(node, (newValue) => {
+    if (newValue.id === '0') {
+        nodetype = (newValue as unknown as Node.AsObject).nodetype
+        icon    = (newValue as unknown as Node.AsObject).icon
+        nodestyle = (newValue as unknown as Node.AsObject).nodestyle
+    }
 })
 </script>
 

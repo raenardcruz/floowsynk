@@ -160,7 +160,6 @@ export const useWorkflowCanvasVueFlowEvents = (props: WorkflowCanvasProps, vueFl
       const totalFrames = (animationDuration / 1000) * frameRate
       const deltaX = (-targetPosition.x - currentViewport.x) / totalFrames
       const deltaY = (-targetPosition.y - currentViewport.y) / totalFrames
-      const deltaZoom = (1.5 - currentViewport.zoom) / totalFrames
 
       let frame = 0
       const animate = () => {
@@ -168,7 +167,7 @@ export const useWorkflowCanvasVueFlowEvents = (props: WorkflowCanvasProps, vueFl
           setViewport({
             x: currentViewport.x + deltaX * frame,
             y: currentViewport.y + deltaY * frame,
-            zoom: currentViewport.zoom + deltaZoom * frame,
+            zoom: 1.5,
           })
           frame++
           requestAnimationFrame(animate)

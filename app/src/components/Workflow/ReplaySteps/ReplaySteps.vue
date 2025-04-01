@@ -33,6 +33,7 @@
 </template>
 
 <script setup lang="ts">
+import { watch } from 'vue'
 import { useWorkflowCanvasStore } from '@/components/Workflow/Canvas/Workflow.Canvas.hooks'
 import { StepSelected } from './ReplaySteps.helper'
 import { SideBar } from "@/components/Composable/UI"
@@ -48,6 +49,12 @@ const { canvasId } = useFloowsynkNodeHooks(props.tabId)
 if (replayData.value.length > 0) {
     selectedReplayData.value = 0
 }
+watch(selectedReplayData, () => {
+    const selectedElement = document.querySelector('.selected');
+    if (selectedElement) {
+        selectedElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+})
 </script>
 
 <style scoped src="./ReplaySteps.styles.css"></style>
