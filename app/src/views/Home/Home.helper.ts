@@ -8,7 +8,7 @@ const { appDrawer } = useAppDrawerStore()
 
 export const pageInit = () => {
     const isIdle = useIdle(INACTIVITY_TIMEOUT)
-    const { pause } = useIntervalFn(() => {
+    const { pause, resume } = useIntervalFn(() => {
         if (!isIdle.idle.value) {
             extendSession()
         }
@@ -17,6 +17,8 @@ export const pageInit = () => {
         if (newValue) {
             pause()
             logout()
+        } else {
+            resume()
         }
     })
 }

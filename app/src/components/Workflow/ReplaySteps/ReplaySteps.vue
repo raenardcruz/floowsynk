@@ -1,7 +1,7 @@
 <template>
     <div v-bind="containerProps" class="replay-data-container">
         <div v-bind="wrapperProps">
-            <div v-for="(item, index) in list" :key="index" @click="StepSelected(props.tabId, index)" class="replay-data-row" :class="{'selected': selectedReplayData === item.index}">
+            <div v-for="(item, index) in list" :key="index" @click="StepSelected(props.tabId, item.index)" class="replay-data-row" :class="{'selected': selectedReplayData === item.index}">
                 <div class="replay-data-nodeid">{{ item.data.nodeid }}</div>
                 <div class="replay-data-message">{{ item.data.message }}</div>
                 <div class="replay-data-status" :class="item.data.status">{{ item.data.status }}</div>
