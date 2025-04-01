@@ -1,13 +1,14 @@
 import { ref, computed } from 'vue'
 import { useTab } from '@/views/Workflow'
+import { createGlobalState } from '@vueuse/core'
 
-const showTooltip = ref(false)
-
-export const useProcessTypeStore = () => {
+export const useProcessTypeStore = createGlobalState(() => {
+    const showTooltip = ref(false)
+    
     return {
         showTooltip
     }
-}
+})
 
 export const useProcessTypeHooks = (tabId: string) => {
     const { tab } = useTab(tabId)

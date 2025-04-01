@@ -3,7 +3,7 @@ import { useWorkflowCanvasHooks } from '@/components/Workflow/Canvas/Workflow.Ca
 import { startNodes } from '@/components/Workflow/Nodes'
 import { useProcessTypeHooks, useProcessTypeStore } from './Workflow.Modal.ProcessTab.hooks'
 import { Node } from 'proto/floowsynk_pb'
-import { useCloned } from '@vueuse/core'
+import { useCloned, useClipboard, useTimeoutFn } from '@vueuse/core'
 
 export const useProcessTypeHelpers = (tabId: string) => {
     const { tab } = useTab(tabId)
@@ -27,12 +27,13 @@ export const useProcessTypeHelpers = (tabId: string) => {
 }
 
 export const copyToClipboard = async (tabId: string) => {
+    const { copy } = useClipboard()
     const { showTooltip } = useProcessTypeStore()
     const { webhookUrl } = useProcessTypeHooks(tabId)
     try {
-        await navigator.clipboard.writeText(webhookUrl.value)
+        copy(webhookUrl.value)
         showTooltip.value = true
-        setTimeout(() => {
+        useTimeoutFn(() => {
             showTooltip.value = false
         }, 2000)
     } catch (err) {
