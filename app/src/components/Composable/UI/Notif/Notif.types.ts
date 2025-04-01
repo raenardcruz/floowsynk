@@ -1,6 +1,6 @@
 export type NotifOptions = {
-    teleportTarget?: string;
-    message: string;
-    duration?: number;
-    type?: "success" | "error" | "info";
+    teleportTarget?: string
+    message: string
+    duration?: number
+    type?: "success" | "error" | "info"
   }

@@ -48,7 +48,7 @@ const {
 const {
     showActions,
     visible,
-} = useModalHooks(props, emit);
+} = useModalHooks(props, emit)
 </script>
 
 <style scoped src="./Modal.styles.css"></style>

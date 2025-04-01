@@ -1,4 +1,4 @@
-export const EMIT_MODEL = 'update:modelValue';
+export const EMIT_MODEL = 'update:modelValue'
 
 export const MONACO_EDITOR_DATA_PROPERTIES = [
     "value",
@@ -13,4 +13,4 @@ export const MONACO_EDITOR_DATA_PROPERTIES = [
     "text",
     "pattern",
     "replacetext",
-];
+]

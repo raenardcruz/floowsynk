@@ -1,3 +1,3 @@
 export type ReplayDataProps = {
-    tabId: string;
+    tabId: string
 }

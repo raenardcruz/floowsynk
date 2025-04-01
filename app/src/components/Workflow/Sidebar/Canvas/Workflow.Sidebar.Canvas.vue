@@ -75,8 +75,8 @@ const {
     showSideBar,
     search,
     expandGroup,
-} = useSidebarCanvasStore();
-const { searchNode } = useFloowsynkNodeHooks();
+} = useSidebarCanvasStore()
+const { searchNode } = useFloowsynkNodeHooks()
 </script>
 
 <style scoped src="./Workflow.Sidebar.Canvas.styles.css"></style>

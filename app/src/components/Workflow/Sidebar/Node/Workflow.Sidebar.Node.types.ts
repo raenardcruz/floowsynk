@@ -1,5 +1,5 @@
 export type SidebarNodeProps = {
-    nodeType: string;
-    modelValue: Record<string, any>;
-    tabid: string;
+    nodeType: string
+    modelValue: Record<string, any>
+    tabid: string
 }

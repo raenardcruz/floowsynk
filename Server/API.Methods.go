@@ -64,7 +64,7 @@ func ExtendToken(token string) (string, error) {
 		return "", fmt.Errorf("Unauthorized")
 	}
 
-	newToken := generateToken(results.id, results.username, results.role, time.Now().Add(time.Minute*15).UTC().Unix())
+	newToken := generateToken(results.id, results.username, results.role, time.Now().Add(time.Minute*60).UTC().Unix())
 	return newToken, nil
 }
 
@@ -83,7 +83,7 @@ func Login(userName string, password string) (string, error) {
 	}
 
 	if dbUser.Password == ePassword {
-		token := generateToken(dbUser.ID, userName, dbUser.Role, time.Now().Add(time.Minute*15).UTC().Unix())
+		token := generateToken(dbUser.ID, userName, dbUser.Role, time.Now().Add(time.Minute*60).UTC().Unix())
 		return token, nil
 	}
 
@@ -122,13 +122,3 @@ func CreateWorkflow(workflow *pb.Workflow) (*pb.Workflow, error) {
 func DeleteWorkflow(id string) error {
 	return dbcon.DB.DeleteWorkflow(id)
 }
-
-// func Protected(c *gin.Context) {
-// 	validateResults := validateToken(c)
-// 	if validateResults.status != http.StatusOK {
-// 		c.JSON(validateResults.status, gin.H{"error": validateResults.message})
-// 		return
-// 	}
-
-// 	c.JSON(http.StatusOK, gin.H{"message": "Hello, " + validateResults.username + ", your role is " + validateResults.role})
-// }

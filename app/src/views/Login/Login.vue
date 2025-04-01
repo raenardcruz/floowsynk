@@ -43,7 +43,6 @@
 <script setup lang="ts">
 import Logo from "@/components/Composable/Logo/Logo.vue";
 import {
-    checkSession,
     login,
 } from './Login.helpers'
 import {
@@ -56,8 +55,6 @@ const {
     loginError,
     loginErrorMessage
 } = useLoginStore();
-
-checkSession();
 
 const handleLogin = async (_: Event) => {
     await login();

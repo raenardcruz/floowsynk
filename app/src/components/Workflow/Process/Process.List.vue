@@ -3,7 +3,7 @@
         <div class="page-title">Process Gallery</div>
         <div class="page-info">
             <span>Showing</span>
-            <span style="color: #3990C5;">10</span>
+            <span style="color: #3990C5">10</span>
             <span>out of 30 Processes</span>
         </div>
         <div class="gallery-search">
@@ -33,12 +33,12 @@
 
 <script setup lang="ts">
 import { createProcess, cardClicked, initWorkflows } from './Process.List.helper'
-import WorkflowIcon from "@/components/Workflow/Workflow.Icon.vue";
+import WorkflowIcon from "@/components/Workflow/Workflow.Icon.vue"
 import { useProcessListStore, useProcessListHooks } from './Process.List.hooks'
 
-const { search } = useProcessListStore();
-const { filteredProcesses } = useProcessListHooks();
-initWorkflows();
+const { search } = useProcessListStore()
+const { filteredProcesses } = useProcessListHooks()
+initWorkflows()
 </script>
 
 <style scoped src="./Process.List.styles.css"></style>

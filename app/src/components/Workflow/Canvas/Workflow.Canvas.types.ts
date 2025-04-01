@@ -1,3 +1,3 @@
 export type WorkflowCanvasProps = {
-    id: string;
+    id: string
 }

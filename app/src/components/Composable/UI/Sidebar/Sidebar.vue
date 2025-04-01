@@ -9,19 +9,15 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps } from 'vue';
-import { SidebarProps } from './Sidebar.types';
-import { useSidebarHooks } from './Sidebar.hooks';
+import { defineProps, defineEmits } from 'vue'
+import { useVModel } from '@vueuse/core'
+import { SidebarProps } from './Sidebar.types'
 import { EMIT_VISIBLE } from './Sidebar.constants'
 
-const props = defineProps<SidebarProps>();
-const emit = defineEmits([EMIT_VISIBLE]);
+const props = defineProps<SidebarProps>()
+const emit = defineEmits([EMIT_VISIBLE])
 
-const {
-    title,
-    caption,
-} = props;
-const { visible } = useSidebarHooks(props, emit);
+const visible = useVModel(props, 'visible', emit)
 </script>
 
 <style scoped src="./Sidebar.styles.css"></style>

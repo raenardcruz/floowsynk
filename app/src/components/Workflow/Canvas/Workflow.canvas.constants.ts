@@ -1,1 +1,1 @@
-export const MAX_HISTORY_SIZE = 20;
+export const MAX_HISTORY_SIZE = 20

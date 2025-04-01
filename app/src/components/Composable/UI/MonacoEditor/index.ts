@@ -1,2 +1,2 @@
-import MonacoEditor from "./MonacoEditor.vue";
-export default MonacoEditor;
+import MonacoEditor from "./MonacoEditor.vue"
+export default MonacoEditor

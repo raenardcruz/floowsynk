@@ -1,13 +1,13 @@
-export const EMIT_MODAL = 'update:modelValue';
-export const LANGUAGE = 'gotemplate';
-export const TEMPLATE = 'floowsynk-template';
-export const TEMPLATE_CODE = 'template-code';
-export const TEMPLATE_COMMENTS = 'template-comments';
-export const STRING = 'string';
-export const NUMBER = 'number';
-export const CLASS = 'class';
-export const STRING_INVALID = 'string.invalid';
-export const VARIABLE_DOCUMENTATION = 'Snippet for inserting a variable. Change the variable name and TempField to your desired value';
+export const EMIT_MODAL = 'update:modelValue'
+export const LANGUAGE = 'gotemplate'
+export const TEMPLATE = 'floowsynk-template'
+export const TEMPLATE_CODE = 'template-code'
+export const TEMPLATE_COMMENTS = 'template-comments'
+export const STRING = 'string'
+export const NUMBER = 'number'
+export const CLASS = 'class'
+export const STRING_INVALID = 'string.invalid'
+export const VARIABLE_DOCUMENTATION = 'Snippet for inserting a variable. Change the variable name and TempField to your desired value'
 export const getDefaultSuggestions = function (monaco: any, range: any) {
   return [
     {

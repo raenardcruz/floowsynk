@@ -87,7 +87,7 @@
 </template>
 
 <script setup lang="ts">
-import WorkflowIcon from '@/components/Workflow/Workflow.Icon.vue';
+import WorkflowIcon from '@/components/Workflow/Workflow.Icon.vue'
 import { ProcessTypeProps } from './Workflow.Modal.ProcessType.types'
 import { useTab } from '@/views/Workflow'
 import { useProcessTypeHooks, useProcessTypeStore } from './Workflow.Modal.ProcessTab.hooks'

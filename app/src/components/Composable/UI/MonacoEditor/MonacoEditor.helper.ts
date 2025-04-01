@@ -20,9 +20,9 @@ import { useWatchProps } from './MonacoEditor.hooks'
 export const registerCustomLanguage = (props: MonacoEditorProps) => {
     monaco.languages.register({ id: LANGUAGE })
 
-    setTokenProvider();
-    defineTheme();
-    return registerCompletionProvider(props);
+    setTokenProvider()
+    defineTheme()
+    return registerCompletionProvider(props)
 }
 
 export const initMonacoEditor = (editorContainer: Ref<HTMLDivElement | null>, props: MonacoEditorProps, emit: (event: "update:modelValue", ...args: any[]) => void) => {
@@ -110,7 +110,7 @@ const registerCompletionProvider = (props: MonacoEditorProps) => {
                 }
             })
 
-            const isInsideRange = /{{.+(range|if|with).+}}/.test(inlineText);
+            const isInsideRange = /{{.+(range|if|with).+}}/.test(inlineText)
             if (isInsideRange) {
                 return {
                     suggestions: suggestions.filter(f => f.kind == monaco.languages.CompletionItemKind.Variable).map(s => ({

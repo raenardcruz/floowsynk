@@ -17,7 +17,7 @@ import {
     NodeDataArray,
     ArrayDataType,
  } from 'proto/floowsynk_pb'
- import type { Node as vfNode, Edge as vfEdge } from '@vue-flow/core'
+ import type { Node as vfNode } from '@vue-flow/core'
 
 function normalizeObject(obj: any): any {
     return Object.keys(obj).reduce((acc, key) => {
