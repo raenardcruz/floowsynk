@@ -1,5 +1,5 @@
 <template>
-    <div class="node no-scroll nopan" :style="nodestyle" :class="{ 'node-selected': node.selected || isReplayNodeSelected, [nodestatus]: isRunning }"
+    <div class="node no-scroll nopan" :style="nodestyle" :class="{ 'node-selected': node.selected, 'replay-node-selected': isReplayNodeSelected, [nodestatus]: isRunning }"
         @click="clickHandler()">
         <div class="icon" :style="{ background: icon?.color }">
             <span class="material-symbols-outlined">{{ icon?.name }}</span>

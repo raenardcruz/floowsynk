@@ -6,10 +6,12 @@ import { useWorkflowCanvasKeyboardActions } from '../KeyboardActions/Workflow.Ca
 import { useSidebarCanvasStore } from '@/components/Workflow/Sidebar/Canvas/Workflow.Sidebar.Canvas.hooks'
 import { watch } from 'vue'
 import { onKeyStroke, useCloned } from '@vueuse/core'
+import { useWorkflowCanvasControlButtonActions } from '../ButtonActions/Workflow.Canvas.ButtonActions'
 
 const { draggedNode } = useSidebarCanvasStore()
 
 export const useWorkflowCanvasVueFlowEvents = (props: WorkflowCanvasProps, vueFlowInstance: any) => {
+  const { saveProcess, exitRunMode } = useWorkflowCanvasControlButtonActions(props, vueFlowInstance)
   const { activeTab } = useWorkflowStore()
   const { tab, commit, undo, redo } = useWorkflowCanvasHooks(props.id)
   const {
@@ -121,6 +123,17 @@ export const useWorkflowCanvasVueFlowEvents = (props: WorkflowCanvasProps, vueFl
         tab.value.nodesList = tab.value.nodesList.filter((node: any) => !nodesToDelete.includes(node))
       } else {
         throw new Error(`Tab nodes not found for id ${tab.value.id}`)
+      }
+    }
+    // Save Process
+    else if (e.ctrlKey && e.key.toLocaleLowerCase() === 's') {
+      e.preventDefault()
+      saveProcess()
+    }
+    // Exit Run Mode 
+    else if (e.key === 'Escape') {
+      if (isRunning.value) {
+        exitRunMode()
       }
     }
     // Previous Replay Data
