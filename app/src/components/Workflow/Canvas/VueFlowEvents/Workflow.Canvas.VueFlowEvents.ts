@@ -11,7 +11,7 @@ import { useWorkflowCanvasControlButtonActions } from '../ButtonActions/Workflow
 const { draggedNode } = useSidebarCanvasStore()
 
 export const useWorkflowCanvasVueFlowEvents = (props: WorkflowCanvasProps, vueFlowInstance: any) => {
-  const { saveProcess, exitRunMode } = useWorkflowCanvasControlButtonActions(props, vueFlowInstance)
+  const { saveProcess, exitRunMode, runProcess, removeProcess, resetTransform } = useWorkflowCanvasControlButtonActions(props, vueFlowInstance)
   const { activeTab } = useWorkflowStore()
   const { tab, commit, undo, redo } = useWorkflowCanvasHooks(props.id)
   const {
@@ -135,6 +135,20 @@ export const useWorkflowCanvasVueFlowEvents = (props: WorkflowCanvasProps, vueFl
       if (isRunning.value) {
         exitRunMode()
       }
+    }
+    // Run
+    else if (e.ctrlKey && e.key.toLocaleLowerCase() === 'enter') {
+      if (isRunning.value) return
+      runProcess()
+    }
+    // Reset Transform
+    else if (e.ctrlKey && e.key.toLocaleLowerCase() === ' ') {
+      resetTransform()
+    }
+    // Remove Process
+    else if (e.ctrlKey && e.key.toLocaleLowerCase() === 'x') {
+      if (isRunning.value) return
+      removeProcess()
     }
     // Previous Replay Data
     else if (e.key === 'ArrowUp') {

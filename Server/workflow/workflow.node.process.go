@@ -83,14 +83,13 @@ func (wp *WorkflowProcessor) LoopNodeProcess(node *proto.Node) error {
 }
 
 func (wp *WorkflowProcessor) ForEachNodeProcess(node *proto.Node) error {
-	listvar := node.Data.ListVariable
+	listvar := node.Data.Listvar
 	listitems := wp.ProcessVariables[*listvar].([]interface{})
 	for _, item := range listitems {
 		replayNode := CopyNode(node)
-		replayNode.Data.ListVariable = listvar
+		replayNode.Data.Listvar = listvar
 		wp.UpdateStatus(node, proto.NodeStatus_RUNNING, replayNode.Data, fmt.Sprintf("Processing item %v in Foreach Loop", item), true)
-		wp.updateNodeCurrentValue(&replayNode, item.(string))
-		wp.ProcessVariables[fmt.Sprintf("%s.item", *listvar)] = item
+		wp.updateNodeCurrentValue(&replayNode, item)
 		if err := wp.nextProcess(node.Id, ""); err != nil {
 			wp.UpdateStatus(node, proto.NodeStatus_FAILED, replayNode.Data, fmt.Sprintf("Error processing item %v: %v", item, err), true)
 			return err
@@ -143,7 +142,7 @@ func (wp *WorkflowProcessor) ListNodeProcess(node *proto.Node) error {
 	switch nodeDataArray.Type {
 	case proto.ArrayDataType_KEYVALUE:
 		for _, item := range nodeDataArray.KeyValueItems {
-			listItems = append(listItems, item)
+			listItems = append(listItems, KeyValue{Key: item.Key, Value: item.Value})
 		}
 	case proto.ArrayDataType_STRING:
 		for _, item := range nodeDataArray.StringItems {

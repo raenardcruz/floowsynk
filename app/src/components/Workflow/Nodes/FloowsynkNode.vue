@@ -43,6 +43,7 @@ import { toSentenceCase } from "@/components/Composable/Utilities"
 import ProcessTypeModal from '@/components/Workflow/Modal/ProcessType/Workflow.Modal.ProcessType.vue'
 import { Modal } from '@/components/Composable/UI'
 import { useWorkflowCanvasStore } from '@/components/Workflow/Canvas/Workflow.Canvas.hooks'
+import { onKeyStroke } from '@vueuse/core'
 
 const props = defineProps<NodeProps>()
 const { node } = useNode()
@@ -64,6 +65,10 @@ watch(node, (newValue) => {
         icon    = (newValue as unknown as Node.AsObject).icon
         nodestyle = (newValue as unknown as Node.AsObject).nodestyle
     }
+})
+onKeyStroke('Escape', () => {
+    showSidebar.value = false
+    showModal.value = false
 })
 </script>
 
