@@ -1,9 +1,10 @@
 import { ref } from "vue";
+import { createGlobalState } from '@vueuse/core'
 
-const appDrawer = ref(false);
-
-export const useAppDrawerStore = () => {
+export const useAppDrawerStore = createGlobalState(() => {
+    const appDrawer = ref(false);
+    
     return {
         appDrawer
     }
-}
+})

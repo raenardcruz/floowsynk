@@ -17,7 +17,9 @@
 <script setup lang="ts">
 import Logo from "@/components/Composable/Logo/Logo.vue";
 import AppDrawer from "./AppDrawer";
-import { openAppDrawer, logout } from './Home.helper';
+import { openAppDrawer, logout, pageInit } from './Home.helper';
+
+pageInit();
 </script>
 
 <style scoped src="./Home.style.css"></style>

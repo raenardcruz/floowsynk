@@ -1,3 +1,3 @@
 export type ProcessTypeProps = {
-    id: string;
+    id: string
 }

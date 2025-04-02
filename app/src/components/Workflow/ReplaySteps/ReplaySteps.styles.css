@@ -1,25 +1,80 @@
-.replay-data-table {
+.replay-data-container {
+    display: flex;
+    position: relative;
+    height: 204.81px; 
     width: 100%;
-    border-collapse: collapse;
-    margin: 20px 0;
-    font-size: 16px;
-    text-align: left;
-}
-.replay-data-table th, .replay-data-table td {
     padding: 8px;
+    overflow-y: auto;
+    border: 1px solid var(--grey-4);
+    border-radius: 8px;
+    background: var(--grey-6);
+ }
+.replay-data-row {
+    display: grid;
+    position: relative;
+    height: 40px;
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px;
+    background: var(--grey-5);
+    color: var(--grey-1);
+    margin-bottom: 8px;
+    grid-template-columns: repeat(3, 1fr);
+    padding: 0 12px;
     cursor: pointer;
 }
-.replay-data-table tr.selected {
-color: var(--blue-3);
-font-weight: bold;
+.replay-data-row:hover {
+    background: var(--grey-4);
+    color: var(--grey-2);
 }
-.replay-data-table th {
-    background-color: #f4f4f4;
+.replay-data-row:hover {
+    background: var(--grey-4);
+    color: var(--grey-2);
+}
+.replay-data-row.selected {
+    color: var(--white-2);
+    background: linear-gradient(
+        135deg,
+        var(--blue-2) 0%,
+        var(--blue-3) 50%,
+        var(--blue-4) 100%
+    );
     font-weight: bold;
+    border: 1px solid var(--blue-5);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
-.replay-data-table tr:nth-child(even) {
-    background-color: #f9f9f9;
+.replay-data-nodeid,
+.replay-data-message,
+.replay-data-status {
+    display: flex;
+    position: relative;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 4px 8px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
-.replay-data-table tr:hover {
-    background-color: #f1f1f1;
+
+.replay-data-status {
+    display: flex;
+    position: relative;
+    justify-content: center;
+    align-items: center;
+    height: 30px;
+    width: 100px;
+    color: var(--white-2);
+    border-radius: 32px;
+}
+
+.Success {
+    background: var(--green-2);
+}
+
+.Running {
+    background: var(--blue-2);
+}
+
+.Failed {
+    background: var(--red-2);
 }

@@ -1,9 +1,9 @@
 .modalcontent {
     position: absolute;
     display: flex;
-    overflow: auto;
-    height: 100%;
-    width: 100%;
+    overflow: hidden;
+    height: 90%;
+    width: 90%;
 }
 .content {
     position: relative;

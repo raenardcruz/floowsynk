@@ -1,9 +1,9 @@
 <template>
-    <div class="gallery-box">
+    <div class="gallery-box" v-if="!isLoading">
         <div class="page-title">Process Gallery</div>
         <div class="page-info">
             <span>Showing</span>
-            <span style="color: #3990C5;">10</span>
+            <span style="color: #3990C5">10</span>
             <span>out of 30 Processes</span>
         </div>
         <div class="gallery-search">
@@ -29,16 +29,18 @@
             </div>
         </div>
     </div>
+    <div v-else>Loading Please Wait...</div>
 </template>
 
 <script setup lang="ts">
 import { createProcess, cardClicked, initWorkflows } from './Process.List.helper'
-import WorkflowIcon from "@/components/Workflow/Workflow.Icon.vue";
+import WorkflowIcon from "@/components/Workflow/Workflow.Icon.vue"
 import { useProcessListStore, useProcessListHooks } from './Process.List.hooks'
+import { useAsyncState } from '@vueuse/core'
 
-const { search } = useProcessListStore();
-const { filteredProcesses } = useProcessListHooks();
-initWorkflows();
+const { search } = useProcessListStore()
+const { filteredProcesses } = useProcessListHooks()
+const { isLoading } = useAsyncState(initWorkflows, null)
 </script>
 
 <style scoped src="./Process.List.styles.css"></style>

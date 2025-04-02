@@ -1,17 +1,16 @@
 import { ref } from 'vue'
+import { createGlobalState } from '@vueuse/core'
 
-const username = ref<string>('');
-const password = ref<string>('');
-const loginError = ref(false);
-const loginErrorMessage = ref('');
-const lastActivity = ref<number>(Date.now());
-
-export const useLoginStore = () => {
+export const useLoginStore = createGlobalState(() => {
+    const username = ref<string>('');
+    const password = ref<string>('');
+    const loginError = ref(false);
+    const loginErrorMessage = ref('');
+    
     return {
         username,
         password,
         loginError,
         loginErrorMessage,
-        lastActivity
     }
-}
+})

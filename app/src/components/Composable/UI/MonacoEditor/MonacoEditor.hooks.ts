@@ -1,6 +1,6 @@
-import { watch } from 'vue';
+import { watch } from 'vue'
 import { MonacoEditorProps } from './MonacoEditor.types'
-import { editor } from 'monaco-editor';
+import { editor } from 'monaco-editor'
 
 export const useWatchProps = (props: MonacoEditorProps, editorInstance: editor.IStandaloneCodeEditor) => {
     watch(

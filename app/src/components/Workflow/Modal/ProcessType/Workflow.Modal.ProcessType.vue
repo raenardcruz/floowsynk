@@ -48,7 +48,7 @@
                         v-if="tab.nodesList && tab.nodesList[0].data && tab.nodesList[0].data.name && tab.nodesList[0].data.name.length > 0">
                         Webhook Url:
                     </label>
-                    <span style="display: flex; align-items: center; position: relative;"
+                    <span style="display: flex; align-items: center; position: relative; overflow: none;"
                         v-if="tab.nodesList && tab.nodesList[0].data && tab.nodesList[0].data.name && tab.nodesList[0].data.name.length > 0">
                         <input type="text" class="input" id="url" :value="webhookUrl" readonly />
                         <span class="material-symbols-outlined copy-btn" @click="copyToClipboard(id)">content_copy</span>
@@ -87,7 +87,7 @@
 </template>
 
 <script setup lang="ts">
-import WorkflowIcon from '@/components/Workflow/Workflow.Icon.vue';
+import WorkflowIcon from '@/components/Workflow/Workflow.Icon.vue'
 import { ProcessTypeProps } from './Workflow.Modal.ProcessType.types'
 import { useTab } from '@/views/Workflow'
 import { useProcessTypeHooks, useProcessTypeStore } from './Workflow.Modal.ProcessTab.hooks'

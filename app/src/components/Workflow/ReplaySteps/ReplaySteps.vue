@@ -1,20 +1,13 @@
 <template>
-    <table class="replay-data-table">
-        <thead>
-            <tr>
-                <th>Node Id</th>
-                <th>Message</th>
-                <th>Status</th> 
-            </tr>
-        </thead>
-        <tbody>
-            <tr v-for="(item, index) in replayData" :key="item.nodeid" @click="StepSelected(tabId, index)" :class="{'selected': selectedReplayData === index}" ref="replayRows">
-                <td>{{ item.nodeid }}</td>
-                <td>{{ item.message }}</td>
-                <td>{{ item.status }}</td>
-            </tr>
-        </tbody>
-    </table>
+    <div v-bind="containerProps" class="replay-data-container">
+        <div v-bind="wrapperProps">
+            <div v-for="(item, index) in list" :key="index" @click="StepSelected(props.tabId, item.index)" class="replay-data-row" :class="{'selected': selectedReplayData === item.index}">
+                <div class="replay-data-nodeid">{{ item.data.nodeid }}</div>
+                <div class="replay-data-message">{{ item.data.message }}</div>
+                <div class="replay-data-status" :class="item.data.status">{{ item.data.status }}</div>
+            </div>
+        </div>
+    </div>
     <Teleport :to="'#' + canvasId"> 
         <SideBar title="Replay Data" caption="" visible>
             <WorkflowNodeSidebarFields nodeType="" :modelValue="replayData[selectedReplayData].nodeid" :tabid="props.tabId" />
@@ -33,30 +26,32 @@
 </template>
 
 <script setup lang="ts">
+import { watch } from 'vue'
 import { useWorkflowCanvasStore } from '@/components/Workflow/Canvas/Workflow.Canvas.hooks'
 import { StepSelected } from './ReplaySteps.helper'
-import { SideBar } from "@/components/Composable/UI";
+import { SideBar } from "@/components/Composable/UI"
 import { ReplayDataProps } from './ReplaySteps.types'
 import { useFloowsynkNodeHooks } from '@/components/Workflow/Nodes/FloowsynkNode.hooks'
 import { SidebarCanvasFields as WorkflowNodeSidebarFields } from "@/components/Workflow/Sidebar"
 import { useReplayStoreHooks } from './ReplaySteps.hooks'
-import { onUpdated, ref } from 'vue';
+import { useVirtualList } from '@vueuse/core'
 
 const props = defineProps<ReplayDataProps>()
-    const { selectedReplayDataData } = useReplayStoreHooks(props.tabId)
-    const { replayData, selectedReplayData } = useWorkflowCanvasStore(props.tabId)
+const { selectedReplayDataData } = useReplayStoreHooks(props.tabId)
+const { replayData, selectedReplayData } = useWorkflowCanvasStore(props.tabId)
 const { canvasId } = useFloowsynkNodeHooks(props.tabId)
+
 if (replayData.value.length > 0) {
     selectedReplayData.value = 0
 }
 
-const replayRows = ref<HTMLElement[]>([]);
+const { list, containerProps, wrapperProps, scrollTo } = useVirtualList(replayData, {
+    itemHeight: 40,
+})
 
-onUpdated(() => {
-    if (selectedReplayData.value !== null && replayRows.value[selectedReplayData.value]) {
-        replayRows.value[selectedReplayData.value].scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-});
+watch(selectedReplayData, () => {
+    scrollTo(selectedReplayData.value-2)
+})
 </script>
 
 <style scoped src="./ReplaySteps.styles.css"></style>

@@ -364,11 +364,11 @@ const startNodesArray: Node.AsObject[] = [
     },
 ]
 
-const startNodes: { [key: string]: Node.AsObject } = {};
+const startNodes: { [key: string]: Node.AsObject } = {}
 startNodesArray.forEach(node => {
-    startNodes[node.nodetype] = node;
-});
+    startNodes[node.nodetype] = node
+})
 
 export {
     startNodes
-};
+}

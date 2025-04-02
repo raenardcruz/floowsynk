@@ -1,5 +1,5 @@
 <template>
-    <div class="node no-scroll nopan" :style="nodestyle" :class="{ 'node-selected': node.selected || isReplayNodeSelected, [nodestatus]: isRunning }"
+    <div class="node no-scroll nopan" :style="nodestyle" :class="{ 'node-selected': node.selected, 'replay-node-selected': isReplayNodeSelected, [nodestatus]: isRunning }"
         @click="clickHandler()">
         <div class="icon" :style="{ background: icon?.color }">
             <span class="material-symbols-outlined">{{ icon?.name }}</span>
@@ -31,32 +31,44 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue";
-import { Handle, Position, useNode } from '@vue-flow/core';
-import { SideBar } from "@/components/Composable/UI";
+import { ref, watch } from "vue"
+import { Handle, Position, useNode } from '@vue-flow/core'
+import { SideBar } from "@/components/Composable/UI"
 import { SidebarCanvasFields as WorkflowNodeSidebarFields } from "@/components/Workflow/Sidebar"
 import { NodeProps } from './FloowsynkNode.types'
 import { useFloowsynkNodeHooks, useFloowsynkNodeWatchers } from './FloowsynkNode.hooks'
 import { clickhandler } from './FloowsynkNode.helper'
 import { Node } from 'proto/floowsynk_pb'
-import { toSentenceCase } from "@/components/Composable/Utilities";
+import { toSentenceCase } from "@/components/Composable/Utilities"
 import ProcessTypeModal from '@/components/Workflow/Modal/ProcessType/Workflow.Modal.ProcessType.vue'
 import { Modal } from '@/components/Composable/UI'
 import { useWorkflowCanvasStore } from '@/components/Workflow/Canvas/Workflow.Canvas.hooks'
+import { onKeyStroke } from '@vueuse/core'
 
-const props = defineProps<NodeProps>();
+const props = defineProps<NodeProps>()
 const { node } = useNode()
 const { canvasId } = useFloowsynkNodeHooks(props.tabid)
-const showSidebar = ref(false);
-const showModal = ref(false);
+const showSidebar = ref(false)
+const showModal = ref(false)
 const { nodestatus, isReplayNodeSelected } = useFloowsynkNodeWatchers(props.tabid, node, showSidebar)
 const clickHandler = () => clickhandler(node, showSidebar, showModal)
-const { icon, nodetype, label, outputsList, inputsList, nodestyle } = node as unknown as Node.AsObject;
+let { icon, nodetype, label, outputsList, inputsList, nodestyle } = node as unknown as Node.AsObject
 const { isRunning } = useWorkflowCanvasStore(props.tabid)
 watch(isRunning, (newValue) => {
     node.draggable = !newValue
     node.deletable = !newValue
     node.connectable = !newValue
+})
+watch(node, (newValue) => {
+    if (newValue.id === '0') {
+        nodetype = (newValue as unknown as Node.AsObject).nodetype
+        icon    = (newValue as unknown as Node.AsObject).icon
+        nodestyle = (newValue as unknown as Node.AsObject).nodestyle
+    }
+})
+onKeyStroke('Escape', () => {
+    showSidebar.value = false
+    showModal.value = false
 })
 </script>
 

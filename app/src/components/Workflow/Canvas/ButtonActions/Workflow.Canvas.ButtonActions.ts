@@ -15,30 +15,30 @@ export const useWorkflowCanvasControlButtonActions = (props: WorkflowCanvasProps
   const {
     tabs,
     activeTab,
-  } = useWorkflowStore();
+  } = useWorkflowStore()
   const {
     nodeStatuses,
     replayData,
     showReplayData,
     isRunning,
-  } = useWorkflowCanvasStore(props.id);
-  const { tab } = useWorkflowCanvasHooks(props.id);
+  } = useWorkflowCanvasStore(props.id)
+  const { tab } = useWorkflowCanvasHooks(props.id)
   // Method: Save
   const saveProcess = async () => {
     try {
       if (tab.value.isnew) {
-        await createProcess(tab.value);
-        await initWorkflows();
-        tab.value.isnew = false;
+        await createProcess(tab.value)
+        await initWorkflows()
+        tab.value.isnew = false
       } else {
-        await updateProcess(tab.value);
+        await updateProcess(tab.value)
       }
       useNotif({
         duration: 5000,
         teleportTarget: `#${btoa(tab.value.id)}`,
         message: "Workflow saved successfully",
         status: STATUS_SUCCESS
-      } as NotifOptions);
+      } as NotifOptions)
     }
     catch (error) {
       useNotif({
@@ -46,22 +46,22 @@ export const useWorkflowCanvasControlButtonActions = (props: WorkflowCanvasProps
         teleportTarget: `#${btoa(tab.value.id)}`,
         message: "Failed to save workflow: " + error,
         status: STATUS_ERROR
-      } as NotifOptions);
+      } as NotifOptions)
     }
   }
   // Method: Delete
   const removeProcess = async () => {
     try {
-      await deleteProcess(tab.value);
+      await deleteProcess(tab.value)
       useNotif({
         duration: 5000,
         teleportTarget: `#${btoa(tab.value.id)}`,
         message: "Workflow deleted successfully",
         status: STATUS_INFO
-      } as NotifOptions);
-      await initWorkflows();
-      tabs.value.splice(tabs.value.indexOf(tab.value), 1);
-      activeTab.value = 'main';
+      } as NotifOptions)
+      await initWorkflows()
+      tabs.value.splice(tabs.value.indexOf(tab.value), 1)
+      activeTab.value = 'main'
     }
     catch (error) {
       useNotif({
@@ -69,57 +69,57 @@ export const useWorkflowCanvasControlButtonActions = (props: WorkflowCanvasProps
         teleportTarget: `#${btoa(tab.value.id)}`,
         message: "Failed to delete workflow",
         status: STATUS_ERROR
-      } as NotifOptions);
+      } as NotifOptions)
     }
   }
 
   const runProcess = async () => {
-    showReplayData.value = false;
-    replayData.value = [];
-    nodeStatuses.value = {};
-    isRunning.value = true;
-    let stream = await executeProcess(tab.value);
+    showReplayData.value = false
+    replayData.value = []
+    nodeStatuses.value = {}
+    isRunning.value = true
+    let stream = await executeProcess(tab.value)
     useNotif({
       duration: 5000,
       teleportTarget: `#${btoa(tab.value.id)}`,
       message: "Workflow started successfully: ",
       status: STATUS_INFO
-    } as NotifOptions);
+    } as NotifOptions)
     stream.on('data', (response: RunWorkflowResponse) => {
       switch (response.getStatus()) {
         case NodeStatus.RUNNING:
-          nodeStatuses.value[response.getNodeid()] = 'running';
-          break;
+          nodeStatuses.value[response.getNodeid()] = 'running'
+          break
         case NodeStatus.COMPLETED:
-          nodeStatuses.value[response.getNodeid()] = 'success';
-          break;
+          nodeStatuses.value[response.getNodeid()] = 'success'
+          break
         case NodeStatus.FAILED:
-          nodeStatuses.value[response.getNodeid()] = 'error';
-          break;
+          nodeStatuses.value[response.getNodeid()] = 'error'
+          break
       }
       if (response.getData() != undefined) {
-        const data = response.getData()?.toObject();
+        const data = response.getData()?.toObject()
         if (data) {
-          replayData.value.push(data);
+          replayData.value.push(data)
         }
       }
-    });
+    })
     stream.on('end', () => {
-      showReplayData.value = true;
-    });
+      showReplayData.value = true
+    })
   }
 
   const resetTransform = function () {
-    const { setViewport } = vueFlowInstance;
+    const { setViewport } = vueFlowInstance
     setViewport({ x: 0, y: 0, zoom: 1 })
-  };
+  }
 
   const exitRunMode = function () {
-    isRunning.value = false;
+    isRunning.value = false
     tab.value.nodesList.forEach((node: Node.AsObject) => {
-      nodeStatuses.value[node.id] = '';
+      nodeStatuses.value[node.id] = ''
     })
-    showReplayData.value = false;
+    showReplayData.value = false
   }
 
   return {

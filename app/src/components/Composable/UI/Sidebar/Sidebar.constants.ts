@@ -1,1 +1,1 @@
-export const EMIT_VISIBLE = 'update:visible';
+export const EMIT_VISIBLE = 'update:visible'

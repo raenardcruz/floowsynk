@@ -7,7 +7,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'Notif',
@@ -25,7 +25,7 @@ export default defineComponent({
       required: true
     }
   }
-});
+})
 </script>
 
 <style scoped src="./Notif.styles.css"></style>

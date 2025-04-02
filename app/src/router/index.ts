@@ -1,23 +1,25 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import App from '@/App'
+import { useStorage } from '@vueuse/core'
+import { SESSION_EXPIRY_KEY, SESSION_TOKEN_KEY } from '@/views/Login/Login.constants'
 
-const { session } = App.store;
+const { session } = App.store
 
-const checkSession = () => {
-  const token = localStorage.getItem('sessionToken');
-  const expiry = localStorage.getItem('sessionExpiry');
-  if (token && expiry) {
-    const expiryDate = new Date(expiry);
+export const checkSession = () => {
+  const token = useStorage(SESSION_TOKEN_KEY, null, localStorage) 
+  const expiry = useStorage(SESSION_EXPIRY_KEY, null, localStorage) 
+  if (token.value && expiry.value) {
+    const expiryDate = new Date(expiry.value)
     if (expiryDate > new Date()) {
-      session.value = token;
-      return true;
+      session.value = token.value 
+      return true
     } else {
-      localStorage.removeItem('sessionToken');
-      localStorage.removeItem('sessionExpiry');
+      token.value = null 
+      expiry.value = null 
     }
   }
-  return false;
-};
+  return false
+}
 
 const routes: RouteRecordRaw[] = [
   {
@@ -59,9 +61,9 @@ const routes: RouteRecordRaw[] = [
     ],
     beforeEnter: (_, __, next) => {
       if (!session.value && !checkSession()) {
-        next({ path: '/login' });
+        next({ path: '/login' })
       } else {
-        next();
+        next()
       }
     },
   },
@@ -70,9 +72,9 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/Login'),
     beforeEnter: (_, __, next) => {
       if (session.value || checkSession()) {
-        next({ path: '/' });
+        next({ path: '/' })
       } else {
-        next();
+        next()
       }
     },
   }

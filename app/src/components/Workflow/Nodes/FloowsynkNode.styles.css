@@ -156,3 +156,9 @@
     background-size: 200% 200%; /* Make gradient larger than the border */
     z-index: -1; /* Place behind the node content */
 }
+
+.replay-node-selected {
+  box-shadow: 0 0 15px var(--blue-3), 0 0 30px var(--blue-2);
+  transform: scale(1.05);
+  z-index: 10;
+}

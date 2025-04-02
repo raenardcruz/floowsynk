@@ -7,10 +7,10 @@ export const useReplayStoreHooks = (tabId: string) => {
         get: () => replayData.value[selectedReplayData.value]?.data || {},
         set: (value) => {
             if (selectedReplayData !== null && replayData.value[selectedReplayData.value]) {
-                replayData.value[selectedReplayData.value].data = value;
+                replayData.value[selectedReplayData.value].data = value
             }
         }
-    });
+    })
 
     return {
         selectedReplayDataData
