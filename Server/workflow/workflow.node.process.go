@@ -238,25 +238,57 @@ func (wp *WorkflowProcessor) CountNodeProcess(node *proto.Node) error {
 }
 
 func (wp *WorkflowProcessor) MapNodeProcess(node *proto.Node) error {
-	mappedList := make([]interface{}, 0)
+	mappedList := make([]any, 0)
 	listVar := node.Data.ListVariable
 	variable := node.Data.Variable
 	templateStr := node.Data.Template
-	listVarValue, ok := wp.ProcessVariables[*listVar].([]interface{})
+	listVarValue, ok := wp.ProcessVariables[*listVar]
+
 	if !ok {
 		wp.UpdateStatus(node, proto.NodeStatus_FAILED, node.Data, "List variable not found or is not a valid List", true)
 		return errors.New("list variable not found or is not a valid List")
 	}
-	for _, item := range listVarValue {
-		mappedItemStr := wp.populateTemplate(*templateStr, item.(map[string]interface{}))
-		var mappedItem interface{}
-		if err := json.Unmarshal([]byte(mappedItemStr), &mappedItem); err != nil {
-			mappedItem = mappedItemStr
+
+	switch items := listVarValue.(type) {
+	case []any:
+		for _, item := range items {
+			var itemMap map[string]any
+			switch v := item.(type) {
+			case string:
+				if err := json.Unmarshal([]byte(v), &itemMap); err != nil {
+					itemMap = map[string]any{"value": v}
+				}
+			case map[string]any:
+				itemMap = v
+			case float64, bool:
+				itemMap = map[string]any{"value": v}
+			case KeyValue:
+				itemMap = map[string]any{"key": v.Key, "value": v.Value}
+			default:
+				wp.UpdateStatus(node, proto.NodeStatus_FAILED, node.Data, "invalid item type", true)
+				return fmt.Errorf("invalid item type")
+			}
+			mappedItemStr := wp.populateTemplate(*templateStr, itemMap)
+			var mappedItem any
+			if err := json.Unmarshal([]byte(mappedItemStr), &mappedItem); err != nil {
+				mappedItem = mappedItemStr
+			}
+			mappedList = append(mappedList, mappedItem)
 		}
-		mappedList = append(mappedList, mappedItem)
+	default:
+		wp.UpdateStatus(node, proto.NodeStatus_FAILED, node.Data, "List variable is not a valid List", true)
+		return errors.New("list variable is not a valid List")
 	}
+
 	wp.setVariable(*variable, mappedList)
-	wp.UpdateStatus(node, proto.NodeStatus_COMPLETED, node.Data, fmt.Sprintf("Map %s processed successfully with a value of %v", *variable, mappedList), true)
+	replayNode := CopyNode(node)
+	replayNode.Data.ListVariable = listVar
+	replayNode.Data.Variable = variable
+	replayNode.Data.Template = templateStr
+	mappedListJSON, _ := json.MarshalIndent(mappedList, "", "  ")
+	mappedListStr := string(mappedListJSON)
+	replayNode.Data.Text = &mappedListStr
+	wp.UpdateStatus(node, proto.NodeStatus_COMPLETED, replayNode.Data, fmt.Sprintf("Map %s processed successfully with a value of %v", *variable, mappedList), true)
 	return nil
 }
 

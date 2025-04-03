@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"html"
 	"html/template"
 	"net/http"
 	"regexp"
@@ -123,14 +124,13 @@ func (wp *WorkflowProcessor) populateTemplate(text string, data map[string]inter
 	for k, v := range data {
 		joinedMap[k] = v
 	}
-	tmpl, err := template.New("template").Parse(text)
+	tmpl, err := template.New("template").Option("missingkey=zero").Parse(text)
 	if err != nil {
 		return text
 	}
 	var builder strings.Builder
 	tmpl.Execute(&builder, joinedMap)
-	text = builder.String()
-	return text
+	return html.UnescapeString(builder.String())
 }
 
 func generateGUID() string {
