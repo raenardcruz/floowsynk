@@ -119,8 +119,6 @@ message Node {
     NodeDimensions dimensions = 14;
     NodeHandleBounds handleBounds = 15;
     NodePosition computedPosition = 16;
-    optional string input = 17;
-    optional string output = 18;
 }
 
 

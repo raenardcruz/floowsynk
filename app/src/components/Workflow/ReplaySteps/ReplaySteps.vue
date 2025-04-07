@@ -10,23 +10,17 @@
     </div>
     <Teleport :to="'#' + canvasId"> 
         <SideBar title="Replay Data" caption="" visible>
+            <p>Id</p>
             <WorkflowNodeSidebarFields nodeType="" :modelValue="replayData[selectedReplayData].nodeid" :tabid="props.tabId" />
             <WorkflowNodeSidebarFields nodeType="" v-model="selectedReplayDataData" :tabid="props.tabId" />
             <h4>Variables</h4>
-            <table class="replay-data-table">
-                <tbody>
-                    <tr v-for="(item, index) in replayData[selectedReplayData].variablesMap" :key="index">
-                        <td>{{ item[0] }}</td>
-                        <td>{{ item[1] }}</td>
-                    </tr>
-                </tbody>
-            </table>
+            <WorkflowNodeSidebarFields nodeType="" :modelValue="variables" :tabid="props.tabId" />
         </SideBar>
     </Teleport>
 </template>
 
 <script setup lang="ts">
-import { watch } from 'vue'
+import { watch, computed } from 'vue'
 import { useWorkflowCanvasStore } from '@/components/Workflow/Canvas/Workflow.Canvas.hooks'
 import { StepSelected } from './ReplaySteps.helper'
 import { SideBar } from "@/components/Composable/UI"
@@ -48,6 +42,15 @@ if (replayData.value.length > 0) {
 const { list, containerProps, wrapperProps, scrollTo } = useVirtualList(replayData, {
     itemHeight: 40,
 })
+const variables = computed(() => {
+    const variablesMap = replayData.value[selectedReplayData.value].variablesMap
+    let result: Record<string, string> = {}
+    variablesMap.forEach((item: any) => {
+        result[item[0]] = item[1].toString()
+    })
+    return result
+})
+
 
 watch(selectedReplayData, () => {
     scrollTo(selectedReplayData.value-2)
