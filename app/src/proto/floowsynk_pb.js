@@ -2994,9 +2994,7 @@ nodestatus: (f = jspb.Message.getField(msg, 12)) == null ? undefined : f,
 type: (f = jspb.Message.getField(msg, 13)) == null ? undefined : f,
 dimensions: (f = msg.getDimensions()) && proto.proto.NodeDimensions.toObject(includeInstance, f),
 handlebounds: (f = msg.getHandlebounds()) && proto.proto.NodeHandleBounds.toObject(includeInstance, f),
-computedposition: (f = msg.getComputedposition()) && proto.proto.NodePosition.toObject(includeInstance, f),
-input: (f = jspb.Message.getField(msg, 17)) == null ? undefined : f,
-output: (f = jspb.Message.getField(msg, 18)) == null ? undefined : f
+computedposition: (f = msg.getComputedposition()) && proto.proto.NodePosition.toObject(includeInstance, f)
   };
 
   if (includeInstance) {
@@ -3104,14 +3102,6 @@ proto.proto.Node.deserializeBinaryFromReader = function(msg, reader) {
       var value = new proto.proto.NodePosition;
       reader.readMessage(value,proto.proto.NodePosition.deserializeBinaryFromReader);
       msg.setComputedposition(value);
-      break;
-    case 17:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setInput(value);
-      break;
-    case 18:
-      var value = /** @type {string} */ (reader.readString());
-      msg.setOutput(value);
       break;
     default:
       reader.skipField();
@@ -3258,20 +3248,6 @@ proto.proto.Node.serializeBinaryToWriter = function(message, writer) {
       16,
       f,
       proto.proto.NodePosition.serializeBinaryToWriter
-    );
-  }
-  f = /** @type {string} */ (jspb.Message.getField(message, 17));
-  if (f != null) {
-    writer.writeString(
-      17,
-      f
-    );
-  }
-  f = /** @type {string} */ (jspb.Message.getField(message, 18));
-  if (f != null) {
-    writer.writeString(
-      18,
-      f
     );
   }
 };
@@ -3805,78 +3781,6 @@ proto.proto.Node.prototype.clearComputedposition = function() {
  */
 proto.proto.Node.prototype.hasComputedposition = function() {
   return jspb.Message.getField(this, 16) != null;
-};
-
-
-/**
- * optional string input = 17;
- * @return {string}
- */
-proto.proto.Node.prototype.getInput = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 17, ""));
-};
-
-
-/**
- * @param {string} value
- * @return {!proto.proto.Node} returns this
- */
-proto.proto.Node.prototype.setInput = function(value) {
-  return jspb.Message.setField(this, 17, value);
-};
-
-
-/**
- * Clears the field making it undefined.
- * @return {!proto.proto.Node} returns this
- */
-proto.proto.Node.prototype.clearInput = function() {
-  return jspb.Message.setField(this, 17, undefined);
-};
-
-
-/**
- * Returns whether this field is set.
- * @return {boolean}
- */
-proto.proto.Node.prototype.hasInput = function() {
-  return jspb.Message.getField(this, 17) != null;
-};
-
-
-/**
- * optional string output = 18;
- * @return {string}
- */
-proto.proto.Node.prototype.getOutput = function() {
-  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 18, ""));
-};
-
-
-/**
- * @param {string} value
- * @return {!proto.proto.Node} returns this
- */
-proto.proto.Node.prototype.setOutput = function(value) {
-  return jspb.Message.setField(this, 18, value);
-};
-
-
-/**
- * Clears the field making it undefined.
- * @return {!proto.proto.Node} returns this
- */
-proto.proto.Node.prototype.clearOutput = function() {
-  return jspb.Message.setField(this, 18, undefined);
-};
-
-
-/**
- * Returns whether this field is set.
- * @return {boolean}
- */
-proto.proto.Node.prototype.hasOutput = function() {
-  return jspb.Message.getField(this, 18) != null;
 };
 
 

@@ -23,9 +23,8 @@ func (wp *WorkflowProcessor) SetVariableNodeProcess(node *proto.Node) error {
 		replayNode := CopyNode(node)
 		replayNode.Data.Name = name
 		replayNode.Data.Value = value
-		wp.updateNodeCurrentValue(&replayNode, *value)
 		wp.setVariable(*name, *value)
-		wp.UpdateStatus(node, proto.NodeStatus_COMPLETED, replayNode.Data, fmt.Sprintf("Variable %s set to %v", *name, *value), true)
+		wp.UpdateStatus(&replayNode, proto.NodeStatus_COMPLETED, *value, fmt.Sprintf("Variable %s set to %v", *name, *value), true)
 	}()
 	return nil
 }
@@ -36,9 +35,9 @@ func (wp *WorkflowProcessor) ConditionNodeProcess(node *proto.Node) (retVal stri
 		replayNode := CopyNode(node)
 		replayNode.Data.Expression = &expression
 		if err != nil {
-			wp.UpdateStatus(node, proto.NodeStatus_FAILED, replayNode.Data, fmt.Sprintf("Condition %s failed: %v", expression, err), true)
+			wp.UpdateStatus(&replayNode, proto.NodeStatus_FAILED, nil, fmt.Sprintf("Condition %s failed: %v", expression, err), true)
 		} else {
-			wp.UpdateStatus(node, proto.NodeStatus_COMPLETED, replayNode.Data, fmt.Sprintf("Condition %s processed: %s", expression, retVal), true)
+			wp.UpdateStatus(&replayNode, proto.NodeStatus_COMPLETED, nil, fmt.Sprintf("Condition %s processed: %s", expression, retVal), true)
 		}
 	}()
 	if expression == "" {
@@ -58,9 +57,8 @@ func (wp *WorkflowProcessor) TextNodeProcess(node *proto.Node) error {
 		replayNode := CopyNode(node)
 		replayNode.Data.Message = &text
 		replayNode.Data.Variable = varName
-		wp.updateNodeCurrentValue(&replayNode, text)
 		wp.setVariable(*varName, text)
-		wp.UpdateStatus(node, proto.NodeStatus_COMPLETED, replayNode.Data, fmt.Sprintf("Text %s set to %s", *varName, text), true)
+		wp.UpdateStatus(&replayNode, proto.NodeStatus_COMPLETED, text, fmt.Sprintf("Text %s set to %s", *varName, text), true)
 	}()
 	return nil
 }
@@ -71,14 +69,13 @@ func (wp *WorkflowProcessor) LoopNodeProcess(node *proto.Node) error {
 		replayNode := CopyNode(node)
 		tmpIteration := int32(i)
 		replayNode.Data.Iteration = &tmpIteration
-		wp.UpdateStatus(node, proto.NodeStatus_RUNNING, replayNode.Data, fmt.Sprintf("Running Iteration %d of %d", i, iteration), true)
-		wp.updateNodeCurrentValue(&replayNode, i)
+		wp.UpdateStatus(&replayNode, proto.NodeStatus_RUNNING, nil, fmt.Sprintf("Running Iteration %d of %d", i, iteration), true)
 		if err := wp.nextProcess(node.Id, ""); err != nil {
-			wp.UpdateStatus(node, proto.NodeStatus_FAILED, replayNode.Data, fmt.Sprintf("Error processing loop iteration %d: %v", i, err), true)
+			wp.UpdateStatus(&replayNode, proto.NodeStatus_FAILED, nil, fmt.Sprintf("Error processing loop iteration %d: %v", i, err), true)
 			return err
 		}
 	}
-	wp.UpdateStatus(node, proto.NodeStatus_COMPLETED, node.Data, "Loop processed successfully", true)
+	wp.UpdateStatus(node, proto.NodeStatus_COMPLETED, nil, "Loop processed successfully", true)
 	return nil
 }
 
@@ -88,14 +85,13 @@ func (wp *WorkflowProcessor) ForEachNodeProcess(node *proto.Node) error {
 	for _, item := range listitems {
 		replayNode := CopyNode(node)
 		replayNode.Data.Listvar = listvar
-		wp.UpdateStatus(node, proto.NodeStatus_RUNNING, replayNode.Data, fmt.Sprintf("Processing item %v in Foreach Loop", item), true)
-		wp.updateNodeCurrentValue(&replayNode, item)
+		wp.UpdateStatus(&replayNode, proto.NodeStatus_RUNNING, item, fmt.Sprintf("Processing item %v in Foreach Loop", item), true)
 		if err := wp.nextProcess(node.Id, ""); err != nil {
-			wp.UpdateStatus(node, proto.NodeStatus_FAILED, replayNode.Data, fmt.Sprintf("Error processing item %v: %v", item, err), true)
+			wp.UpdateStatus(&replayNode, proto.NodeStatus_FAILED, nil, fmt.Sprintf("Error processing item %v: %v", item, err), true)
 			return err
 		}
 	}
-	wp.UpdateStatus(node, proto.NodeStatus_COMPLETED, node.Data, fmt.Sprintf("Foreach Loop completed for variable %s", *listvar), true)
+	wp.UpdateStatus(node, proto.NodeStatus_COMPLETED, nil, fmt.Sprintf("Foreach Loop completed for variable %s", *listvar), true)
 	return nil
 }
 
@@ -107,26 +103,26 @@ func (wp *WorkflowProcessor) WhileNodeProcess(node *proto.Node) error {
 	cur := 0
 	res, err := m.EvaluateBoolean(expression)
 	if err != nil {
-		wp.UpdateStatus(node, proto.NodeStatus_FAILED, replayNode.Data, fmt.Sprintf("Error evaluating while condition '%s': %v", expression, err), true)
+		wp.UpdateStatus(&replayNode, proto.NodeStatus_FAILED, nil, fmt.Sprintf("Error evaluating while condition '%s': %v", expression, err), true)
 		return err
 	}
 	for res && cur < limit {
 		iteration := int32(cur)
 		replayNode.Data.Iteration = &iteration
-		wp.UpdateStatus(node, proto.NodeStatus_RUNNING, replayNode.Data, fmt.Sprintf("While Loop iteration %d with condition '%s'", cur, expression), true)
+		wp.UpdateStatus(&replayNode, proto.NodeStatus_RUNNING, nil, fmt.Sprintf("While Loop iteration %d with condition '%s'", cur, expression), true)
 		if err := wp.nextProcess(node.Id, ""); err != nil {
-			wp.UpdateStatus(node, proto.NodeStatus_FAILED, replayNode.Data, fmt.Sprintf("Error during While Loop iteration %d: %v", cur, err), true)
+			wp.UpdateStatus(&replayNode, proto.NodeStatus_FAILED, nil, fmt.Sprintf("Error during While Loop iteration %d: %v", cur, err), true)
 			return err
 		}
 		expression = wp.populateTemplate(*node.Data.Expression, nil)
 		res, err = m.EvaluateBoolean(expression)
 		if err != nil {
-			wp.UpdateStatus(node, proto.NodeStatus_FAILED, replayNode.Data, fmt.Sprintf("Error re-evaluating while condition '%s': %v", expression, err), true)
+			wp.UpdateStatus(&replayNode, proto.NodeStatus_FAILED, nil, fmt.Sprintf("Error re-evaluating while condition '%s': %v", expression, err), true)
 			return err
 		}
 		cur++
 	}
-	wp.UpdateStatus(node, proto.NodeStatus_COMPLETED, replayNode.Data, "While Loop completed successfully", true)
+	wp.UpdateStatus(&replayNode, proto.NodeStatus_COMPLETED, nil, "While Loop completed successfully", true)
 	return nil
 }
 
@@ -135,9 +131,8 @@ func (wp *WorkflowProcessor) ListNodeProcess(node *proto.Node) error {
 	varName := *node.Data.Variable
 	listItems := make([]interface{}, 0)
 	defer func() {
-		wp.updateNodeCurrentValue(node, listItems)
 		wp.setVariable(varName, listItems)
-		wp.UpdateStatus(node, proto.NodeStatus_COMPLETED, node.Data, fmt.Sprintf("List %s was populated", varName), true)
+		wp.UpdateStatus(node, proto.NodeStatus_COMPLETED, listItems, fmt.Sprintf("List %s was populated", varName), true)
 	}()
 	switch nodeDataArray.Type {
 	case proto.ArrayDataType_KEYVALUE:
@@ -177,11 +172,11 @@ func (wp *WorkflowProcessor) ApiNodeProcess(node *proto.Node) error {
 	replayNode.Data.Url = &url
 	replayNode.Data.Payload = &payloadStr
 	if err != nil {
-		wp.UpdateStatus(node, proto.NodeStatus_FAILED, replayNode.Data, fmt.Sprintf("Error processing API %s: %v", url, err), true)
+		wp.UpdateStatus(&replayNode, proto.NodeStatus_FAILED, nil, fmt.Sprintf("Error processing API %s: %v", url, err), true)
 		return err
 	}
 	defer func() {
-		wp.UpdateStatus(node, proto.NodeStatus_COMPLETED, replayNode.Data, fmt.Sprintf("API %s processed successfully", url), true)
+		wp.UpdateStatus(&replayNode, proto.NodeStatus_COMPLETED, response, fmt.Sprintf("API %s processed successfully", url), true)
 	}()
 	wp.setVariable(variable, response)
 	return nil
@@ -192,7 +187,7 @@ func (wp *WorkflowProcessor) LogNodeProcess(node *proto.Node) error {
 	defer func() {
 		replayNode := CopyNode(node)
 		replayNode.Data.Message = &message
-		wp.UpdateStatus(node, proto.NodeStatus_COMPLETED, replayNode.Data, message, true)
+		wp.UpdateStatus(&replayNode, proto.NodeStatus_COMPLETED, nil, message, true)
 	}()
 	return nil
 }
@@ -201,7 +196,7 @@ func (wp *WorkflowProcessor) GuidNodeProcess(node *proto.Node) error {
 	varName := node.Data.Variable
 	newGuid := generateGUID()
 	defer func() {
-		wp.UpdateStatus(node, proto.NodeStatus_COMPLETED, node.Data, fmt.Sprintf("GUID %s generated", newGuid), true)
+		wp.UpdateStatus(node, proto.NodeStatus_COMPLETED, newGuid, fmt.Sprintf("GUID %s generated", newGuid), true)
 	}()
 	wp.setVariable(*varName, newGuid)
 	return nil
@@ -214,11 +209,11 @@ func (wp *WorkflowProcessor) MathNodeProcess(node *proto.Node) error {
 	replayNode := CopyNode(node)
 	replayNode.Data.Expression = &expression
 	if err != nil {
-		wp.UpdateStatus(node, proto.NodeStatus_FAILED, replayNode.Data, fmt.Sprintf("Error processing Math %s: %v", expression, err), true)
+		wp.UpdateStatus(&replayNode, proto.NodeStatus_FAILED, nil, fmt.Sprintf("Error processing Math %s: %v", expression, err), true)
 		return err
 	}
 	wp.setVariable(*varName, res)
-	wp.UpdateStatus(node, proto.NodeStatus_COMPLETED, replayNode.Data, fmt.Sprintf("Math %s processed successfully with a value of %f", expression, res), true)
+	wp.UpdateStatus(&replayNode, proto.NodeStatus_COMPLETED, res, fmt.Sprintf("Math %s processed successfully with a value of %f", expression, res), true)
 	return nil
 }
 
@@ -229,34 +224,66 @@ func (wp *WorkflowProcessor) CountNodeProcess(node *proto.Node) error {
 	if listVarValue, ok := wp.ProcessVariables[*listVar].([]interface{}); ok {
 		count = count + len(listVarValue)
 	} else {
-		wp.UpdateStatus(node, proto.NodeStatus_FAILED, node.Data, "List variable not found or is not a valid List", true)
+		wp.UpdateStatus(node, proto.NodeStatus_FAILED, nil, "List variable not found or is not a valid List", true)
 		return errors.New("list variable not found or is not a valid List")
 	}
 	wp.setVariable(*varName, count)
-	wp.UpdateStatus(node, proto.NodeStatus_COMPLETED, node.Data, fmt.Sprintf("Count %s processed successfully with a value of %d", *varName, count), true)
+	wp.UpdateStatus(node, proto.NodeStatus_COMPLETED, count, fmt.Sprintf("Count %s processed successfully with a value of %d", *varName, count), true)
 	return nil
 }
 
 func (wp *WorkflowProcessor) MapNodeProcess(node *proto.Node) error {
-	mappedList := make([]interface{}, 0)
+	mappedList := make([]any, 0)
 	listVar := node.Data.ListVariable
 	variable := node.Data.Variable
 	templateStr := node.Data.Template
-	listVarValue, ok := wp.ProcessVariables[*listVar].([]interface{})
+	listVarValue, ok := wp.ProcessVariables[*listVar]
+
 	if !ok {
-		wp.UpdateStatus(node, proto.NodeStatus_FAILED, node.Data, "List variable not found or is not a valid List", true)
+		wp.UpdateStatus(node, proto.NodeStatus_FAILED, nil, "List variable not found or is not a valid List", true)
 		return errors.New("list variable not found or is not a valid List")
 	}
-	for _, item := range listVarValue {
-		mappedItemStr := wp.populateTemplate(*templateStr, item.(map[string]interface{}))
-		var mappedItem interface{}
-		if err := json.Unmarshal([]byte(mappedItemStr), &mappedItem); err != nil {
-			mappedItem = mappedItemStr
+
+	switch items := listVarValue.(type) {
+	case []any:
+		for _, item := range items {
+			var itemMap map[string]any
+			switch v := item.(type) {
+			case string:
+				if err := json.Unmarshal([]byte(v), &itemMap); err != nil {
+					itemMap = map[string]any{"value": v}
+				}
+			case map[string]any:
+				itemMap = v
+			case float64, bool:
+				itemMap = map[string]any{"value": v}
+			case KeyValue:
+				itemMap = map[string]any{"key": v.Key, "value": v.Value}
+			default:
+				wp.UpdateStatus(node, proto.NodeStatus_FAILED, nil, "invalid item type", true)
+				return fmt.Errorf("invalid item type")
+			}
+			mappedItemStr := wp.populateTemplate(*templateStr, itemMap)
+			var mappedItem any
+			if err := json.Unmarshal([]byte(mappedItemStr), &mappedItem); err != nil {
+				mappedItem = mappedItemStr
+			}
+			mappedList = append(mappedList, mappedItem)
 		}
-		mappedList = append(mappedList, mappedItem)
+	default:
+		wp.UpdateStatus(node, proto.NodeStatus_FAILED, nil, "List variable is not a valid List", true)
+		return errors.New("list variable is not a valid List")
 	}
+
 	wp.setVariable(*variable, mappedList)
-	wp.UpdateStatus(node, proto.NodeStatus_COMPLETED, node.Data, fmt.Sprintf("Map %s processed successfully with a value of %v", *variable, mappedList), true)
+	replayNode := CopyNode(node)
+	replayNode.Data.ListVariable = listVar
+	replayNode.Data.Variable = variable
+	replayNode.Data.Template = templateStr
+	mappedListJSON, _ := json.MarshalIndent(mappedList, "", "  ")
+	mappedListStr := string(mappedListJSON)
+	replayNode.Data.Text = &mappedListStr
+	wp.UpdateStatus(&replayNode, proto.NodeStatus_COMPLETED, mappedList, fmt.Sprintf("Map %s processed successfully with a value of %v", *variable, mappedList), true)
 	return nil
 }
 
@@ -271,7 +298,7 @@ func (wp *WorkflowProcessor) ReplaceNodeProcess(node *proto.Node) error {
 		replayNode.Data.Text = &text
 		replayNode.Data.Pattern = &pattern
 		replayNode.Data.ReplaceText = &replaceText
-		wp.UpdateStatus(node, proto.NodeStatus_COMPLETED, replayNode.Data, fmt.Sprintf("Replace %s processed successfully with a value of %s", *varName, newText), true)
+		wp.UpdateStatus(&replayNode, proto.NodeStatus_COMPLETED, newText, fmt.Sprintf("Replace %s processed successfully with a value of %s", *varName, newText), true)
 	}()
 	wp.setVariable(*varName, newText)
 	return nil
@@ -287,7 +314,7 @@ func (wp *WorkflowProcessor) FindAllNodeProcess(node *proto.Node) error {
 		replayNode := CopyNode(node)
 		replayNode.Data.Text = &text
 		replayNode.Data.Pattern = &pattern
-		wp.UpdateStatus(node, proto.NodeStatus_COMPLETED, replayNode.Data, fmt.Sprintf("FindAll %s processed successfully with a value of %v", *varName, matches), true)
+		wp.UpdateStatus(&replayNode, proto.NodeStatus_COMPLETED, matches, fmt.Sprintf("FindAll %s processed successfully with a value of %v", *varName, matches), true)
 	}()
 	wp.setVariable(*varName, matches)
 	return nil
@@ -296,11 +323,11 @@ func (wp *WorkflowProcessor) FindAllNodeProcess(node *proto.Node) error {
 func (wp *WorkflowProcessor) SubProcessNodeProcess(node *proto.Node) error {
 	subProcessId := node.Data.SubProcessId
 	defer func() {
-		wp.UpdateStatus(node, proto.NodeStatus_COMPLETED, node.Data, fmt.Sprintf("SubProcess %s completed successfully", *subProcessId), true)
+		wp.UpdateStatus(node, proto.NodeStatus_COMPLETED, nil, fmt.Sprintf("SubProcess %s completed successfully", *subProcessId), true)
 	}()
 	workflow, err := wp.DBcon.GetWorkflow(*subProcessId)
 	if err != nil {
-		wp.UpdateStatus(node, proto.NodeStatus_FAILED, node.Data, fmt.Sprintf("Error retrieving SubProcess %s: %v", *subProcessId, err), true)
+		wp.UpdateStatus(node, proto.NodeStatus_FAILED, nil, fmt.Sprintf("Error retrieving SubProcess %s: %v", *subProcessId, err), true)
 		return err
 	}
 	subProcessor := &WorkflowProcessor{
@@ -309,7 +336,7 @@ func (wp *WorkflowProcessor) SubProcessNodeProcess(node *proto.Node) error {
 		ProcessVariables: wp.ProcessVariables,
 		DBcon:            wp.DBcon,
 	}
-	wp.UpdateStatus(node, proto.NodeStatus_RUNNING, node.Data, fmt.Sprintf("SubProcess %s is running", *subProcessId), true)
+	wp.UpdateStatus(node, proto.NodeStatus_RUNNING, nil, fmt.Sprintf("SubProcess %s is running", *subProcessId), true)
 	subProcessor.Process("0")
 	for key, value := range subProcessor.ProcessVariables {
 		wp.ProcessVariables[key] = value

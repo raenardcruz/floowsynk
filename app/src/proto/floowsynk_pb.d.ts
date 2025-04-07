@@ -417,16 +417,6 @@ export class Node extends jspb.Message {
   hasComputedposition(): boolean;
   clearComputedposition(): Node;
 
-  getInput(): string;
-  setInput(value: string): Node;
-  hasInput(): boolean;
-  clearInput(): Node;
-
-  getOutput(): string;
-  setOutput(value: string): Node;
-  hasOutput(): boolean;
-  clearOutput(): Node;
-
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): Node.AsObject;
   static toObject(includeInstance: boolean, msg: Node): Node.AsObject;
@@ -453,8 +443,6 @@ export namespace Node {
     dimensions?: NodeDimensions.AsObject,
     handlebounds?: NodeHandleBounds.AsObject,
     computedposition?: NodePosition.AsObject,
-    input?: string,
-    output?: string,
   }
 
   export enum DataCase { 
@@ -490,16 +478,6 @@ export namespace Node {
   export enum TypeCase { 
     _TYPE_NOT_SET = 0,
     TYPE = 13,
-  }
-
-  export enum InputCase { 
-    _INPUT_NOT_SET = 0,
-    INPUT = 17,
-  }
-
-  export enum OutputCase { 
-    _OUTPUT_NOT_SET = 0,
-    OUTPUT = 18,
   }
 }
 

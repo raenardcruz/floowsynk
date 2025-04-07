@@ -190,10 +190,7 @@ export function nodeDataFromObject(obj: any): NodeData {
       msg.setMethod(normalizedObj.method);
     }
     if (normalizedObj.headers !== undefined) {
-      const headers = normalizedObj.headers.keyvalueitemslist.map(keyValueFromObject);
-      const nodeDataArray: NodeDataArray = new NodeDataArray();
-      nodeDataArray.setKeyvalueitemsList(headers);
-      nodeDataArray.setType(ArrayDataType.KEYVALUE);
+      const nodeDataArray: NodeDataArray = nodeDataArrayFromObject(normalizedObj.headers);
       msg.setHeaders(nodeDataArray);
     }
     if (normalizedObj.payload !== undefined) {

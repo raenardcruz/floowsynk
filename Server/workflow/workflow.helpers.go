@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"html"
 	"html/template"
 	"net/http"
 	"regexp"
@@ -13,7 +14,22 @@ import (
 	"github.com/raenardcruz/floowsynk/proto"
 )
 
-func (wp *WorkflowProcessor) UpdateStatus(node *proto.Node, status proto.NodeStatus, nodeData *proto.NodeData, message string, includeReplayData bool) {
+func (wp *WorkflowProcessor) UpdateStatus(node *proto.Node, status proto.NodeStatus, output interface{}, message string, includeReplayData bool) {
+	if (output != nil) && (status == proto.NodeStatus_COMPLETED || status == proto.NodeStatus_FAILED) {
+		switch v := output.(type) {
+		case string:
+			wp.ProcessVariables[OUTPUT] = v
+		case float64, int, int64, bool:
+			wp.ProcessVariables[OUTPUT] = fmt.Sprintf("%v", v)
+		default:
+			outputBytes, err := json.MarshalIndent(output, "", "  ")
+			if err != nil {
+				wp.ProcessVariables[OUTPUT] = fmt.Sprintf("error marshaling output: %v", err)
+			} else {
+				wp.ProcessVariables[OUTPUT] = string(outputBytes)
+			}
+		}
+	}
 	res := &proto.RunWorkflowResponse{
 		NodeId: node.Id,
 		Status: status,
@@ -22,7 +38,7 @@ func (wp *WorkflowProcessor) UpdateStatus(node *proto.Node, status proto.NodeSta
 		res.Data = &proto.ReplayData{
 			NodeId:    node.Id,
 			Variables: wp.getVariableMapString(),
-			Data:      nodeData,
+			Data:      node.Data,
 			Status:    getStatusString(status),
 			Message:   message,
 		}
@@ -36,25 +52,6 @@ func (wp *WorkflowProcessor) getVariableMapString() map[string]string {
 		variableMap[k] = fmt.Sprintf("%v", v)
 	}
 	return variableMap
-}
-
-func (wp *WorkflowProcessor) updateNodeCurrentValue(node *proto.Node, newValue interface{}) {
-	oldValue := wp.ProcessVariables[CURRENT]
-	wp.ProcessVariables[CURRENT] = newValue
-	// Store Input
-	if strValue, ok := oldValue.(string); ok {
-		node.Input = &strValue
-	} else {
-		strValue := fmt.Sprintf("%v", newValue)
-		node.Input = &strValue
-	}
-	// Store Output
-	if strValue, ok := newValue.(string); ok {
-		node.Output = &strValue
-	} else {
-		strValue := fmt.Sprintf("%v", newValue)
-		node.Output = &strValue
-	}
 }
 
 func (wp *WorkflowProcessor) setVariable(varName string, value interface{}) error {
@@ -123,14 +120,13 @@ func (wp *WorkflowProcessor) populateTemplate(text string, data map[string]inter
 	for k, v := range data {
 		joinedMap[k] = v
 	}
-	tmpl, err := template.New("template").Parse(text)
+	tmpl, err := template.New("template").Option("missingkey=zero").Parse(text)
 	if err != nil {
 		return text
 	}
 	var builder strings.Builder
 	tmpl.Execute(&builder, joinedMap)
-	text = builder.String()
-	return text
+	return html.UnescapeString(builder.String())
 }
 
 func generateGUID() string {

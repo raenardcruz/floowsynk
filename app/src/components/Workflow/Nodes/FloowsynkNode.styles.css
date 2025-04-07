@@ -158,7 +158,9 @@
 }
 
 .replay-node-selected {
-  box-shadow: 0 0 15px var(--blue-3), 0 0 30px var(--blue-2);
-  transform: scale(1.05);
-  z-index: 10;
+  border: 2px var(--brown-2) solid;
+}
+.node.replay-node-selected:hover {
+  transform: none;
+  box-shadow: none;
 }

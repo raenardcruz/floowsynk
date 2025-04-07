@@ -33,6 +33,8 @@ const (
 
 const (
 	CURRENT = "current"
+	INPUT   = "input"
+	OUTPUT  = "output"
 	TRUE    = "True"
 	FALSE   = "False"
 )
@@ -46,12 +48,16 @@ type WorkflowProcessor struct {
 
 func (wp *WorkflowProcessor) StartWorkflow() (err error) {
 	start := time.Now()
+	wp.ProcessVariables = make(map[string]interface{})
+	wp.ProcessVariables[INPUT] = ""
+	wp.ProcessVariables[OUTPUT] = ""
 	wp.Process("0")
 	time.Since(start)
 	return nil
 }
 
 func (wp *WorkflowProcessor) Process(nodeId string) (err error) {
+	wp.ProcessVariables[INPUT] = wp.ProcessVariables[OUTPUT]
 	sourceHandle := ""
 	node, exist := getNodeById(wp.Workflow.Nodes, nodeId)
 	wp.UpdateStatus(node, proto.NodeStatus_RUNNING, nil, "", false)
