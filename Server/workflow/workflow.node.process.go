@@ -85,16 +85,31 @@ func (wp *WorkflowProcessor) LoopNodeProcess(node *proto.Node) (string, error) {
 
 func (wp *WorkflowProcessor) ForEachNodeProcess(node *proto.Node) (string, error) {
 	listvar := node.Data.Listvar
-	listitems := wp.ProcessVariables[*listvar].([]interface{})
-	for _, item := range listitems {
-		replayNode := CopyNode(node)
-		replayNode.Data.Listvar = listvar
-		wp.UpdateStatus(&replayNode, proto.NodeStatus_INFO, item, fmt.Sprintf("Processing item %v in Foreach Loop", item), true)
-		if err := wp.nextProcess(node.Id, ""); err != nil {
-			wp.UpdateStatus(&replayNode, proto.NodeStatus_FAILED, nil, fmt.Sprintf("Error processing item %v: %v", item, err), true)
-			return "", err
+	listitems := wp.ProcessVariables[*listvar]
+
+	items, ok := listitems.([]interface{})
+	if !ok {
+		wp.UpdateStatus(node, proto.NodeStatus_FAILED, nil, "List variable is not a valid List", true)
+		return "", errors.New("list variable is not a valid List")
+	}
+
+	for _, item := range items {
+		switch v := item.(type) {
+		case string, float64, bool, KeyValue:
+			replayNode := CopyNode(node)
+			replayNode.Data.Listvar = listvar
+			wp.UpdateStatus(&replayNode, proto.NodeStatus_INFO, v, fmt.Sprintf("Processing item %v in Foreach Loop", v), true)
+			wp.setVariable(OUTPUT, v)
+			if err := wp.nextProcess(node.Id, ""); err != nil {
+				wp.UpdateStatus(&replayNode, proto.NodeStatus_FAILED, nil, fmt.Sprintf("Error processing item %v: %v", v, err), true)
+				return "", err
+			}
+		default:
+			wp.UpdateStatus(node, proto.NodeStatus_FAILED, nil, "Invalid item type in List", true)
+			return "", errors.New("invalid item type in List")
 		}
 	}
+
 	wp.UpdateStatus(node, proto.NodeStatus_COMPLETED, nil, fmt.Sprintf("Foreach Loop completed for variable %s", *listvar), true)
 	return "", nil
 }

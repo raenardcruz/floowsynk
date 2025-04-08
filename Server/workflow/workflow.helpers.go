@@ -49,7 +49,19 @@ func (wp *WorkflowProcessor) UpdateStatus(node *proto.Node, status proto.NodeSta
 func (wp *WorkflowProcessor) getVariableMapString() map[string]string {
 	variableMap := make(map[string]string)
 	for k, v := range wp.ProcessVariables {
-		variableMap[k] = fmt.Sprintf("%v", v)
+		switch value := v.(type) {
+		case string:
+			variableMap[k] = value
+		case float64, int, int64, bool:
+			variableMap[k] = fmt.Sprintf("%v", value)
+		default:
+			outputBytes, err := json.Marshal(value)
+			if err != nil {
+				variableMap[k] = fmt.Sprintf("error marshaling value: %v", err)
+			} else {
+				variableMap[k] = string(outputBytes)
+			}
+		}
 	}
 	return variableMap
 }
