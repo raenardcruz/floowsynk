@@ -69,7 +69,7 @@ func (wp *WorkflowProcessor) LoopNodeProcess(node *proto.Node) error {
 		replayNode := CopyNode(node)
 		tmpIteration := int32(i)
 		replayNode.Data.Iteration = &tmpIteration
-		wp.UpdateStatus(&replayNode, proto.NodeStatus_RUNNING, nil, fmt.Sprintf("Running Iteration %d of %d", i, iteration), true)
+		wp.UpdateStatus(&replayNode, proto.NodeStatus_INFO, nil, fmt.Sprintf("Running Iteration %d of %d", i, iteration), true)
 		if err := wp.nextProcess(node.Id, ""); err != nil {
 			wp.UpdateStatus(&replayNode, proto.NodeStatus_FAILED, nil, fmt.Sprintf("Error processing loop iteration %d: %v", i, err), true)
 			return err
@@ -85,7 +85,7 @@ func (wp *WorkflowProcessor) ForEachNodeProcess(node *proto.Node) error {
 	for _, item := range listitems {
 		replayNode := CopyNode(node)
 		replayNode.Data.Listvar = listvar
-		wp.UpdateStatus(&replayNode, proto.NodeStatus_RUNNING, item, fmt.Sprintf("Processing item %v in Foreach Loop", item), true)
+		wp.UpdateStatus(&replayNode, proto.NodeStatus_INFO, item, fmt.Sprintf("Processing item %v in Foreach Loop", item), true)
 		if err := wp.nextProcess(node.Id, ""); err != nil {
 			wp.UpdateStatus(&replayNode, proto.NodeStatus_FAILED, nil, fmt.Sprintf("Error processing item %v: %v", item, err), true)
 			return err
@@ -109,7 +109,7 @@ func (wp *WorkflowProcessor) WhileNodeProcess(node *proto.Node) error {
 	for res && cur < limit {
 		iteration := int32(cur)
 		replayNode.Data.Iteration = &iteration
-		wp.UpdateStatus(&replayNode, proto.NodeStatus_RUNNING, nil, fmt.Sprintf("While Loop iteration %d with condition '%s'", cur, expression), true)
+		wp.UpdateStatus(&replayNode, proto.NodeStatus_INFO, nil, fmt.Sprintf("While Loop iteration %d with condition '%s'", cur, expression), true)
 		if err := wp.nextProcess(node.Id, ""); err != nil {
 			wp.UpdateStatus(&replayNode, proto.NodeStatus_FAILED, nil, fmt.Sprintf("Error during While Loop iteration %d: %v", cur, err), true)
 			return err
@@ -336,7 +336,7 @@ func (wp *WorkflowProcessor) SubProcessNodeProcess(node *proto.Node) error {
 		ProcessVariables: wp.ProcessVariables,
 		DBcon:            wp.DBcon,
 	}
-	wp.UpdateStatus(node, proto.NodeStatus_RUNNING, nil, fmt.Sprintf("SubProcess %s is running", *subProcessId), true)
+	wp.UpdateStatus(node, proto.NodeStatus_INFO, nil, fmt.Sprintf("SubProcess %s is running", *subProcessId), true)
 	subProcessor.Process("0")
 	for key, value := range subProcessor.ProcessVariables {
 		wp.ProcessVariables[key] = value

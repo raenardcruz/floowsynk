@@ -6547,7 +6547,8 @@ proto.proto.ArrayDataType = {
 proto.proto.NodeStatus = {
   RUNNING: 0,
   COMPLETED: 1,
-  FAILED: 2
+  FAILED: 2,
+  INFO: 3
 };
 
 goog.object.extend(exports, proto.proto);

@@ -960,4 +960,5 @@ export enum NodeStatus {
   RUNNING = 0,
   COMPLETED = 1,
   FAILED = 2,
+  INFO = 3,
 }

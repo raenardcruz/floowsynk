@@ -1,15 +1,14 @@
 package db
 
 import (
-	"database/sql"
 	"fmt"
 	"log"
+	"os"
 	"strconv"
 
-	"os"
-
 	"github.com/joho/godotenv"
-	_ "github.com/lib/pq"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 var (
@@ -43,56 +42,36 @@ func getEnvAsInt(name string, defaultVal int) int {
 }
 
 func NewDB() (*DB, error) {
+	log.Println("Connecting to database...")
 	connStr := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable", host, port, user, password, dbname)
-	conn, err := sql.Open("postgres", connStr)
+	conn, err := gorm.Open(postgres.Open(connStr), &gorm.Config{})
 	if err != nil {
 		return nil, err
 	}
-
+	log.Println("Connected to database")
 	return &DB{conn: conn}, nil
 }
 
 func (db *DB) InitDB() error {
-	log.Println("Creating tables...")
-	_, err := db.conn.Exec(`
-		CREATE TABLE IF NOT EXISTS users (
-			id UUID PRIMARY KEY,
-			username VARCHAR(50) NOT NULL UNIQUE,
-			password VARCHAR(255) NOT NULL,
-			role VARCHAR(50) NOT NULL,
-			email VARCHAR(50) NOT NULL,
-			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-			updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-		);
-		CREATE TABLE IF NOT EXISTS workflows (
-			id UUID PRIMARY KEY,
-			name VARCHAR(100) NOT NULL,
-			description TEXT,
-			type VARCHAR(50) NOT NULL DEFAULT 'defaultnode',
-			nodes JSONB,
-			edges JSONB,
-			tags TEXT[],
-			created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-			updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-			created_by UUID NOT NULL,
-			updated_by UUID NOT NULL
-		);
-		CREATE TABLE IF NOT EXISTS workflow_profiles (
-			id SERIAL PRIMARY KEY,
-			workflow_id UUID NOT NULL,
-			name VARCHAR(100) NOT NULL,
-			profile JSONB
-		);
-	`)
-	if err != nil {
-		log.Fatalf("Error creating tables: %v", err)
-		return err
+	log.Println("Migrating tables...")
+
+	// Add logging to identify problematic models
+	models := []interface{}{
+		&UsersModel{},
+		&Workflow{},
+		&WorkflowProfileModel{},
 	}
+
+	for _, model := range models {
+		log.Printf("Migrating model: %T", model)
+		if err := db.conn.AutoMigrate(model); err != nil {
+			log.Fatalf("Error migrating model %T: %v", model, err)
+			return err
+		}
+	}
+
 	admin, err := db.GetUser("b5bd8424-fb52-4454-8102-488959a41ca8")
-	if err != nil {
-		log.Fatalf("Error getting user: %v", err)
-	}
-	if admin.ID == "" {
+	if admin.ID == "" || err != nil {
 		db.AddUser(UsersModel{
 			ID:       "b5bd8424-fb52-4454-8102-488959a41ca8",
 			Username: "admin",
@@ -105,5 +84,5 @@ func (db *DB) InitDB() error {
 }
 
 func (db *DB) Close() {
-	db.conn.Close()
+	// Gorm does not require explicit close; connection pooling is managed internally.
 }
