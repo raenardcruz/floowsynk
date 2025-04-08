@@ -65,96 +65,48 @@ func (wp *WorkflowProcessor) Process(nodeId string) (err error) {
 		return nil
 	}
 
-	var processErr error
-	switch node.Nodetype {
-	case defaultnodeType, intervalType, webhookType, eventsType:
-		wp.UpdateStatus(node, proto.NodeStatus_COMPLETED, node.Data, "Process Started", true)
+	nodeProcessors := map[string]func(*proto.Node) (string, error){
+		defaultnodeType: wp.DefaultNodeProcess,
+		intervalType:    wp.DefaultNodeProcess,
+		webhookType:     wp.DefaultNodeProcess,
+		eventsType:      wp.DefaultNodeProcess,
+		setVariabletype: wp.SetVariableNodeProcess,
+		textType:        wp.TextNodeProcess,
+		conditionType:   wp.ConditionNodeProcessWrapper,
+		listType:        wp.ListNodeProcess,
+		loopType:        wp.LoopNodeProcess,
+		forEachType:     wp.ForEachNodeProcess,
+		whileType:       wp.WhileNodeProcess,
+		apiType:         wp.ApiNodeProcess,
+		logType:         wp.LogNodeProcess,
+		guidType:        wp.GuidNodeProcess,
+		mathType:        wp.MathNodeProcess,
+		countType:       wp.CountNodeProcess,
+		mapType:         wp.MapNodeProcess,
+		replaceType:     wp.ReplaceNodeProcess,
+		findAllType:     wp.FindAllNodeProcess,
+		subprocessType:  wp.SubProcessNodeProcess,
+	}
 
-	case setVariabletype:
-		if processErr = wp.SetVariableNodeProcess(node); processErr != nil {
-			return processErr
+	processFunc, ok := nodeProcessors[node.Nodetype]
+	if !ok {
+		return errors.New("unknown node type")
+	}
+
+	if node.Nodetype == conditionType {
+		if sourceHandle, err = processFunc(node); err != nil {
+			return err
 		}
-
-	case textType:
-		if processErr = wp.TextNodeProcess(node); processErr != nil {
-			return processErr
+	} else {
+		if sourceHandle, err = processFunc(node); err != nil {
+			return err
 		}
-
-	case conditionType:
-		if sourceHandle, processErr = wp.ConditionNodeProcess(node); processErr != nil {
-			return processErr
-		}
-
-	case listType:
-		if processErr = wp.ListNodeProcess(node); processErr != nil {
-			return processErr
-		}
-
-	case loopType:
-		if processErr = wp.LoopNodeProcess(node); processErr != nil {
-			return processErr
-		}
-
-	case forEachType:
-		if processErr = wp.ForEachNodeProcess(node); processErr != nil {
-			return processErr
-		}
-
-	case whileType:
-		if processErr = wp.WhileNodeProcess(node); processErr != nil {
-			return processErr
-		}
-
-	case apiType:
-		if processErr = wp.ApiNodeProcess(node); processErr != nil {
-			return processErr
-		}
-
-	case logType:
-		if processErr = wp.LogNodeProcess(node); processErr != nil {
-			return processErr
-		}
-
-	case guidType:
-		if processErr = wp.GuidNodeProcess(node); processErr != nil {
-			return processErr
-		}
-
-	case mathType:
-		if processErr = wp.MathNodeProcess(node); processErr != nil {
-			return processErr
-		}
-
-	case countType:
-		if processErr = wp.CountNodeProcess(node); processErr != nil {
-			return processErr
-		}
-
-	case mapType:
-		if processErr = wp.MapNodeProcess(node); processErr != nil {
-			return processErr
-		}
-
-	case replaceType:
-		if processErr = wp.ReplaceNodeProcess(node); processErr != nil {
-			return processErr
-		}
-
-	case findAllType:
-		if processErr = wp.FindAllNodeProcess(node); processErr != nil {
-			return processErr
-		}
-
-	case subprocessType:
-		if processErr = wp.SubProcessNodeProcess(node); processErr != nil {
-			return processErr
-		}
-
-	default:
-		processErr = errors.New("unknown node type")
-		return processErr
 	}
 
 	wp.nextProcess(nodeId, sourceHandle)
 	return nil
+}
+
+func (wp *WorkflowProcessor) ConditionNodeProcessWrapper(node *proto.Node) (string, error) {
+	return wp.ConditionNodeProcess(node)
 }
