@@ -1,11 +1,13 @@
 package db
 
 import (
-	"database/sql"
+	"gorm.io/gorm"
 )
 
+type JSONB []byte
+
 type DB struct {
-	conn *sql.DB
+	conn *gorm.DB
 }
 
 type UsersModel struct {
@@ -22,5 +24,19 @@ type WorkflowProfileModel struct {
 	ID         string
 	WorkflowId string
 	Name       string
-	Profile    interface{}
+	Profile    JSONB `gorm:"type:jsonb"`
+}
+
+type Workflow struct {
+	ID          string `gorm:"primaryKey"`
+	Name        string
+	Type        string
+	Description string
+	Nodes       JSONB `gorm:"type:jsonb"`
+	Edges       JSONB `gorm:"type:jsonb"`
+	CreatedBy   string
+	UpdatedBy   string
+	Tags        []string `gorm:"type:text[]"`
+	CreatedAt   string
+	UpdatedAt   string
 }

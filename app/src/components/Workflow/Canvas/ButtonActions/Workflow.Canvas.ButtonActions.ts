@@ -96,6 +96,9 @@ export const useWorkflowCanvasControlButtonActions = (props: WorkflowCanvasProps
         case NodeStatus.FAILED:
           nodeStatuses.value[response.getNodeid()] = 'error'
           break
+        case NodeStatus.INFO:
+          nodeStatuses.value[response.getNodeid()] = 'info'
+          break
       }
       if (response.getData() != undefined) {
         const data = response.getData()?.toObject()

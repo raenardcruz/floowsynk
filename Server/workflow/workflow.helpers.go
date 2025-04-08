@@ -83,6 +83,8 @@ func getStatusString(status proto.NodeStatus) string {
 		return "Success"
 	case proto.NodeStatus_FAILED:
 		return "Failed"
+	case proto.NodeStatus_INFO:
+		return "Info"
 	default:
 		return "Unknown"
 	}

@@ -5,12 +5,8 @@ import (
 	"errors"
 	"log"
 
-	"github.com/lib/pq"
 	pb "github.com/raenardcruz/floowsynk/proto"
 )
-
-// Add these types at the top of the file
-type JSONB []byte
 
 func (j *JSONB) Scan(value interface{}) error {
 	if value == nil {
@@ -26,11 +22,6 @@ func (j *JSONB) Scan(value interface{}) error {
 }
 
 func (db *DB) CreateWorkflow(workflow *pb.Workflow) (string, error) {
-	query := `
-		INSERT INTO workflows (id, name, type, description, nodes, edges, created_by, updated_by, tags, created_at, updated_at) 
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW(), NOW()) 
-		RETURNING id`
-
 	nodes, err := json.Marshal(workflow.Nodes)
 	if err != nil {
 		return "", err
@@ -40,125 +31,90 @@ func (db *DB) CreateWorkflow(workflow *pb.Workflow) (string, error) {
 		return "", err
 	}
 
-	var id string
-	err = db.conn.QueryRow(
-		query,
-		workflow.Id,
-		workflow.Name,
-		workflow.Type,
-		workflow.Description,
-		nodes,
-		edges,
-		workflow.CreatedBy,
-		workflow.UpdatedBy,
-		pq.Array(workflow.Tags),
-	).Scan(&id)
-	if err != nil {
+	wf := Workflow{
+		ID:          workflow.Id,
+		Name:        workflow.Name,
+		Type:        workflow.Type,
+		Description: workflow.Description,
+		Nodes:       nodes,
+		Edges:       edges,
+		CreatedBy:   workflow.CreatedBy,
+		UpdatedBy:   workflow.UpdatedBy,
+		Tags:        workflow.Tags,
+	}
+
+	if err := db.conn.Create(&wf).Error; err != nil {
 		return "", err
 	}
-	return id, nil
+	return wf.ID, nil
 }
 
-func (db *DB) GetWorkflows(limit, offset int) (wl *pb.WorkflowList, err error) {
-	wl = &pb.WorkflowList{
-		Workflows: make([]*pb.Workflow, 0),
-	}
-	if limit < 1 {
-		limit = 10 // default limit
-	}
-	if offset < 0 {
-		offset = 0
-	}
-
-	query := `
-		SELECT id, type, name, description, nodes, edges, created_at, updated_at, tags
-		FROM workflows
-		ORDER BY id
-		LIMIT $1 OFFSET $2`
-
-	rows, err := db.conn.Query(query, limit, offset)
-	if err != nil {
+func (db *DB) GetWorkflows(limit, offset int) (*pb.WorkflowList, error) {
+	var workflows []Workflow
+	if err := db.conn.Limit(limit).Offset(offset).Find(&workflows).Error; err != nil {
 		log.Printf("Error querying workflows: %v", err)
 		return nil, err
 	}
-	defer rows.Close()
 
-	for rows.Next() {
-		workflow := &pb.Workflow{}
-		var nodes, edges JSONB
-		err = rows.Scan(
-			&workflow.Id,
-			&workflow.Type,
-			&workflow.Name,
-			&workflow.Description,
-			&nodes,
-			&edges,
-			&workflow.CreatedAt,
-			&workflow.UpdatedAt,
-			pq.Array(&workflow.Tags),
-		)
-		if err != nil {
-			log.Printf("Error scanning workflow: %v", err)
-			return nil, err
-		}
-		if err := json.Unmarshal(nodes, &workflow.Nodes); err != nil {
+	wl := &pb.WorkflowList{Workflows: make([]*pb.Workflow, 0)}
+	for _, wf := range workflows {
+		var nodes []*pb.Node
+		if err := json.Unmarshal(wf.Nodes, &nodes); err != nil {
 			log.Printf("Error unmarshalling nodes: %v", err)
 			return nil, err
 		}
-		if err := json.Unmarshal(edges, &workflow.Edges); err != nil {
+		var edges []*pb.Edge
+		if err := json.Unmarshal(wf.Edges, &edges); err != nil {
 			log.Printf("Error unmarshalling edges: %v", err)
 			return nil, err
 		}
-
-		wl.Workflows = append(wl.Workflows, workflow)
-	}
-
-	if err := rows.Err(); err != nil {
-		return nil, err
+		wl.Workflows = append(wl.Workflows, &pb.Workflow{
+			Id:          wf.ID,
+			Name:        wf.Name,
+			Type:        wf.Type,
+			Description: wf.Description,
+			Nodes:       nodes,
+			Edges:       edges,
+			CreatedAt:   wf.CreatedAt,
+			UpdatedAt:   wf.UpdatedAt,
+			Tags:        wf.Tags,
+		})
 	}
 	return wl, nil
 }
 
-func (db *DB) GetWorkflow(id string) (workflow *pb.Workflow, err error) {
-	query := `
-		SELECT id, name, description, nodes, edges, created_at, updated_at, tags
-		FROM workflows 
-		WHERE id = $1`
-
-	workflow = &pb.Workflow{}
-	var nodes, edges JSONB
-	err = db.conn.QueryRow(query, id).Scan(
-		&workflow.Id,
-		&workflow.Name,
-		&workflow.Description,
-		&nodes,
-		&edges,
-		&workflow.CreatedAt,
-		&workflow.UpdatedAt,
-		pq.Array(&workflow.Tags),
-	)
-	if err != nil {
-		log.Printf("Error scanning workflow: %v", err)
-		return workflow, err
+func (db *DB) GetWorkflow(id string) (*pb.Workflow, error) {
+	var wf Workflow
+	if err := db.conn.First(&wf, "id = ?", id).Error; err != nil {
+		log.Printf("Error querying workflow: %v", err)
+		return nil, err
 	}
-	if err := json.Unmarshal(nodes, &workflow.Nodes); err != nil {
+
+	var nodes []*pb.Node
+	var edges []*pb.Edge
+	if err := json.Unmarshal(wf.Nodes, &nodes); err != nil {
 		log.Printf("Error unmarshalling nodes: %v", err)
-		return workflow, err
+		return nil, err
 	}
-	if err := json.Unmarshal(edges, &workflow.Edges); err != nil {
+	if err := json.Unmarshal(wf.Edges, &edges); err != nil {
 		log.Printf("Error unmarshalling edges: %v", err)
-		return workflow, err
+		return nil, err
 	}
 
-	return workflow, nil
+	return &pb.Workflow{
+		Id:          wf.ID,
+		Name:        wf.Name,
+		Type:        wf.Type,
+		Description: wf.Description,
+		Nodes:       nodes,
+		Edges:       edges,
+		CreatedAt:   wf.CreatedAt,
+		UpdatedAt:   wf.UpdatedAt,
+		Tags:        wf.Tags,
+	}, nil
 }
 
-func (db *DB) UpdateWorkflow(workflow *pb.Workflow) (err error) {
-	query := `
-		UPDATE workflows 
-		SET name = $1, description = $2, nodes = $3, edges = $4, updated_by = $5, type = $6, tags = $8, updated_at = NOW()
-		WHERE id = $7`
-
+func (db *DB) UpdateWorkflow(workflow *pb.Workflow) error {
 	nodes, err := json.Marshal(workflow.Nodes)
 	if err != nil {
 		return err
@@ -168,24 +124,25 @@ func (db *DB) UpdateWorkflow(workflow *pb.Workflow) (err error) {
 		return err
 	}
 
-	_, err = db.conn.Exec(
-		query,
-		workflow.Name,
-		workflow.Description,
-		nodes,
-		edges,
-		workflow.UpdatedBy,
-		workflow.Type,
-		workflow.Id,
-		pq.Array(workflow.Tags),
-	)
-	return err
+	wf := Workflow{
+		ID:          workflow.Id,
+		Name:        workflow.Name,
+		Type:        workflow.Type,
+		Description: workflow.Description,
+		Nodes:       nodes,
+		Edges:       edges,
+		UpdatedBy:   workflow.UpdatedBy,
+		Tags:        workflow.Tags,
+	}
+
+	if err := db.conn.Model(&Workflow{}).Where("id = ?", wf.ID).Updates(&wf).Error; err != nil {
+		return err
+	}
+	return nil
 }
 
 func (db *DB) DeleteWorkflow(id string) error {
-	query := "DELETE FROM workflows WHERE id = $1"
-	_, err := db.conn.Exec(query, id)
-	if err != nil {
+	if err := db.conn.Delete(&Workflow{}, "id = ?", id).Error; err != nil {
 		return err
 	}
 	return nil
