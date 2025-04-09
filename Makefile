@@ -1,4 +1,4 @@
-.PHONY: all start build install clean proto start-jobs docker-setup
+.PHONY: all start build install clean proto start-jobs docker-setup setup
 # Define directories
 APP_DIR = app
 SERVER_DIR = Server
@@ -51,6 +51,26 @@ proto:
 docker-setup:
 	@echo 🐳 ... Setting up Docker...
 	docker-compose up -d
+
+setup:
+	@echo 🔧 ... Installing required dependencies...
+	# Install protoc
+	@sudo apt-get update && sudo apt-get install -y protobuf-compiler
+	# Install protoc-gen-go and protoc-gen-go-grpc
+	@go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+	@go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+	# Install Node.js dependencies
+	@echo 🔧 ... Installing Node.js dependencies...
+	@cd app && npm install
+	# Install Go modules
+	@echo 🔧 ... Installing Go modules...
+	@go mod tidy
+	# Docker setup
+	@echo 🐳 ... Setting up Docker...
+	docker-compose up -d
+	# Verify installations
+	@protoc --version
+	@echo 🔧 ... All dependencies installed successfully.
 
 include $(APP_DIR)/app.mk
 include $(SERVER_DIR)/server.mk
