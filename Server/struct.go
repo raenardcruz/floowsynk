@@ -3,13 +3,16 @@ package main
 import (
 	"sync"
 
-	"github.com/raenardcruz/floowsynk/db"
+	"github.com/raenardcruz/floowsynk/Server/db"
 )
 
 type NodeList []Node
 type EdgeList []Edge
 type KeyValueList []KeyValue
 type Body map[string]interface{}
+
+var jwtKey = []byte("secret_key")
+var dbcon DBConnection
 
 type User struct {
 	Username string `json:"username"`

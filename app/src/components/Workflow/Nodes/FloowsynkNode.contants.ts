@@ -340,9 +340,6 @@ const startNodesArray: Node.AsObject[] = [
         label: '',
         draggable: false,
         icon: { name: 'webhook', color: 'var(--orange-2)' }, // orange
-        data: {
-            name: ''
-        },
         inputsList: [],
         outputsList: ['output'],
         groupList: [1],

@@ -11,7 +11,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/raenardcruz/floowsynk/proto"
+	"github.com/raenardcruz/floowsynk/Server/proto"
 )
 
 func (wp *WorkflowProcessor) UpdateStatus(node *proto.Node, status proto.NodeStatus, output interface{}, message string, includeReplayData bool) {

@@ -4,8 +4,8 @@ import (
 	"errors"
 	"time"
 
-	"github.com/raenardcruz/floowsynk/db"
-	"github.com/raenardcruz/floowsynk/proto"
+	"github.com/raenardcruz/floowsynk/Server/db"
+	"github.com/raenardcruz/floowsynk/Server/proto"
 )
 
 const (

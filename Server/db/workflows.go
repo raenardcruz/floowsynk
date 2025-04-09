@@ -5,7 +5,7 @@ import (
 	"errors"
 	"log"
 
-	pb "github.com/raenardcruz/floowsynk/proto"
+	pb "github.com/raenardcruz/floowsynk/Server/proto"
 )
 
 func (j *JSONB) Scan(value interface{}) error {
@@ -111,6 +111,34 @@ func (db *DB) GetWorkflow(id string) (*pb.Workflow, error) {
 		CreatedAt:   wf.CreatedAt,
 		UpdatedAt:   wf.UpdatedAt,
 		Tags:        wf.Tags,
+	}, nil
+}
+
+func (db *DB) GetWebhookWorkflow(id string) (*pb.Workflow, error) {
+	var wf Workflow
+	if err := db.conn.First(&wf, "id = ? and type = ?", id, "webhook").Error; err != nil {
+		log.Printf("Error querying workflow: %v", err)
+		return nil, err
+	}
+
+	var nodes []*pb.Node
+	var edges []*pb.Edge
+	if err := json.Unmarshal(wf.Nodes, &nodes); err != nil {
+		log.Printf("Error unmarshalling nodes: %v", err)
+		return nil, err
+	}
+	if err := json.Unmarshal(wf.Edges, &edges); err != nil {
+		log.Printf("Error unmarshalling edges: %v", err)
+		return nil, err
+	}
+
+	return &pb.Workflow{
+		Id:          wf.ID,
+		Name:        wf.Name,
+		Type:        wf.Type,
+		Description: wf.Description,
+		Nodes:       nodes,
+		Edges:       edges,
 	}, nil
 }
 

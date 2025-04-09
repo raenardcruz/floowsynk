@@ -5,12 +5,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/raenardcruz/floowsynk/proto"
-	"github.com/raenardcruz/floowsynk/workflow"
+	"github.com/raenardcruz/floowsynk/Server/proto"
+	"github.com/raenardcruz/floowsynk/Server/workflow"
 )
-
-var jwtKey = []byte("secret_key")
-var dbcon DBConnection
 
 func (s *LoginServer) Login(ctx context.Context, in *proto.Credential) (*proto.Token, error) {
 	token, err := Login(in.Username, in.Password)

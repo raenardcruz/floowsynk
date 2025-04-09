@@ -1,4 +1,4 @@
-.PHONY: all start build install clean proto
+.PHONY: all start build install clean proto start-jobs docker-setup
 # Define directories
 APP_DIR = app
 SERVER_DIR = Server
@@ -8,15 +8,19 @@ all: start
 
 start:
 	@echo 🚀 ... Starting all services...
-	@make -j2 start-ui start-server
+	@make -j2 start-ui start-server start-jobs
+
+start-jobs:
+	@echo 🚀 ... Starting job processor...
+	@cd Jobs && go run interval_processor.go
 
 build:
 	@echo 🔧 ... Building all services...
 	@make -j2 build-ui build-server
 
-install:
-	@echo 💾 ... Installing all services...
-	@make -j2 install-ui install-server
+install: docker-setup
+	@echo 💾 ... Installing all dependencies and setting up Docker...
+	@make -j3 install-ui install-server
 
 clean:
 	@echo 🧹 ... Cleaning up all services...
@@ -42,6 +46,11 @@ proto:
 	cd ${SERVER_DIR} && go mod tidy
 	cd ..
 	@echo 📦 ... Generating proto files Completed...
+
+# Docker setup target
+docker-setup:
+	@echo 🐳 ... Setting up Docker...
+	docker-compose up -d
 
 include $(APP_DIR)/app.mk
 include $(SERVER_DIR)/server.mk

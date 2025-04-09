@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
-	"github.com/raenardcruz/floowsynk/crypto"
-	pb "github.com/raenardcruz/floowsynk/proto"
+	"github.com/raenardcruz/floowsynk/Server/crypto"
+	pb "github.com/raenardcruz/floowsynk/Server/proto"
 	"google.golang.org/grpc/metadata"
 )
 

@@ -35,21 +35,11 @@
                     v-if="tab.nodesList && tab.nodesList[0] && tab.nodesList[0].data" />
                 </div>
                 <div v-else-if="isSelected('webhook')" class="fields">
-                    <label for="name">Name: </label>
-                    <input
-                        type="text"
-                        class="input"
-                        id="name" 
-                        placeholder="Name of webhook"
-                        v-model="tab.nodesList[0].data.name" 
-                        v-if="tab.nodesList && tab.nodesList[0] && tab.nodesList[0].data" />
                     <label
-                        for="url"
-                        v-if="tab.nodesList && tab.nodesList[0].data && tab.nodesList[0].data.name && tab.nodesList[0].data.name.length > 0">
+                        for="url">
                         Webhook Url:
                     </label>
-                    <span style="display: flex; align-items: center; position: relative; overflow: none;"
-                        v-if="tab.nodesList && tab.nodesList[0].data && tab.nodesList[0].data.name && tab.nodesList[0].data.name.length > 0">
+                    <span style="display: flex; align-items: center; position: relative; overflow: none;">
                         <input type="text" class="input" id="url" :value="webhookUrl" readonly />
                         <span class="material-symbols-outlined copy-btn" @click="copyToClipboard(id)">content_copy</span>
                         <span class="tooltip" v-if="showTooltip">URL copied!</span>

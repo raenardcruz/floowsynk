@@ -4,11 +4,12 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strings"
 
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
-	"github.com/raenardcruz/floowsynk/db"
-	"github.com/raenardcruz/floowsynk/proto"
-	"github.com/raenardcruz/floowsynk/workflow"
+	"github.com/raenardcruz/floowsynk/Server/db"
+	"github.com/raenardcruz/floowsynk/Server/proto"
+	"github.com/raenardcruz/floowsynk/Server/workflow"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
@@ -24,11 +25,10 @@ type WorkflowServer struct {
 }
 
 func main() {
-	dbobj, err := initializeDatabase()
+	_, err := initializeDatabase()
 	if err != nil {
 		log.Fatalf("Failed to initialize database: %v", err)
 	}
-	defer dbobj.Close()
 
 	grpcServer := setupGRPCServer()
 	httpServer := setupHTTPServer(grpcServer)
@@ -71,7 +71,7 @@ func setupHTTPServer(grpcServer *grpc.Server) *http.ServeMux {
 func startRESTServer() {
 	restAPIPort := ":8081"
 	restServer := http.NewServeMux()
-	restServer.HandleFunc("/run-workflow", runWorkflowHandler)
+	restServer.HandleFunc("/api/webhook/", runWebhookHandler)
 
 	go func() {
 		log.Println("REST API server started at", restAPIPort)
@@ -81,19 +81,26 @@ func startRESTServer() {
 	}()
 }
 
-func runWorkflowHandler(w http.ResponseWriter, r *http.Request) {
+func runWebhookHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Only POST method is allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
-	workflowID := r.URL.Query().Get("id")
+	// Extract workflow ID from the route after /webhook/
+	pathParts := strings.Split(r.URL.Path, "/")
+	if len(pathParts) < 4 || pathParts[2] != "webhook" {
+		http.Error(w, "Invalid webhook route", http.StatusBadRequest)
+		return
+	}
+	workflowID := pathParts[3]
+
 	if workflowID == "" {
 		http.Error(w, "Missing workflow ID", http.StatusBadRequest)
 		return
 	}
 
-	workflowObj, err := dbcon.DB.GetWorkflow(workflowID)
+	workflowObj, err := dbcon.DB.GetWebhookWorkflow(workflowID)
 	if err != nil {
 		http.Error(w, "Failed to get workflow: "+err.Error(), http.StatusInternalServerError)
 		return

@@ -6,9 +6,13 @@ import (
 	"os"
 	"strconv"
 
+	"database/sql"
+
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+
+	_ "github.com/lib/pq" // PostgreSQL driver
 )
 
 var (
@@ -52,6 +56,21 @@ func NewDB() (*DB, error) {
 	return &DB{conn: conn}, nil
 }
 
+func NewDBConnection() *sql.DB {
+	connStr := "user=username password=password dbname=floowsynk sslmode=disable"
+	db, err := sql.Open("postgres", connStr)
+	if err != nil {
+		log.Fatalf("Failed to connect to the database: %v", err)
+	}
+
+	if err := db.Ping(); err != nil {
+		log.Fatalf("Failed to ping the database: %v", err)
+	}
+
+	log.Println("Database connection established successfully.")
+	return db
+}
+
 func (db *DB) InitDB() error {
 	log.Println("Migrating tables...")
 
@@ -81,8 +100,4 @@ func (db *DB) InitDB() error {
 	}
 
 	return nil
-}
-
-func (db *DB) Close() {
-	// Gorm does not require explicit close; connection pooling is managed internally.
 }

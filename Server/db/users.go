@@ -4,7 +4,7 @@ import (
 	"log"
 
 	"github.com/google/uuid"
-	"github.com/raenardcruz/floowsynk/crypto"
+	"github.com/raenardcruz/floowsynk/Server/crypto"
 )
 
 func (db *DB) GetUsers() ([]UsersModel, error) {
