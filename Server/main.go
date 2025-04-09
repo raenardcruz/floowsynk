@@ -1,45 +1,124 @@
 package main
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
 	"github.com/raenardcruz/floowsynk/db"
 	"github.com/raenardcruz/floowsynk/proto"
+	"github.com/raenardcruz/floowsynk/workflow"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
 
+// LoginServer handles login-related gRPC services
 type LoginServer struct {
 	proto.UnimplementedLoginServiceServer
 }
 
+// WorkflowServer handles workflow-related gRPC services
 type WorkflowServer struct {
 	proto.UnimplementedWorkflowServiceServer
 }
 
 func main() {
-	dbobj, err := db.NewDB()
+	dbobj, err := initializeDatabase()
 	if err != nil {
-		panic(err)
+		log.Fatalf("Failed to initialize database: %v", err)
 	}
 	defer dbobj.Close()
+
+	grpcServer := setupGRPCServer()
+	httpServer := setupHTTPServer(grpcServer)
+
+	startRESTServer()
+
+	log.Println("Server started at :8080")
+	if err := http.ListenAndServe(":8080", corsMiddleware(httpServer)); err != nil {
+		log.Fatalf("Failed to start server: %v", err)
+	}
+}
+
+func initializeDatabase() (*db.DB, error) {
+	dbobj, err := db.NewDB()
+	if err != nil {
+		return nil, err
+	}
 	dbobj.InitDB()
 	dbcon = DBConnection{dbobj}
+	return dbobj, nil
+}
+
+func setupGRPCServer() *grpc.Server {
 	grpcServer := grpc.NewServer()
 	proto.RegisterLoginServiceServer(grpcServer, &LoginServer{})
 	proto.RegisterWorkflowServiceServer(grpcServer, &WorkflowServer{})
 	reflection.Register(grpcServer)
+	return grpcServer
+}
+
+func setupHTTPServer(grpcServer *grpc.Server) *http.ServeMux {
 	wrap := grpcweb.WrapServer(grpcServer)
 	httpServer := http.NewServeMux()
 	httpServer.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		wrap.ServeHTTP(w, r)
 	})
+	return httpServer
+}
 
-	log.Println("Server started at :8080")
-	if err := http.ListenAndServe(":8080", corsMiddleware(httpServer)); err != nil {
-		log.Fatalf("Failed to start server: %v", err)
+func startRESTServer() {
+	restAPIPort := ":8081"
+	restServer := http.NewServeMux()
+	restServer.HandleFunc("/run-workflow", runWorkflowHandler)
+
+	go func() {
+		log.Println("REST API server started at", restAPIPort)
+		if err := http.ListenAndServe(restAPIPort, corsMiddleware(restServer)); err != nil {
+			log.Fatalf("Failed to start REST API server: %v", err)
+		}
+	}()
+}
+
+func runWorkflowHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Only POST method is allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	workflowID := r.URL.Query().Get("id")
+	if workflowID == "" {
+		http.Error(w, "Missing workflow ID", http.StatusBadRequest)
+		return
+	}
+
+	workflowObj, err := dbcon.DB.GetWorkflow(workflowID)
+	if err != nil {
+		http.Error(w, "Failed to get workflow: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	wp := workflow.WorkflowProcessor{
+		DBcon:            *dbcon.DB,
+		Workflow:         workflowObj,
+		Stream:           nil, // Replace with a valid implementation if required
+		ProcessVariables: make(map[string]interface{}),
+	}
+
+	if err := wp.StartWorkflow(); err != nil {
+		http.Error(w, "Failed to start workflow: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	response := map[string]interface{}{
+		"message":   "Workflow started successfully",
+		"variables": wp.ProcessVariables,
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		http.Error(w, "Failed to encode response as JSON", http.StatusInternalServerError)
 	}
 }
 

@@ -43,7 +43,9 @@ func (wp *WorkflowProcessor) UpdateStatus(node *proto.Node, status proto.NodeSta
 			Message:   message,
 		}
 	}
-	wp.Stream.Send(res)
+	if wp.Stream != nil {
+		wp.Stream.Send(res)
+	}
 }
 
 func (wp *WorkflowProcessor) getVariableMapString() map[string]string {
