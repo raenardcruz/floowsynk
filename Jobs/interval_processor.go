@@ -6,16 +6,11 @@ import (
 	"log"
 	"time"
 
-	"database/sql"
-
-	"github.com/raenardcruz/floowsynk/Server/db"
 	"github.com/raenardcruz/floowsynk/Server/proto"
 	"github.com/segmentio/kafka-go"
 )
 
-type IntervalJob struct {
-	DB *sql.DB
-}
+type IntervalJob struct{}
 
 func (job *IntervalJob) ProcessIntervalWorkflows() {
 	reader := kafka.NewReader(kafka.ReaderConfig{
@@ -79,8 +74,7 @@ func (job *IntervalJob) processNode(node *proto.Node) {
 }
 
 func main() {
-	dbConnection := db.NewDBConnection()
-	job := &IntervalJob{DB: dbConnection}
+	job := &IntervalJob{}
 	log.Println("Starting interval workflow processor...")
 	job.ProcessIntervalWorkflows()
 }

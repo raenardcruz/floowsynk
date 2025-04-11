@@ -6,8 +6,6 @@ import (
 	"os"
 	"strconv"
 
-	"database/sql"
-
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -54,21 +52,6 @@ func NewDB() (*DB, error) {
 	}
 	log.Println("Connected to database")
 	return &DB{conn: conn}, nil
-}
-
-func NewDBConnection() *sql.DB {
-	connStr := "user=username password=password dbname=floowsynk sslmode=disable"
-	db, err := sql.Open("postgres", connStr)
-	if err != nil {
-		log.Fatalf("Failed to connect to the database: %v", err)
-	}
-
-	if err := db.Ping(); err != nil {
-		log.Fatalf("Failed to ping the database: %v", err)
-	}
-
-	log.Println("Database connection established successfully.")
-	return db
 }
 
 func (db *DB) InitDB() error {
