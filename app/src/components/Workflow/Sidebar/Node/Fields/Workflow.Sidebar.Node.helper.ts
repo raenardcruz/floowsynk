@@ -3,7 +3,7 @@ import { SidebarNodeProps } from '../Workflow.Sidebar.Node.types'
 import { EMIT_MODEL } from './Workflow.Sidebar.Node.Fields.constants'
 import { NodeDataArray, ArrayDataType } from 'proto/floowsynk_pb'
 
-const { modalStates, arraytype } = useSidebarNodeStore();
+const { modalStates } = useSidebarNodeStore();
 
 export const showModal = (key: string) => {
     modalStates.value[key] = true;

@@ -3,6 +3,7 @@ import { useTab } from '@/views/Workflow'
 import { DenormalizeVueFlowObject } from '@/components/Composable/protoTransformers'
 import { ReplayData } from 'proto/floowsynk_pb'
 import { useMouse, useManualRefHistory } from '@vueuse/core'
+import type { Node, Edge } from '@vue-flow/core'
 
 // Global Refs
 const isDragOver = ref(false)
@@ -38,13 +39,19 @@ export const useWorkflowCanvasHooks = (tabId: string) => {
     const { tab } = useTab(tabId)
     const canvasId = computed(() => btoa(tab.value.id))
     const node = computed({
-        get: () => tab.value.nodesList.map((node: any) => DenormalizeVueFlowObject(node)),
+        get: () => tab.value.nodesList.map((node: Object) => {
+            const denormalizedNode = DenormalizeVueFlowObject(node);
+            return {
+                ...denormalizedNode,
+                position: denormalizedNode.position || { x: 0, y: 0 },
+            } as Node<any, any, string>;
+        }),
         set: (newNodes: any[]) => { 
             tab.value.nodesList = [...newNodes]
         }
     })
     const edge = computed({
-        get: () => tab.value.edgesList.map((edge: any) => DenormalizeVueFlowObject(edge)),
+        get: () => tab.value.edgesList.map((edge: Edge<any, any, string>) => DenormalizeVueFlowObject(edge)),
         set: (newEdges: any[]) => { 
             tab.value.edgesList = [...newEdges]
         }

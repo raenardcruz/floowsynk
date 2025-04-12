@@ -15,7 +15,6 @@ import {
     NodeHandleBounds,
     Handle,
     NodeDataArray,
-    ArrayDataType,
  } from 'proto/floowsynk_pb'
  import type { Node as vfNode } from '@vue-flow/core'
 

@@ -30,8 +30,8 @@
                 <ProcessTypeModal :id="tab.id" />
             </Modal>
             <div class="workspace">
-                <VueFlow class="vue-flow-container" tabindex="0" v-model:nodes="node as Node<any, any, string>[]"
-                    v-model:edges="edge as Edge<any, any, string>[]" :only-render-visible-elements="false"
+                <VueFlow class="vue-flow-container" tabindex="0" v-model:nodes="node"
+                    v-model:edges="edge" :only-render-visible-elements="false"
                     :snapToGrid="true" @connect="onConnectEdge($event)" @drop="onDrop($event)"
                     @dragover="onDragOver($event)" @dragleave="onDragLeave()"
                     @selection-drag-stop="commit()" @edges-change="commit()" delete-key-code="false"
@@ -79,7 +79,6 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import type { Node, Edge } from '@vue-flow/core'
 import { VueFlow, useVueFlow } from '@vue-flow/core'
 import { WorkflowCanvasProps } from './Workflow.Canvas.types'
 import { useWorkflowCanvasHooks, useWorkflowCanvasStore, useWorkflowCanvasGlbalStore } from './Workflow.Canvas.hooks'

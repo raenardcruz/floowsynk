@@ -10,7 +10,6 @@ interface Props {
 }
 
 const props = defineProps<Props>()
-const emit = defineEmits<{ (e: 'update:modelValue', value: string): void }>()
 
 const localData = ref(props.modelValue)
 
@@ -21,9 +20,6 @@ watch(
   }
 )
 
-function updateData() {
-  emit('update:modelValue', localData.value)
-}
 </script>
 
 <style scoped>

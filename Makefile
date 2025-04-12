@@ -4,27 +4,17 @@ APP_DIR = app
 SERVER_DIR = Server
 PROTO_DIR = './proto'
 
-all: start
-
-start:
-	@echo 🚀 ... Starting all services...
-	@make -j2 start-ui start-server start-jobs
+build:
+	@echo 🔧 ... Building all services...
+	@make -j2 build-ui build-server
 
 start-jobs:
 	@echo 🚀 ... Starting job processor...
 	@cd Jobs && go run interval_processor.go
 
-build:
-	@echo 🔧 ... Building all services...
-	@make -j2 build-ui build-server
-
 install: docker-setup
 	@echo 💾 ... Installing all dependencies and setting up Docker...
 	@make -j3 install-ui install-server
-
-clean:
-	@echo 🧹 ... Cleaning up all services...
-	@make -j2 db-clean
 
 proto:
 	@echo 📦 ... Generating proto files started...
@@ -48,9 +38,14 @@ proto:
 	@echo 📦 ... Generating proto files Completed...
 
 # Docker setup target
-docker-setup:
+start-docker:
 	@echo 🐳 ... Setting up Docker...
-	docker-compose up -d
+	docker compose up -d
+
+stop-docker:
+	@echo 🐳 ... Stopping Docker...
+	docker compose down -v
+	@echo 🐳 ... Docker stopped.
 
 setup:
 	@echo 🔧 ... Installing required dependencies...
@@ -74,4 +69,3 @@ setup:
 
 include $(APP_DIR)/app.mk
 include $(SERVER_DIR)/server.mk
-include $(SERVER_DIR)/db/db.mk
