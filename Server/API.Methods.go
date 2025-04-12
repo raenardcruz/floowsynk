@@ -69,7 +69,7 @@ func ExtendToken(token string) (string, error) {
 }
 
 func Login(userName string, password string) (string, error) {
-	dbUser, err := dbcon.DB.GetUserByUsername(userName)
+	dbUser, err := DBCon.GetUserByUsername(userName)
 	if err != nil {
 		return "", fmt.Errorf("error getting user")
 	}
@@ -91,7 +91,7 @@ func Login(userName string, password string) (string, error) {
 }
 
 func GetWorkflow(id string) (workflow *pb.Workflow, err error) {
-	workflow, err = dbcon.DB.GetWorkflow(id)
+	workflow, err = DBCon.GetWorkflow(id)
 	if err != nil {
 		return workflow, err
 	}
@@ -99,20 +99,20 @@ func GetWorkflow(id string) (workflow *pb.Workflow, err error) {
 }
 
 func ListWorkflows(offset int32, limit int32) (wl *pb.WorkflowList, err error) {
-	wl, err = dbcon.DB.GetWorkflows(int(limit), int(offset))
+	wl, err = DBCon.GetWorkflows(int(limit), int(offset))
 	if err != nil {
 		return nil, err
 	}
 	return wl, nil
 }
 func UpdateWorkflow(workflow *pb.Workflow) (w *pb.Workflow, err error) {
-	if err := dbcon.DB.UpdateWorkflow(workflow); err != nil {
+	if err := DBCon.UpdateWorkflow(workflow); err != nil {
 		return nil, err
 	}
 	return workflow, nil
 }
 func CreateWorkflow(workflow *pb.Workflow) (*pb.Workflow, error) {
-	id, err := dbcon.DB.CreateWorkflow(workflow)
+	id, err := DBCon.CreateWorkflow(workflow)
 	if err != nil {
 		return nil, err
 	}
@@ -120,5 +120,5 @@ func CreateWorkflow(workflow *pb.Workflow) (*pb.Workflow, error) {
 	return workflow, nil
 }
 func DeleteWorkflow(id string) error {
-	return dbcon.DB.DeleteWorkflow(id)
+	return DBCon.DeleteWorkflow(id)
 }

@@ -1,20 +1,26 @@
 .PHONY: all start build install clean proto start-jobs docker-setup setup
 # Define directories
-APP_DIR = app
+APP_DIR = App
 SERVER_DIR = Server
 PROTO_DIR = './proto'
 
 build:
 	@echo 🔧 ... Building all services...
-	@make -j2 build-ui build-server
+	@cd $(SERVER_DIR) && go build -o floowsynk_server .
+	@cd $(APP_DIR) && npm run build
+	@echo 🔧 ... Build completed.
+
+start-server:
+	@echo 🚀 ... Starting server...
+	@cd $(SERVER_DIR) && go run .
+
+start-ui:
+	@echo 🚀 ... Starting UI...
+	@cd $(APP_DIR) && npm run dev
 
 start-jobs:
 	@echo 🚀 ... Starting job processor...
 	@cd Jobs && go run interval_processor.go
-
-install: docker-setup
-	@echo 💾 ... Installing all dependencies and setting up Docker...
-	@make -j3 install-ui install-server
 
 proto:
 	@echo 📦 ... Generating proto files started...
@@ -66,6 +72,3 @@ setup:
 	# Verify installations
 	@protoc --version
 	@echo 🔧 ... All dependencies installed successfully.
-
-include $(APP_DIR)/app.mk
-include $(SERVER_DIR)/server.mk

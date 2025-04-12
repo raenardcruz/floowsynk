@@ -128,7 +128,7 @@ func (s *WorkflowServer) RunWorkflow(req *proto.Workflow, stream proto.WorkflowS
 		Stream:           stream,
 		Workflow:         req,
 		ProcessVariables: make(map[string]interface{}),
-		DBcon:            *dbcon.DB,
+		DBcon:            *DBCon,
 	}
 	processor.StartWorkflow()
 	return nil

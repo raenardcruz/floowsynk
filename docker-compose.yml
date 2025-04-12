@@ -1,5 +1,13 @@
 version: '3.8'
-
+# This Docker Compose configuration file defines the services, networks, and volumes
+# required to run a multi-container Docker application. Each service represents a 
+# containerized application or component, and the configuration specifies how they 
+# interact with each other. The file also includes settings for environment variables, 
+# ports, volumes, and other runtime options to ensure proper orchestration of the 
+# application stack.
+# 
+# Note: Replace the placeholder passwords (e.g., 'floowsynk') with strong, secure passwords
+# to enhance the security of your application.
 services:
   db:
     image: postgres:15
@@ -17,6 +25,11 @@ services:
     image: redis:latest
     ports:
       - "6379:6379"
+    volumes:
+      - redis_data:/data
+    environment:
+      - REDIS_PASSWORD=floowsynk
+    command: redis-server --requirepass floowsynk
 
   kafka:
     image: confluentinc/cp-kafka:latest
@@ -37,3 +50,4 @@ services:
 
 volumes:
   postgres_data:
+  redis_data:

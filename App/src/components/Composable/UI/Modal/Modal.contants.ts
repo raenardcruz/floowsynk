@@ -1,0 +1,1 @@
+export const EMMIT_VISIBLE = 'update:visible'

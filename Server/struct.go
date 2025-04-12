@@ -3,7 +3,7 @@ package main
 import (
 	"sync"
 
-	"github.com/raenardcruz/floowsynk/Server/db"
+	db "github.com/raenardcruz/floowsynk/Database"
 )
 
 type NodeList []Node
@@ -12,7 +12,6 @@ type KeyValueList []KeyValue
 type Body map[string]interface{}
 
 var jwtKey = []byte("secret_key")
-var dbcon DBConnection
 
 type User struct {
 	Username string `json:"username"`
@@ -65,7 +64,7 @@ type LogData struct {
 type WorkflowProcessor struct {
 	ProcessID        string
 	Workflow         *Workflow
-	Dbcon            *DBConnection
+	Dbcon            *db.DatabaseConnection
 	ProcessVariables map[string]interface{}
 	ProcessResults   map[string]interface{}
 	LoggingData      []LogData
@@ -88,10 +87,6 @@ type Edge struct {
 type KeyValue struct {
 	Key   string `json:"key"`
 	Value string `json:"value"`
-}
-
-type DBConnection struct {
-	*db.DB
 }
 
 type CurrentNode struct {

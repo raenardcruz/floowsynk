@@ -1,0 +1,65 @@
+.logic-main {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 50px);
+    width: 100%;
+    padding: 0;
+}
+
+.logic-main .logic-main-content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    padding: 0;
+    border-top: 1px solid var(--grey-4);
+    overflow: hidden;
+}
+
+.logic-main .logic-main-content .logic-main-workspace {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+.tabs {
+    height: 20px;
+    width: 100%;
+    margin-top: 5px;
+    display: flex;
+}
+.tabs * {
+    font-size: 10px;
+}
+.tabs .tab {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    transition: 0.5s;
+    border: 1px solid var(--grey-3);
+    border-bottom: none;
+    cursor: pointer;
+    background: var(--grey-5);
+    border-top-right-radius: 5px;
+    border-top-left-radius: 5px;
+}
+.tabs .tab:hover {
+    filter: brightness(1.1);
+}
+.tabs .tab.nav-active {
+    background: var(--blue-2);
+    color: var(--white-1);
+}
+.close {
+    margin-left: 5px;
+}
+.content-animation {
+    animation: 0.5s fade;
+}

@@ -1,0 +1,22 @@
+button {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--red-2);
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    width: 15px;
+    height: 15px;
+    border-radius: 90px;
+    background: var(--wihte-1);
+    padding: 0px;
+}
+button:hover {
+    transform: scale(1.2);
+    background: var(--white-1);
+}
+button span {
+    font-size: 20px;
+}

@@ -4,7 +4,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/raenardcruz/floowsynk/Server/db"
+	db "github.com/raenardcruz/floowsynk/Database"
 	"github.com/raenardcruz/floowsynk/Server/proto"
 )
 
@@ -43,7 +43,7 @@ type WorkflowProcessor struct {
 	Stream           proto.WorkflowService_RunWorkflowServer
 	Workflow         *proto.Workflow
 	ProcessVariables map[string]interface{}
-	DBcon            db.DB
+	DBcon            db.DatabaseConnection
 }
 
 func (wp *WorkflowProcessor) StartWorkflow() (err error) {

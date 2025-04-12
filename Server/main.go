@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
-	"github.com/raenardcruz/floowsynk/Server/db"
+	db "github.com/raenardcruz/floowsynk/Database"
 	"github.com/raenardcruz/floowsynk/Server/proto"
 	"github.com/raenardcruz/floowsynk/Server/workflow"
 	"google.golang.org/grpc"
@@ -24,8 +24,10 @@ type WorkflowServer struct {
 	proto.UnimplementedWorkflowServiceServer
 }
 
+var DBCon *db.DatabaseConnection
+
 func main() {
-	_, err := initializeDatabase()
+	err := initializeDatabase()
 	if err != nil {
 		log.Fatalf("Failed to initialize database: %v", err)
 	}
@@ -41,14 +43,13 @@ func main() {
 	}
 }
 
-func initializeDatabase() (*db.DB, error) {
-	dbobj, err := db.NewDB()
-	if err != nil {
-		return nil, err
+func initializeDatabase() (err error) {
+	db.ConnectToRedis()
+	if DBCon, err = db.ConnectToDatabase(); err != nil {
+		return err
 	}
-	dbobj.InitDB()
-	dbcon = DBConnection{dbobj}
-	return dbobj, nil
+	DBCon.MigrateAndSeedDatabase()
+	return nil
 }
 
 func setupGRPCServer() *grpc.Server {
@@ -100,16 +101,16 @@ func runWebhookHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	workflowObj, err := dbcon.DB.GetWebhookWorkflow(workflowID)
+	workflowObj, err := DBCon.GetWebhookWorkflow(workflowID)
 	if err != nil {
 		http.Error(w, "Failed to get workflow: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	wp := workflow.WorkflowProcessor{
-		DBcon:            *dbcon.DB,
+		DBcon:            *DBCon,
 		Workflow:         workflowObj,
-		Stream:           nil, // Replace with a valid implementation if required
+		Stream:           nil,
 		ProcessVariables: make(map[string]interface{}),
 	}
 
