@@ -29,6 +29,11 @@ service WorkflowService {
     rpc CreateWorkflow(Workflow) returns (Workflow);
     rpc DeleteWorkflow(Workflow) returns (Empty);
     rpc RunWorkflow(Workflow) returns (stream RunWorkflowResponse);
+    rpc RunWorkflowId(RunWorkflowIdRequest) returns (RunWorkflowResponse);
+}
+
+message RunWorkflowIdRequest {
+    string id = 1;
 }
 
 message RunWorkflowResponse {

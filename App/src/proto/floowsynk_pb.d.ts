@@ -2,6 +2,24 @@ import * as jspb from 'google-protobuf'
 
 
 
+export class RunWorkflowIdRequest extends jspb.Message {
+  getId(): string;
+  setId(value: string): RunWorkflowIdRequest;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): RunWorkflowIdRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: RunWorkflowIdRequest): RunWorkflowIdRequest.AsObject;
+  static serializeBinaryToWriter(message: RunWorkflowIdRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): RunWorkflowIdRequest;
+  static deserializeBinaryFromReader(message: RunWorkflowIdRequest, reader: jspb.BinaryReader): RunWorkflowIdRequest;
+}
+
+export namespace RunWorkflowIdRequest {
+  export type AsObject = {
+    id: string,
+  }
+}
+
 export class RunWorkflowResponse extends jspb.Message {
   getNodeid(): string;
   setNodeid(value: string): RunWorkflowResponse;

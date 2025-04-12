@@ -1,8 +1,6 @@
 package main
 
 import (
-	"sync"
-
 	db "github.com/raenardcruz/floowsynk/Database"
 )
 
@@ -42,11 +40,6 @@ type StreamMessage struct {
 
 type StreamData struct {
 	Obj string `json:"obj"`
-}
-
-type EventStream struct {
-	clients map[string]chan StreamMessage
-	mu      sync.Mutex
 }
 
 type Workflow struct {
@@ -99,7 +92,7 @@ type ReplayData struct {
 }
 
 const (
-	success    = "success"
-	failed     = "failed"
-	inProgress = "inProgress"
+	Success    = "success"
+	Failed     = "failed"
+	InProgress = "inProgress"
 )

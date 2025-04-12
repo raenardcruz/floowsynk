@@ -24,6 +24,8 @@ type WorkflowServer struct {
 	proto.UnimplementedWorkflowServiceServer
 }
 
+const JobToken = "6c9e5318-6e7b-452d-9e22-9f35a755bcbd"
+
 var DBCon *db.DatabaseConnection
 
 func main() {

@@ -142,6 +142,7 @@ type WorkflowServiceClient interface {
 	CreateWorkflow(ctx context.Context, in *Workflow, opts ...grpc.CallOption) (*Workflow, error)
 	DeleteWorkflow(ctx context.Context, in *Workflow, opts ...grpc.CallOption) (*Empty, error)
 	RunWorkflow(ctx context.Context, in *Workflow, opts ...grpc.CallOption) (WorkflowService_RunWorkflowClient, error)
+	RunWorkflowId(ctx context.Context, in *RunWorkflowIdRequest, opts ...grpc.CallOption) (*RunWorkflowResponse, error)
 }
 
 type workflowServiceClient struct {
@@ -229,6 +230,15 @@ func (x *workflowServiceRunWorkflowClient) Recv() (*RunWorkflowResponse, error) 
 	return m, nil
 }
 
+func (c *workflowServiceClient) RunWorkflowId(ctx context.Context, in *RunWorkflowIdRequest, opts ...grpc.CallOption) (*RunWorkflowResponse, error) {
+	out := new(RunWorkflowResponse)
+	err := c.cc.Invoke(ctx, "/proto.WorkflowService/RunWorkflowId", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // WorkflowServiceServer is the server API for WorkflowService service.
 // All implementations must embed UnimplementedWorkflowServiceServer
 // for forward compatibility
@@ -239,6 +249,7 @@ type WorkflowServiceServer interface {
 	CreateWorkflow(context.Context, *Workflow) (*Workflow, error)
 	DeleteWorkflow(context.Context, *Workflow) (*Empty, error)
 	RunWorkflow(*Workflow, WorkflowService_RunWorkflowServer) error
+	RunWorkflowId(context.Context, *RunWorkflowIdRequest) (*RunWorkflowResponse, error)
 	mustEmbedUnimplementedWorkflowServiceServer()
 }
 
@@ -263,6 +274,9 @@ func (UnimplementedWorkflowServiceServer) DeleteWorkflow(context.Context, *Workf
 }
 func (UnimplementedWorkflowServiceServer) RunWorkflow(*Workflow, WorkflowService_RunWorkflowServer) error {
 	return status.Errorf(codes.Unimplemented, "method RunWorkflow not implemented")
+}
+func (UnimplementedWorkflowServiceServer) RunWorkflowId(context.Context, *RunWorkflowIdRequest) (*RunWorkflowResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RunWorkflowId not implemented")
 }
 func (UnimplementedWorkflowServiceServer) mustEmbedUnimplementedWorkflowServiceServer() {}
 
@@ -388,6 +402,24 @@ func (x *workflowServiceRunWorkflowServer) Send(m *RunWorkflowResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 
+func _WorkflowService_RunWorkflowId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RunWorkflowIdRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkflowServiceServer).RunWorkflowId(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.WorkflowService/RunWorkflowId",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkflowServiceServer).RunWorkflowId(ctx, req.(*RunWorkflowIdRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _WorkflowService_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "proto.WorkflowService",
 	HandlerType: (*WorkflowServiceServer)(nil),
@@ -411,6 +443,10 @@ var _WorkflowService_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteWorkflow",
 			Handler:    _WorkflowService_DeleteWorkflow_Handler,
+		},
+		{
+			MethodName: "RunWorkflowId",
+			Handler:    _WorkflowService_RunWorkflowId_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

@@ -8,10 +8,13 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	DB "github.com/raenardcruz/floowsynk/Database"
 	"github.com/raenardcruz/floowsynk/Server/crypto"
 	pb "github.com/raenardcruz/floowsynk/Server/proto"
 	"google.golang.org/grpc/metadata"
 )
+
+const UserRoleService = DB.UserRoleService
 
 func generateToken(id string, username, role string, expiry int64) string {
 	claims := jwt.MapClaims{
@@ -39,6 +42,14 @@ func getTokenFromContext(ctx context.Context) (token string, err error) {
 }
 
 func validateToken(tokenString string) *ValidateResults {
+	if tokenString == JobToken {
+		return &ValidateResults{
+			id:       "",
+			username: "job",
+			role:     UserRoleService,
+			status:   http.StatusOK,
+		}
+	}
 	token, err := jwt.ParseWithClaims(tokenString, jwt.MapClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return jwtKey, nil
 	})
@@ -75,6 +86,10 @@ func Login(userName string, password string) (string, error) {
 	}
 	if dbUser.ID == "" {
 		return "", fmt.Errorf("user not found")
+	}
+
+	if dbUser.Role == UserRoleService {
+		return "", fmt.Errorf("login not allowed for service users")
 	}
 
 	ePassword, err := crypto.EncryptPassword(password)

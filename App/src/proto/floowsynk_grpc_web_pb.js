@@ -609,5 +609,66 @@ proto.proto.WorkflowServicePromiseClient.prototype.runWorkflow =
 };
 
 
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.proto.RunWorkflowIdRequest,
+ *   !proto.proto.RunWorkflowResponse>}
+ */
+const methodDescriptor_WorkflowService_RunWorkflowId = new grpc.web.MethodDescriptor(
+  '/proto.WorkflowService/RunWorkflowId',
+  grpc.web.MethodType.UNARY,
+  proto.proto.RunWorkflowIdRequest,
+  proto.proto.RunWorkflowResponse,
+  /**
+   * @param {!proto.proto.RunWorkflowIdRequest} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.proto.RunWorkflowResponse.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.proto.RunWorkflowIdRequest} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.RpcError, ?proto.proto.RunWorkflowResponse)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.proto.RunWorkflowResponse>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.proto.WorkflowServiceClient.prototype.runWorkflowId =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/proto.WorkflowService/RunWorkflowId',
+      request,
+      metadata || {},
+      methodDescriptor_WorkflowService_RunWorkflowId,
+      callback);
+};
+
+
+/**
+ * @param {!proto.proto.RunWorkflowIdRequest} request The
+ *     request proto
+ * @param {?Object<string, string>=} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.proto.RunWorkflowResponse>}
+ *     Promise that resolves to the response
+ */
+proto.proto.WorkflowServicePromiseClient.prototype.runWorkflowId =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/proto.WorkflowService/RunWorkflowId',
+      request,
+      metadata || {},
+      methodDescriptor_WorkflowService_RunWorkflowId);
+};
+
+
 module.exports = proto.proto;
 

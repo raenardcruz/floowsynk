@@ -57,3 +57,11 @@ func DeleteCache(ctx context.Context, key string) error {
 	}
 	return nil
 }
+
+func CacheExists(ctx context.Context, key string) (bool, error) {
+	exists, err := RedisClient.Exists(ctx, key).Result()
+	if err != nil {
+		return false, fmt.Errorf("failed to check existence of cache key %s: %w", key, err)
+	}
+	return exists > 0, nil
+}

@@ -14,7 +14,8 @@ const (
 	UserRoleAdmin       = "admin"
 	UserRoleUser        = "user"
 	UserRoleGuest       = "guest"
-	userCacheExpiration = 5 * time.Minute
+	UserRoleService     = "service"
+	userCacheExpiration = 15 * time.Minute
 )
 
 type UsersModel struct {

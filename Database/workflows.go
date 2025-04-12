@@ -10,7 +10,7 @@ import (
 	pb "github.com/raenardcruz/floowsynk/Server/proto"
 )
 
-const workflowCacheExpiration = 5 * time.Minute
+const workflowCacheExpiration = 15 * time.Minute
 
 type Workflow struct {
 	ID          string `gorm:"primaryKey"`
@@ -192,6 +192,55 @@ func (db *DatabaseConnection) GetWebhookWorkflow(id string) (*pb.Workflow, error
 	return workflow, nil
 }
 
+func (db *DatabaseConnection) GetIntervalWorkflows() (*pb.WorkflowList, error) {
+	ctx := context.Background()
+	cacheKey := "interval_workflows:"
+
+	if cachedData, found := GetFromCache(ctx, cacheKey); found {
+		var cachedWorkflowList pb.WorkflowList
+		if err := json.Unmarshal(cachedData, &cachedWorkflowList); err == nil {
+			return &cachedWorkflowList, nil
+		}
+	}
+
+	var workflows []Workflow
+	if err := db.conn.Where("type = ?", "interval").Find(&workflows).Error; err != nil {
+		log.Printf("Error querying interval workflows: %v", err)
+		return nil, err
+	}
+
+	wl := &pb.WorkflowList{Workflows: make([]*pb.Workflow, 0)}
+	for _, wf := range workflows {
+		var nodes []*pb.Node
+		if err := json.Unmarshal(wf.Nodes, &nodes); err != nil {
+			log.Printf("Error unmarshalling nodes: %v", err)
+			return nil, err
+		}
+		var edges []*pb.Edge
+		if err := json.Unmarshal(wf.Edges, &edges); err != nil {
+			log.Printf("Error unmarshalling edges: %v", err)
+			return nil, err
+		}
+		wl.Workflows = append(wl.Workflows, &pb.Workflow{
+			Id:          wf.ID,
+			Name:        wf.Name,
+			Type:        wf.Type,
+			Description: wf.Description,
+			Nodes:       nodes,
+			Edges:       edges,
+			CreatedAt:   wf.CreatedAt,
+			UpdatedAt:   wf.UpdatedAt,
+			Tags:        wf.Tags,
+		})
+	}
+
+	if err := SetCache(ctx, cacheKey, wl, workflowCacheExpiration); err != nil {
+		log.Printf("Error setting cache for interval workflows: %v", err)
+	}
+
+	return wl, nil
+}
+
 func (db *DatabaseConnection) UpdateWorkflow(workflow *pb.Workflow) error {
 	ctx := context.Background()
 	cacheKey := "workflow:" + workflow.Id
@@ -228,6 +277,13 @@ func (db *DatabaseConnection) UpdateWorkflow(workflow *pb.Workflow) error {
 		webhookCacheKey := "webhook_workflow:" + workflow.Id
 		if err := SetCache(ctx, webhookCacheKey, workflow, workflowCacheExpiration); err != nil {
 			log.Printf("Error setting cache for webhook workflow %s: %v", workflow.Id, err)
+		}
+	}
+
+	if workflow.Type == "interval" {
+		intervalCacheKey := "interval_workflows:" + workflow.CreatedAt + ":" + workflow.UpdatedAt
+		if err := SetCache(ctx, intervalCacheKey, workflow, workflowCacheExpiration); err != nil {
+			log.Printf("Error setting cache for interval workflow %s: %v", workflow.Id, err)
 		}
 	}
 
