@@ -9,7 +9,6 @@
 </template>
 
 <script setup lang="ts">
-import { defineProps, defineEmits } from 'vue'
 import { useVModel } from '@vueuse/core'
 import { SidebarProps } from './Sidebar.types'
 import { EMIT_VISIBLE } from './Sidebar.constants'

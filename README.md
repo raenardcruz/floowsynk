@@ -190,6 +190,21 @@ Ensure the following are installed and configured:
    make start
    ```
 
+## Aliases for Common Tasks
+Add the following aliases to your shell configuration file (e.g., `~/.bashrc` or `~/.zshrc`) to streamline your workflow:
+
+```bash
+# Aliases for common tasks
+alias build="make build"
+alias start-server="make start-server"
+alias start-ui="make start-ui"
+alias start-jobs="make start-jobs"
+alias proto="make proto"
+alias start-docker="make start-docker"
+alias stop-docker="make stop-docker"
+alias setup="make setup"
+```
+
 ## Troubleshooting
 
 - If WSL commands fail: Ensure Windows features "Virtual Machine Platform" and "Windows Subsystem for Linux" are enabled

@@ -5,25 +5,28 @@ SERVER_DIR = Server
 PROTO_DIR = './proto'
 
 build:
-	@echo 🔧 ... Building all services...
+	@echo "🔧 Building all services..."
 	@cd $(SERVER_DIR) && go build -o floowsynk_server .
 	@cd $(APP_DIR) && npm run build
-	@echo 🔧 ... Build completed.
+	@echo "✅ Build completed."
 
 start-server:
-	@echo 🚀 ... Starting server...
+	@echo "🚀 Starting server..."
 	@cd $(SERVER_DIR) && go run .
+	@echo "✅ Server is running."
 
 start-ui:
-	@echo 🚀 ... Starting UI...
+	@echo "🚀 Starting UI..."
 	@cd $(APP_DIR) && npm run dev
+	@echo "✅ UI is live."
 
 start-jobs:
-	@echo 🚀 ... Starting job processor...
+	@echo "🚀 Starting job processor..."
 	@cd Jobs && go run interval_processor.go
+	@echo "✅ Job processor started."
 
 proto:
-	@echo 📦 ... Generating proto files started...
+	@echo "📦 Generating proto files started..."
 	rm -f $(SERVER_DIR)/proto/*_pb*
 	rm -f $(APP_DIR)/src/proto/*_pb*
 	mkdir -p $(SERVER_DIR)/proto
@@ -41,17 +44,18 @@ proto:
 	cd ..
 	cd ${SERVER_DIR} && go mod tidy
 	cd ..
-	@echo 📦 ... Generating proto files Completed...
+	@echo "✅ Proto files generated successfully."
 
 # Docker setup target
 start-docker:
-	@echo 🐳 ... Setting up Docker...
+	@echo "🐳 Setting up Docker..."
 	docker compose up -d
+	@echo "✅ Docker containers are up and running."
 
 stop-docker:
-	@echo 🐳 ... Stopping Docker...
+	@echo "🐳 Stopping Docker..."
 	docker compose down -v
-	@echo 🐳 ... Docker stopped.
+	@echo "✅ Docker containers stopped and cleaned up."
 
 setup:
 	@echo 🔧 ... Installing required dependencies...
