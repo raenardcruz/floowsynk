@@ -1,5 +1,83 @@
 # FloowSynk Local Development Setup
 
+## Purpose of the Application
+FloowSynk is a workflow management platform designed to streamline and automate business processes. It provides a user-friendly interface for creating, managing, and monitoring workflows, along with integration capabilities for external services.
+
+## Code Structure
+The project is organized into the following main directories:
+
+- **app/**: Contains the frontend application built with Vue.js and Vite. It includes components, assets, and configuration files for the UI.
+  - `src/`: Main source code for the frontend.
+    - `components/`: Reusable Vue components.
+    - `views/`: Page-level components for different routes.
+    - `proto/`: Generated protocol buffer files for gRPC communication.
+    - `router/`: Vue Router configuration.
+  - `public/`: Static assets like images and icons.
+  - `vite.config.ts`: Configuration for the Vite build tool.
+
+- **Server/**: Backend server written in Go.
+  - `API.go`: Defines API endpoints.
+  - `proto/`: Generated protocol buffer files for gRPC communication.
+  - `db/`: Database models and queries.
+  - `workflow/`: Workflow-related logic and helpers.
+
+- **Jobs/**: Contains the job processor for handling background tasks.
+
+- **proto/**: Source `.proto` files used to generate gRPC code for both frontend and backend.
+
+## Steps to Run the Application
+
+### Prerequisites
+Ensure the following are installed and configured:
+- Docker and Docker Compose
+- Node.js (v22) and npm
+- Go (latest version)
+- Protocol Buffer Compiler (`protoc`)
+
+### Setup
+1. Clone the repository and navigate to the project directory:
+   ```bash
+   git clone <repository-url>
+   cd floowsynk
+   ```
+
+2. Install dependencies:
+   ```bash
+   make install
+   ```
+
+3. Generate protocol buffer files:
+   ```bash
+   make proto
+   ```
+
+4. Set up the database:
+   ```bash
+   sudo make db-install
+   ```
+
+5. Start all services:
+   ```bash
+   make start
+   ```
+   This will start the frontend, backend, and job processor concurrently.
+
+### Access the Application
+- Frontend: Open `http://localhost:3000` in your browser.
+- Backend: API endpoints are available at `http://localhost:8080`.
+
+### Troubleshooting
+- If services fail to start, check the logs for errors using:
+  ```bash
+  docker logs <container-name>
+  ```
+- Ensure all dependencies are installed and up-to-date.
+
+## Development Tips
+- Use `make` commands for common tasks like building, cleaning, and starting services.
+- Modify `.proto` files in the `proto/` directory and regenerate code using `make proto`.
+- Use `docker ps` to monitor running containers and `docker-compose logs` for debugging.
+
 ## Prerequisites
 
 ### Windows Subsystem for Linux (WSL)
@@ -111,6 +189,21 @@
    ```bash
    make start
    ```
+
+## Aliases for Common Tasks
+Add the following aliases to your shell configuration file (e.g., `~/.bashrc` or `~/.zshrc`) to streamline your workflow:
+
+```bash
+# Aliases for common tasks
+alias build="make build"
+alias start-server="make start-server"
+alias start-ui="make start-ui"
+alias start-jobs="make start-jobs"
+alias proto="make proto"
+alias start-docker="make start-docker"
+alias stop-docker="make stop-docker"
+alias setup="make setup"
+```
 
 ## Troubleshooting
 

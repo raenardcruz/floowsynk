@@ -1,15 +1,15 @@
 package main
 
 import (
-	"sync"
-
-	"github.com/raenardcruz/floowsynk/db"
+	db "github.com/raenardcruz/floowsynk/Database"
 )
 
 type NodeList []Node
 type EdgeList []Edge
 type KeyValueList []KeyValue
 type Body map[string]interface{}
+
+var jwtKey = []byte("secret_key")
 
 type User struct {
 	Username string `json:"username"`
@@ -42,11 +42,6 @@ type StreamData struct {
 	Obj string `json:"obj"`
 }
 
-type EventStream struct {
-	clients map[string]chan StreamMessage
-	mu      sync.Mutex
-}
-
 type Workflow struct {
 	Nodes NodeList `json:"nodes"`
 	Edges EdgeList `json:"edges"`
@@ -62,7 +57,7 @@ type LogData struct {
 type WorkflowProcessor struct {
 	ProcessID        string
 	Workflow         *Workflow
-	Dbcon            *DBConnection
+	Dbcon            *db.DatabaseConnection
 	ProcessVariables map[string]interface{}
 	ProcessResults   map[string]interface{}
 	LoggingData      []LogData
@@ -87,10 +82,6 @@ type KeyValue struct {
 	Value string `json:"value"`
 }
 
-type DBConnection struct {
-	*db.DB
-}
-
 type CurrentNode struct {
 	Id string `json:"id"`
 }
@@ -101,7 +92,7 @@ type ReplayData struct {
 }
 
 const (
-	success    = "success"
-	failed     = "failed"
-	inProgress = "inProgress"
+	Success    = "success"
+	Failed     = "failed"
+	InProgress = "inProgress"
 )

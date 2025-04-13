@@ -4,8 +4,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/raenardcruz/floowsynk/db"
-	"github.com/raenardcruz/floowsynk/proto"
+	"github.com/raenardcruz/floowsynk/Server/proto"
 )
 
 const (
@@ -38,13 +37,6 @@ const (
 	TRUE    = "True"
 	FALSE   = "False"
 )
-
-type WorkflowProcessor struct {
-	Stream           proto.WorkflowService_RunWorkflowServer
-	Workflow         *proto.Workflow
-	ProcessVariables map[string]interface{}
-	DBcon            db.DB
-}
 
 func (wp *WorkflowProcessor) StartWorkflow() (err error) {
 	start := time.Now()

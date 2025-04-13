@@ -1,29 +1,32 @@
-.PHONY: all start build install clean proto
+.PHONY: all start build install clean proto start-jobs docker-setup setup
 # Define directories
-APP_DIR = app
+APP_DIR = App
 SERVER_DIR = Server
 PROTO_DIR = './proto'
 
-all: start
-
-start:
-	@echo 🚀 ... Starting all services...
-	@make -j2 start-ui start-server
-
 build:
-	@echo 🔧 ... Building all services...
-	@make -j2 build-ui build-server
+	@echo "🔧 Building all services..."
+	@cd $(SERVER_DIR) && go build -o floowsynk_server .
+	@cd $(APP_DIR) && npm run build
+	@echo "✅ Build completed."
 
-install:
-	@echo 💾 ... Installing all services...
-	@make -j2 install-ui install-server
+start-server:
+	@echo "🚀 Starting server..."
+	@cd $(SERVER_DIR) && go run .
+	@echo "✅ Server is running."
 
-clean:
-	@echo 🧹 ... Cleaning up all services...
-	@make -j2 db-clean
+start-ui:
+	@echo "🚀 Starting UI..."
+	@cd $(APP_DIR) && npm run dev
+	@echo "✅ UI is live."
+
+start-jobs:
+	@echo "🚀 Starting job processor..."
+	@cd Jobs && go run .
+	@echo "✅ Job processor started."
 
 proto:
-	@echo 📦 ... Generating proto files started...
+	@echo "📦 Generating proto files started..."
 	rm -f $(SERVER_DIR)/proto/*_pb*
 	rm -f $(APP_DIR)/src/proto/*_pb*
 	mkdir -p $(SERVER_DIR)/proto
@@ -41,8 +44,35 @@ proto:
 	cd ..
 	cd ${SERVER_DIR} && go mod tidy
 	cd ..
-	@echo 📦 ... Generating proto files Completed...
+	@echo "✅ Proto files generated successfully."
 
-include $(APP_DIR)/app.mk
-include $(SERVER_DIR)/server.mk
-include $(SERVER_DIR)/db/db.mk
+# Docker setup target
+start-docker:
+	@echo "🐳 Setting up Docker..."
+	docker compose up -d
+	@echo "✅ Docker containers are up and running."
+
+stop-docker:
+	@echo "🐳 Stopping Docker..."
+	docker compose down -v
+	@echo "✅ Docker containers stopped and cleaned up."
+
+setup:
+	@echo 🔧 ... Installing required dependencies...
+	# Install protoc
+	@sudo apt-get update && sudo apt-get install -y protobuf-compiler
+	# Install protoc-gen-go and protoc-gen-go-grpc
+	@go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+	@go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+	# Install Node.js dependencies
+	@echo 🔧 ... Installing Node.js dependencies...
+	@cd app && npm install
+	# Install Go modules
+	@echo 🔧 ... Installing Go modules...
+	@go mod tidy
+	# Docker setup
+	@echo 🐳 ... Setting up Docker...
+	docker-compose up -d
+	# Verify installations
+	@protoc --version
+	@echo 🔧 ... All dependencies installed successfully.

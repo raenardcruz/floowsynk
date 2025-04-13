@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"regexp"
 
-	m "github.com/raenardcruz/floowsynk/matheval"
-	"github.com/raenardcruz/floowsynk/proto"
+	m "github.com/raenardcruz/floowsynk/Server/matheval"
+	"github.com/raenardcruz/floowsynk/Server/proto"
 )
 
 const (

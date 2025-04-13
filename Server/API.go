@@ -5,12 +5,9 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/raenardcruz/floowsynk/proto"
-	"github.com/raenardcruz/floowsynk/workflow"
+	"github.com/raenardcruz/floowsynk/Server/proto"
+	"github.com/raenardcruz/floowsynk/Server/workflow"
 )
-
-var jwtKey = []byte("secret_key")
-var dbcon DBConnection
 
 func (s *LoginServer) Login(ctx context.Context, in *proto.Credential) (*proto.Token, error) {
 	token, err := Login(in.Username, in.Password)
@@ -117,7 +114,7 @@ func (s *WorkflowServer) DeleteWorkflow(ctx context.Context, req *proto.Workflow
 	return &proto.Empty{}, nil
 }
 
-func (s *WorkflowServer) RunWorkflow(req *proto.Workflow, stream proto.WorkflowService_RunWorkflowServer) error {
+func (s *WorkflowServer) QuickRun(req *proto.Workflow, stream proto.WorkflowService_QuickRunServer) error {
 	ctx := stream.Context()
 	token, err := getTokenFromContext(ctx)
 	if err != nil {
@@ -131,7 +128,31 @@ func (s *WorkflowServer) RunWorkflow(req *proto.Workflow, stream proto.WorkflowS
 		Stream:           stream,
 		Workflow:         req,
 		ProcessVariables: make(map[string]interface{}),
-		DBcon:            *dbcon.DB,
+		DBcon:            *DBCon,
+	}
+	err = processor.StartWorkflow()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *WorkflowServer) RunWorkflowId(req *proto.RunWorkflowIdRequest, stream proto.WorkflowService_RunWorkflowIdServer) error {
+	ctx := stream.Context()
+	token, err := getTokenFromContext(ctx)
+	if err != nil {
+		return err
+	}
+	validateResults := validateToken(token)
+	if validateResults.status != http.StatusOK {
+		return fmt.Errorf(validateResults.message)
+	}
+	wf, err := GetWorkflow(req.Id)
+	processor := workflow.WorkflowProcessor{
+		Stream:           nil,
+		ProcessVariables: make(map[string]interface{}),
+		DBcon:            *DBCon,
+		Workflow:         wf,
 	}
 	processor.StartWorkflow()
 	return nil

@@ -8,10 +8,13 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
-	"github.com/raenardcruz/floowsynk/crypto"
-	pb "github.com/raenardcruz/floowsynk/proto"
+	DB "github.com/raenardcruz/floowsynk/Database"
+	"github.com/raenardcruz/floowsynk/Server/crypto"
+	pb "github.com/raenardcruz/floowsynk/Server/proto"
 	"google.golang.org/grpc/metadata"
 )
+
+const UserRoleService = DB.UserRoleService
 
 func generateToken(id string, username, role string, expiry int64) string {
 	claims := jwt.MapClaims{
@@ -39,6 +42,14 @@ func getTokenFromContext(ctx context.Context) (token string, err error) {
 }
 
 func validateToken(tokenString string) *ValidateResults {
+	if tokenString == JobToken {
+		return &ValidateResults{
+			id:       "",
+			username: "job",
+			role:     UserRoleService,
+			status:   http.StatusOK,
+		}
+	}
 	token, err := jwt.ParseWithClaims(tokenString, jwt.MapClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return jwtKey, nil
 	})
@@ -69,12 +80,16 @@ func ExtendToken(token string) (string, error) {
 }
 
 func Login(userName string, password string) (string, error) {
-	dbUser, err := dbcon.DB.GetUserByUsername(userName)
+	dbUser, err := DBCon.GetUserByUsername(userName)
 	if err != nil {
 		return "", fmt.Errorf("error getting user")
 	}
 	if dbUser.ID == "" {
 		return "", fmt.Errorf("user not found")
+	}
+
+	if dbUser.Role == UserRoleService {
+		return "", fmt.Errorf("login not allowed for service users")
 	}
 
 	ePassword, err := crypto.EncryptPassword(password)
@@ -91,7 +106,7 @@ func Login(userName string, password string) (string, error) {
 }
 
 func GetWorkflow(id string) (workflow *pb.Workflow, err error) {
-	workflow, err = dbcon.DB.GetWorkflow(id)
+	workflow, err = DBCon.GetWorkflow(id)
 	if err != nil {
 		return workflow, err
 	}
@@ -99,20 +114,20 @@ func GetWorkflow(id string) (workflow *pb.Workflow, err error) {
 }
 
 func ListWorkflows(offset int32, limit int32) (wl *pb.WorkflowList, err error) {
-	wl, err = dbcon.DB.GetWorkflows(int(limit), int(offset))
+	wl, err = DBCon.GetWorkflows(int(limit), int(offset))
 	if err != nil {
 		return nil, err
 	}
 	return wl, nil
 }
 func UpdateWorkflow(workflow *pb.Workflow) (w *pb.Workflow, err error) {
-	if err := dbcon.DB.UpdateWorkflow(workflow); err != nil {
+	if err := DBCon.UpdateWorkflow(workflow); err != nil {
 		return nil, err
 	}
 	return workflow, nil
 }
 func CreateWorkflow(workflow *pb.Workflow) (*pb.Workflow, error) {
-	id, err := dbcon.DB.CreateWorkflow(workflow)
+	id, err := DBCon.CreateWorkflow(workflow)
 	if err != nil {
 		return nil, err
 	}
@@ -120,5 +135,5 @@ func CreateWorkflow(workflow *pb.Workflow) (*pb.Workflow, error) {
 	return workflow, nil
 }
 func DeleteWorkflow(id string) error {
-	return dbcon.DB.DeleteWorkflow(id)
+	return DBCon.DeleteWorkflow(id)
 }
