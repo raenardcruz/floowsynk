@@ -34,7 +34,7 @@ func (job *IntervalJob) ProcessIntervalWorkflows() {
 }
 
 func (job *IntervalJob) processNode(workflow *proto.Workflow) {
-	ctx := metadata.AppendToOutgoingContext(context.Background(), "authorization", JobToken)
+	ctx := metadata.AppendToOutgoingContext(context.Background(), "Authorization", JobToken)
 	node := workflow.Nodes[0]
 	interval := node.Data.GetInterval()
 	intervalType := node.Data.GetType()
@@ -79,7 +79,7 @@ func (job *IntervalJob) processNode(workflow *proto.Workflow) {
 
 	log.Printf("Processing workflow %v", workflow.Id)
 	// Add logic to execute the node's workflow
-	conn, err := grpc.NewClient("localhost:8080", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient("localhost:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Printf("Error connecting to gRPC server: %v", err)
 		return
@@ -89,7 +89,9 @@ func (job *IntervalJob) processNode(workflow *proto.Workflow) {
 	client := proto.NewWorkflowServiceClient(conn)
 
 	log.Printf("Executing workflow %s", workflow.Id)
-	stream, err := client.RunWorkflow(ctx, workflow)
+	stream, err := client.RunWorkflowId(ctx, &proto.RunWorkflowIdRequest{
+		Id: workflow.Id,
+	})
 	if err != nil {
 		log.Printf("Error running workflow %v: %v", workflow.Id, err)
 		return

@@ -559,8 +559,8 @@ proto.proto.WorkflowServicePromiseClient.prototype.deleteWorkflow =
  *   !proto.proto.Workflow,
  *   !proto.proto.RunWorkflowResponse>}
  */
-const methodDescriptor_WorkflowService_RunWorkflow = new grpc.web.MethodDescriptor(
-  '/proto.WorkflowService/RunWorkflow',
+const methodDescriptor_WorkflowService_QuickRun = new grpc.web.MethodDescriptor(
+  '/proto.WorkflowService/QuickRun',
   grpc.web.MethodType.SERVER_STREAMING,
   proto.proto.Workflow,
   proto.proto.RunWorkflowResponse,
@@ -582,13 +582,13 @@ const methodDescriptor_WorkflowService_RunWorkflow = new grpc.web.MethodDescript
  * @return {!grpc.web.ClientReadableStream<!proto.proto.RunWorkflowResponse>}
  *     The XHR Node Readable Stream
  */
-proto.proto.WorkflowServiceClient.prototype.runWorkflow =
+proto.proto.WorkflowServiceClient.prototype.quickRun =
     function(request, metadata) {
   return this.client_.serverStreaming(this.hostname_ +
-      '/proto.WorkflowService/RunWorkflow',
+      '/proto.WorkflowService/QuickRun',
       request,
       metadata || {},
-      methodDescriptor_WorkflowService_RunWorkflow);
+      methodDescriptor_WorkflowService_QuickRun);
 };
 
 
@@ -599,13 +599,13 @@ proto.proto.WorkflowServiceClient.prototype.runWorkflow =
  * @return {!grpc.web.ClientReadableStream<!proto.proto.RunWorkflowResponse>}
  *     The XHR Node Readable Stream
  */
-proto.proto.WorkflowServicePromiseClient.prototype.runWorkflow =
+proto.proto.WorkflowServicePromiseClient.prototype.quickRun =
     function(request, metadata) {
   return this.client_.serverStreaming(this.hostname_ +
-      '/proto.WorkflowService/RunWorkflow',
+      '/proto.WorkflowService/QuickRun',
       request,
       metadata || {},
-      methodDescriptor_WorkflowService_RunWorkflow);
+      methodDescriptor_WorkflowService_QuickRun);
 };
 
 
@@ -617,7 +617,7 @@ proto.proto.WorkflowServicePromiseClient.prototype.runWorkflow =
  */
 const methodDescriptor_WorkflowService_RunWorkflowId = new grpc.web.MethodDescriptor(
   '/proto.WorkflowService/RunWorkflowId',
-  grpc.web.MethodType.UNARY,
+  grpc.web.MethodType.SERVER_STREAMING,
   proto.proto.RunWorkflowIdRequest,
   proto.proto.RunWorkflowResponse,
   /**
@@ -632,37 +632,32 @@ const methodDescriptor_WorkflowService_RunWorkflowId = new grpc.web.MethodDescri
 
 
 /**
- * @param {!proto.proto.RunWorkflowIdRequest} request The
- *     request proto
- * @param {?Object<string, string>} metadata User defined
+ * @param {!proto.proto.RunWorkflowIdRequest} request The request proto
+ * @param {?Object<string, string>=} metadata User defined
  *     call metadata
- * @param {function(?grpc.web.RpcError, ?proto.proto.RunWorkflowResponse)}
- *     callback The callback function(error, response)
- * @return {!grpc.web.ClientReadableStream<!proto.proto.RunWorkflowResponse>|undefined}
+ * @return {!grpc.web.ClientReadableStream<!proto.proto.RunWorkflowResponse>}
  *     The XHR Node Readable Stream
  */
 proto.proto.WorkflowServiceClient.prototype.runWorkflowId =
-    function(request, metadata, callback) {
-  return this.client_.rpcCall(this.hostname_ +
+    function(request, metadata) {
+  return this.client_.serverStreaming(this.hostname_ +
       '/proto.WorkflowService/RunWorkflowId',
       request,
       metadata || {},
-      methodDescriptor_WorkflowService_RunWorkflowId,
-      callback);
+      methodDescriptor_WorkflowService_RunWorkflowId);
 };
 
 
 /**
- * @param {!proto.proto.RunWorkflowIdRequest} request The
- *     request proto
+ * @param {!proto.proto.RunWorkflowIdRequest} request The request proto
  * @param {?Object<string, string>=} metadata User defined
  *     call metadata
- * @return {!Promise<!proto.proto.RunWorkflowResponse>}
- *     Promise that resolves to the response
+ * @return {!grpc.web.ClientReadableStream<!proto.proto.RunWorkflowResponse>}
+ *     The XHR Node Readable Stream
  */
 proto.proto.WorkflowServicePromiseClient.prototype.runWorkflowId =
     function(request, metadata) {
-  return this.client_.unaryCall(this.hostname_ +
+  return this.client_.serverStreaming(this.hostname_ +
       '/proto.WorkflowService/RunWorkflowId',
       request,
       metadata || {},

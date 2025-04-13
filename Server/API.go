@@ -114,7 +114,7 @@ func (s *WorkflowServer) DeleteWorkflow(ctx context.Context, req *proto.Workflow
 	return &proto.Empty{}, nil
 }
 
-func (s *WorkflowServer) RunWorkflow(req *proto.Workflow, stream proto.WorkflowService_RunWorkflowServer) error {
+func (s *WorkflowServer) QuickRun(req *proto.Workflow, stream proto.WorkflowService_QuickRunServer) error {
 	ctx := stream.Context()
 	token, err := getTokenFromContext(ctx)
 	if err != nil {
@@ -129,6 +129,30 @@ func (s *WorkflowServer) RunWorkflow(req *proto.Workflow, stream proto.WorkflowS
 		Workflow:         req,
 		ProcessVariables: make(map[string]interface{}),
 		DBcon:            *DBCon,
+	}
+	err = processor.StartWorkflow()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *WorkflowServer) RunWorkflowId(req *proto.RunWorkflowIdRequest, stream proto.WorkflowService_RunWorkflowIdServer) error {
+	ctx := stream.Context()
+	token, err := getTokenFromContext(ctx)
+	if err != nil {
+		return err
+	}
+	validateResults := validateToken(token)
+	if validateResults.status != http.StatusOK {
+		return fmt.Errorf(validateResults.message)
+	}
+	wf, err := GetWorkflow(req.Id)
+	processor := workflow.WorkflowProcessor{
+		Stream:           nil,
+		ProcessVariables: make(map[string]interface{}),
+		DBcon:            *DBCon,
+		Workflow:         wf,
 	}
 	processor.StartWorkflow()
 	return nil

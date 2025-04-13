@@ -141,8 +141,8 @@ type WorkflowServiceClient interface {
 	UpdateWorkflow(ctx context.Context, in *Workflow, opts ...grpc.CallOption) (*Workflow, error)
 	CreateWorkflow(ctx context.Context, in *Workflow, opts ...grpc.CallOption) (*Workflow, error)
 	DeleteWorkflow(ctx context.Context, in *Workflow, opts ...grpc.CallOption) (*Empty, error)
-	RunWorkflow(ctx context.Context, in *Workflow, opts ...grpc.CallOption) (WorkflowService_RunWorkflowClient, error)
-	RunWorkflowId(ctx context.Context, in *RunWorkflowIdRequest, opts ...grpc.CallOption) (*RunWorkflowResponse, error)
+	QuickRun(ctx context.Context, in *Workflow, opts ...grpc.CallOption) (WorkflowService_QuickRunClient, error)
+	RunWorkflowId(ctx context.Context, in *RunWorkflowIdRequest, opts ...grpc.CallOption) (WorkflowService_RunWorkflowIdClient, error)
 }
 
 type workflowServiceClient struct {
@@ -198,12 +198,12 @@ func (c *workflowServiceClient) DeleteWorkflow(ctx context.Context, in *Workflow
 	return out, nil
 }
 
-func (c *workflowServiceClient) RunWorkflow(ctx context.Context, in *Workflow, opts ...grpc.CallOption) (WorkflowService_RunWorkflowClient, error) {
-	stream, err := c.cc.NewStream(ctx, &_WorkflowService_serviceDesc.Streams[0], "/proto.WorkflowService/RunWorkflow", opts...)
+func (c *workflowServiceClient) QuickRun(ctx context.Context, in *Workflow, opts ...grpc.CallOption) (WorkflowService_QuickRunClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_WorkflowService_serviceDesc.Streams[0], "/proto.WorkflowService/QuickRun", opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &workflowServiceRunWorkflowClient{stream}
+	x := &workflowServiceQuickRunClient{stream}
 	if err := x.ClientStream.SendMsg(in); err != nil {
 		return nil, err
 	}
@@ -213,16 +213,16 @@ func (c *workflowServiceClient) RunWorkflow(ctx context.Context, in *Workflow, o
 	return x, nil
 }
 
-type WorkflowService_RunWorkflowClient interface {
+type WorkflowService_QuickRunClient interface {
 	Recv() (*RunWorkflowResponse, error)
 	grpc.ClientStream
 }
 
-type workflowServiceRunWorkflowClient struct {
+type workflowServiceQuickRunClient struct {
 	grpc.ClientStream
 }
 
-func (x *workflowServiceRunWorkflowClient) Recv() (*RunWorkflowResponse, error) {
+func (x *workflowServiceQuickRunClient) Recv() (*RunWorkflowResponse, error) {
 	m := new(RunWorkflowResponse)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
@@ -230,13 +230,36 @@ func (x *workflowServiceRunWorkflowClient) Recv() (*RunWorkflowResponse, error) 
 	return m, nil
 }
 
-func (c *workflowServiceClient) RunWorkflowId(ctx context.Context, in *RunWorkflowIdRequest, opts ...grpc.CallOption) (*RunWorkflowResponse, error) {
-	out := new(RunWorkflowResponse)
-	err := c.cc.Invoke(ctx, "/proto.WorkflowService/RunWorkflowId", in, out, opts...)
+func (c *workflowServiceClient) RunWorkflowId(ctx context.Context, in *RunWorkflowIdRequest, opts ...grpc.CallOption) (WorkflowService_RunWorkflowIdClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_WorkflowService_serviceDesc.Streams[1], "/proto.WorkflowService/RunWorkflowId", opts...)
 	if err != nil {
 		return nil, err
 	}
-	return out, nil
+	x := &workflowServiceRunWorkflowIdClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type WorkflowService_RunWorkflowIdClient interface {
+	Recv() (*RunWorkflowResponse, error)
+	grpc.ClientStream
+}
+
+type workflowServiceRunWorkflowIdClient struct {
+	grpc.ClientStream
+}
+
+func (x *workflowServiceRunWorkflowIdClient) Recv() (*RunWorkflowResponse, error) {
+	m := new(RunWorkflowResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
 }
 
 // WorkflowServiceServer is the server API for WorkflowService service.
@@ -248,8 +271,8 @@ type WorkflowServiceServer interface {
 	UpdateWorkflow(context.Context, *Workflow) (*Workflow, error)
 	CreateWorkflow(context.Context, *Workflow) (*Workflow, error)
 	DeleteWorkflow(context.Context, *Workflow) (*Empty, error)
-	RunWorkflow(*Workflow, WorkflowService_RunWorkflowServer) error
-	RunWorkflowId(context.Context, *RunWorkflowIdRequest) (*RunWorkflowResponse, error)
+	QuickRun(*Workflow, WorkflowService_QuickRunServer) error
+	RunWorkflowId(*RunWorkflowIdRequest, WorkflowService_RunWorkflowIdServer) error
 	mustEmbedUnimplementedWorkflowServiceServer()
 }
 
@@ -272,11 +295,11 @@ func (UnimplementedWorkflowServiceServer) CreateWorkflow(context.Context, *Workf
 func (UnimplementedWorkflowServiceServer) DeleteWorkflow(context.Context, *Workflow) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteWorkflow not implemented")
 }
-func (UnimplementedWorkflowServiceServer) RunWorkflow(*Workflow, WorkflowService_RunWorkflowServer) error {
-	return status.Errorf(codes.Unimplemented, "method RunWorkflow not implemented")
+func (UnimplementedWorkflowServiceServer) QuickRun(*Workflow, WorkflowService_QuickRunServer) error {
+	return status.Errorf(codes.Unimplemented, "method QuickRun not implemented")
 }
-func (UnimplementedWorkflowServiceServer) RunWorkflowId(context.Context, *RunWorkflowIdRequest) (*RunWorkflowResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RunWorkflowId not implemented")
+func (UnimplementedWorkflowServiceServer) RunWorkflowId(*RunWorkflowIdRequest, WorkflowService_RunWorkflowIdServer) error {
+	return status.Errorf(codes.Unimplemented, "method RunWorkflowId not implemented")
 }
 func (UnimplementedWorkflowServiceServer) mustEmbedUnimplementedWorkflowServiceServer() {}
 
@@ -381,43 +404,46 @@ func _WorkflowService_DeleteWorkflow_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
-func _WorkflowService_RunWorkflow_Handler(srv interface{}, stream grpc.ServerStream) error {
+func _WorkflowService_QuickRun_Handler(srv interface{}, stream grpc.ServerStream) error {
 	m := new(Workflow)
 	if err := stream.RecvMsg(m); err != nil {
 		return err
 	}
-	return srv.(WorkflowServiceServer).RunWorkflow(m, &workflowServiceRunWorkflowServer{stream})
+	return srv.(WorkflowServiceServer).QuickRun(m, &workflowServiceQuickRunServer{stream})
 }
 
-type WorkflowService_RunWorkflowServer interface {
+type WorkflowService_QuickRunServer interface {
 	Send(*RunWorkflowResponse) error
 	grpc.ServerStream
 }
 
-type workflowServiceRunWorkflowServer struct {
+type workflowServiceQuickRunServer struct {
 	grpc.ServerStream
 }
 
-func (x *workflowServiceRunWorkflowServer) Send(m *RunWorkflowResponse) error {
+func (x *workflowServiceQuickRunServer) Send(m *RunWorkflowResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 
-func _WorkflowService_RunWorkflowId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RunWorkflowIdRequest)
-	if err := dec(in); err != nil {
-		return nil, err
+func _WorkflowService_RunWorkflowId_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(RunWorkflowIdRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
 	}
-	if interceptor == nil {
-		return srv.(WorkflowServiceServer).RunWorkflowId(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/proto.WorkflowService/RunWorkflowId",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(WorkflowServiceServer).RunWorkflowId(ctx, req.(*RunWorkflowIdRequest))
-	}
-	return interceptor(ctx, in, info, handler)
+	return srv.(WorkflowServiceServer).RunWorkflowId(m, &workflowServiceRunWorkflowIdServer{stream})
+}
+
+type WorkflowService_RunWorkflowIdServer interface {
+	Send(*RunWorkflowResponse) error
+	grpc.ServerStream
+}
+
+type workflowServiceRunWorkflowIdServer struct {
+	grpc.ServerStream
+}
+
+func (x *workflowServiceRunWorkflowIdServer) Send(m *RunWorkflowResponse) error {
+	return x.ServerStream.SendMsg(m)
 }
 
 var _WorkflowService_serviceDesc = grpc.ServiceDesc{
@@ -444,15 +470,16 @@ var _WorkflowService_serviceDesc = grpc.ServiceDesc{
 			MethodName: "DeleteWorkflow",
 			Handler:    _WorkflowService_DeleteWorkflow_Handler,
 		},
-		{
-			MethodName: "RunWorkflowId",
-			Handler:    _WorkflowService_RunWorkflowId_Handler,
-		},
 	},
 	Streams: []grpc.StreamDesc{
 		{
-			StreamName:    "RunWorkflow",
-			Handler:       _WorkflowService_RunWorkflow_Handler,
+			StreamName:    "QuickRun",
+			Handler:       _WorkflowService_QuickRun_Handler,
+			ServerStreams: true,
+		},
+		{
+			StreamName:    "RunWorkflowId",
+			Handler:       _WorkflowService_RunWorkflowId_Handler,
 			ServerStreams: true,
 		},
 	},

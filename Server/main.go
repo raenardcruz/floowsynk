@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"log"
+	"net"
 	"net/http"
 	"strings"
 
@@ -38,10 +39,16 @@ func main() {
 	httpServer := setupHTTPServer(grpcServer)
 
 	startRESTServer()
+	setupPlainGRPCServer()
 
-	log.Println("Server started at :8080")
-	if err := http.ListenAndServe(":8080", corsMiddleware(httpServer)); err != nil {
-		log.Fatalf("Failed to start server: %v", err)
+	grpcPort := ":8080"
+	log.Println("gRPC Web server started at", grpcPort)
+	listener, err := net.Listen("tcp", grpcPort)
+	if err != nil {
+		log.Fatalf("Failed to start gRPC server: %v", err)
+	}
+	if err := http.Serve(listener, corsMiddleware(httpServer)); err != nil {
+		log.Fatalf("Failed to serve gRPC: %v", err)
 	}
 }
 
@@ -74,12 +81,37 @@ func setupHTTPServer(grpcServer *grpc.Server) *http.ServeMux {
 func startRESTServer() {
 	restAPIPort := ":8081"
 	restServer := http.NewServeMux()
+
+	// Define the route for the webhook handler
 	restServer.HandleFunc("/api/webhook/", runWebhookHandler)
 
 	go func() {
 		log.Println("REST API server started at", restAPIPort)
-		if err := http.ListenAndServe(restAPIPort, corsMiddleware(restServer)); err != nil {
+		listener, err := net.Listen("tcp", restAPIPort)
+		if err != nil {
 			log.Fatalf("Failed to start REST API server: %v", err)
+		}
+		if err := http.Serve(listener, corsMiddleware(restServer)); err != nil {
+			log.Fatalf("Failed to serve REST API: %v", err)
+		}
+	}()
+}
+
+func setupPlainGRPCServer() {
+	plainGRPCPort := ":50051"
+	plainGRPCServer := grpc.NewServer()
+	proto.RegisterLoginServiceServer(plainGRPCServer, &LoginServer{})
+	proto.RegisterWorkflowServiceServer(plainGRPCServer, &WorkflowServer{})
+	reflection.Register(plainGRPCServer)
+
+	go func() {
+		log.Println("Plain gRPC server started at", plainGRPCPort)
+		listener, err := net.Listen("tcp", plainGRPCPort)
+		if err != nil {
+			log.Fatalf("Failed to start plain gRPC server: %v", err)
+		}
+		if err := plainGRPCServer.Serve(listener); err != nil {
+			log.Fatalf("Failed to serve plain gRPC: %v", err)
 		}
 	}()
 }

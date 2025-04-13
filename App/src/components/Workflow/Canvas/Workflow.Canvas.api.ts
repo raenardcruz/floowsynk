@@ -30,7 +30,7 @@ export const deleteProcess = async (process: Workflow.AsObject) => {
 export const executeProcess = async (_: Workflow.AsObject) => {
     const client = new WorkflowServicePromiseClient(getApiUrl())
     const workflow = workflowFromObject(_)
-    return client.runWorkflow(workflow, {
+    return client.quickRun(workflow, {
         'Authorization': `${localStorage.getItem('sessionToken')}`
     })
 }

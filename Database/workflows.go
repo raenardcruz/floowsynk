@@ -281,10 +281,8 @@ func (db *DatabaseConnection) UpdateWorkflow(workflow *pb.Workflow) error {
 	}
 
 	if workflow.Type == "interval" {
-		intervalCacheKey := "interval_workflows:" + workflow.CreatedAt + ":" + workflow.UpdatedAt
-		if err := SetCache(ctx, intervalCacheKey, workflow, workflowCacheExpiration); err != nil {
-			log.Printf("Error setting cache for interval workflow %s: %v", workflow.Id, err)
-		}
+		intervalCacheKey := "workflow:interval:" + workflow.Id
+		DeleteCache(ctx, intervalCacheKey)
 	}
 
 	return nil

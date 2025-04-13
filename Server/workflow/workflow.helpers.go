@@ -44,7 +44,7 @@ func (wp *WorkflowProcessor) UpdateStatus(node *proto.Node, status proto.NodeSta
 		}
 	}
 	if wp.Stream != nil {
-		wp.Stream.Send(res)
+		wp.Stream.SendMsg(res)
 	}
 }
 
