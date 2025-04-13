@@ -196,45 +196,6 @@ func (wp *WorkflowProcessor) makeRequest(url string, method string, headers []*p
 	return body, nil
 }
 
-func getAllJSONPaths(jsonObj interface{}) ([]string, error) {
-	jsonStr := fmt.Sprintf("%v", jsonObj)
-	var data map[string]interface{}
-	err := json.Unmarshal([]byte(jsonStr), &data)
-	if err != nil {
-		return nil, fmt.Errorf("error unmarshaling JSON: %w", err)
-	}
-
-	paths := []string{}
-	var explore func(interface{}, string)
-
-	explore = func(current interface{}, currentPath string) {
-		switch v := current.(type) {
-		case map[string]interface{}:
-			for key, value := range v {
-				newPath := key
-				if currentPath != "" {
-					newPath = currentPath + "." + key
-				}
-				paths = append(paths, newPath)
-
-				explore(value, newPath)
-			}
-		case []interface{}:
-			for i, value := range v {
-				newPath := fmt.Sprintf("%d", i)
-				if currentPath != "" {
-					newPath = currentPath + "." + fmt.Sprintf("%d", i)
-				}
-				paths = append(paths, newPath)
-				explore(value, newPath)
-			}
-		}
-	}
-
-	explore(data, "")
-	return paths, nil
-}
-
 func RegexReplaceAll(text, pattern, replaceText string) string {
 	re := regexp.MustCompile(pattern)
 	return re.ReplaceAllString(text, replaceText)
