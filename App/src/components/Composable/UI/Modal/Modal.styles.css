@@ -1,5 +1,8 @@
 .background {
-    position: absolute;
+    position: fixed; /* Changed from absolute to fixed to ensure it always fits the parent */
+    top: 0;
+    left: 0;
+    overflow: hidden; /* Prevents scroll on the parent */
     display: flex;
     height: 100%;
     width: 100%;

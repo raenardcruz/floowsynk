@@ -1,11 +1,14 @@
 <template>
     <div class="input" v-if="props.nodeType == 'subprocess'">
+        <!-- 1 -->
         <select class="sidebar-input" v-model="props.modelValue.subProcessId" :disabled="isRunning">
             <option v-for="process in filteredProcesses" :value="process.id">{{ process.name }}</option>
         </select>
+        <!-- 1 -->
     </div>
     <span v-for="(value, key) in props.modelValue" :key="key" v-else-if="props.modelValue.constructor == Object">
         <div class="input" v-if="value != null">
+            <!-- 2 -->
             <legend class="sidebar-legend" v-if="props.modelValue[key].length > 0 || value.constructor != Array">
                 <div class="checkbox" v-if="value.constructor == Boolean">
                     <input type="checkbox" v-model="props.modelValue[key]" :disabled="isRunning" />
@@ -13,6 +16,8 @@
                 </div>
                 <span v-else>{{ toSentenceCase(key.toString()) }}</span>
             </legend>
+            <!-- 2 -->
+             <!-- 3 -->
             <span style="width: 100%" v-if="value.constructor == String">
                 <Teleport to=".content" v-if="MONACO_EDITOR_DATA_PROPERTIES.includes(key)">
                     <Modal :title="toSentenceCase(key.toString())" caption="" v-model:visible="modalStates[key]">
@@ -22,8 +27,11 @@
                 <input class="sidebar-input" type="text" v-model="props.modelValue[key]" :disabled="isRunning" />
                 <span class="material-symbols-outlined show-code-btn" @click="showModal(key)" v-if="MONACO_EDITOR_DATA_PROPERTIES.includes(key)">developer_mode_tv</span>
             </span>
+            <!-- 3 -->
+            <!-- 4 -->
             <input class="sidebar-input" type="number" v-model="props.modelValue[key]"
                 v-if="value.constructor == Number" :disabled="isRunning" />
+            <!-- 4 -->
             <div class="array-container" v-if="isNodeArray(value)">
                 <div class="child-container" v-for="(v, i) in getArrayData(props.modelValue[key] as NodeDataArray.AsObject)" :key="v">
                     <span class="material-symbols-outlined remove-array" @click="removeArrayItem(i, key)">delete</span>

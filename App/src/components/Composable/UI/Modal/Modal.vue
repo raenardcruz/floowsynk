@@ -32,10 +32,13 @@
 <script lang="ts" setup>
 import { ModalProps } from './Modal.types'
 import { useModalHooks } from './Modal.hooks'
-import { EMMIT_VISIBLE } from './Modal.contants'
 
 const props = defineProps<ModalProps>()
-const emit = defineEmits([EMMIT_VISIBLE])
+const visible = defineModel({
+    type: Boolean,
+    default: false
+})
+
 
 const {
     title,
@@ -46,9 +49,8 @@ const {
     onOk,
 } = props
 const {
-    showActions,
-    visible,
-} = useModalHooks(props, emit)
+    showActions
+} = useModalHooks(props)
 </script>
 
 <style scoped src="./Modal.styles.css"></style>
