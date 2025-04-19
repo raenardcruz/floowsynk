@@ -6,7 +6,7 @@
     </Teleport>
     <div class="input">
         <div class="label" v-if="label">{{ label }}</div>
-        <input input="text" v-model="value" :disabled="disabled" :placeholder="placeholder" />
+        <input :type="type" v-model="value" :disabled="disabled" :placeholder="placeholder" />
         <span class="material-symbols-outlined show-code-btn" @click="toggleEditor" v-if="editorConfig && !showEditor" title="Show Editor">developer_mode_tv</span>
     </div>
 </template>
@@ -36,6 +36,10 @@ defineProps({
     disabled: {
         type: Boolean,
         default: false
+    },
+    type: {
+        type: String,
+        default: 'text'
     },
     editorConfig: {
         type: Object as () => EditorConfig,
