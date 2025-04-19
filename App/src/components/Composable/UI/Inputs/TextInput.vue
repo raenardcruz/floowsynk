@@ -54,12 +54,12 @@ defineProps({
     position: relative;
     justify-content: center;
     align-items: center;
-    height: 30px;
     width: 100%;
-    padding: 5px;
+    padding: 8px;
     border-radius: 50px;
     border: 1px solid var(--grey-4);
     background: var(--white-1);
+    margin-top: 12px;
 }
 .input input {
     width: 100%;
@@ -86,15 +86,17 @@ defineProps({
     transition: all 0.3s;
 }
 .label {
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--grey-8);
-    margin-bottom: 5px;
     display: flex;
     position: absolute;
-    left: 12px;
     top: -10px;
-    background: var(--white-1);
-    z-index: inherit;
+    left: 10px;
+    font-size: 12px;
+    background: var(--grey-3);
+    color: var(--white-1);
+    border: 1px solid var(--grey-4);
+    border-radius: 10px;
+    padding: 0px 8px;
+    font-weight: 500;
+    box-shadow: 2px 4px 8px var(--grey-4);
 }
 </style>

@@ -2,7 +2,6 @@
     <h2>Reviews</h2>
     <div class="modal-container"></div>
     <ListField label="Sample List" v-model="text"/>
-    {{ text }}
 </template>
 
 <script setup lang="ts">

@@ -2,6 +2,7 @@
     <div class="array-container">
         <div class="label">{{ label }}</div>
         <div class="list-container" v-for="(_, index) in arrayValue" :key="index">
+            <span class="material-symbols-outlined remove-btn" title="Remove Item" @click="removeItem(index)">close</span>
             <component
             :key="index"
             :is="getComponent(index).component"
@@ -16,10 +17,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue'
+import { ref, computed } from 'vue'
 import Select from './Select.vue' 
 import TextInput from './TextInput.vue'
 import Checkbox from './Checkbox.vue'
+import KeyValueField from './KeyValue.vue'
 import { NodeDataArray, ArrayDataType, KeyValue } from 'proto/floowsynk_pb'
 
 
@@ -83,7 +85,7 @@ const getComponent = (index: number) => {
             props: {
                 type: 'text',
                 placeholder: 'Enter text',
-                label: `Item ${index + 1}`
+                label: `List Item ${index + 1}`
             }
         },
         [ArrayDataType.INT]: {
@@ -91,21 +93,19 @@ const getComponent = (index: number) => {
             props: {
                 type: 'number',
                 placeholder: 'Enter number',
-                label: `Item ${index + 1}`
+                label: `List Item ${index + 1}`
             }
         },
         [ArrayDataType.BOOL]: {
             component: Checkbox,
             props: {
-                label: `Item ${index + 1}`
+                label: `List Item ${index + 1}`
             }
         },
         [ArrayDataType.KEYVALUE]: {
-            component: TextInput,
+            component: KeyValueField,
             props: {
-                type: 'text',
-                placeholder: 'Enter key',
-                label: `Key ${index + 1}`
+                label: `List Item ${index + 1}`
             }
         }
     };
@@ -113,6 +113,11 @@ const getComponent = (index: number) => {
 };
 
 const addList = () => {
+    if (!stringList.value) stringList.value = [];
+    if (!intList.value) intList.value = [];
+    if (!boolList.value) boolList.value = [];
+    if (!keyValueList.value) keyValueList.value = [];
+
     const listAdderMap = {
         [ArrayDataType.STRING]: () => stringList.value.push(''),
         [ArrayDataType.INT]: () => intList.value.push(0),
@@ -120,6 +125,16 @@ const addList = () => {
         [ArrayDataType.KEYVALUE]: () => keyValueList.value.push({ key: '', value: '' })
     };
     listAdderMap[dataType.value]?.();
+};
+
+const removeItem = (index: number) => {
+    const listRemoverMap = {
+        [ArrayDataType.STRING]: () => stringList.value.splice(index, 1),
+        [ArrayDataType.INT]: () => intList.value.splice(index, 1),
+        [ArrayDataType.BOOL]: () => boolList.value.splice(index, 1),
+        [ArrayDataType.KEYVALUE]: () => keyValueList.value.splice(index, 1)
+    };
+    listRemoverMap[dataType.value]?.();
 };
 </script>
 
@@ -134,15 +149,21 @@ const addList = () => {
     min-height: 40px;
     border-radius: 10px;
     padding: 20px 10px;
+    margin-top: 12px;
 }
 .label {
-    font-size: 14px;
-    color: var(--black);
     display: flex;
     position: absolute;
     top: -10px;
     left: 10px;
-    background: var(--white-1);
+    font-size: 12px;
+    background: var(--grey-3);
+    color: var(--white-1);
+    border: 1px solid var(--grey-4);
+    border-radius: 10px;
+    padding: 0px 8px;
+    font-weight: 500;
+    box-shadow: 2px 4px 8px var(--grey-4);
 }
 .action-section {
     display: flex;
@@ -172,5 +193,24 @@ const addList = () => {
     justify-content: center;
     align-items: center;
     gap: 24px;
+}
+.remove-btn {
+    display: flex;
+    position: absolute;
+    top: 20px;
+    right: 10px;
+    color: var(--red-3);
+    z-index: 100;
+    cursor: pointer;
+    font-size: 18px;
+    background: var(--grey-4);
+    border-radius: 50%;
+    padding: 5px;
+    transition: all 0.3s ease;
+}
+.remove-btn:hover {
+    background: var(--red-3);
+    color: var(--white-1);
+    transform: scale(1.1);
 }
 </style>

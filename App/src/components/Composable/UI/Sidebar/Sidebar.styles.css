@@ -4,7 +4,7 @@
     right: 0;
     flex-direction: column;
     background: var(--grey-5);
-    width: 300px;
+    width: 500px;
     height: 100%;
     box-shadow: -2px 0px 4px grey;
     z-index: 100;
