@@ -74,6 +74,20 @@ export class WorkflowServiceClient {
     metadata?: grpcWeb.Metadata
   ): grpcWeb.ClientReadableStream<floowsynk_pb.RunWorkflowResponse>;
 
+  listWorkflowHistory(
+    request: floowsynk_pb.Empty,
+    metadata: grpcWeb.Metadata | undefined,
+    callback: (err: grpcWeb.RpcError,
+               response: floowsynk_pb.WorkflowHistoryList) => void
+  ): grpcWeb.ClientReadableStream<floowsynk_pb.WorkflowHistoryList>;
+
+  getWorkflowHistory(
+    request: floowsynk_pb.WorkflowHistoryRequest,
+    metadata: grpcWeb.Metadata | undefined,
+    callback: (err: grpcWeb.RpcError,
+               response: floowsynk_pb.WorkflowHistoryResponse) => void
+  ): grpcWeb.ClientReadableStream<floowsynk_pb.WorkflowHistoryResponse>;
+
 }
 
 export class LoginServicePromiseClient {
@@ -132,6 +146,16 @@ export class WorkflowServicePromiseClient {
     request: floowsynk_pb.RunWorkflowIdRequest,
     metadata?: grpcWeb.Metadata
   ): grpcWeb.ClientReadableStream<floowsynk_pb.RunWorkflowResponse>;
+
+  listWorkflowHistory(
+    request: floowsynk_pb.Empty,
+    metadata?: grpcWeb.Metadata
+  ): Promise<floowsynk_pb.WorkflowHistoryList>;
+
+  getWorkflowHistory(
+    request: floowsynk_pb.WorkflowHistoryRequest,
+    metadata?: grpcWeb.Metadata
+  ): Promise<floowsynk_pb.WorkflowHistoryResponse>;
 
 }
 

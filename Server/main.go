@@ -7,7 +7,10 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/IBM/sarama"
+	"github.com/google/uuid"
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
+	"github.com/raenardcruz/floowsynk/Broker"
 	db "github.com/raenardcruz/floowsynk/Database"
 	"github.com/raenardcruz/floowsynk/Server/proto"
 	"github.com/raenardcruz/floowsynk/Server/workflow"
@@ -28,12 +31,32 @@ type WorkflowServer struct {
 const JobToken = "6c9e5318-6e7b-452d-9e22-9f35a755bcbd"
 
 var DBCon *db.DatabaseConnection
+var producer *sarama.SyncProducer
+var consumer *sarama.Consumer
 
 func main() {
-	err := initializeDatabase()
-	if err != nil {
-		log.Fatalf("Failed to initialize database: %v", err)
+	var err error
+	if err = initializeDatabase(); err != nil {
+		log.Fatalf("Failed to connect to database: %v", err)
+		return
 	}
+	if producer, consumer, err = Broker.Init(); err != nil {
+		log.Fatalf("Failed to initialize broker: %v", err)
+		return
+	}
+	if producer == nil || consumer == nil {
+		log.Fatalf("Failed to create producer or consumer")
+		return
+	}
+	defer func() {
+		if err := (*producer).Close(); err != nil {
+			log.Fatalf("Failed to close producer: %v", err)
+		}
+		if err := (*consumer).Close(); err != nil {
+			log.Fatalf("Failed to close consumer: %v", err)
+		}
+		log.Println("Cleaned up producer and consumer")
+	}()
 
 	grpcServer := setupGRPCServer()
 	httpServer := setupHTTPServer(grpcServer)
@@ -142,10 +165,13 @@ func runWebhookHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	wp := workflow.WorkflowProcessor{
+		ID:               uuid.NewString(),
 		DBcon:            *DBCon,
 		Workflow:         workflowObj,
 		Stream:           nil,
 		ProcessVariables: make(map[string]interface{}),
+		Producer:         producer,
+		Consumer:         consumer,
 	}
 
 	if err := wp.StartWorkflow(); err != nil {

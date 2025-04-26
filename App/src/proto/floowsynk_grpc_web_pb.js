@@ -665,5 +665,127 @@ proto.proto.WorkflowServicePromiseClient.prototype.runWorkflowId =
 };
 
 
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.proto.Empty,
+ *   !proto.proto.WorkflowHistoryList>}
+ */
+const methodDescriptor_WorkflowService_ListWorkflowHistory = new grpc.web.MethodDescriptor(
+  '/proto.WorkflowService/ListWorkflowHistory',
+  grpc.web.MethodType.UNARY,
+  proto.proto.Empty,
+  proto.proto.WorkflowHistoryList,
+  /**
+   * @param {!proto.proto.Empty} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.proto.WorkflowHistoryList.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.proto.Empty} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.RpcError, ?proto.proto.WorkflowHistoryList)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.proto.WorkflowHistoryList>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.proto.WorkflowServiceClient.prototype.listWorkflowHistory =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/proto.WorkflowService/ListWorkflowHistory',
+      request,
+      metadata || {},
+      methodDescriptor_WorkflowService_ListWorkflowHistory,
+      callback);
+};
+
+
+/**
+ * @param {!proto.proto.Empty} request The
+ *     request proto
+ * @param {?Object<string, string>=} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.proto.WorkflowHistoryList>}
+ *     Promise that resolves to the response
+ */
+proto.proto.WorkflowServicePromiseClient.prototype.listWorkflowHistory =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/proto.WorkflowService/ListWorkflowHistory',
+      request,
+      metadata || {},
+      methodDescriptor_WorkflowService_ListWorkflowHistory);
+};
+
+
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.proto.WorkflowHistoryRequest,
+ *   !proto.proto.WorkflowHistoryResponse>}
+ */
+const methodDescriptor_WorkflowService_GetWorkflowHistory = new grpc.web.MethodDescriptor(
+  '/proto.WorkflowService/GetWorkflowHistory',
+  grpc.web.MethodType.UNARY,
+  proto.proto.WorkflowHistoryRequest,
+  proto.proto.WorkflowHistoryResponse,
+  /**
+   * @param {!proto.proto.WorkflowHistoryRequest} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.proto.WorkflowHistoryResponse.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.proto.WorkflowHistoryRequest} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.RpcError, ?proto.proto.WorkflowHistoryResponse)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.proto.WorkflowHistoryResponse>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.proto.WorkflowServiceClient.prototype.getWorkflowHistory =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/proto.WorkflowService/GetWorkflowHistory',
+      request,
+      metadata || {},
+      methodDescriptor_WorkflowService_GetWorkflowHistory,
+      callback);
+};
+
+
+/**
+ * @param {!proto.proto.WorkflowHistoryRequest} request The
+ *     request proto
+ * @param {?Object<string, string>=} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.proto.WorkflowHistoryResponse>}
+ *     Promise that resolves to the response
+ */
+proto.proto.WorkflowServicePromiseClient.prototype.getWorkflowHistory =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/proto.WorkflowService/GetWorkflowHistory',
+      request,
+      metadata || {},
+      methodDescriptor_WorkflowService_GetWorkflowHistory);
+};
+
+
 module.exports = proto.proto;
 

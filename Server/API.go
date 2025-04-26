@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/google/uuid"
 	"github.com/raenardcruz/floowsynk/Server/proto"
 	"github.com/raenardcruz/floowsynk/Server/workflow"
 )
@@ -125,10 +126,13 @@ func (s *WorkflowServer) QuickRun(req *proto.Workflow, stream proto.WorkflowServ
 		return fmt.Errorf(validateResults.message)
 	}
 	processor := workflow.WorkflowProcessor{
+		ID:               uuid.NewString(),
 		Stream:           stream,
 		Workflow:         req,
 		ProcessVariables: make(map[string]interface{}),
 		DBcon:            *DBCon,
+		Consumer:         consumer,
+		Producer:         producer,
 	}
 	err = processor.StartWorkflow()
 	if err != nil {
@@ -156,4 +160,36 @@ func (s *WorkflowServer) RunWorkflowId(req *proto.RunWorkflowIdRequest, stream p
 	}
 	processor.StartWorkflow()
 	return nil
+}
+
+func (s *WorkflowServer) ListWorkflowHistory(ctx context.Context, in *proto.Empty) (*proto.WorkflowHistoryList, error) {
+	token, err := getTokenFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	validateResults := validateToken(token)
+	if validateResults.status != http.StatusOK {
+		return nil, fmt.Errorf(validateResults.message)
+	}
+	history, err := ListWorkflowHistory()
+	if err != nil {
+		return nil, err
+	}
+	return history, nil
+}
+
+func (s *WorkflowServer) GetWorkflowHistory(ctx context.Context, req *proto.WorkflowHistoryRequest) (*proto.WorkflowHistoryResponse, error) {
+	token, err := getTokenFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	validateResults := validateToken(token)
+	if validateResults.status != http.StatusOK {
+		return nil, fmt.Errorf(validateResults.message)
+	}
+	history, err := GetWorkflowHistory(req.Id)
+	if err != nil {
+		return nil, err
+	}
+	return history, nil
 }

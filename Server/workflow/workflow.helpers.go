@@ -11,6 +11,9 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/raenardcruz/floowsynk/Broker"
+	"github.com/raenardcruz/floowsynk/Broker/kafka"
+	"github.com/raenardcruz/floowsynk/Helper"
 	"github.com/raenardcruz/floowsynk/Server/proto"
 )
 
@@ -45,6 +48,12 @@ func (wp *WorkflowProcessor) UpdateStatus(node *proto.Node, status proto.NodeSta
 	}
 	if wp.Stream != nil {
 		wp.Stream.SendMsg(res)
+		resStr, err := Helper.Marshal(res)
+		if err != nil {
+			fmt.Printf("Error marshaling RunWorkflowResponse: %v\n", err)
+			return
+		}
+		kafka.SendMessage(*wp.Producer, Broker.WORKFLOW_REPLAY_DATA, wp.ID, resStr)
 	}
 }
 

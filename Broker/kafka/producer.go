@@ -1,6 +1,9 @@
 package kafka
 
 import (
+	"log"
+	"strconv"
+
 	"github.com/IBM/sarama"
 )
 
@@ -27,6 +30,7 @@ func SendMessage(producer sarama.SyncProducer, topic string, key string, value s
 	if err != nil {
 		return 0, 0, err
 	}
+	log.Default().Printf("Message sent to topic %s, partition %d, offset %d\n", topic, partition, offset)
 	return partition, offset, nil
 }
 
@@ -50,4 +54,39 @@ func SendMessages(producer sarama.SyncProducer, topic string, messages []string)
 		offsets = append(offsets, offset)
 	}
 	return partitions, offsets, nil
+}
+
+func CreateTopic(brokers []string, topic string, numPartitions int32, retentionMs int64) error {
+	config := sarama.NewConfig()
+	admin, err := sarama.NewClusterAdmin(brokers, config)
+	if err != nil {
+		return err
+	}
+	defer admin.Close()
+
+	topics, err := admin.ListTopics()
+	if err != nil {
+		return err
+	}
+	if _, exists := topics[topic]; exists {
+		return nil
+	}
+
+	topicDetail := &sarama.TopicDetail{
+		NumPartitions:     numPartitions,
+		ReplicationFactor: 1,
+		ConfigEntries: map[string]*string{
+			"retention.ms": ptr(strconv.FormatInt(retentionMs, 10)),
+		},
+	}
+
+	err = admin.CreateTopic(topic, topicDetail, false)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func ptr(s string) *string {
+	return &s
 }

@@ -17,20 +17,6 @@ enum NodeStatus {
     INFO = 3;
 }
 
-service LoginService {
-    rpc Login(Credential) returns (Token);
-    rpc ExtendToken(Empty) returns (Token);
-}
-
-service WorkflowService {
-    rpc GetWorkflow(GetWorkflowRequest) returns (Workflow);
-    rpc ListWorkflows(PageRequest) returns (WorkflowList);
-    rpc UpdateWorkflow(Workflow) returns (Workflow);
-    rpc CreateWorkflow(Workflow) returns (Workflow);
-    rpc DeleteWorkflow(Workflow) returns (Empty);
-    rpc QuickRun(Workflow) returns (stream RunWorkflowResponse);
-    rpc RunWorkflowId(RunWorkflowIdRequest) returns (stream RunWorkflowResponse);
-}
 
 message RunWorkflowIdRequest {
     string id = 1;
@@ -40,6 +26,24 @@ message RunWorkflowResponse {
     string nodeId = 1;
     NodeStatus status = 2;
     optional ReplayData data = 3;
+}
+
+message WorkflowHistoryList {
+    repeated WorkflowHistory history = 1;
+}
+
+message WorkflowHistory {
+    string Id = 1;
+    string WorkflowId = 2;
+    string RunDate = 3;
+}
+
+message WorkflowHistoryRequest {
+    string id = 1;
+}
+
+message WorkflowHistoryResponse {
+    repeated RunWorkflowResponse data = 1;
 }
 
 message ReplayData {
@@ -196,4 +200,21 @@ message Handle {
     float height = 6;
     string nodeId = 7;
     string position = 8;
+}
+
+service LoginService {
+    rpc Login(Credential) returns (Token);
+    rpc ExtendToken(Empty) returns (Token);
+}
+
+service WorkflowService {
+    rpc GetWorkflow(GetWorkflowRequest) returns (Workflow);
+    rpc ListWorkflows(PageRequest) returns (WorkflowList);
+    rpc UpdateWorkflow(Workflow) returns (Workflow);
+    rpc CreateWorkflow(Workflow) returns (Workflow);
+    rpc DeleteWorkflow(Workflow) returns (Empty);
+    rpc QuickRun(Workflow) returns (stream RunWorkflowResponse);
+    rpc RunWorkflowId(RunWorkflowIdRequest) returns (stream RunWorkflowResponse);
+    rpc ListWorkflowHistory(proto.Empty) returns (WorkflowHistoryList);
+    rpc GetWorkflowHistory(WorkflowHistoryRequest) returns (WorkflowHistoryResponse);
 }

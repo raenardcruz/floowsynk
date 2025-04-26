@@ -2,8 +2,12 @@ package workflow
 
 import (
 	"errors"
+	"log"
 	"time"
 
+	"github.com/raenardcruz/floowsynk/Broker"
+	"github.com/raenardcruz/floowsynk/Broker/kafka"
+	"github.com/raenardcruz/floowsynk/Helper"
 	"github.com/raenardcruz/floowsynk/Server/proto"
 )
 
@@ -39,12 +43,24 @@ const (
 )
 
 func (wp *WorkflowProcessor) StartWorkflow() (err error) {
+	workflowHistory := WorkflowHistory{
+		ID:         wp.ID,
+		WorkflowId: wp.Workflow.Id,
+		RunDate:    time.Now().Format(time.RFC3339),
+	}
+	whStr, err := Helper.Marshal(workflowHistory)
+	if err != nil {
+		log.Printf("Error marshaling workflow history: %v", err)
+		return err
+	}
+	kafka.SendMessage(*wp.Producer, Broker.WORKFLOW_RUN_HISTORY, wp.ID, whStr)
 	start := time.Now()
 	wp.ProcessVariables = make(map[string]interface{})
 	wp.ProcessVariables[INPUT] = ""
 	wp.ProcessVariables[OUTPUT] = ""
 	wp.Process("0")
-	time.Since(start)
+	duration := time.Since(start)
+	log.Default().Printf("Workflow %s completed in %s", wp.Workflow.Id, duration)
 	return nil
 }
 

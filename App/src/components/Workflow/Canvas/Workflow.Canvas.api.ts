@@ -31,6 +31,6 @@ export const executeProcess = async (_: Workflow.AsObject) => {
     const client = new WorkflowServicePromiseClient(getApiUrl())
     const workflow = workflowFromObject(_)
     return client.quickRun(workflow, {
-        'Authorization': `${localStorage.getItem('sessionToken')}`
+        'Authorization': `${localStorage.getItem('sessionToken')}`,
     })
 }

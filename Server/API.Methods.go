@@ -8,9 +8,14 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/raenardcruz/floowsynk/Broker"
+	"github.com/raenardcruz/floowsynk/Broker/kafka"
 	DB "github.com/raenardcruz/floowsynk/Database"
+	"github.com/raenardcruz/floowsynk/Helper"
 	"github.com/raenardcruz/floowsynk/Server/crypto"
+	"github.com/raenardcruz/floowsynk/Server/proto"
 	pb "github.com/raenardcruz/floowsynk/Server/proto"
+	"github.com/raenardcruz/floowsynk/Server/workflow"
 	"google.golang.org/grpc/metadata"
 )
 
@@ -136,4 +141,47 @@ func CreateWorkflow(workflow *pb.Workflow) (*pb.Workflow, error) {
 }
 func DeleteWorkflow(id string) error {
 	return DBCon.DeleteWorkflow(id)
+}
+func ListWorkflowHistory() (history *pb.WorkflowHistoryList, err error) {
+	whList, err := kafka.ReadAllMessages(*consumer, Broker.WORKFLOW_RUN_HISTORY, 0)
+	if err != nil {
+		return nil, err
+	}
+	var historyList []*pb.WorkflowHistory
+	for _, wh := range whList {
+		whObj, err := Helper.Unmarshal[workflow.WorkflowHistory](wh)
+		if err != nil {
+			return nil, err
+		}
+		historyList = append(historyList, &pb.WorkflowHistory{
+			Id:         whObj.ID,
+			WorkflowId: whObj.WorkflowId,
+			RunDate:    whObj.RunDate,
+		})
+	}
+
+	return &pb.WorkflowHistoryList{
+		History: historyList,
+	}, nil
+}
+func GetWorkflowHistory(id string) (*proto.WorkflowHistoryResponse, error) {
+	rdList, err := kafka.ReadMessagesByKey(*consumer, Broker.WORKFLOW_REPLAY_DATA, id, 0)
+	if err != nil {
+		return nil, err
+	}
+	var historyList []*pb.RunWorkflowResponse
+	for _, rd := range rdList {
+		rdObj, err := Helper.Unmarshal[pb.RunWorkflowResponse](rd)
+		if err != nil {
+			return nil, err
+		}
+		historyList = append(historyList, &pb.RunWorkflowResponse{
+			NodeId: rdObj.NodeId,
+			Status: rdObj.Status,
+			Data:   rdObj.Data,
+		})
+	}
+	return &proto.WorkflowHistoryResponse{
+		Data: historyList,
+	}, nil
 }
