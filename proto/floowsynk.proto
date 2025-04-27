@@ -216,6 +216,6 @@ service WorkflowService {
     rpc DeleteWorkflow(Workflow) returns (Empty);
     rpc QuickRun(Workflow) returns (stream RunWorkflowResponse);
     rpc RunWorkflowId(RunWorkflowIdRequest) returns (stream RunWorkflowResponse);
-    rpc ListWorkflowHistory(proto.Empty) returns (WorkflowHistoryList);
+    rpc ListWorkflowHistory(Empty) returns (WorkflowHistoryList);
     rpc GetWorkflowHistory(WorkflowHistoryRequest) returns (WorkflowHistoryResponse);
 }

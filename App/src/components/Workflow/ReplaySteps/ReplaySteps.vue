@@ -25,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import { watch, computed, Teleport } from 'vue'
+import { watch, computed, Teleport, nextTick } from 'vue'
 import { useWorkflowCanvasStore } from '@/components/Workflow/Canvas/Workflow.Canvas.hooks'
 import { StepSelected } from './ReplaySteps.helper'
 import { SideBar } from "@/components/Composable/UI"
@@ -59,9 +59,14 @@ const variables = computed(() => {
 })
 
 
-watch(selectedReplayData, () => {
-    scrollTo(selectedReplayData.value-2)
-})
+// watch(selectedReplayData, (newValue, oldValue) => {
+//     if (newValue !== oldValue) {
+//         // Use nextTick to ensure scrollTo does not trigger reactivity updates
+//         nextTick(() => {
+//             scrollTo(newValue - 2);
+//         });
+//     }
+// })
 </script>
 
 <style scoped src="./ReplaySteps.styles.css"></style>
