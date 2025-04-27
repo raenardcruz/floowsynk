@@ -153,10 +153,15 @@ func ListWorkflowHistory() (history *pb.WorkflowHistoryList, err error) {
 		if err != nil {
 			return nil, err
 		}
+		w, err := DBCon.GetWorkflow(whObj.WorkflowId)
+		if err != nil {
+			return nil, err
+		}
 		historyList = append(historyList, &pb.WorkflowHistory{
-			Id:         whObj.ID,
-			WorkflowId: whObj.WorkflowId,
-			RunDate:    whObj.RunDate,
+			Id:           whObj.ID,
+			WorkflowId:   whObj.WorkflowId,
+			WorkflowName: w.Name,
+			RunDate:      whObj.RunDate,
 		})
 	}
 

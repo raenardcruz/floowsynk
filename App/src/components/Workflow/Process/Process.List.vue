@@ -28,6 +28,20 @@
                 </div>
             </div>
         </div>
+        <div class="run-history">
+            <Collapsible title="Run History" caption="List of all the processes that have been run">
+                <Header columnstyle="repeat(3, 1fr)">
+                    <div class="header">Process Name</div>
+                    <div class="header">Status</div>
+                    <div class="header">Date</div>
+                </Header>
+                <Row columnstyle="repeat(3, 1fr)" v-for="count in 10" :key="i">
+                    <div class="row">Process {{ i }}</div>
+                    <div class="row">Success</div>
+                    <div class="row">2023-10-01</div>
+                </Row>
+            </Collapsible>
+        </div>
     </div>
     <div v-else>Loading Please Wait...</div>
 </template>
@@ -37,6 +51,9 @@ import { createProcess, cardClicked, initWorkflows } from './Process.List.helper
 import WorkflowIcon from "@/components/Workflow/Workflow.Icon.vue"
 import { useProcessListStore, useProcessListHooks } from './Process.List.hooks'
 import { useAsyncState } from '@vueuse/core'
+import Header from '@/components/Composable/UI/Table/Headers.vue'
+import Row from '@/components/Composable/UI/Table/Row.vue'
+import Collapsible from '@/components/Composable/UI/Collapsible/Collapsible.vue'
 
 const { search } = useProcessListStore()
 const { filteredProcesses } = useProcessListHooks()

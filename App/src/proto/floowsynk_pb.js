@@ -1086,7 +1086,8 @@ proto.proto.WorkflowHistory.toObject = function(includeInstance, msg) {
   var f, obj = {
 id: jspb.Message.getFieldWithDefault(msg, 1, ""),
 workflowid: jspb.Message.getFieldWithDefault(msg, 2, ""),
-rundate: jspb.Message.getFieldWithDefault(msg, 3, "")
+workflowname: jspb.Message.getFieldWithDefault(msg, 3, ""),
+rundate: jspb.Message.getFieldWithDefault(msg, 4, "")
   };
 
   if (includeInstance) {
@@ -1133,6 +1134,10 @@ proto.proto.WorkflowHistory.deserializeBinaryFromReader = function(msg, reader) 
       break;
     case 3:
       var value = /** @type {string} */ (reader.readString());
+      msg.setWorkflowname(value);
+      break;
+    case 4:
+      var value = /** @type {string} */ (reader.readString());
       msg.setRundate(value);
       break;
     default:
@@ -1178,10 +1183,17 @@ proto.proto.WorkflowHistory.serializeBinaryToWriter = function(message, writer) 
       f
     );
   }
-  f = message.getRundate();
+  f = message.getWorkflowname();
   if (f.length > 0) {
     writer.writeString(
       3,
+      f
+    );
+  }
+  f = message.getRundate();
+  if (f.length > 0) {
+    writer.writeString(
+      4,
       f
     );
   }
@@ -1225,10 +1237,10 @@ proto.proto.WorkflowHistory.prototype.setWorkflowid = function(value) {
 
 
 /**
- * optional string RunDate = 3;
+ * optional string WorkflowName = 3;
  * @return {string}
  */
-proto.proto.WorkflowHistory.prototype.getRundate = function() {
+proto.proto.WorkflowHistory.prototype.getWorkflowname = function() {
   return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
 };
 
@@ -1237,8 +1249,26 @@ proto.proto.WorkflowHistory.prototype.getRundate = function() {
  * @param {string} value
  * @return {!proto.proto.WorkflowHistory} returns this
  */
-proto.proto.WorkflowHistory.prototype.setRundate = function(value) {
+proto.proto.WorkflowHistory.prototype.setWorkflowname = function(value) {
   return jspb.Message.setProto3StringField(this, 3, value);
+};
+
+
+/**
+ * optional string RunDate = 4;
+ * @return {string}
+ */
+proto.proto.WorkflowHistory.prototype.getRundate = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 4, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.proto.WorkflowHistory} returns this
+ */
+proto.proto.WorkflowHistory.prototype.setRundate = function(value) {
+  return jspb.Message.setProto3StringField(this, 4, value);
 };
 
 

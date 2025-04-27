@@ -80,6 +80,9 @@ export class WorkflowHistory extends jspb.Message {
   getWorkflowid(): string;
   setWorkflowid(value: string): WorkflowHistory;
 
+  getWorkflowname(): string;
+  setWorkflowname(value: string): WorkflowHistory;
+
   getRundate(): string;
   setRundate(value: string): WorkflowHistory;
 
@@ -95,6 +98,7 @@ export namespace WorkflowHistory {
   export type AsObject = {
     id: string,
     workflowid: string,
+    workflowname: string,
     rundate: string,
   }
 }

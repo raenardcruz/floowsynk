@@ -9,40 +9,6 @@
     border-radius: 8px;
     background: var(--grey-6);
  }
-.replay-data-row {
-    display: grid;
-    position: relative;
-    height: 40px;
-    justify-content: center;
-    align-items: center;
-    border-radius: 8px;
-    background: var(--grey-5);
-    color: var(--grey-1);
-    margin-bottom: 8px;
-    grid-template-columns: repeat(3, 1fr);
-    padding: 0 12px;
-    cursor: pointer;
-}
-.replay-data-row:hover {
-    background: var(--grey-4);
-    color: var(--grey-2);
-}
-.replay-data-row:hover {
-    background: var(--grey-4);
-    color: var(--grey-2);
-}
-.replay-data-row.selected {
-    color: var(--white-2);
-    background: linear-gradient(
-        135deg,
-        var(--blue-2) 0%,
-        var(--blue-3) 50%,
-        var(--blue-4) 100%
-    );
-    font-weight: bold;
-    border: 1px solid var(--blue-5);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
 .replay-data-nodeid,
 .replay-data-message,
 .replay-data-status {
