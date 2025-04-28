@@ -24,8 +24,8 @@ type UsersModel struct {
 	Password  string
 	Email     string
 	Role      string
-	CreatedAt string
-	UpdatedAt string
+	CreatedAt int64
+	UpdatedAt int64
 }
 
 func (db *DatabaseConnection) GetUsers() ([]UsersModel, error) {
@@ -72,6 +72,8 @@ func (db *DatabaseConnection) AddUser(u UsersModel) error {
 		u.ID = uuid.New().String()
 	}
 	u.Password = encPassword
+	u.CreatedAt = time.Now().UTC().Unix()
+	u.UpdatedAt = time.Now().UTC().Unix()
 	if err := db.conn.Create(&u).Error; err != nil {
 		log.Printf("Error adding user: %v", err)
 		return err
@@ -107,6 +109,8 @@ func (db *DatabaseConnection) UpdateUser(u UsersModel) error {
 	ctx := context.Background()
 	cacheKey := "user:" + u.ID
 	cacheKeyByUsername := "user:username:" + u.Username
+
+	u.UpdatedAt = time.Now().UTC().Unix()
 
 	encPassword, err := crypto.EncryptPassword(u.Password)
 	if err != nil {

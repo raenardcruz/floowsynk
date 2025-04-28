@@ -90,6 +90,7 @@ func (db *DatabaseConnection) MigrateAndSeedDatabase() error {
 	models := []interface{}{
 		&UsersModel{},
 		&Workflow{},
+		&ReplayData{},
 	}
 
 	for _, model := range models {
