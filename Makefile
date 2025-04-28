@@ -22,7 +22,7 @@ start-ui:
 
 start-jobs:
 	@echo "🚀 Starting job processor..."
-	@cd Jobs && go run .
+	@cd Jobs/Interval && go run .
 	@echo "✅ Job processor started."
 
 proto:

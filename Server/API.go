@@ -131,7 +131,6 @@ func (s *WorkflowServer) QuickRun(req *proto.Workflow, stream proto.WorkflowServ
 		Workflow:         req,
 		ProcessVariables: make(map[string]interface{}),
 		DBcon:            *DBCon,
-		Consumer:         consumer,
 		Producer:         producer,
 	}
 	err = processor.StartWorkflow()
@@ -167,15 +166,9 @@ func (s *WorkflowServer) ListWorkflowHistory(ctx context.Context, in *proto.Empt
 	if err != nil {
 		return nil, err
 	}
-	validateResults := validateToken(token)
-	if validateResults.status != http.StatusOK {
-		return nil, fmt.Errorf(validateResults.message)
-	}
-	history, err := ListWorkflowHistory()
-	if err != nil {
-		return nil, err
-	}
-	return history, nil
+	validateToken(token)
+
+	return &proto.WorkflowHistoryList{}, nil
 }
 
 func (s *WorkflowServer) GetWorkflowHistory(ctx context.Context, req *proto.WorkflowHistoryRequest) (*proto.WorkflowHistoryResponse, error) {
@@ -187,9 +180,6 @@ func (s *WorkflowServer) GetWorkflowHistory(ctx context.Context, req *proto.Work
 	if validateResults.status != http.StatusOK {
 		return nil, fmt.Errorf(validateResults.message)
 	}
-	history, err := GetWorkflowHistory(req.Id)
-	if err != nil {
-		return nil, err
-	}
-	return history, nil
+
+	return &proto.WorkflowHistoryResponse{}, nil
 }

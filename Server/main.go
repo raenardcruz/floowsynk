@@ -32,7 +32,6 @@ const JobToken = "6c9e5318-6e7b-452d-9e22-9f35a755bcbd"
 
 var DBCon *db.DatabaseConnection
 var producer *sarama.SyncProducer
-var consumer *sarama.Consumer
 
 func main() {
 	var err error
@@ -40,22 +39,19 @@ func main() {
 		log.Fatalf("Failed to connect to database: %v", err)
 		return
 	}
-	if producer, consumer, err = Broker.Init(); err != nil {
+	if producer, err = Broker.Init(); err != nil {
 		log.Fatalf("Failed to initialize broker: %v", err)
 		return
 	}
-	if producer == nil || consumer == nil {
-		log.Fatalf("Failed to create producer or consumer")
+	if producer == nil {
+		log.Fatalf("Failed to create producer")
 		return
 	}
 	defer func() {
 		if err := (*producer).Close(); err != nil {
 			log.Fatalf("Failed to close producer: %v", err)
 		}
-		if err := (*consumer).Close(); err != nil {
-			log.Fatalf("Failed to close consumer: %v", err)
-		}
-		log.Println("Cleaned up producer and consumer")
+		log.Println("Cleaned up producer")
 	}()
 
 	grpcServer := setupGRPCServer()
@@ -171,7 +167,6 @@ func runWebhookHandler(w http.ResponseWriter, r *http.Request) {
 		Stream:           nil,
 		ProcessVariables: make(map[string]interface{}),
 		Producer:         producer,
-		Consumer:         consumer,
 	}
 
 	if err := wp.StartWorkflow(); err != nil {
