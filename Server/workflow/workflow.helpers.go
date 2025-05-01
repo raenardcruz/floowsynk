@@ -33,19 +33,17 @@ func (wp *WorkflowProcessor) UpdateStatus(node *proto.Node, status proto.NodeSta
 			}
 		}
 	}
-	res := &proto.RunWorkflowResponse{
-		NodeId: node.Id,
-		Status: status,
+
+	res := &proto.ReplayData{
+		NodeId:  node.Id,
+		Status:  status,
+		Message: message,
 	}
 	if includeReplayData {
-		res.Data = &proto.ReplayData{
-			NodeId:    node.Id,
-			Variables: wp.getVariableMapString(),
-			Data:      node.Data,
-			Status:    getStatusString(status),
-			Message:   message,
-		}
+		res.Variables = wp.getVariableMapString()
+		res.Data = node.Data
 	}
+
 	if wp.Stream != nil {
 		wp.Stream.SendMsg(res)
 		resStr, err := Helper.Marshal(res)
@@ -96,21 +94,6 @@ func (wp *WorkflowProcessor) nextProcess(nodeId string, sourceHandle string) err
 		}
 	}
 	return nil
-}
-
-func getStatusString(status proto.NodeStatus) string {
-	switch status {
-	case proto.NodeStatus_RUNNING:
-		return "Running"
-	case proto.NodeStatus_COMPLETED:
-		return "Success"
-	case proto.NodeStatus_FAILED:
-		return "Failed"
-	case proto.NodeStatus_INFO:
-		return "Info"
-	default:
-		return "Unknown"
-	}
 }
 
 func getNodeById(n []*proto.Node, id string) (*proto.Node, bool) {

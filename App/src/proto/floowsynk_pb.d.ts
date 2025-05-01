@@ -20,39 +20,6 @@ export namespace RunWorkflowIdRequest {
   }
 }
 
-export class RunWorkflowResponse extends jspb.Message {
-  getNodeid(): string;
-  setNodeid(value: string): RunWorkflowResponse;
-
-  getStatus(): NodeStatus;
-  setStatus(value: NodeStatus): RunWorkflowResponse;
-
-  getData(): ReplayData | undefined;
-  setData(value?: ReplayData): RunWorkflowResponse;
-  hasData(): boolean;
-  clearData(): RunWorkflowResponse;
-
-  serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): RunWorkflowResponse.AsObject;
-  static toObject(includeInstance: boolean, msg: RunWorkflowResponse): RunWorkflowResponse.AsObject;
-  static serializeBinaryToWriter(message: RunWorkflowResponse, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): RunWorkflowResponse;
-  static deserializeBinaryFromReader(message: RunWorkflowResponse, reader: jspb.BinaryReader): RunWorkflowResponse;
-}
-
-export namespace RunWorkflowResponse {
-  export type AsObject = {
-    nodeid: string,
-    status: NodeStatus,
-    data?: ReplayData.AsObject,
-  }
-
-  export enum DataCase { 
-    _DATA_NOT_SET = 0,
-    DATA = 3,
-  }
-}
-
 export class WorkflowHistoryList extends jspb.Message {
   getHistoryList(): Array<WorkflowHistory>;
   setHistoryList(value: Array<WorkflowHistory>): WorkflowHistoryList;
@@ -122,10 +89,10 @@ export namespace WorkflowHistoryRequest {
 }
 
 export class WorkflowHistoryResponse extends jspb.Message {
-  getDataList(): Array<RunWorkflowResponse>;
-  setDataList(value: Array<RunWorkflowResponse>): WorkflowHistoryResponse;
+  getDataList(): Array<ReplayData>;
+  setDataList(value: Array<ReplayData>): WorkflowHistoryResponse;
   clearDataList(): WorkflowHistoryResponse;
-  addData(value?: RunWorkflowResponse, index?: number): RunWorkflowResponse;
+  addData(value?: ReplayData, index?: number): ReplayData;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): WorkflowHistoryResponse.AsObject;
@@ -137,7 +104,7 @@ export class WorkflowHistoryResponse extends jspb.Message {
 
 export namespace WorkflowHistoryResponse {
   export type AsObject = {
-    dataList: Array<RunWorkflowResponse.AsObject>,
+    dataList: Array<ReplayData.AsObject>,
   }
 }
 
@@ -153,8 +120,8 @@ export class ReplayData extends jspb.Message {
   getVariablesMap(): jspb.Map<string, string>;
   clearVariablesMap(): ReplayData;
 
-  getStatus(): string;
-  setStatus(value: string): ReplayData;
+  getStatus(): NodeStatus;
+  setStatus(value: NodeStatus): ReplayData;
 
   getMessage(): string;
   setMessage(value: string): ReplayData;
@@ -172,7 +139,7 @@ export namespace ReplayData {
     nodeid: string,
     data?: NodeData.AsObject,
     variablesMap: Array<[string, string]>,
-    status: string,
+    status: NodeStatus,
     message: string,
   }
 }

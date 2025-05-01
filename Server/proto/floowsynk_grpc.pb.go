@@ -216,7 +216,7 @@ func (c *workflowServiceClient) QuickRun(ctx context.Context, in *Workflow, opts
 }
 
 type WorkflowService_QuickRunClient interface {
-	Recv() (*RunWorkflowResponse, error)
+	Recv() (*ReplayData, error)
 	grpc.ClientStream
 }
 
@@ -224,8 +224,8 @@ type workflowServiceQuickRunClient struct {
 	grpc.ClientStream
 }
 
-func (x *workflowServiceQuickRunClient) Recv() (*RunWorkflowResponse, error) {
-	m := new(RunWorkflowResponse)
+func (x *workflowServiceQuickRunClient) Recv() (*ReplayData, error) {
+	m := new(ReplayData)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
@@ -248,7 +248,7 @@ func (c *workflowServiceClient) RunWorkflowId(ctx context.Context, in *RunWorkfl
 }
 
 type WorkflowService_RunWorkflowIdClient interface {
-	Recv() (*RunWorkflowResponse, error)
+	Recv() (*ReplayData, error)
 	grpc.ClientStream
 }
 
@@ -256,8 +256,8 @@ type workflowServiceRunWorkflowIdClient struct {
 	grpc.ClientStream
 }
 
-func (x *workflowServiceRunWorkflowIdClient) Recv() (*RunWorkflowResponse, error) {
-	m := new(RunWorkflowResponse)
+func (x *workflowServiceRunWorkflowIdClient) Recv() (*ReplayData, error) {
+	m := new(ReplayData)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
@@ -441,7 +441,7 @@ func _WorkflowService_QuickRun_Handler(srv interface{}, stream grpc.ServerStream
 }
 
 type WorkflowService_QuickRunServer interface {
-	Send(*RunWorkflowResponse) error
+	Send(*ReplayData) error
 	grpc.ServerStream
 }
 
@@ -449,7 +449,7 @@ type workflowServiceQuickRunServer struct {
 	grpc.ServerStream
 }
 
-func (x *workflowServiceQuickRunServer) Send(m *RunWorkflowResponse) error {
+func (x *workflowServiceQuickRunServer) Send(m *ReplayData) error {
 	return x.ServerStream.SendMsg(m)
 }
 
@@ -462,7 +462,7 @@ func _WorkflowService_RunWorkflowId_Handler(srv interface{}, stream grpc.ServerS
 }
 
 type WorkflowService_RunWorkflowIdServer interface {
-	Send(*RunWorkflowResponse) error
+	Send(*ReplayData) error
 	grpc.ServerStream
 }
 
@@ -470,7 +470,7 @@ type workflowServiceRunWorkflowIdServer struct {
 	grpc.ServerStream
 }
 
-func (x *workflowServiceRunWorkflowIdServer) Send(m *RunWorkflowResponse) error {
+func (x *workflowServiceRunWorkflowIdServer) Send(m *ReplayData) error {
 	return x.ServerStream.SendMsg(m)
 }
 

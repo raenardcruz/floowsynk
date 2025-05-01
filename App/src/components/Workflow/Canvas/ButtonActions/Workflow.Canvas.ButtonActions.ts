@@ -3,7 +3,7 @@ import { WorkflowCanvasProps } from '../Workflow.Canvas.types'
 import { useNotif, NotifOptions, STATUS_ERROR, STATUS_INFO, STATUS_SUCCESS } from '@/components/Composable/UI/Notif'
 import { initWorkflows } from '@/components/Workflow/Process'
 import { useWorkflowStore } from '@/views/Workflow'
-import { NodeStatus, RunWorkflowResponse, Node } from 'proto/floowsynk_pb'
+import { NodeStatus, ReplayData, Node } from 'proto/floowsynk_pb'
 import {
   createProcess,
   updateProcess,
@@ -85,26 +85,27 @@ export const useWorkflowCanvasControlButtonActions = (props: WorkflowCanvasProps
       message: "Workflow started successfully: ",
       status: STATUS_INFO
     } as NotifOptions)
-    stream.on('data', (response: RunWorkflowResponse) => {
-      switch (response.getStatus()) {
+    stream.on('data', (response: ReplayData) => {
+      const status: NodeStatus = response?.getStatus()
+      switch (status) {
         case NodeStatus.RUNNING:
           nodeStatuses.value[response.getNodeid()] = 'running'
           break
         case NodeStatus.COMPLETED:
           nodeStatuses.value[response.getNodeid()] = 'success'
+          replayData.value.push(response.toObject())
           break
         case NodeStatus.FAILED:
           nodeStatuses.value[response.getNodeid()] = 'error'
+          replayData.value.push(response.toObject())
           break
         case NodeStatus.INFO:
           nodeStatuses.value[response.getNodeid()] = 'info'
+          replayData.value.push(response.toObject())
           break
-      }
-      if (response.getData() != undefined) {
-        const data = response.getData()?.toObject()
-        if (data) {
-          replayData.value.push(data)
-        }
+        default:
+          nodeStatuses.value[response.getNodeid()] = 'error'
+          break
       }
     })
     stream.on('end', () => {

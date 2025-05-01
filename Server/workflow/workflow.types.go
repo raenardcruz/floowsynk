@@ -12,7 +12,7 @@ type KeyValue struct {
 	Value string `json:"value"`
 }
 type GrpcWorkflowStream interface {
-	Send(*proto.RunWorkflowResponse) error
+	Send(*proto.ReplayData) error
 	grpc.ServerStream
 }
 

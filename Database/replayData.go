@@ -16,6 +16,7 @@ type ReplayData struct {
 	ID              string `gorm:"primaryKey"`
 	ProcessID       string
 	WorkflowID      string
+	NodeID          string `gorm:"ommitempty"`
 	ProcessSequence int    `gorm:"omitempty"`
 	Data            JSONB  `gorm:"type:jsonb"`
 	Variables       JSONB  `gorm:"type:jsonb"`
@@ -52,7 +53,7 @@ func (db *DatabaseConnection) GetWorkflowHistory() ([]ReplayData, error) {
 		}
 	}
 
-	if err := db.conn.Select("ID, ProcessID, WorkflowID").Distinct().Find(&replayData).Error; err != nil {
+	if err := db.conn.Select("id, process_id, workflow_id").Distinct().Find(&replayData).Error; err != nil {
 		return nil, err
 	}
 
@@ -75,7 +76,7 @@ func (db *DatabaseConnection) GetReplayDataGroupedByProcessID(processID string) 
 		}
 	}
 
-	if err := db.conn.Where("ProcessID = ?", processID).Find(&replayData).Error; err != nil {
+	if err := db.conn.Where("process_id = ?", processID).Find(&replayData).Error; err != nil {
 		return nil, err
 	}
 
@@ -88,7 +89,7 @@ func (db *DatabaseConnection) GetReplayDataGroupedByProcessID(processID string) 
 
 func (db *DatabaseConnection) Cleanup(retention int) error {
 	cutoff := time.Now().UTC().AddDate(0, 0, -retention).Unix()
-	if err := db.conn.Where("CreatedAt < ?", cutoff).Delete(&ReplayData{}).Error; err != nil {
+	if err := db.conn.Where("created_at < ?", cutoff).Delete(&ReplayData{}).Error; err != nil {
 		return err
 	}
 	log.Printf("Cleaned up Replay Data older than %d days", retention)

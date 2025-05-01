@@ -10,7 +10,7 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	DB "github.com/raenardcruz/floowsynk/Database"
 	"github.com/raenardcruz/floowsynk/Server/crypto"
-	pb "github.com/raenardcruz/floowsynk/Server/proto"
+	"github.com/raenardcruz/floowsynk/Server/proto"
 	"google.golang.org/grpc/metadata"
 )
 
@@ -105,7 +105,7 @@ func Login(userName string, password string) (string, error) {
 	return "", fmt.Errorf("invalid password")
 }
 
-func GetWorkflow(id string) (workflow *pb.Workflow, err error) {
+func GetWorkflow(id string) (workflow *proto.Workflow, err error) {
 	workflow, err = DBCon.GetWorkflow(id)
 	if err != nil {
 		return workflow, err
@@ -113,20 +113,20 @@ func GetWorkflow(id string) (workflow *pb.Workflow, err error) {
 	return workflow, nil
 }
 
-func ListWorkflows(offset int32, limit int32) (wl *pb.WorkflowList, err error) {
+func ListWorkflows(offset int32, limit int32) (wl *proto.WorkflowList, err error) {
 	wl, err = DBCon.GetWorkflows(int(limit), int(offset))
 	if err != nil {
 		return nil, err
 	}
 	return wl, nil
 }
-func UpdateWorkflow(workflow *pb.Workflow) (w *pb.Workflow, err error) {
+func UpdateWorkflow(workflow *proto.Workflow) (w *proto.Workflow, err error) {
 	if err := DBCon.UpdateWorkflow(workflow); err != nil {
 		return nil, err
 	}
 	return workflow, nil
 }
-func CreateWorkflow(workflow *pb.Workflow) (*pb.Workflow, error) {
+func CreateWorkflow(workflow *proto.Workflow) (*proto.Workflow, error) {
 	id, err := DBCon.CreateWorkflow(workflow)
 	if err != nil {
 		return nil, err
@@ -136,4 +136,47 @@ func CreateWorkflow(workflow *pb.Workflow) (*pb.Workflow, error) {
 }
 func DeleteWorkflow(id string) error {
 	return DBCon.DeleteWorkflow(id)
+}
+func ListWorkflowHistoryImpl() (*proto.WorkflowHistoryList, error) {
+	history, err := DBCon.GetWorkflowHistory()
+	if err != nil {
+		return nil, err
+	}
+
+	var hl []*proto.WorkflowHistory
+	for _, data := range history {
+		w, err := DBCon.GetWorkflow(data.WorkflowID)
+		if err != nil {
+			return nil, err
+		}
+		hl = append(hl, &proto.WorkflowHistory{
+			Id:           data.ID,
+			WorkflowId:   data.WorkflowID,
+			WorkflowName: w.Name,
+			RunDate:      time.Unix(data.CreatedAt, 0).Format("Jan 02, 2006"),
+		})
+	}
+
+	return &proto.WorkflowHistoryList{
+		History: hl,
+	}, nil
+}
+func GetWorkflowHistoryImpl(Id string) (*proto.WorkflowHistoryResponse, error) {
+	// replayDataList, err := DBCon.GetReplayDataGroupedByProcessID(Id)
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	// var data []*proto.RunWorkflowResponse
+	// for _, rd := range replayDataList {
+	// 	data = append(data, &proto.RunWorkflowResponse{
+	// 		NodeId: rd.NodeID,
+	// 		Status: rd.Status,
+	// 		Data: &proto.ReplayData{
+
+	// 		},
+	// 	})
+	// }
+
+	return nil, nil
 }

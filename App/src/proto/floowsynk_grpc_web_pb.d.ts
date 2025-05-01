@@ -67,12 +67,12 @@ export class WorkflowServiceClient {
   quickRun(
     request: floowsynk_pb.Workflow,
     metadata?: grpcWeb.Metadata
-  ): grpcWeb.ClientReadableStream<floowsynk_pb.RunWorkflowResponse>;
+  ): grpcWeb.ClientReadableStream<floowsynk_pb.ReplayData>;
 
   runWorkflowId(
     request: floowsynk_pb.RunWorkflowIdRequest,
     metadata?: grpcWeb.Metadata
-  ): grpcWeb.ClientReadableStream<floowsynk_pb.RunWorkflowResponse>;
+  ): grpcWeb.ClientReadableStream<floowsynk_pb.ReplayData>;
 
   listWorkflowHistory(
     request: floowsynk_pb.Empty,
@@ -140,12 +140,12 @@ export class WorkflowServicePromiseClient {
   quickRun(
     request: floowsynk_pb.Workflow,
     metadata?: grpcWeb.Metadata
-  ): grpcWeb.ClientReadableStream<floowsynk_pb.RunWorkflowResponse>;
+  ): grpcWeb.ClientReadableStream<floowsynk_pb.ReplayData>;
 
   runWorkflowId(
     request: floowsynk_pb.RunWorkflowIdRequest,
     metadata?: grpcWeb.Metadata
-  ): grpcWeb.ClientReadableStream<floowsynk_pb.RunWorkflowResponse>;
+  ): grpcWeb.ClientReadableStream<floowsynk_pb.ReplayData>;
 
   listWorkflowHistory(
     request: floowsynk_pb.Empty,

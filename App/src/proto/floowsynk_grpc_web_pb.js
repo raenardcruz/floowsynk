@@ -557,13 +557,13 @@ proto.proto.WorkflowServicePromiseClient.prototype.deleteWorkflow =
  * @const
  * @type {!grpc.web.MethodDescriptor<
  *   !proto.proto.Workflow,
- *   !proto.proto.RunWorkflowResponse>}
+ *   !proto.proto.ReplayData>}
  */
 const methodDescriptor_WorkflowService_QuickRun = new grpc.web.MethodDescriptor(
   '/proto.WorkflowService/QuickRun',
   grpc.web.MethodType.SERVER_STREAMING,
   proto.proto.Workflow,
-  proto.proto.RunWorkflowResponse,
+  proto.proto.ReplayData,
   /**
    * @param {!proto.proto.Workflow} request
    * @return {!Uint8Array}
@@ -571,7 +571,7 @@ const methodDescriptor_WorkflowService_QuickRun = new grpc.web.MethodDescriptor(
   function(request) {
     return request.serializeBinary();
   },
-  proto.proto.RunWorkflowResponse.deserializeBinary
+  proto.proto.ReplayData.deserializeBinary
 );
 
 
@@ -579,7 +579,7 @@ const methodDescriptor_WorkflowService_QuickRun = new grpc.web.MethodDescriptor(
  * @param {!proto.proto.Workflow} request The request proto
  * @param {?Object<string, string>=} metadata User defined
  *     call metadata
- * @return {!grpc.web.ClientReadableStream<!proto.proto.RunWorkflowResponse>}
+ * @return {!grpc.web.ClientReadableStream<!proto.proto.ReplayData>}
  *     The XHR Node Readable Stream
  */
 proto.proto.WorkflowServiceClient.prototype.quickRun =
@@ -596,7 +596,7 @@ proto.proto.WorkflowServiceClient.prototype.quickRun =
  * @param {!proto.proto.Workflow} request The request proto
  * @param {?Object<string, string>=} metadata User defined
  *     call metadata
- * @return {!grpc.web.ClientReadableStream<!proto.proto.RunWorkflowResponse>}
+ * @return {!grpc.web.ClientReadableStream<!proto.proto.ReplayData>}
  *     The XHR Node Readable Stream
  */
 proto.proto.WorkflowServicePromiseClient.prototype.quickRun =
@@ -613,13 +613,13 @@ proto.proto.WorkflowServicePromiseClient.prototype.quickRun =
  * @const
  * @type {!grpc.web.MethodDescriptor<
  *   !proto.proto.RunWorkflowIdRequest,
- *   !proto.proto.RunWorkflowResponse>}
+ *   !proto.proto.ReplayData>}
  */
 const methodDescriptor_WorkflowService_RunWorkflowId = new grpc.web.MethodDescriptor(
   '/proto.WorkflowService/RunWorkflowId',
   grpc.web.MethodType.SERVER_STREAMING,
   proto.proto.RunWorkflowIdRequest,
-  proto.proto.RunWorkflowResponse,
+  proto.proto.ReplayData,
   /**
    * @param {!proto.proto.RunWorkflowIdRequest} request
    * @return {!Uint8Array}
@@ -627,7 +627,7 @@ const methodDescriptor_WorkflowService_RunWorkflowId = new grpc.web.MethodDescri
   function(request) {
     return request.serializeBinary();
   },
-  proto.proto.RunWorkflowResponse.deserializeBinary
+  proto.proto.ReplayData.deserializeBinary
 );
 
 
@@ -635,7 +635,7 @@ const methodDescriptor_WorkflowService_RunWorkflowId = new grpc.web.MethodDescri
  * @param {!proto.proto.RunWorkflowIdRequest} request The request proto
  * @param {?Object<string, string>=} metadata User defined
  *     call metadata
- * @return {!grpc.web.ClientReadableStream<!proto.proto.RunWorkflowResponse>}
+ * @return {!grpc.web.ClientReadableStream<!proto.proto.ReplayData>}
  *     The XHR Node Readable Stream
  */
 proto.proto.WorkflowServiceClient.prototype.runWorkflowId =
@@ -652,7 +652,7 @@ proto.proto.WorkflowServiceClient.prototype.runWorkflowId =
  * @param {!proto.proto.RunWorkflowIdRequest} request The request proto
  * @param {?Object<string, string>=} metadata User defined
  *     call metadata
- * @return {!grpc.web.ClientReadableStream<!proto.proto.RunWorkflowResponse>}
+ * @return {!grpc.web.ClientReadableStream<!proto.proto.ReplayData>}
  *     The XHR Node Readable Stream
  */
 proto.proto.WorkflowServicePromiseClient.prototype.runWorkflowId =

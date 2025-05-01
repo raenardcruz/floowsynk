@@ -22,12 +22,6 @@ message RunWorkflowIdRequest {
     string id = 1;
 }
 
-message RunWorkflowResponse {
-    string nodeId = 1;
-    NodeStatus status = 2;
-    optional ReplayData data = 3;
-}
-
 message WorkflowHistoryList {
     repeated WorkflowHistory history = 1;
 }
@@ -44,14 +38,14 @@ message WorkflowHistoryRequest {
 }
 
 message WorkflowHistoryResponse {
-    repeated RunWorkflowResponse data = 1;
+    repeated ReplayData data = 1;
 }
 
 message ReplayData {
     string nodeId = 1;
     NodeData data = 2;
     map<string, string> variables = 3;
-    string status = 4;
+    NodeStatus status = 4;
     string message = 5;
 }
 
@@ -214,8 +208,8 @@ service WorkflowService {
     rpc UpdateWorkflow(Workflow) returns (Workflow);
     rpc CreateWorkflow(Workflow) returns (Workflow);
     rpc DeleteWorkflow(Workflow) returns (Empty);
-    rpc QuickRun(Workflow) returns (stream RunWorkflowResponse);
-    rpc RunWorkflowId(RunWorkflowIdRequest) returns (stream RunWorkflowResponse);
+    rpc QuickRun(Workflow) returns (stream ReplayData);
+    rpc RunWorkflowId(RunWorkflowIdRequest) returns (stream ReplayData);
     rpc ListWorkflowHistory(Empty) returns (WorkflowHistoryList);
     rpc GetWorkflowHistory(WorkflowHistoryRequest) returns (WorkflowHistoryResponse);
 }

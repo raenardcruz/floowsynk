@@ -166,9 +166,16 @@ func (s *WorkflowServer) ListWorkflowHistory(ctx context.Context, in *proto.Empt
 	if err != nil {
 		return nil, err
 	}
-	validateToken(token)
+	validateResults := validateToken(token)
+	if validateResults.status != http.StatusOK {
+		return nil, fmt.Errorf(validateResults.message)
+	}
+	wh, err := ListWorkflowHistoryImpl()
+	if err != nil {
+		return nil, err
+	}
 
-	return &proto.WorkflowHistoryList{}, nil
+	return wh, nil
 }
 
 func (s *WorkflowServer) GetWorkflowHistory(ctx context.Context, req *proto.WorkflowHistoryRequest) (*proto.WorkflowHistoryResponse, error) {

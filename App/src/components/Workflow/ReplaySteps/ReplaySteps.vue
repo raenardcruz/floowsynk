@@ -9,7 +9,7 @@
             <Row v-for="(item, index) in list" :key="index" @click="StepSelected(props.tabId, item.index)" :selected="selectedReplayData === item.index">
                 <div class="replay-data-nodeid">{{ item.data.nodeid }}</div>
                 <div class="replay-data-message">{{ item.data.message }}</div>
-                <div class="replay-data-status" :class="item.data.status">{{ item.data.status }}</div>
+                <div class="replay-data-status" :class="getStatus(item.data.status)">{{ getStatus(item.data.status) }}</div>
             </Row>
         </div>
     </div>
@@ -25,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import { watch, computed, Teleport, nextTick } from 'vue'
+import { computed, Teleport } from 'vue'
 import { useWorkflowCanvasStore } from '@/components/Workflow/Canvas/Workflow.Canvas.hooks'
 import { StepSelected } from './ReplaySteps.helper'
 import { SideBar } from "@/components/Composable/UI"
@@ -36,6 +36,7 @@ import { useReplayStoreHooks } from './ReplaySteps.hooks'
 import { useVirtualList } from '@vueuse/core'
 import Row from '@/components/Composable/UI/Table/Row.vue'
 import Header from '@/components/Composable/UI/Table/Headers.vue'
+import { NodeStatus } from 'proto/floowsynk_pb'
 
 const props = defineProps<ReplayDataProps>()
 const { selectedReplayDataData } = useReplayStoreHooks(props.tabId)
@@ -46,7 +47,7 @@ if (replayData.value.length > 0) {
     selectedReplayData.value = 0
 }
 
-const { list, containerProps, wrapperProps, scrollTo } = useVirtualList(replayData, {
+const { list, containerProps, wrapperProps } = useVirtualList(replayData, {
     itemHeight: 40,
 })
 const variables = computed(() => {
@@ -57,16 +58,18 @@ const variables = computed(() => {
     })
     return result
 })
-
-
-// watch(selectedReplayData, (newValue, oldValue) => {
-//     if (newValue !== oldValue) {
-//         // Use nextTick to ensure scrollTo does not trigger reactivity updates
-//         nextTick(() => {
-//             scrollTo(newValue - 2);
-//         });
-//     }
-// })
+const getStatus = (status: number) => {
+    switch (status) {
+        case NodeStatus.COMPLETED:
+            return 'Success'
+        case NodeStatus.FAILED:
+            return 'Failed'
+        case NodeStatus.INFO:
+            return 'Info'
+        default:
+            return 'Info'
+    }
+}
 </script>
 
 <style scoped src="./ReplaySteps.styles.css"></style>
