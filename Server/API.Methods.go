@@ -9,6 +9,7 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	DB "github.com/raenardcruz/floowsynk/Database"
+	"github.com/raenardcruz/floowsynk/Helper"
 	"github.com/raenardcruz/floowsynk/Server/crypto"
 	"github.com/raenardcruz/floowsynk/Server/proto"
 	"google.golang.org/grpc/metadata"
@@ -162,21 +163,40 @@ func ListWorkflowHistoryImpl() (*proto.WorkflowHistoryList, error) {
 	}, nil
 }
 func GetWorkflowHistoryImpl(Id string) (*proto.WorkflowHistoryResponse, error) {
-	// replayDataList, err := DBCon.GetReplayDataGroupedByProcessID(Id)
-	// if err != nil {
-	// 	return nil, err
-	// }
+	replayDataList, err := DBCon.GetReplayDataGroupedByProcessID(Id)
+	if err != nil {
+		return nil, err
+	}
 
-	// var data []*proto.RunWorkflowResponse
-	// for _, rd := range replayDataList {
-	// 	data = append(data, &proto.RunWorkflowResponse{
-	// 		NodeId: rd.NodeID,
-	// 		Status: rd.Status,
-	// 		Data: &proto.ReplayData{
+	var data []*proto.ReplayData
+	for _, rd := range replayDataList {
+		ndStr, err := Helper.Marshal(rd.Data)
+		if err != nil {
+			return nil, err
+		}
+		nd, err := Helper.Unmarshal[proto.NodeData](ndStr)
+		if err != nil {
+			return nil, err
+		}
+		variableStr, err := Helper.Marshal(rd.Variables)
+		if err != nil {
+			return nil, err
+		}
+		variables, err := Helper.Unmarshal[map[string]string](variableStr)
+		if err != nil {
+			return nil, err
+		}
 
-	// 		},
-	// 	})
-	// }
+		data = append(data, &proto.ReplayData{
+			NodeId:    rd.NodeID,
+			Data:      &nd,
+			Variables: variables,
+			Status:    proto.NodeStatus(rd.Status),
+			Message:   rd.Message,
+		})
+	}
 
-	return nil, nil
+	return &proto.WorkflowHistoryResponse{
+		Data: data,
+	}, nil
 }

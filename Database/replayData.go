@@ -20,7 +20,7 @@ type ReplayData struct {
 	ProcessSequence int    `gorm:"omitempty"`
 	Data            JSONB  `gorm:"type:jsonb"`
 	Variables       JSONB  `gorm:"type:jsonb"`
-	Status          string `gorm:"omitempty"`
+	Status          int32  `gorm:"omitempty"`
 	Message         string `gorm:"omitempty"`
 	CreatedAt       int64  `gorm:"omitempty"`
 }
