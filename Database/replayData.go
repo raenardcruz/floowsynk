@@ -40,6 +40,28 @@ func (db *DatabaseConnection) CreateReplayData(data *ReplayData) (string, error)
 	return data.ID, nil
 }
 
+func (db *DatabaseConnection) CreateBatchReplayData(dataList []ReplayData) ([]string, error) {
+	if len(dataList) == 0 {
+		return nil, fmt.Errorf("dataList is empty")
+	}
+
+	var ids []string
+	for i := range dataList {
+		dataList[i].CreatedAt = time.Now().UTC().Unix()
+		if dataList[i].ID == "" {
+			dataList[i].ID = uuid.NewString()
+		}
+		ids = append(ids, dataList[i].ID)
+	}
+
+	if err := db.conn.Create(&dataList).Error; err != nil {
+		return nil, err
+	}
+
+	log.Printf("Batch Replay Data added to DB: %v", ids)
+	return ids, nil
+}
+
 func (db *DatabaseConnection) GetWorkflowHistory() ([]ReplayData, error) {
 	log.Print("Getting ProcessID and WorkflowID")
 	var replayData []ReplayData

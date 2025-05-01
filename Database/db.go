@@ -1,6 +1,7 @@
 package DB
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -13,7 +14,17 @@ import (
 	_ "github.com/lib/pq"
 )
 
+// Implement json.Unmarshaler for JSONB
 type JSONB []byte
+
+func (j *JSONB) UnmarshalJSON(data []byte) error {
+	if !json.Valid(data) {
+		return fmt.Errorf("invalid JSON data")
+	}
+	*j = append((*j)[0:0], data...)
+	return nil
+}
+
 type DatabaseConnection struct {
 	conn *gorm.DB
 }
