@@ -24,7 +24,7 @@
     </Teleport>
     <Teleport :to="`#${canvasId}`">
         <Modal title="Select Process Type" caption="Select the type of process you want to create"
-            v-model:visible="showModal">
+            v-model="showModal">
             <ProcessTypeModal :id="props.tabid" />
         </Modal>
     </Teleport>
