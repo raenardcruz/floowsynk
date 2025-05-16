@@ -32,7 +32,7 @@
 .sidebar .content {
     display: flex;
     position: relative;
-    gap: 50px;
+    gap: 12px;
     padding: 10px;
     overflow-y: auto;
     height: calc(100% - 40px);

@@ -16,7 +16,7 @@ import (
 const (
 	brokerAddress = "localhost:9092"
 	topic         = Broker.WORKFLOW_REPLAY_DATA
-	groupID       = "floowsynk-job-group-tmp3"
+	groupID       = "floowsynk-job-group"
 	bufferTime    = 3 * time.Second
 )
 

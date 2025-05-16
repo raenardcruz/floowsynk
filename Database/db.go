@@ -43,6 +43,7 @@ type Config struct {
 }
 
 var AppConfig *Config
+var UseCache = true
 
 func init() {
 	godotenv.Load()
@@ -92,7 +93,10 @@ func ConnectToDatabase() (*DatabaseConnection, error) {
 		return nil, err
 	}
 	log.Println("Connected to database")
-	return &DatabaseConnection{conn: conn}, nil
+	dbCon := &DatabaseConnection{conn: conn}
+	UseCache = dbCon.IsFeatureEnabled(FEATURE_DB_CACHE)
+	log.Printf("Use Cache Feature Flag: %v", UseCache)
+	return dbCon, nil
 }
 
 func (db *DatabaseConnection) MigrateAndSeedDatabase() error {
@@ -102,6 +106,7 @@ func (db *DatabaseConnection) MigrateAndSeedDatabase() error {
 		&UsersModel{},
 		&Workflow{},
 		&ReplayData{},
+		&Feature{},
 	}
 
 	for _, model := range models {

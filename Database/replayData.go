@@ -33,10 +33,12 @@ func (db *DatabaseConnection) CreateReplayData(data *ReplayData) (string, error)
 	if data.ID == "" {
 		data.ID = uuid.NewString()
 	}
-	if err := db.conn.Create(&data).Error; err != nil {
-		return "", err
+	result := db.conn.Create(&data)
+	if result.Error != nil {
+		return "", result.Error
 	}
 	log.Printf("Replay Data %v added to DB", data)
+	log.Printf("SQL: %v, Rows Affected: %d", result.Statement.SQL.String(), result.RowsAffected)
 	return data.ID, nil
 }
 
@@ -54,11 +56,13 @@ func (db *DatabaseConnection) CreateBatchReplayData(dataList []ReplayData) ([]st
 		ids = append(ids, dataList[i].ID)
 	}
 
-	if err := db.conn.Create(&dataList).Error; err != nil {
-		return nil, err
+	result := db.conn.Create(&dataList)
+	if result.Error != nil {
+		return nil, result.Error
 	}
 
 	log.Printf("Batch Replay Data added to DB: %v", ids)
+	log.Printf("SQL: %v, Rows Affected: %d", result.Statement.SQL.String(), result.RowsAffected)
 	return ids, nil
 }
 
@@ -75,9 +79,12 @@ func (db *DatabaseConnection) GetWorkflowHistory() ([]ReplayData, error) {
 		}
 	}
 
-	if err := db.conn.Select("id, process_id, workflow_id").Distinct().Find(&replayData).Error; err != nil {
-		return nil, err
+	result := db.conn.Select("id, process_id, workflow_id").Distinct().Find(&replayData)
+	if result.Error != nil {
+		return nil, result.Error
 	}
+
+	log.Printf("SQL: %v, Rows Affected: %d", result.Statement.SQL.String(), result.RowsAffected)
 
 	if err := SetCache(ctx, cacheKey, replayData, replayDataCacheExpiration); err != nil {
 		log.Printf("Error Setting cache for %s", cacheKey)
@@ -98,9 +105,12 @@ func (db *DatabaseConnection) GetReplayDataGroupedByProcessID(processID string) 
 		}
 	}
 
-	if err := db.conn.Where("process_id = ?", processID).Find(&replayData).Error; err != nil {
-		return nil, err
+	result := db.conn.Where("process_id = ?", processID).Find(&replayData)
+	if result.Error != nil {
+		return nil, result.Error
 	}
+
+	log.Printf("SQL: %v, Rows Affected: %d", result.Statement.SQL.String(), result.RowsAffected)
 
 	if err := SetCache(ctx, cacheKey, replayData, replayDataCacheExpiration); err != nil {
 		log.Printf("Error Setting cache for %s", cacheKey)
@@ -111,9 +121,11 @@ func (db *DatabaseConnection) GetReplayDataGroupedByProcessID(processID string) 
 
 func (db *DatabaseConnection) Cleanup(retention int) error {
 	cutoff := time.Now().UTC().AddDate(0, 0, -retention).Unix()
-	if err := db.conn.Where("created_at < ?", cutoff).Delete(&ReplayData{}).Error; err != nil {
+	result := db.conn.Where("created_at < ?", cutoff).Delete(&ReplayData{})
+	if err := result.Error; err != nil {
 		return err
 	}
+	log.Printf("SQL: %v, Rows Affected: %d", result.Statement.SQL.String(), result.RowsAffected)
 	log.Printf("Cleaned up Replay Data older than %d days", retention)
 	return nil
 }

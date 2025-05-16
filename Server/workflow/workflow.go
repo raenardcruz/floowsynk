@@ -40,10 +40,6 @@ const (
 )
 
 func (wp *WorkflowProcessor) StartWorkflow() (err error) {
-	if err != nil {
-		log.Printf("Error marshaling workflow history: %v", err)
-		return err
-	}
 	start := time.Now()
 	wp.ProcessVariables = make(map[string]interface{})
 	wp.ProcessVariables[INPUT] = ""

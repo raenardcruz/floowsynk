@@ -132,6 +132,7 @@ func (s *WorkflowServer) QuickRun(req *proto.Workflow, stream proto.WorkflowServ
 		ProcessVariables: make(map[string]interface{}),
 		DBcon:            *DBCon,
 		Producer:         producer,
+		Step:             1,
 	}
 	err = processor.StartWorkflow()
 	if err != nil {
@@ -156,6 +157,7 @@ func (s *WorkflowServer) RunWorkflowId(req *proto.RunWorkflowIdRequest, stream p
 		ProcessVariables: make(map[string]interface{}),
 		DBcon:            *DBCon,
 		Workflow:         wf,
+		Step:             1,
 	}
 	processor.StartWorkflow()
 	return nil
@@ -188,5 +190,10 @@ func (s *WorkflowServer) GetWorkflowHistory(ctx context.Context, req *proto.Work
 		return nil, fmt.Errorf(validateResults.message)
 	}
 
-	return &proto.WorkflowHistoryResponse{}, nil
+	res, err := GetWorkflowHistoryImpl(req.Id)
+	if err != nil {
+		return &proto.WorkflowHistoryResponse{}, err
+	}
+
+	return res, nil
 }

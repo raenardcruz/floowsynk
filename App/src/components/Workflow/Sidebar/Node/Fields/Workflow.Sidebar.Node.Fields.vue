@@ -1,14 +1,13 @@
 <template>
     <div class="input" v-if="props.nodeType == 'subprocess'">
-        <SelectInput 
-            v-model="modelValue.subProcessId"
+        <SelectInput
             :options="filteredProcesses"
             :disabled="isRunning"
             label="Subprocess" />
     </div>
-    <div v-for="(value, key) in modelValue" :key="key" v-else-if="modelValue.constructor == Object">
-        <component :is="getComponent(key, value).component" v-bind="getComponent(key, value).props" v-if="value != null" v-model="modelValue[key]" />
-    </div>
+    <template v-for="(value, key) in modelValue" :key="key" v-else-if="modelValue && typeof modelValue === 'object'">
+        <component :is="getComponent(key, value)?.component" v-bind="getComponent(key, value)?.props" v-if="value != null" v-model="modelValue[key]" />
+    </template>
 </template>
 
 <script setup lang="ts">
@@ -18,15 +17,18 @@ import { useSidebarNodeHooks } from '../Workflow.Sidebar.Node.hooks'
 import { toSentenceCase } from '@/components/Composable/Utilities'
 import { useWorkflowCanvasStore } from '@/components/Workflow/Canvas/Workflow.Canvas.hooks'
 import { MONACO_EDITOR_DATA_PROPERTIES } from './Workflow.Sidebar.Node.Fields.constants'
-
 import CheckboxInput from '@/components/Composable/UI/Inputs/Checkbox.vue'
 import TextInput from '@/components/Composable/UI/Inputs/TextInput.vue'
 import SelectInput from '@/components/Composable/UI/Inputs/Select.vue'
 import ListInput from '@/components/Composable/UI/Inputs/ListField.vue'
 
 const props = defineProps<SidebarNodeProps>()
-const modelValue = defineModel()
-const { filteredProcesses, variables } = useSidebarNodeHooks(props.tabid)
+const modelValue = defineModel<Record<string, string>>()
+const { filteredProcesses: rawProcesses, variables } = useSidebarNodeHooks(props.tabid)
+const filteredProcesses = rawProcesses.value.map(process => ({
+    label: process.name,
+    value: process.id
+}))
 const isNodeArray = (obj: any): boolean => {
     try {
         return (

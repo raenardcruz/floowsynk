@@ -13,6 +13,7 @@ import (
 
 	"github.com/raenardcruz/floowsynk/Broker"
 	"github.com/raenardcruz/floowsynk/Broker/kafka"
+	DB "github.com/raenardcruz/floowsynk/Database"
 	"github.com/raenardcruz/floowsynk/Helper"
 	"github.com/raenardcruz/floowsynk/Server/proto"
 )
@@ -46,12 +47,37 @@ func (wp *WorkflowProcessor) UpdateStatus(node *proto.Node, status proto.NodeSta
 
 	if wp.Stream != nil {
 		wp.Stream.SendMsg(res)
-		resStr, err := Helper.Marshal(res)
+		// DB Record format
+		dbRD := DB.ReplayData{
+			ProcessID:  wp.ID,
+			WorkflowID: wp.Workflow.Id,
+			NodeID:     res.NodeId,
+			Data: func() DB.JSONB {
+				dataBytes, err := json.Marshal(res.Data)
+				if err != nil {
+					fmt.Printf("Error marshaling NodeData: %v\n", err)
+					return nil
+				}
+				return DB.JSONB(dataBytes)
+			}(),
+			Variables: func() DB.JSONB {
+				varBytes, err := json.Marshal(res.Variables)
+				if err != nil {
+					fmt.Printf("Error marshaling NodeData: %v\n", err)
+					return nil
+				}
+				return DB.JSONB(varBytes)
+			}(),
+			Status:          int32(res.Status),
+			Message:         res.Message,
+			ProcessSequence: int(wp.Step),
+		}
+		rdStr, err := Helper.Marshal(dbRD)
 		if err != nil {
 			fmt.Printf("Error marshaling RunWorkflowResponse: %v\n", err)
 			return
 		}
-		kafka.SendMessage(*wp.Producer, Broker.WORKFLOW_REPLAY_DATA, wp.ID, resStr)
+		kafka.SendMessage(*wp.Producer, Broker.WORKFLOW_REPLAY_DATA, wp.ID, rdStr)
 	}
 }
 
@@ -84,6 +110,7 @@ func (wp *WorkflowProcessor) setVariable(varName string, value interface{}) erro
 }
 
 func (wp *WorkflowProcessor) nextProcess(nodeId string, sourceHandle string) error {
+	wp.Step = wp.Step + 1
 	targets, ok := wp.GetNextNodes(nodeId, sourceHandle)
 	if !ok {
 		return nil

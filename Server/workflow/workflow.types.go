@@ -23,6 +23,7 @@ type WorkflowProcessor struct {
 	ProcessVariables map[string]interface{}
 	DBcon            db.DatabaseConnection
 	Producer         *sarama.SyncProducer
+	Step             int32
 }
 
 type WorkflowHistory struct {
