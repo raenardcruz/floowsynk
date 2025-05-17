@@ -7,18 +7,22 @@ import { useSidebarCanvasStore } from '@/components/Workflow/Sidebar/Canvas/Work
 import { watch } from 'vue'
 import { onKeyStroke, useCloned } from '@vueuse/core'
 import { useWorkflowCanvasControlButtonActions } from '../ButtonActions/Workflow.Canvas.ButtonActions'
+import { closeTabById } from '@/views/Workflow/Workflow.helpers'
+import { useTab } from '@/views/Workflow/Workflow.hooks'
 
 const { draggedNode } = useSidebarCanvasStore()
 
 export const useWorkflowCanvasVueFlowEvents = (props: WorkflowCanvasProps, vueFlowInstance: any) => {
   const { saveProcess, exitRunMode, runProcess, removeProcess, resetTransform } = useWorkflowCanvasControlButtonActions(props, vueFlowInstance)
   const { activeTab } = useWorkflowStore()
-  const { tab, commit, undo, redo } = useWorkflowCanvasHooks(props.id)
+  const { commit, undo, redo } = useWorkflowCanvasHooks(props.id)
+  const { tab, setActiveTabToNext, setActiveTabToPrevious } = useTab(props.id)
   const {
     selectedReplayData,
     replayData,
     isRunning,
     showReplayData,
+    hadOpenModalSidebar,
   } = useWorkflowCanvasStore(props.id)
   const { isDragOver, } = useWorkflowCanvasGlbalStore()
 
@@ -76,6 +80,7 @@ export const useWorkflowCanvasVueFlowEvents = (props: WorkflowCanvasProps, vueFl
   }
 
   onKeyStroke((e) => {
+    if (activeTab.value != tab.value.id) return
     const {
       getSelectedNodes,
       getSelectedEdges,
@@ -134,6 +139,11 @@ export const useWorkflowCanvasVueFlowEvents = (props: WorkflowCanvasProps, vueFl
     else if (e.key === 'Escape') {
       if (isRunning.value) {
         exitRunMode()
+        return
+      } else if (hadOpenModalSidebar.value) {
+        return
+      } else {
+        closeTabById(activeTab.value)
       }
     }
     // Run
@@ -161,8 +171,12 @@ export const useWorkflowCanvasVueFlowEvents = (props: WorkflowCanvasProps, vueFl
       if (showReplayData.value)
         if (selectedReplayData.value < replayData.value.length - 1)
           selectedReplayData.value++
+    } else if (e.key === 'ArrowLeft') {
+      setTimeout(() => setActiveTabToPrevious(), 10)
+    } else if (e.key === 'ArrowRight') {
+      setTimeout(() => setActiveTabToNext(), 10)
     }
-  })
+  }, { dedupe: true })
 
   watch(selectedReplayData, (newValue) => {
     if (newValue >= 0 && newValue < replayData.value.length) {
@@ -194,7 +208,7 @@ export const useWorkflowCanvasVueFlowEvents = (props: WorkflowCanvasProps, vueFl
           setViewport({
             x: currentViewport.x + deltaX * frame,
             y: currentViewport.y + deltaY * frame,
-            zoom: 1.5,
+            zoom: 1,
           })
           frame++
           requestAnimationFrame(animate)
@@ -202,7 +216,7 @@ export const useWorkflowCanvasVueFlowEvents = (props: WorkflowCanvasProps, vueFl
           setViewport({
             x: -targetPosition.x,
             y: -targetPosition.y,
-            zoom: 1.5,
+            zoom: 1,
           })
         }
       }

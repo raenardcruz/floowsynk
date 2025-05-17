@@ -50,10 +50,10 @@ const { node } = useNode()
 const { canvasId } = useFloowsynkNodeHooks(props.tabid)
 const showSidebar = ref(false)
 const showModal = ref(false)
+const { isRunning, hadOpenModalSidebar } = useWorkflowCanvasStore(props.tabid)
 const { nodestatus, isReplayNodeSelected } = useFloowsynkNodeWatchers(props.tabid, node, showSidebar)
 const clickHandler = () => clickhandler(node, showSidebar, showModal)
 let { icon, nodetype, label, outputsList, inputsList, nodestyle } = node as unknown as Node.AsObject
-const { isRunning } = useWorkflowCanvasStore(props.tabid)
 watch(isRunning, (newValue) => {
     node.draggable = !newValue
     node.deletable = !newValue
@@ -66,6 +66,9 @@ watch(node, (newValue) => {
         nodestyle = (newValue as unknown as Node.AsObject).nodestyle
     }
 })
+watch([showModal, showModal], ([newShowModal, newShowSidebar]) => {
+    hadOpenModalSidebar.value = newShowSidebar || newShowModal
+})  
 onKeyStroke('Escape', () => {
     showSidebar.value = false
     showModal.value = false

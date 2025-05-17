@@ -13,6 +13,7 @@ const clipBoard = ref({
 })
 const tabStores: Record<string, any> = {}
 const { x, y, } = useMouse({ touch: false })
+const hadOpenModalSidebar = ref(false)
 
 export const useWorkflowCanvasStore = (tabId: string) => {
     if (!tabStores[tabId]) {
@@ -22,6 +23,7 @@ export const useWorkflowCanvasStore = (tabId: string) => {
             replayData: ref<ReplayData.AsObject[]>([]),
             selectedReplayData: ref<number>(0),
             showReplayData: ref(false),
+            hadOpenModalSidebar,
         }
     }
 
