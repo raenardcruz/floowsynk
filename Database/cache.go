@@ -68,6 +68,26 @@ func DeleteCache(ctx context.Context, key string) error {
 	return nil
 }
 
+func ClearCache(ctx context.Context) error {
+	if !UseCache {
+		return nil
+	}
+	keys, err := RedisClient.Keys(ctx, "*").Result()
+	if err != nil {
+		return fmt.Errorf("failed to get cache keys: %w", err)
+	}
+
+	for _, key := range keys {
+		err = RedisClient.Del(ctx, key).Err()
+		if err != nil {
+			log.Printf("Failed to delete cache key %s: %v", key, err)
+		}
+	}
+
+	log.Println("Cache cleared")
+	return nil
+}
+
 func CacheExists(ctx context.Context, key string) (bool, error) {
 	if !UseCache {
 		return false, nil

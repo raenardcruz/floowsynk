@@ -7,6 +7,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/lib/pq"
 	pb "github.com/raenardcruz/floowsynk/Server/proto"
 )
 
@@ -21,7 +22,7 @@ type Workflow struct {
 	Edges       JSONB `gorm:"type:jsonb"`
 	CreatedBy   string
 	UpdatedBy   string
-	Tags        []string `gorm:"type:text[]"`
+	Tags        pq.StringArray `gorm:"type:text[]"`
 	CreatedAt   int64
 	UpdatedAt   int64
 }
@@ -58,7 +59,7 @@ func (db *DatabaseConnection) CreateWorkflow(workflow *pb.Workflow) (string, err
 		Edges:       edges,
 		CreatedBy:   workflow.CreatedBy,
 		UpdatedBy:   workflow.UpdatedBy,
-		Tags:        workflow.Tags,
+		Tags:        pq.StringArray(workflow.Tags),
 		CreatedAt:   time.Now().UTC().Unix(),
 		UpdatedAt:   time.Now().UTC().Unix(),
 	}
@@ -97,7 +98,7 @@ func (db *DatabaseConnection) GetWorkflows(limit, offset int) (*pb.WorkflowList,
 			Edges:       edges,
 			CreatedAt:   time.Unix(wf.CreatedAt, 0).Format("Jan 02, 2006"),
 			UpdatedAt:   time.Unix(wf.UpdatedAt, 0).Format("Jan 02, 2006"),
-			Tags:        wf.Tags,
+			Tags:        []string(wf.Tags),
 		})
 	}
 	return wl, nil
@@ -265,7 +266,7 @@ func (db *DatabaseConnection) UpdateWorkflow(workflow *pb.Workflow) error {
 		Edges:       edges,
 		UpdatedBy:   workflow.UpdatedBy,
 		UpdatedAt:   time.Now().UTC().Unix(),
-		Tags:        workflow.Tags,
+		Tags:        pq.StringArray(workflow.Tags),
 	}
 
 	if err := db.conn.Model(&Workflow{}).Where("id = ?", wf.ID).Updates(&wf).Error; err != nil {
