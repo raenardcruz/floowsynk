@@ -56,13 +56,21 @@ func (db *DatabaseConnection) CreateBatchReplayData(dataList []ReplayData) ([]st
 		ids = append(ids, dataList[i].ID)
 	}
 
-	result := db.conn.Create(&dataList)
-	if result.Error != nil {
-		return nil, result.Error
+	const chunkSize = 500
+	for i := 0; i < len(dataList); i += chunkSize {
+		end := i + chunkSize
+		if end > len(dataList) {
+			end = len(dataList)
+		}
+		chunk := dataList[i:end]
+		result := db.conn.Create(&chunk)
+		if result.Error != nil {
+			return nil, result.Error
+		}
+		log.Printf("Batch Replay Data chunk added to DB: %v", ids[i:end])
+		log.Printf("SQL: %v, Rows Affected: %d", result.Statement.SQL.String(), result.RowsAffected)
 	}
 
-	log.Printf("Batch Replay Data added to DB: %v", ids)
-	log.Printf("SQL: %v, Rows Affected: %d", result.Statement.SQL.String(), result.RowsAffected)
 	return ids, nil
 }
 

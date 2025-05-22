@@ -148,7 +148,7 @@ func ListWorkflowHistoryImpl() (*proto.WorkflowHistoryList, error) {
 	for _, data := range history {
 		w, err := DBCon.GetWorkflow(data.WorkflowID)
 		if err != nil {
-			return nil, err
+			continue
 		}
 		hl = append(hl, &proto.WorkflowHistory{
 			Id:           data.ID,

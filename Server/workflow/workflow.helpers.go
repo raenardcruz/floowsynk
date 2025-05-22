@@ -48,6 +48,9 @@ func (wp *WorkflowProcessor) UpdateStatus(node *proto.Node, status proto.NodeSta
 	if wp.Stream != nil {
 		wp.Stream.SendMsg(res)
 		// DB Record format
+		if status != proto.NodeStatus_COMPLETED && status != proto.NodeStatus_FAILED {
+			return
+		}
 		dbRD := DB.ReplayData{
 			ProcessID:  wp.ID,
 			WorkflowID: wp.Workflow.Id,

@@ -14,6 +14,7 @@
         <Handle class="handle-output" v-if="outputsList" v-for="(output, index) in outputsList" :key="output" :id="output"
             :data-output="output" type="source" :position="Position.Right"
             :style="{ top: `${(100 / (outputsList.length + 1)) * (index + 1)}%` }" />
+        <button class="add-btn" v-for="(output, index) in outputsList" :key="output" v-if="node.selected">+</button>
     </div>
     <Teleport :to="'#' + canvasId" v-if="!isRunning">
         <SideBar :title="label" :caption="node.id" v-model:visible="showSidebar">

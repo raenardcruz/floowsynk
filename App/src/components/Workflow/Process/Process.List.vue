@@ -14,7 +14,7 @@
                 <img src="/src/components/Icons/add.svg" alt="add" />
             </div>
             <div class="card" v-for="process in filteredProcesses" :key="process.id" :class="process.type"
-                @click="cardClicked(process)">
+                @click="cardClicked($event, process)">
                 <div class="type">
                     <workflow-icon :type="process.type" />
                     <span class="type-text">{{ process.type }}</span>

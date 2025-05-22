@@ -22,11 +22,12 @@ export const initWorkflows = async () => {
     })
 }
 
-export const cardClicked = (process: Workflow.AsObject) => {
+export const cardClicked = (e: MouseEvent, process: Workflow.AsObject) => {
     const { tabs, activeTab } = useWorkflowStore()
     if (!tabs.value.some(existingTab => existingTab.id === process.id)) {
         tabs.value.push(process)
     }
+    if (e.ctrlKey) return
     activeTab.value = process.id
 }
 

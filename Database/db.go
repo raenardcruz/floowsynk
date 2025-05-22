@@ -57,7 +57,7 @@ func init() {
 		Redis_Port:         getEnvAsInt("REDIS_PORT", 6379),
 		Redis_Password:     getEnv("REDIS_PASSWORD", "floowsynk"),
 		Redis_DB:           getEnvAsInt("REDIS_DB", 0),
-		App_Admin_Password: getEnv("APP_ADMIN_PASSWORD", "admin"),
+		App_Admin_Password: getEnv("APP_ADMIN_PASSWORD", "floowsynk"),
 		App_Admin_Username: getEnv("APP_ADMIN_USERNAME", "admin"),
 	}
 }
@@ -103,7 +103,7 @@ func (db *DatabaseConnection) MigrateAndSeedDatabase() error {
 	log.Println("Migrating tables and seeding initial data...")
 
 	models := []interface{}{
-		&UsersModel{},
+		&Users{},
 		&Workflow{},
 		&ReplayData{},
 		&Feature{},
@@ -117,15 +117,18 @@ func (db *DatabaseConnection) MigrateAndSeedDatabase() error {
 		}
 	}
 
+	log.Println("Seeding initial data...")
 	admin, err := db.GetUser("b5bd8424-fb52-4454-8102-488959a41ca8")
 	if admin.ID == "" || err != nil {
-		db.AddUser(UsersModel{
+		log.Println("Admin user not found, creating a new one...")
+		db.AddUser(Users{
 			ID:       "b5bd8424-fb52-4454-8102-488959a41ca8",
 			Username: AppConfig.App_Admin_Username,
 			Password: AppConfig.App_Admin_Password,
 			Role:     UserRoleAdmin,
 		})
 	}
+	log.Println("Database migration and seeding completed")
 
 	return nil
 }

@@ -1,4 +1,4 @@
-.PHONY: all start build install clean proto start-jobs docker-setup setup
+.PHONY: all build start-server start-ui job-interval job-consumer job-clearcache proto start-docker stop-docker setup
 # Define directories
 APP_DIR = App
 SERVER_DIR = Server
@@ -20,10 +20,21 @@ start-ui:
 	@cd $(APP_DIR) && npm run dev
 	@echo "✅ UI is live."
 
-start-jobs:
-	@echo "🚀 Starting job processor..."
+job-interval:
+	@echo "🚀 Starting job interval processor..."
 	@cd Jobs/Interval && go run .
-	@echo "✅ Job processor started."
+	@echo "✅ Job processor started"
+
+job-consumer:
+	@echo "🚀 Starting job consumer..."
+	@cd Jobs/Consumer && go run .
+	@echo "✅ Job consumer started"
+
+job-clearcache:
+	@echo "🚀 Starting job cache cleaner..."
+	@cd Jobs/ClearCache && go run .
+	@echo "✅ Job cache cleaner started"
+
 
 proto:
 	@echo "📦 Generating proto files started..."
