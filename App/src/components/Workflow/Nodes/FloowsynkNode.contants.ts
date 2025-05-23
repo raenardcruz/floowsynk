@@ -3,7 +3,7 @@ import {
     Node,
     NodeDataArray,
     ArrayDataType 
-} from 'proto/floowsynk_pb'
+} from 'proto/workflow/workflow_pb'
 
 export const groups: Group[] = [
     {

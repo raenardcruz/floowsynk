@@ -1,5 +1,5 @@
 import { ref, computed } from 'vue'
-import { Workflow, WorkflowHistory } from 'proto/floowsynk_pb'
+import { Workflow, WorkflowHistory } from 'proto/workflow/workflow_pb'
 import { createGlobalState } from '@vueuse/core'
 
 export const useProcessListStore = createGlobalState(() => {

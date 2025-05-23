@@ -2,7 +2,7 @@ import { useTab } from '@/views/Workflow'
 import { useWorkflowCanvasHooks } from '@/components/Workflow/Canvas/Workflow.Canvas.hooks'
 import { startNodes } from '@/components/Workflow/Nodes'
 import { useProcessTypeHooks, useProcessTypeStore } from './Workflow.Modal.ProcessTab.hooks'
-import { Node } from 'proto/floowsynk_pb'
+import { Node } from 'proto/workflow/workflow_pb'
 import { useCloned, useClipboard, useTimeoutFn } from '@vueuse/core'
 
 export const useProcessTypeHelpers = (tabId: string) => {

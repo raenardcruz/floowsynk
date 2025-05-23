@@ -1,5 +1,5 @@
 import { useWorkflowStore } from './Workflow.hooks'
-import { Workflow } from 'proto/floowsynk_pb'
+import { Workflow } from 'proto/workflow/workflow_pb'
 
 const { activeTab, tabs } = useWorkflowStore();
 

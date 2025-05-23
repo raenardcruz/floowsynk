@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"regexp"
 
+	proto "github.com/raenardcruz/floowsynk/CodeGen/go/workflow"
 	m "github.com/raenardcruz/floowsynk/Server/matheval"
-	"github.com/raenardcruz/floowsynk/Server/proto"
 )
 
 const (

@@ -7,7 +7,7 @@ import {
     ERROR_SESSION_EXTENSION,
     ERROR_USER_PASS } from './Login.constants';
 import { LoginRequest, LoginRequestUserPass } from './Login.api'
-import { Token } from '@/proto/floowsynk_pb'
+import { Token } from 'proto/login/login_pb'
 import { useStorage } from '@vueuse/core';
 
 const {

@@ -2,8 +2,8 @@ package workflow
 
 import (
 	"github.com/IBM/sarama"
+	proto "github.com/raenardcruz/floowsynk/CodeGen/go/workflow"
 	db "github.com/raenardcruz/floowsynk/Database"
-	"github.com/raenardcruz/floowsynk/Server/proto"
 	"google.golang.org/grpc"
 )
 

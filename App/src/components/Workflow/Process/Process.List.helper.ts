@@ -2,7 +2,7 @@ import { useProcessListStore } from './Process.List.hooks'
 import { getAllWorkflows, listWorkflowRunHistory, getWorkflowHistory } from './Process.List.api'
 import { useWorkflowStore, newProcess } from '@/views/Workflow'
 import { startNodes } from '@/components/Workflow/Nodes/FloowsynkNode.contants'
-import { Workflow, WorkflowHistory, NodeStatus } from 'proto/floowsynk_pb'
+import { Workflow, WorkflowHistory, NodeStatus } from 'proto/workflow/workflow_pb'
 import { useWorkflowCanvasStore } from '../Canvas/Workflow.Canvas.hooks'
 
 export const initWorkflows = async () => {

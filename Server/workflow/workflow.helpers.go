@@ -13,9 +13,9 @@ import (
 
 	"github.com/raenardcruz/floowsynk/Broker"
 	"github.com/raenardcruz/floowsynk/Broker/kafka"
+	proto "github.com/raenardcruz/floowsynk/CodeGen/go/workflow"
 	DB "github.com/raenardcruz/floowsynk/Database"
 	"github.com/raenardcruz/floowsynk/Helper"
-	"github.com/raenardcruz/floowsynk/Server/proto"
 )
 
 func (wp *WorkflowProcessor) UpdateStatus(node *proto.Node, status proto.NodeStatus, output interface{}, message string, includeReplayData bool) {

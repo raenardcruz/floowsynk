@@ -36,7 +36,7 @@ import { useReplayStoreHooks } from './ReplaySteps.hooks'
 import { useVirtualList } from '@vueuse/core'
 import Row from '@/components/Composable/UI/Table/Row.vue'
 import Header from '@/components/Composable/UI/Table/Headers.vue'
-import { NodeStatus } from 'proto/floowsynk_pb'
+import { NodeStatus } from 'proto/workflow/workflow_pb'
 
 const props = defineProps<ReplayDataProps>()
 const { selectedReplayDataData } = useReplayStoreHooks(props.tabId)

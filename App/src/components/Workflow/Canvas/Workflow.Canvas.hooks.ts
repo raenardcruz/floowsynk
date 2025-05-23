@@ -1,7 +1,7 @@
 import { ref, computed } from 'vue'
 import { useTab } from '@/views/Workflow'
 import { DenormalizeVueFlowObject } from '@/components/Composable/protoTransformers'
-import { ReplayData } from 'proto/floowsynk_pb'
+import { ReplayData } from 'proto/workflow/workflow_pb'
 import { useMouse, useManualRefHistory } from '@vueuse/core'
 import type { Node, Edge } from '@vue-flow/core'
 

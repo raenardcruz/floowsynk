@@ -1,6 +1,8 @@
 syntax = "proto3";
 package proto;
 
+import "google/protobuf/empty.proto";
+
 option go_package = "./proto";
 
 enum ArrayDataType {
@@ -49,20 +51,9 @@ message ReplayData {
     string message = 5;
 }
 
-message Empty {}
-
 message PageRequest {
     int32 limit = 1;
     int32 offset = 2;
-}
-
-message Credential {
-    string username = 1;
-    string password = 2;
-}
-
-message Token {
-    string token = 1;
 }
 
 message GetWorkflowRequest {
@@ -197,19 +188,14 @@ message Handle {
     string position = 8;
 }
 
-service LoginService {
-    rpc Login(Credential) returns (Token);
-    rpc ExtendToken(Empty) returns (Token);
-}
-
 service WorkflowService {
     rpc GetWorkflow(GetWorkflowRequest) returns (Workflow);
     rpc ListWorkflows(PageRequest) returns (WorkflowList);
     rpc UpdateWorkflow(Workflow) returns (Workflow);
     rpc CreateWorkflow(Workflow) returns (Workflow);
-    rpc DeleteWorkflow(Workflow) returns (Empty);
+    rpc DeleteWorkflow(Workflow) returns (google.protobuf.Empty);
     rpc QuickRun(Workflow) returns (stream ReplayData);
     rpc RunWorkflowId(RunWorkflowIdRequest) returns (stream ReplayData);
-    rpc ListWorkflowHistory(Empty) returns (WorkflowHistoryList);
+    rpc ListWorkflowHistory(google.protobuf.Empty) returns (WorkflowHistoryList);
     rpc GetWorkflowHistory(WorkflowHistoryRequest) returns (WorkflowHistoryResponse);
 }

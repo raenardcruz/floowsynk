@@ -11,8 +11,9 @@ import (
 	"github.com/google/uuid"
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
 	"github.com/raenardcruz/floowsynk/Broker"
+	lg "github.com/raenardcruz/floowsynk/CodeGen/go/login"
+	wf "github.com/raenardcruz/floowsynk/CodeGen/go/workflow"
 	db "github.com/raenardcruz/floowsynk/Database"
-	"github.com/raenardcruz/floowsynk/Server/proto"
 	"github.com/raenardcruz/floowsynk/Server/workflow"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -20,12 +21,12 @@ import (
 
 // LoginServer handles login-related gRPC services
 type LoginServer struct {
-	proto.UnimplementedLoginServiceServer
+	lg.UnimplementedLoginServiceServer
 }
 
 // WorkflowServer handles workflow-related gRPC services
 type WorkflowServer struct {
-	proto.UnimplementedWorkflowServiceServer
+	wf.UnimplementedWorkflowServiceServer
 }
 
 const JobToken = "6c9e5318-6e7b-452d-9e22-9f35a755bcbd"
@@ -82,8 +83,8 @@ func initializeDatabase() (err error) {
 
 func setupGRPCServer() *grpc.Server {
 	grpcServer := grpc.NewServer()
-	proto.RegisterLoginServiceServer(grpcServer, &LoginServer{})
-	proto.RegisterWorkflowServiceServer(grpcServer, &WorkflowServer{})
+	lg.RegisterLoginServiceServer(grpcServer, &LoginServer{})
+	wf.RegisterWorkflowServiceServer(grpcServer, &WorkflowServer{})
 	reflection.Register(grpcServer)
 	return grpcServer
 }
@@ -119,8 +120,8 @@ func startRESTServer() {
 func setupPlainGRPCServer() {
 	plainGRPCPort := ":50051"
 	plainGRPCServer := grpc.NewServer()
-	proto.RegisterLoginServiceServer(plainGRPCServer, &LoginServer{})
-	proto.RegisterWorkflowServiceServer(plainGRPCServer, &WorkflowServer{})
+	lg.RegisterLoginServiceServer(plainGRPCServer, &LoginServer{})
+	wf.RegisterWorkflowServiceServer(plainGRPCServer, &WorkflowServer{})
 	reflection.Register(plainGRPCServer)
 
 	go func() {

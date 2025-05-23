@@ -87,7 +87,8 @@ func (db *DatabaseConnection) GetWorkflowHistory() ([]ReplayData, error) {
 		}
 	}
 
-	result := db.conn.Select("id, process_id, workflow_id").Distinct().Find(&replayData)
+	result := db.conn.Select("process_id, workflow_id, min(created_at) as created_at").Group("process_id, workflow_id").Find(&replayData)
+
 	if result.Error != nil {
 		return nil, result.Error
 	}

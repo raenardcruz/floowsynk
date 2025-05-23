@@ -22,7 +22,7 @@ import Select from './Select.vue'
 import TextInput from './TextInput.vue'
 import Checkbox from './Checkbox.vue'
 import KeyValueField from './KeyValue.vue'
-import { NodeDataArray, ArrayDataType, KeyValue } from 'proto/floowsynk_pb'
+import { NodeDataArray, ArrayDataType, KeyValue } from 'proto/workflow/workflow_pb'
 
 
 const value = defineModel({

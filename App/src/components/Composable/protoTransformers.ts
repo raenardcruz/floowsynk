@@ -1,7 +1,5 @@
 import {
     PageRequest,
-    Credential,
-    Token,
     GetWorkflowRequest,
     WorkflowList,
     Workflow,
@@ -15,7 +13,8 @@ import {
     NodeHandleBounds,
     Handle,
     NodeDataArray,
- } from 'proto/floowsynk_pb'
+ } from 'proto/workflow/workflow_pb';
+ import { Credential, Token } from 'proto/login/login_pb';
  import type { Node as vfNode } from '@vue-flow/core'
 
 function normalizeObject(obj: any): any {

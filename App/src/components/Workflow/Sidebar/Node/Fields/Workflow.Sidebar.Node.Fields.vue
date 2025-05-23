@@ -25,7 +25,7 @@ import ListInput from '@/components/Composable/UI/Inputs/ListField.vue'
 const props = defineProps<SidebarNodeProps>()
 const modelValue = defineModel<Record<string, string>>()
 const { filteredProcesses: rawProcesses, variables } = useSidebarNodeHooks(props.tabid)
-const filteredProcesses = rawProcesses.value.map(process => ({
+const filteredProcesses = rawProcesses.value.map((process: any) => ({
     label: process.name,
     value: process.id
 }))

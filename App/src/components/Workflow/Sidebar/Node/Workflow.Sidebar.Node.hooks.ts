@@ -1,7 +1,7 @@
 import { computed } from 'vue'
 import { useTab } from '@/views/Workflow'
 import { useProcessListStore } from '@/components/Workflow/Process'
-import { Workflow } from 'proto/floowsynk_pb'
+import { Workflow } from 'proto/workflow/workflow_pb'
 
 const { processes } = useProcessListStore()
 

@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/lib/pq"
-	pb "github.com/raenardcruz/floowsynk/Server/proto"
+	pb "github.com/raenardcruz/floowsynk/CodeGen/go/workflow"
 )
 
 const workflowCacheExpiration = 15 * time.Minute

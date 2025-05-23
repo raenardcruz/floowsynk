@@ -6,21 +6,23 @@ import (
 	"net/http"
 
 	"github.com/google/uuid"
-	"github.com/raenardcruz/floowsynk/Server/proto"
+	lg "github.com/raenardcruz/floowsynk/CodeGen/go/login"
+	wf "github.com/raenardcruz/floowsynk/CodeGen/go/workflow"
 	"github.com/raenardcruz/floowsynk/Server/workflow"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
-func (s *LoginServer) Login(ctx context.Context, in *proto.Credential) (*proto.Token, error) {
+func (s *LoginServer) Login(ctx context.Context, in *lg.Credential) (*lg.Token, error) {
 	token, err := Login(in.Username, in.Password)
 	if err != nil {
 		return nil, err
 	}
-	return &proto.Token{
+	return &lg.Token{
 		Token: token,
 	}, nil
 }
 
-func (s *LoginServer) ExtendToken(ctx context.Context, _ *proto.Empty) (token *proto.Token, err error) {
+func (s *LoginServer) ExtendToken(ctx context.Context, _ *emptypb.Empty) (token *lg.Token, err error) {
 	oldToken, err := getTokenFromContext(ctx)
 	if err != nil {
 		return nil, err
@@ -29,11 +31,11 @@ func (s *LoginServer) ExtendToken(ctx context.Context, _ *proto.Empty) (token *p
 	if err != nil {
 		return nil, err
 	}
-	token = &proto.Token{Token: newToken}
+	token = &lg.Token{Token: newToken}
 	return token, nil
 }
 
-func (s *WorkflowServer) GetWorkflow(ctx context.Context, req *proto.GetWorkflowRequest) (workflow *proto.Workflow, err error) {
+func (s *WorkflowServer) GetWorkflow(ctx context.Context, req *wf.GetWorkflowRequest) (workflow *wf.Workflow, err error) {
 	token, err := getTokenFromContext(ctx)
 	if err != nil {
 		return nil, err
@@ -49,7 +51,7 @@ func (s *WorkflowServer) GetWorkflow(ctx context.Context, req *proto.GetWorkflow
 	return workflow, nil
 }
 
-func (s *WorkflowServer) ListWorkflows(ctx context.Context, req *proto.PageRequest) (wl *proto.WorkflowList, err error) {
+func (s *WorkflowServer) ListWorkflows(ctx context.Context, req *wf.PageRequest) (wl *wf.WorkflowList, err error) {
 	token, err := getTokenFromContext(ctx)
 	if err != nil {
 		return nil, err
@@ -65,7 +67,7 @@ func (s *WorkflowServer) ListWorkflows(ctx context.Context, req *proto.PageReque
 	return wl, nil
 }
 
-func (s *WorkflowServer) UpdateWorkflow(ctx context.Context, req *proto.Workflow) (wl *proto.Workflow, err error) {
+func (s *WorkflowServer) UpdateWorkflow(ctx context.Context, req *wf.Workflow) (wl *wf.Workflow, err error) {
 	token, err := getTokenFromContext(ctx)
 	if err != nil {
 		return nil, err
@@ -82,7 +84,7 @@ func (s *WorkflowServer) UpdateWorkflow(ctx context.Context, req *proto.Workflow
 	return wl, nil
 }
 
-func (s *WorkflowServer) CreateWorkflow(ctx context.Context, req *proto.Workflow) (wl *proto.Workflow, err error) {
+func (s *WorkflowServer) CreateWorkflow(ctx context.Context, req *wf.Workflow) (wl *wf.Workflow, err error) {
 	token, err := getTokenFromContext(ctx)
 	if err != nil {
 		return nil, err
@@ -100,7 +102,7 @@ func (s *WorkflowServer) CreateWorkflow(ctx context.Context, req *proto.Workflow
 	return wl, nil
 }
 
-func (s *WorkflowServer) DeleteWorkflow(ctx context.Context, req *proto.Workflow) (*proto.Empty, error) {
+func (s *WorkflowServer) DeleteWorkflow(ctx context.Context, req *wf.Workflow) (*emptypb.Empty, error) {
 	token, err := getTokenFromContext(ctx)
 	if err != nil {
 		return nil, err
@@ -112,10 +114,10 @@ func (s *WorkflowServer) DeleteWorkflow(ctx context.Context, req *proto.Workflow
 	if err := DeleteWorkflow(req.Id); err != nil {
 		return nil, err
 	}
-	return &proto.Empty{}, nil
+	return &emptypb.Empty{}, nil
 }
 
-func (s *WorkflowServer) QuickRun(req *proto.Workflow, stream proto.WorkflowService_QuickRunServer) error {
+func (s *WorkflowServer) QuickRun(req *wf.Workflow, stream wf.WorkflowService_QuickRunServer) error {
 	ctx := stream.Context()
 	token, err := getTokenFromContext(ctx)
 	if err != nil {
@@ -141,7 +143,7 @@ func (s *WorkflowServer) QuickRun(req *proto.Workflow, stream proto.WorkflowServ
 	return nil
 }
 
-func (s *WorkflowServer) RunWorkflowId(req *proto.RunWorkflowIdRequest, stream proto.WorkflowService_RunWorkflowIdServer) error {
+func (s *WorkflowServer) RunWorkflowId(req *wf.RunWorkflowIdRequest, stream wf.WorkflowService_RunWorkflowIdServer) error {
 	ctx := stream.Context()
 	token, err := getTokenFromContext(ctx)
 	if err != nil {
@@ -163,7 +165,7 @@ func (s *WorkflowServer) RunWorkflowId(req *proto.RunWorkflowIdRequest, stream p
 	return nil
 }
 
-func (s *WorkflowServer) ListWorkflowHistory(ctx context.Context, in *proto.Empty) (*proto.WorkflowHistoryList, error) {
+func (s *WorkflowServer) ListWorkflowHistory(ctx context.Context, in *emptypb.Empty) (*wf.WorkflowHistoryList, error) {
 	token, err := getTokenFromContext(ctx)
 	if err != nil {
 		return nil, err
@@ -180,7 +182,7 @@ func (s *WorkflowServer) ListWorkflowHistory(ctx context.Context, in *proto.Empt
 	return wh, nil
 }
 
-func (s *WorkflowServer) GetWorkflowHistory(ctx context.Context, req *proto.WorkflowHistoryRequest) (*proto.WorkflowHistoryResponse, error) {
+func (s *WorkflowServer) GetWorkflowHistory(ctx context.Context, req *wf.WorkflowHistoryRequest) (*wf.WorkflowHistoryResponse, error) {
 	token, err := getTokenFromContext(ctx)
 	if err != nil {
 		return nil, err
@@ -192,7 +194,7 @@ func (s *WorkflowServer) GetWorkflowHistory(ctx context.Context, req *proto.Work
 
 	res, err := GetWorkflowHistoryImpl(req.Id)
 	if err != nil {
-		return &proto.WorkflowHistoryResponse{}, err
+		return &wf.WorkflowHistoryResponse{}, err
 	}
 
 	return res, nil

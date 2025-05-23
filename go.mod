@@ -6,7 +6,6 @@ require (
 	github.com/IBM/sarama v1.45.1
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-redis/redis/v8 v8.11.5
-	github.com/goccy/go-json v0.10.2
 	github.com/improbable-eng/grpc-web v0.15.0
 	github.com/joho/godotenv v1.5.1
 	github.com/lib/pq v1.10.9

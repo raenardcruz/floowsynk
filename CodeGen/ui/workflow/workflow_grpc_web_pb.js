@@ -8,7 +8,7 @@
 // versions:
 // 	protoc-gen-grpc-web v1.5.0
 // 	protoc              v3.21.12
-// source: floowsynk.proto
+// source: workflow.proto
 
 
 /* eslint-disable */
@@ -19,182 +19,10 @@
 const grpc = {};
 grpc.web = require('grpc-web');
 
+
+var google_protobuf_empty_pb = require('google-protobuf/google/protobuf/empty_pb.js')
 const proto = {};
-proto.proto = require('./floowsynk_pb.js');
-
-/**
- * @param {string} hostname
- * @param {?Object} credentials
- * @param {?grpc.web.ClientOptions} options
- * @constructor
- * @struct
- * @final
- */
-proto.proto.LoginServiceClient =
-    function(hostname, credentials, options) {
-  if (!options) options = {};
-  options.format = 'text';
-
-  /**
-   * @private @const {!grpc.web.GrpcWebClientBase} The client
-   */
-  this.client_ = new grpc.web.GrpcWebClientBase(options);
-
-  /**
-   * @private @const {string} The hostname
-   */
-  this.hostname_ = hostname.replace(/\/+$/, '');
-
-};
-
-
-/**
- * @param {string} hostname
- * @param {?Object} credentials
- * @param {?grpc.web.ClientOptions} options
- * @constructor
- * @struct
- * @final
- */
-proto.proto.LoginServicePromiseClient =
-    function(hostname, credentials, options) {
-  if (!options) options = {};
-  options.format = 'text';
-
-  /**
-   * @private @const {!grpc.web.GrpcWebClientBase} The client
-   */
-  this.client_ = new grpc.web.GrpcWebClientBase(options);
-
-  /**
-   * @private @const {string} The hostname
-   */
-  this.hostname_ = hostname.replace(/\/+$/, '');
-
-};
-
-
-/**
- * @const
- * @type {!grpc.web.MethodDescriptor<
- *   !proto.proto.Credential,
- *   !proto.proto.Token>}
- */
-const methodDescriptor_LoginService_Login = new grpc.web.MethodDescriptor(
-  '/proto.LoginService/Login',
-  grpc.web.MethodType.UNARY,
-  proto.proto.Credential,
-  proto.proto.Token,
-  /**
-   * @param {!proto.proto.Credential} request
-   * @return {!Uint8Array}
-   */
-  function(request) {
-    return request.serializeBinary();
-  },
-  proto.proto.Token.deserializeBinary
-);
-
-
-/**
- * @param {!proto.proto.Credential} request The
- *     request proto
- * @param {?Object<string, string>} metadata User defined
- *     call metadata
- * @param {function(?grpc.web.RpcError, ?proto.proto.Token)}
- *     callback The callback function(error, response)
- * @return {!grpc.web.ClientReadableStream<!proto.proto.Token>|undefined}
- *     The XHR Node Readable Stream
- */
-proto.proto.LoginServiceClient.prototype.login =
-    function(request, metadata, callback) {
-  return this.client_.rpcCall(this.hostname_ +
-      '/proto.LoginService/Login',
-      request,
-      metadata || {},
-      methodDescriptor_LoginService_Login,
-      callback);
-};
-
-
-/**
- * @param {!proto.proto.Credential} request The
- *     request proto
- * @param {?Object<string, string>=} metadata User defined
- *     call metadata
- * @return {!Promise<!proto.proto.Token>}
- *     Promise that resolves to the response
- */
-proto.proto.LoginServicePromiseClient.prototype.login =
-    function(request, metadata) {
-  return this.client_.unaryCall(this.hostname_ +
-      '/proto.LoginService/Login',
-      request,
-      metadata || {},
-      methodDescriptor_LoginService_Login);
-};
-
-
-/**
- * @const
- * @type {!grpc.web.MethodDescriptor<
- *   !proto.proto.Empty,
- *   !proto.proto.Token>}
- */
-const methodDescriptor_LoginService_ExtendToken = new grpc.web.MethodDescriptor(
-  '/proto.LoginService/ExtendToken',
-  grpc.web.MethodType.UNARY,
-  proto.proto.Empty,
-  proto.proto.Token,
-  /**
-   * @param {!proto.proto.Empty} request
-   * @return {!Uint8Array}
-   */
-  function(request) {
-    return request.serializeBinary();
-  },
-  proto.proto.Token.deserializeBinary
-);
-
-
-/**
- * @param {!proto.proto.Empty} request The
- *     request proto
- * @param {?Object<string, string>} metadata User defined
- *     call metadata
- * @param {function(?grpc.web.RpcError, ?proto.proto.Token)}
- *     callback The callback function(error, response)
- * @return {!grpc.web.ClientReadableStream<!proto.proto.Token>|undefined}
- *     The XHR Node Readable Stream
- */
-proto.proto.LoginServiceClient.prototype.extendToken =
-    function(request, metadata, callback) {
-  return this.client_.rpcCall(this.hostname_ +
-      '/proto.LoginService/ExtendToken',
-      request,
-      metadata || {},
-      methodDescriptor_LoginService_ExtendToken,
-      callback);
-};
-
-
-/**
- * @param {!proto.proto.Empty} request The
- *     request proto
- * @param {?Object<string, string>=} metadata User defined
- *     call metadata
- * @return {!Promise<!proto.proto.Token>}
- *     Promise that resolves to the response
- */
-proto.proto.LoginServicePromiseClient.prototype.extendToken =
-    function(request, metadata) {
-  return this.client_.unaryCall(this.hostname_ +
-      '/proto.LoginService/ExtendToken',
-      request,
-      metadata || {},
-      methodDescriptor_LoginService_ExtendToken);
-};
-
+proto.proto = require('./workflow_pb.js');
 
 /**
  * @param {string} hostname
@@ -496,13 +324,13 @@ proto.proto.WorkflowServicePromiseClient.prototype.createWorkflow =
  * @const
  * @type {!grpc.web.MethodDescriptor<
  *   !proto.proto.Workflow,
- *   !proto.proto.Empty>}
+ *   !proto.google.protobuf.Empty>}
  */
 const methodDescriptor_WorkflowService_DeleteWorkflow = new grpc.web.MethodDescriptor(
   '/proto.WorkflowService/DeleteWorkflow',
   grpc.web.MethodType.UNARY,
   proto.proto.Workflow,
-  proto.proto.Empty,
+  google_protobuf_empty_pb.Empty,
   /**
    * @param {!proto.proto.Workflow} request
    * @return {!Uint8Array}
@@ -510,7 +338,7 @@ const methodDescriptor_WorkflowService_DeleteWorkflow = new grpc.web.MethodDescr
   function(request) {
     return request.serializeBinary();
   },
-  proto.proto.Empty.deserializeBinary
+  google_protobuf_empty_pb.Empty.deserializeBinary
 );
 
 
@@ -519,9 +347,9 @@ const methodDescriptor_WorkflowService_DeleteWorkflow = new grpc.web.MethodDescr
  *     request proto
  * @param {?Object<string, string>} metadata User defined
  *     call metadata
- * @param {function(?grpc.web.RpcError, ?proto.proto.Empty)}
+ * @param {function(?grpc.web.RpcError, ?proto.google.protobuf.Empty)}
  *     callback The callback function(error, response)
- * @return {!grpc.web.ClientReadableStream<!proto.proto.Empty>|undefined}
+ * @return {!grpc.web.ClientReadableStream<!proto.google.protobuf.Empty>|undefined}
  *     The XHR Node Readable Stream
  */
 proto.proto.WorkflowServiceClient.prototype.deleteWorkflow =
@@ -540,7 +368,7 @@ proto.proto.WorkflowServiceClient.prototype.deleteWorkflow =
  *     request proto
  * @param {?Object<string, string>=} metadata User defined
  *     call metadata
- * @return {!Promise<!proto.proto.Empty>}
+ * @return {!Promise<!proto.google.protobuf.Empty>}
  *     Promise that resolves to the response
  */
 proto.proto.WorkflowServicePromiseClient.prototype.deleteWorkflow =
@@ -668,16 +496,16 @@ proto.proto.WorkflowServicePromiseClient.prototype.runWorkflowId =
 /**
  * @const
  * @type {!grpc.web.MethodDescriptor<
- *   !proto.proto.Empty,
+ *   !proto.google.protobuf.Empty,
  *   !proto.proto.WorkflowHistoryList>}
  */
 const methodDescriptor_WorkflowService_ListWorkflowHistory = new grpc.web.MethodDescriptor(
   '/proto.WorkflowService/ListWorkflowHistory',
   grpc.web.MethodType.UNARY,
-  proto.proto.Empty,
+  google_protobuf_empty_pb.Empty,
   proto.proto.WorkflowHistoryList,
   /**
-   * @param {!proto.proto.Empty} request
+   * @param {!proto.google.protobuf.Empty} request
    * @return {!Uint8Array}
    */
   function(request) {
@@ -688,7 +516,7 @@ const methodDescriptor_WorkflowService_ListWorkflowHistory = new grpc.web.Method
 
 
 /**
- * @param {!proto.proto.Empty} request The
+ * @param {!proto.google.protobuf.Empty} request The
  *     request proto
  * @param {?Object<string, string>} metadata User defined
  *     call metadata
@@ -709,7 +537,7 @@ proto.proto.WorkflowServiceClient.prototype.listWorkflowHistory =
 
 
 /**
- * @param {!proto.proto.Empty} request The
+ * @param {!proto.google.protobuf.Empty} request The
  *     request proto
  * @param {?Object<string, string>=} metadata User defined
  *     call metadata

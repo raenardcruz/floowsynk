@@ -3,7 +3,7 @@ import { WorkflowCanvasProps } from '../Workflow.Canvas.types'
 import { useNotif, NotifOptions, STATUS_ERROR, STATUS_INFO, STATUS_SUCCESS } from '@/components/Composable/UI/Notif'
 import { initWorkflows } from '@/components/Workflow/Process'
 import { useWorkflowStore } from '@/views/Workflow'
-import { NodeStatus, ReplayData, Node } from 'proto/floowsynk_pb'
+import { NodeStatus, ReplayData, Node } from 'proto/workflow/workflow_pb'
 import {
   createProcess,
   updateProcess,

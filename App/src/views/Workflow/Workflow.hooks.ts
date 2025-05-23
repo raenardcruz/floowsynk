@@ -1,5 +1,5 @@
 import { ref, computed } from "vue"
-import { Workflow } from 'proto/floowsynk_pb'
+import { Workflow } from 'proto/workflow/workflow_pb'
 import { newProcess } from "./Workflow.factory"
 import { createGlobalState } from '@vueuse/core'
 

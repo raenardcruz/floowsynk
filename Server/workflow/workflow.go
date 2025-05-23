@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/raenardcruz/floowsynk/Server/proto"
+	proto "github.com/raenardcruz/floowsynk/CodeGen/go/workflow"
 )
 
 const (

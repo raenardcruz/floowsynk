@@ -39,7 +39,7 @@ import { SidebarCanvasFields as WorkflowNodeSidebarFields } from "@/components/W
 import { NodeProps } from './FloowsynkNode.types'
 import { useFloowsynkNodeHooks, useFloowsynkNodeWatchers } from './FloowsynkNode.hooks'
 import { clickhandler } from './FloowsynkNode.helper'
-import { Node } from 'proto/floowsynk_pb'
+import { Node } from 'proto/workflow/workflow_pb'
 import { toSentenceCase } from "@/components/Composable/Utilities"
 import ProcessTypeModal from '@/components/Workflow/Modal/ProcessType/Workflow.Modal.ProcessType.vue'
 import { Modal } from '@/components/Composable/UI'
