@@ -56,6 +56,7 @@
     flex-wrap: wrap;
     margin-top: 30px;
     gap: 20px;
+    height: 100%;
 }
 .cards-gallery .create {
     position: relative;
@@ -188,4 +189,15 @@
 }
 .tag-actions .tag-btn:hover {
     box-shadow: inset 3px 3px 5px var(--grey-3), inset -3px -3px 5px var(--white-1);
+}
+.run-history {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    height: 100%;
+    width: 100%;
+    border: 1px solid var(--grey-4);
+    border-radius: 20px;
+    padding: 12px;
 }

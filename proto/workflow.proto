@@ -1,6 +1,8 @@
 syntax = "proto3";
 package proto;
 
+import "google/protobuf/empty.proto";
+
 option go_package = "./proto";
 
 enum ArrayDataType {
@@ -17,53 +19,41 @@ enum NodeStatus {
     INFO = 3;
 }
 
-service LoginService {
-    rpc Login(Credential) returns (Token);
-    rpc ExtendToken(Empty) returns (Token);
-}
-
-service WorkflowService {
-    rpc GetWorkflow(GetWorkflowRequest) returns (Workflow);
-    rpc ListWorkflows(PageRequest) returns (WorkflowList);
-    rpc UpdateWorkflow(Workflow) returns (Workflow);
-    rpc CreateWorkflow(Workflow) returns (Workflow);
-    rpc DeleteWorkflow(Workflow) returns (Empty);
-    rpc QuickRun(Workflow) returns (stream RunWorkflowResponse);
-    rpc RunWorkflowId(RunWorkflowIdRequest) returns (stream RunWorkflowResponse);
-}
 
 message RunWorkflowIdRequest {
     string id = 1;
 }
 
-message RunWorkflowResponse {
-    string nodeId = 1;
-    NodeStatus status = 2;
-    optional ReplayData data = 3;
+message WorkflowHistoryList {
+    repeated WorkflowHistory history = 1;
+}
+
+message WorkflowHistory {
+    string Id = 1;
+    string WorkflowId = 2;
+    string WorkflowName = 3;
+    string RunDate = 4;
+}
+
+message WorkflowHistoryRequest {
+    string id = 1;
+}
+
+message WorkflowHistoryResponse {
+    repeated ReplayData data = 1;
 }
 
 message ReplayData {
     string nodeId = 1;
     NodeData data = 2;
     map<string, string> variables = 3;
-    string status = 4;
+    NodeStatus status = 4;
     string message = 5;
 }
-
-message Empty {}
 
 message PageRequest {
     int32 limit = 1;
     int32 offset = 2;
-}
-
-message Credential {
-    string username = 1;
-    string password = 2;
-}
-
-message Token {
-    string token = 1;
 }
 
 message GetWorkflowRequest {
@@ -196,4 +186,16 @@ message Handle {
     float height = 6;
     string nodeId = 7;
     string position = 8;
+}
+
+service WorkflowService {
+    rpc GetWorkflow(GetWorkflowRequest) returns (Workflow);
+    rpc ListWorkflows(PageRequest) returns (WorkflowList);
+    rpc UpdateWorkflow(Workflow) returns (Workflow);
+    rpc CreateWorkflow(Workflow) returns (Workflow);
+    rpc DeleteWorkflow(Workflow) returns (google.protobuf.Empty);
+    rpc QuickRun(Workflow) returns (stream ReplayData);
+    rpc RunWorkflowId(RunWorkflowIdRequest) returns (stream ReplayData);
+    rpc ListWorkflowHistory(google.protobuf.Empty) returns (WorkflowHistoryList);
+    rpc GetWorkflowHistory(WorkflowHistoryRequest) returns (WorkflowHistoryResponse);
 }

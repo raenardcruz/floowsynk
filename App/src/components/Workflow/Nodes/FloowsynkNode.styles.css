@@ -164,3 +164,16 @@
   transform: none;
   box-shadow: none;
 }
+.add-btn {
+  position: absolute;
+  right: -15px;
+  background-color: var(--blue-2);
+  color: var(--white-1);
+  border-radius: 5px;
+  width: 12px;
+  height: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}

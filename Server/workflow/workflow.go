@@ -2,9 +2,10 @@ package workflow
 
 import (
 	"errors"
+	"log"
 	"time"
 
-	"github.com/raenardcruz/floowsynk/Server/proto"
+	proto "github.com/raenardcruz/floowsynk/CodeGen/go/workflow"
 )
 
 const (
@@ -44,7 +45,8 @@ func (wp *WorkflowProcessor) StartWorkflow() (err error) {
 	wp.ProcessVariables[INPUT] = ""
 	wp.ProcessVariables[OUTPUT] = ""
 	wp.Process("0")
-	time.Since(start)
+	duration := time.Since(start)
+	log.Default().Printf("Workflow %s completed in %s", wp.Workflow.Id, duration)
 	return nil
 }
 

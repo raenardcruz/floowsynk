@@ -1,6 +1,7 @@
 package DB
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -13,7 +14,17 @@ import (
 	_ "github.com/lib/pq"
 )
 
+// Implement json.Unmarshaler for JSONB
 type JSONB []byte
+
+func (j *JSONB) UnmarshalJSON(data []byte) error {
+	if !json.Valid(data) {
+		return fmt.Errorf("invalid JSON data")
+	}
+	*j = append((*j)[0:0], data...)
+	return nil
+}
+
 type DatabaseConnection struct {
 	conn *gorm.DB
 }
@@ -32,6 +43,7 @@ type Config struct {
 }
 
 var AppConfig *Config
+var UseCache = true
 
 func init() {
 	godotenv.Load()
@@ -45,7 +57,7 @@ func init() {
 		Redis_Port:         getEnvAsInt("REDIS_PORT", 6379),
 		Redis_Password:     getEnv("REDIS_PASSWORD", "floowsynk"),
 		Redis_DB:           getEnvAsInt("REDIS_DB", 0),
-		App_Admin_Password: getEnv("APP_ADMIN_PASSWORD", "admin"),
+		App_Admin_Password: getEnv("APP_ADMIN_PASSWORD", "floowsynk"),
 		App_Admin_Username: getEnv("APP_ADMIN_USERNAME", "admin"),
 	}
 }
@@ -81,15 +93,20 @@ func ConnectToDatabase() (*DatabaseConnection, error) {
 		return nil, err
 	}
 	log.Println("Connected to database")
-	return &DatabaseConnection{conn: conn}, nil
+	dbCon := &DatabaseConnection{conn: conn}
+	UseCache = dbCon.IsFeatureEnabled(FEATURE_DB_CACHE)
+	log.Printf("Use Cache Feature Flag: %v", UseCache)
+	return dbCon, nil
 }
 
 func (db *DatabaseConnection) MigrateAndSeedDatabase() error {
 	log.Println("Migrating tables and seeding initial data...")
 
 	models := []interface{}{
-		&UsersModel{},
+		&Users{},
 		&Workflow{},
+		&ReplayData{},
+		&Feature{},
 	}
 
 	for _, model := range models {
@@ -100,15 +117,18 @@ func (db *DatabaseConnection) MigrateAndSeedDatabase() error {
 		}
 	}
 
+	log.Println("Seeding initial data...")
 	admin, err := db.GetUser("b5bd8424-fb52-4454-8102-488959a41ca8")
 	if admin.ID == "" || err != nil {
-		db.AddUser(UsersModel{
+		log.Println("Admin user not found, creating a new one...")
+		db.AddUser(Users{
 			ID:       "b5bd8424-fb52-4454-8102-488959a41ca8",
 			Username: AppConfig.App_Admin_Username,
 			Password: AppConfig.App_Admin_Password,
 			Role:     UserRoleAdmin,
 		})
 	}
+	log.Println("Database migration and seeding completed")
 
 	return nil
 }

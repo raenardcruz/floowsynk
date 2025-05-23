@@ -7,7 +7,8 @@ import (
 	"log"
 	"time"
 
-	pb "github.com/raenardcruz/floowsynk/Server/proto"
+	"github.com/lib/pq"
+	pb "github.com/raenardcruz/floowsynk/CodeGen/go/workflow"
 )
 
 const workflowCacheExpiration = 15 * time.Minute
@@ -21,9 +22,9 @@ type Workflow struct {
 	Edges       JSONB `gorm:"type:jsonb"`
 	CreatedBy   string
 	UpdatedBy   string
-	Tags        []string `gorm:"type:text[]"`
-	CreatedAt   string
-	UpdatedAt   string
+	Tags        pq.StringArray `gorm:"type:text[]"`
+	CreatedAt   int64
+	UpdatedAt   int64
 }
 
 func (j *JSONB) Scan(value interface{}) error {
@@ -58,7 +59,9 @@ func (db *DatabaseConnection) CreateWorkflow(workflow *pb.Workflow) (string, err
 		Edges:       edges,
 		CreatedBy:   workflow.CreatedBy,
 		UpdatedBy:   workflow.UpdatedBy,
-		Tags:        workflow.Tags,
+		Tags:        pq.StringArray(workflow.Tags),
+		CreatedAt:   time.Now().UTC().Unix(),
+		UpdatedAt:   time.Now().UTC().Unix(),
 	}
 
 	if err := db.conn.Create(&wf).Error; err != nil {
@@ -93,9 +96,9 @@ func (db *DatabaseConnection) GetWorkflows(limit, offset int) (*pb.WorkflowList,
 			Description: wf.Description,
 			Nodes:       nodes,
 			Edges:       edges,
-			CreatedAt:   wf.CreatedAt,
-			UpdatedAt:   wf.UpdatedAt,
-			Tags:        wf.Tags,
+			CreatedAt:   time.Unix(wf.CreatedAt, 0).Format("Jan 02, 2006"),
+			UpdatedAt:   time.Unix(wf.UpdatedAt, 0).Format("Jan 02, 2006"),
+			Tags:        []string(wf.Tags),
 		})
 	}
 	return wl, nil
@@ -136,8 +139,8 @@ func (db *DatabaseConnection) GetWorkflow(id string) (*pb.Workflow, error) {
 		Description: wf.Description,
 		Nodes:       nodes,
 		Edges:       edges,
-		CreatedAt:   wf.CreatedAt,
-		UpdatedAt:   wf.UpdatedAt,
+		CreatedAt:   time.Unix(wf.CreatedAt, 0).Format("Jan 02, 2006"),
+		UpdatedAt:   time.Unix(wf.UpdatedAt, 0).Format("jan 02, 2006"),
 		Tags:        wf.Tags,
 	}
 
@@ -228,8 +231,8 @@ func (db *DatabaseConnection) GetIntervalWorkflows() (*pb.WorkflowList, error) {
 			Description: wf.Description,
 			Nodes:       nodes,
 			Edges:       edges,
-			CreatedAt:   wf.CreatedAt,
-			UpdatedAt:   wf.UpdatedAt,
+			CreatedAt:   time.Unix(wf.CreatedAt, 0).Format("Jan 02, 2006"),
+			UpdatedAt:   time.Unix(wf.UpdatedAt, 0).Format("Jan 02, 2006"),
 			Tags:        wf.Tags,
 		})
 	}
@@ -262,7 +265,8 @@ func (db *DatabaseConnection) UpdateWorkflow(workflow *pb.Workflow) error {
 		Nodes:       nodes,
 		Edges:       edges,
 		UpdatedBy:   workflow.UpdatedBy,
-		Tags:        workflow.Tags,
+		UpdatedAt:   time.Now().UTC().Unix(),
+		Tags:        pq.StringArray(workflow.Tags),
 	}
 
 	if err := db.conn.Model(&Workflow{}).Where("id = ?", wf.ID).Updates(&wf).Error; err != nil {

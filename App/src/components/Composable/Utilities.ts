@@ -7,6 +7,7 @@ export const generateUUID = (): string => {
 }
 
 export const toSentenceCase = function (str: string): string {
+    if (!str) return str;
     return str
         .replace(/([a-z])([A-Z])/g, '$1 $2') // insert space between camelCase words
         .replace(/([A-Z])([A-Z][a-z])/g, '$1 $2') // insert space between PascalCase words

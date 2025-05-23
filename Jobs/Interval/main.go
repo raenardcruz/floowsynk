@@ -6,8 +6,8 @@ import (
 	"log"
 	"time"
 
+	wf "github.com/raenardcruz/floowsynk/CodeGen/go/workflow"
 	db "github.com/raenardcruz/floowsynk/Database"
-	"github.com/raenardcruz/floowsynk/Server/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/metadata"
@@ -33,7 +33,7 @@ func (job *IntervalJob) ProcessIntervalWorkflows() {
 	}
 }
 
-func (job *IntervalJob) processNode(workflow *proto.Workflow) {
+func (job *IntervalJob) processNode(workflow *wf.Workflow) {
 	ctx := metadata.AppendToOutgoingContext(context.Background(), "Authorization", JobToken)
 	node := workflow.Nodes[0]
 	interval := node.Data.GetInterval()
@@ -86,10 +86,10 @@ func (job *IntervalJob) processNode(workflow *proto.Workflow) {
 	}
 	defer conn.Close()
 
-	client := proto.NewWorkflowServiceClient(conn)
+	client := wf.NewWorkflowServiceClient(conn)
 
 	log.Printf("Executing workflow %s", workflow.Id)
-	stream, err := client.RunWorkflowId(ctx, &proto.RunWorkflowIdRequest{
+	stream, err := client.RunWorkflowId(ctx, &wf.RunWorkflowIdRequest{
 		Id: workflow.Id,
 	})
 	if err != nil {

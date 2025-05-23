@@ -1,5 +1,6 @@
 import * as jspb from 'google-protobuf'
 
+import * as google_protobuf_empty_pb from 'google-protobuf/google/protobuf/empty_pb'; // proto import: "google/protobuf/empty.proto"
 
 
 export class RunWorkflowIdRequest extends jspb.Message {
@@ -20,36 +21,91 @@ export namespace RunWorkflowIdRequest {
   }
 }
 
-export class RunWorkflowResponse extends jspb.Message {
-  getNodeid(): string;
-  setNodeid(value: string): RunWorkflowResponse;
-
-  getStatus(): NodeStatus;
-  setStatus(value: NodeStatus): RunWorkflowResponse;
-
-  getData(): ReplayData | undefined;
-  setData(value?: ReplayData): RunWorkflowResponse;
-  hasData(): boolean;
-  clearData(): RunWorkflowResponse;
+export class WorkflowHistoryList extends jspb.Message {
+  getHistoryList(): Array<WorkflowHistory>;
+  setHistoryList(value: Array<WorkflowHistory>): WorkflowHistoryList;
+  clearHistoryList(): WorkflowHistoryList;
+  addHistory(value?: WorkflowHistory, index?: number): WorkflowHistory;
 
   serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): RunWorkflowResponse.AsObject;
-  static toObject(includeInstance: boolean, msg: RunWorkflowResponse): RunWorkflowResponse.AsObject;
-  static serializeBinaryToWriter(message: RunWorkflowResponse, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): RunWorkflowResponse;
-  static deserializeBinaryFromReader(message: RunWorkflowResponse, reader: jspb.BinaryReader): RunWorkflowResponse;
+  toObject(includeInstance?: boolean): WorkflowHistoryList.AsObject;
+  static toObject(includeInstance: boolean, msg: WorkflowHistoryList): WorkflowHistoryList.AsObject;
+  static serializeBinaryToWriter(message: WorkflowHistoryList, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): WorkflowHistoryList;
+  static deserializeBinaryFromReader(message: WorkflowHistoryList, reader: jspb.BinaryReader): WorkflowHistoryList;
 }
 
-export namespace RunWorkflowResponse {
+export namespace WorkflowHistoryList {
   export type AsObject = {
-    nodeid: string,
-    status: NodeStatus,
-    data?: ReplayData.AsObject,
+    historyList: Array<WorkflowHistory.AsObject>,
   }
+}
 
-  export enum DataCase { 
-    _DATA_NOT_SET = 0,
-    DATA = 3,
+export class WorkflowHistory extends jspb.Message {
+  getId(): string;
+  setId(value: string): WorkflowHistory;
+
+  getWorkflowid(): string;
+  setWorkflowid(value: string): WorkflowHistory;
+
+  getWorkflowname(): string;
+  setWorkflowname(value: string): WorkflowHistory;
+
+  getRundate(): string;
+  setRundate(value: string): WorkflowHistory;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): WorkflowHistory.AsObject;
+  static toObject(includeInstance: boolean, msg: WorkflowHistory): WorkflowHistory.AsObject;
+  static serializeBinaryToWriter(message: WorkflowHistory, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): WorkflowHistory;
+  static deserializeBinaryFromReader(message: WorkflowHistory, reader: jspb.BinaryReader): WorkflowHistory;
+}
+
+export namespace WorkflowHistory {
+  export type AsObject = {
+    id: string,
+    workflowid: string,
+    workflowname: string,
+    rundate: string,
+  }
+}
+
+export class WorkflowHistoryRequest extends jspb.Message {
+  getId(): string;
+  setId(value: string): WorkflowHistoryRequest;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): WorkflowHistoryRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: WorkflowHistoryRequest): WorkflowHistoryRequest.AsObject;
+  static serializeBinaryToWriter(message: WorkflowHistoryRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): WorkflowHistoryRequest;
+  static deserializeBinaryFromReader(message: WorkflowHistoryRequest, reader: jspb.BinaryReader): WorkflowHistoryRequest;
+}
+
+export namespace WorkflowHistoryRequest {
+  export type AsObject = {
+    id: string,
+  }
+}
+
+export class WorkflowHistoryResponse extends jspb.Message {
+  getDataList(): Array<ReplayData>;
+  setDataList(value: Array<ReplayData>): WorkflowHistoryResponse;
+  clearDataList(): WorkflowHistoryResponse;
+  addData(value?: ReplayData, index?: number): ReplayData;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): WorkflowHistoryResponse.AsObject;
+  static toObject(includeInstance: boolean, msg: WorkflowHistoryResponse): WorkflowHistoryResponse.AsObject;
+  static serializeBinaryToWriter(message: WorkflowHistoryResponse, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): WorkflowHistoryResponse;
+  static deserializeBinaryFromReader(message: WorkflowHistoryResponse, reader: jspb.BinaryReader): WorkflowHistoryResponse;
+}
+
+export namespace WorkflowHistoryResponse {
+  export type AsObject = {
+    dataList: Array<ReplayData.AsObject>,
   }
 }
 
@@ -65,8 +121,8 @@ export class ReplayData extends jspb.Message {
   getVariablesMap(): jspb.Map<string, string>;
   clearVariablesMap(): ReplayData;
 
-  getStatus(): string;
-  setStatus(value: string): ReplayData;
+  getStatus(): NodeStatus;
+  setStatus(value: NodeStatus): ReplayData;
 
   getMessage(): string;
   setMessage(value: string): ReplayData;
@@ -84,22 +140,8 @@ export namespace ReplayData {
     nodeid: string,
     data?: NodeData.AsObject,
     variablesMap: Array<[string, string]>,
-    status: string,
+    status: NodeStatus,
     message: string,
-  }
-}
-
-export class Empty extends jspb.Message {
-  serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): Empty.AsObject;
-  static toObject(includeInstance: boolean, msg: Empty): Empty.AsObject;
-  static serializeBinaryToWriter(message: Empty, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): Empty;
-  static deserializeBinaryFromReader(message: Empty, reader: jspb.BinaryReader): Empty;
-}
-
-export namespace Empty {
-  export type AsObject = {
   }
 }
 
@@ -122,46 +164,6 @@ export namespace PageRequest {
   export type AsObject = {
     limit: number,
     offset: number,
-  }
-}
-
-export class Credential extends jspb.Message {
-  getUsername(): string;
-  setUsername(value: string): Credential;
-
-  getPassword(): string;
-  setPassword(value: string): Credential;
-
-  serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): Credential.AsObject;
-  static toObject(includeInstance: boolean, msg: Credential): Credential.AsObject;
-  static serializeBinaryToWriter(message: Credential, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): Credential;
-  static deserializeBinaryFromReader(message: Credential, reader: jspb.BinaryReader): Credential;
-}
-
-export namespace Credential {
-  export type AsObject = {
-    username: string,
-    password: string,
-  }
-}
-
-export class Token extends jspb.Message {
-  getToken(): string;
-  setToken(value: string): Token;
-
-  serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): Token.AsObject;
-  static toObject(includeInstance: boolean, msg: Token): Token.AsObject;
-  static serializeBinaryToWriter(message: Token, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): Token;
-  static deserializeBinaryFromReader(message: Token, reader: jspb.BinaryReader): Token;
-}
-
-export namespace Token {
-  export type AsObject = {
-    token: string,
   }
 }
 

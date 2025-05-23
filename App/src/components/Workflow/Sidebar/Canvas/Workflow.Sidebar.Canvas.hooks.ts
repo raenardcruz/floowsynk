@@ -1,6 +1,6 @@
 import { ref, computed } from 'vue'
 import { nodes } from '@/components/Workflow/Nodes'
-import { Node } from 'proto/floowsynk_pb'
+import { Node } from 'proto/workflow/workflow_pb'
 
 const showSideBar = ref<boolean>(false)
 const search = ref<string>('')

@@ -7,130 +7,12 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion7
-
-// LoginServiceClient is the client API for LoginService service.
-//
-// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type LoginServiceClient interface {
-	Login(ctx context.Context, in *Credential, opts ...grpc.CallOption) (*Token, error)
-	ExtendToken(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Token, error)
-}
-
-type loginServiceClient struct {
-	cc grpc.ClientConnInterface
-}
-
-func NewLoginServiceClient(cc grpc.ClientConnInterface) LoginServiceClient {
-	return &loginServiceClient{cc}
-}
-
-func (c *loginServiceClient) Login(ctx context.Context, in *Credential, opts ...grpc.CallOption) (*Token, error) {
-	out := new(Token)
-	err := c.cc.Invoke(ctx, "/proto.LoginService/Login", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *loginServiceClient) ExtendToken(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*Token, error) {
-	out := new(Token)
-	err := c.cc.Invoke(ctx, "/proto.LoginService/ExtendToken", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-// LoginServiceServer is the server API for LoginService service.
-// All implementations must embed UnimplementedLoginServiceServer
-// for forward compatibility
-type LoginServiceServer interface {
-	Login(context.Context, *Credential) (*Token, error)
-	ExtendToken(context.Context, *Empty) (*Token, error)
-	mustEmbedUnimplementedLoginServiceServer()
-}
-
-// UnimplementedLoginServiceServer must be embedded to have forward compatible implementations.
-type UnimplementedLoginServiceServer struct {
-}
-
-func (UnimplementedLoginServiceServer) Login(context.Context, *Credential) (*Token, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
-}
-func (UnimplementedLoginServiceServer) ExtendToken(context.Context, *Empty) (*Token, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ExtendToken not implemented")
-}
-func (UnimplementedLoginServiceServer) mustEmbedUnimplementedLoginServiceServer() {}
-
-// UnsafeLoginServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to LoginServiceServer will
-// result in compilation errors.
-type UnsafeLoginServiceServer interface {
-	mustEmbedUnimplementedLoginServiceServer()
-}
-
-func RegisterLoginServiceServer(s *grpc.Server, srv LoginServiceServer) {
-	s.RegisterService(&_LoginService_serviceDesc, srv)
-}
-
-func _LoginService_Login_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Credential)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(LoginServiceServer).Login(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/proto.LoginService/Login",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(LoginServiceServer).Login(ctx, req.(*Credential))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _LoginService_ExtendToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Empty)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(LoginServiceServer).ExtendToken(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/proto.LoginService/ExtendToken",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(LoginServiceServer).ExtendToken(ctx, req.(*Empty))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-var _LoginService_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "proto.LoginService",
-	HandlerType: (*LoginServiceServer)(nil),
-	Methods: []grpc.MethodDesc{
-		{
-			MethodName: "Login",
-			Handler:    _LoginService_Login_Handler,
-		},
-		{
-			MethodName: "ExtendToken",
-			Handler:    _LoginService_ExtendToken_Handler,
-		},
-	},
-	Streams:  []grpc.StreamDesc{},
-	Metadata: "floowsynk.proto",
-}
 
 // WorkflowServiceClient is the client API for WorkflowService service.
 //
@@ -140,9 +22,11 @@ type WorkflowServiceClient interface {
 	ListWorkflows(ctx context.Context, in *PageRequest, opts ...grpc.CallOption) (*WorkflowList, error)
 	UpdateWorkflow(ctx context.Context, in *Workflow, opts ...grpc.CallOption) (*Workflow, error)
 	CreateWorkflow(ctx context.Context, in *Workflow, opts ...grpc.CallOption) (*Workflow, error)
-	DeleteWorkflow(ctx context.Context, in *Workflow, opts ...grpc.CallOption) (*Empty, error)
+	DeleteWorkflow(ctx context.Context, in *Workflow, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	QuickRun(ctx context.Context, in *Workflow, opts ...grpc.CallOption) (WorkflowService_QuickRunClient, error)
 	RunWorkflowId(ctx context.Context, in *RunWorkflowIdRequest, opts ...grpc.CallOption) (WorkflowService_RunWorkflowIdClient, error)
+	ListWorkflowHistory(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*WorkflowHistoryList, error)
+	GetWorkflowHistory(ctx context.Context, in *WorkflowHistoryRequest, opts ...grpc.CallOption) (*WorkflowHistoryResponse, error)
 }
 
 type workflowServiceClient struct {
@@ -189,8 +73,8 @@ func (c *workflowServiceClient) CreateWorkflow(ctx context.Context, in *Workflow
 	return out, nil
 }
 
-func (c *workflowServiceClient) DeleteWorkflow(ctx context.Context, in *Workflow, opts ...grpc.CallOption) (*Empty, error) {
-	out := new(Empty)
+func (c *workflowServiceClient) DeleteWorkflow(ctx context.Context, in *Workflow, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, "/proto.WorkflowService/DeleteWorkflow", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -214,7 +98,7 @@ func (c *workflowServiceClient) QuickRun(ctx context.Context, in *Workflow, opts
 }
 
 type WorkflowService_QuickRunClient interface {
-	Recv() (*RunWorkflowResponse, error)
+	Recv() (*ReplayData, error)
 	grpc.ClientStream
 }
 
@@ -222,8 +106,8 @@ type workflowServiceQuickRunClient struct {
 	grpc.ClientStream
 }
 
-func (x *workflowServiceQuickRunClient) Recv() (*RunWorkflowResponse, error) {
-	m := new(RunWorkflowResponse)
+func (x *workflowServiceQuickRunClient) Recv() (*ReplayData, error) {
+	m := new(ReplayData)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
@@ -246,7 +130,7 @@ func (c *workflowServiceClient) RunWorkflowId(ctx context.Context, in *RunWorkfl
 }
 
 type WorkflowService_RunWorkflowIdClient interface {
-	Recv() (*RunWorkflowResponse, error)
+	Recv() (*ReplayData, error)
 	grpc.ClientStream
 }
 
@@ -254,12 +138,30 @@ type workflowServiceRunWorkflowIdClient struct {
 	grpc.ClientStream
 }
 
-func (x *workflowServiceRunWorkflowIdClient) Recv() (*RunWorkflowResponse, error) {
-	m := new(RunWorkflowResponse)
+func (x *workflowServiceRunWorkflowIdClient) Recv() (*ReplayData, error) {
+	m := new(ReplayData)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
 	return m, nil
+}
+
+func (c *workflowServiceClient) ListWorkflowHistory(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*WorkflowHistoryList, error) {
+	out := new(WorkflowHistoryList)
+	err := c.cc.Invoke(ctx, "/proto.WorkflowService/ListWorkflowHistory", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workflowServiceClient) GetWorkflowHistory(ctx context.Context, in *WorkflowHistoryRequest, opts ...grpc.CallOption) (*WorkflowHistoryResponse, error) {
+	out := new(WorkflowHistoryResponse)
+	err := c.cc.Invoke(ctx, "/proto.WorkflowService/GetWorkflowHistory", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 // WorkflowServiceServer is the server API for WorkflowService service.
@@ -270,9 +172,11 @@ type WorkflowServiceServer interface {
 	ListWorkflows(context.Context, *PageRequest) (*WorkflowList, error)
 	UpdateWorkflow(context.Context, *Workflow) (*Workflow, error)
 	CreateWorkflow(context.Context, *Workflow) (*Workflow, error)
-	DeleteWorkflow(context.Context, *Workflow) (*Empty, error)
+	DeleteWorkflow(context.Context, *Workflow) (*emptypb.Empty, error)
 	QuickRun(*Workflow, WorkflowService_QuickRunServer) error
 	RunWorkflowId(*RunWorkflowIdRequest, WorkflowService_RunWorkflowIdServer) error
+	ListWorkflowHistory(context.Context, *emptypb.Empty) (*WorkflowHistoryList, error)
+	GetWorkflowHistory(context.Context, *WorkflowHistoryRequest) (*WorkflowHistoryResponse, error)
 	mustEmbedUnimplementedWorkflowServiceServer()
 }
 
@@ -292,7 +196,7 @@ func (UnimplementedWorkflowServiceServer) UpdateWorkflow(context.Context, *Workf
 func (UnimplementedWorkflowServiceServer) CreateWorkflow(context.Context, *Workflow) (*Workflow, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateWorkflow not implemented")
 }
-func (UnimplementedWorkflowServiceServer) DeleteWorkflow(context.Context, *Workflow) (*Empty, error) {
+func (UnimplementedWorkflowServiceServer) DeleteWorkflow(context.Context, *Workflow) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteWorkflow not implemented")
 }
 func (UnimplementedWorkflowServiceServer) QuickRun(*Workflow, WorkflowService_QuickRunServer) error {
@@ -300,6 +204,12 @@ func (UnimplementedWorkflowServiceServer) QuickRun(*Workflow, WorkflowService_Qu
 }
 func (UnimplementedWorkflowServiceServer) RunWorkflowId(*RunWorkflowIdRequest, WorkflowService_RunWorkflowIdServer) error {
 	return status.Errorf(codes.Unimplemented, "method RunWorkflowId not implemented")
+}
+func (UnimplementedWorkflowServiceServer) ListWorkflowHistory(context.Context, *emptypb.Empty) (*WorkflowHistoryList, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListWorkflowHistory not implemented")
+}
+func (UnimplementedWorkflowServiceServer) GetWorkflowHistory(context.Context, *WorkflowHistoryRequest) (*WorkflowHistoryResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetWorkflowHistory not implemented")
 }
 func (UnimplementedWorkflowServiceServer) mustEmbedUnimplementedWorkflowServiceServer() {}
 
@@ -413,7 +323,7 @@ func _WorkflowService_QuickRun_Handler(srv interface{}, stream grpc.ServerStream
 }
 
 type WorkflowService_QuickRunServer interface {
-	Send(*RunWorkflowResponse) error
+	Send(*ReplayData) error
 	grpc.ServerStream
 }
 
@@ -421,7 +331,7 @@ type workflowServiceQuickRunServer struct {
 	grpc.ServerStream
 }
 
-func (x *workflowServiceQuickRunServer) Send(m *RunWorkflowResponse) error {
+func (x *workflowServiceQuickRunServer) Send(m *ReplayData) error {
 	return x.ServerStream.SendMsg(m)
 }
 
@@ -434,7 +344,7 @@ func _WorkflowService_RunWorkflowId_Handler(srv interface{}, stream grpc.ServerS
 }
 
 type WorkflowService_RunWorkflowIdServer interface {
-	Send(*RunWorkflowResponse) error
+	Send(*ReplayData) error
 	grpc.ServerStream
 }
 
@@ -442,8 +352,44 @@ type workflowServiceRunWorkflowIdServer struct {
 	grpc.ServerStream
 }
 
-func (x *workflowServiceRunWorkflowIdServer) Send(m *RunWorkflowResponse) error {
+func (x *workflowServiceRunWorkflowIdServer) Send(m *ReplayData) error {
 	return x.ServerStream.SendMsg(m)
+}
+
+func _WorkflowService_ListWorkflowHistory_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkflowServiceServer).ListWorkflowHistory(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.WorkflowService/ListWorkflowHistory",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkflowServiceServer).ListWorkflowHistory(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkflowService_GetWorkflowHistory_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(WorkflowHistoryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkflowServiceServer).GetWorkflowHistory(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.WorkflowService/GetWorkflowHistory",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkflowServiceServer).GetWorkflowHistory(ctx, req.(*WorkflowHistoryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 var _WorkflowService_serviceDesc = grpc.ServiceDesc{
@@ -470,6 +416,14 @@ var _WorkflowService_serviceDesc = grpc.ServiceDesc{
 			MethodName: "DeleteWorkflow",
 			Handler:    _WorkflowService_DeleteWorkflow_Handler,
 		},
+		{
+			MethodName: "ListWorkflowHistory",
+			Handler:    _WorkflowService_ListWorkflowHistory_Handler,
+		},
+		{
+			MethodName: "GetWorkflowHistory",
+			Handler:    _WorkflowService_GetWorkflowHistory_Handler,
+		},
 	},
 	Streams: []grpc.StreamDesc{
 		{
@@ -483,5 +437,5 @@ var _WorkflowService_serviceDesc = grpc.ServiceDesc{
 			ServerStreams: true,
 		},
 	},
-	Metadata: "floowsynk.proto",
+	Metadata: "workflow.proto",
 }

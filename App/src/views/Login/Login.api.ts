@@ -1,5 +1,5 @@
-import { LoginServicePromiseClient } from 'proto/floowsynk_grpc_web_pb'
-import { Credential, Token } from 'proto/floowsynk_pb'
+import { LoginServicePromiseClient } from 'proto/login/login_grpc_web_pb'
+import { Credential, Token } from 'proto/login/login_pb'
 import { getApiUrl } from '@/components/Composable/constants'
 
 export const LoginRequest = async (session: any): Promise<Token> => {

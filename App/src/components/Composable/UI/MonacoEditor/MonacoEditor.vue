@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
 import { MonacoEditorProps } from './MonacoEditor.types'
 import { registerCustomLanguage, initMonacoEditor, disposeMonacoEditor } from './MonacoEditor.helper'
 import { EMIT_MODAL } from './MonacoEditor.contants'
@@ -25,6 +25,10 @@ onBeforeUnmount(() => {
     disposeMonacoEditor(editorInstance, monacoDisposable)
   }
 })
+
+watch(() => props.variables, () => {
+  monacoDisposable = registerCustomLanguage(props);
+});
 </script>
 
 <style scoped src="./MonacoEditor.styles.css"></style>

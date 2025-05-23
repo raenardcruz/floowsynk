@@ -1,5 +1,5 @@
 import { ref, computed } from "vue"
-import { Workflow } from 'proto/floowsynk_pb'
+import { Workflow } from 'proto/workflow/workflow_pb'
 import { newProcess } from "./Workflow.factory"
 import { createGlobalState } from '@vueuse/core'
 
@@ -26,8 +26,29 @@ export const useTab = (tabId: string) => {
             }
         }
     })
+    const setActiveTabToNext = () => {
+        const { activeTab } = useWorkflowStore()
+        const currentIndex = tabs.value.findIndex(tab => tab.id === activeTab.value)
+        if (currentIndex < tabs.value.length - 1) {
+            activeTab.value = tabs.value[currentIndex + 1].id
+        } else if (currentIndex === tabs.value.length - 1) {
+            activeTab.value = tabs.value[0].id
+        }
+    }
+
+    const setActiveTabToPrevious = () => {
+        const { activeTab } = useWorkflowStore()
+        const currentIndex = tabs.value.findIndex(tab => tab.id === activeTab.value)
+        if (currentIndex > 0) {
+            activeTab.value = tabs.value[currentIndex - 1].id
+        } else if (currentIndex === 0) {
+            activeTab.value = tabs.value[tabs.value.length -1].id
+        }
+    }
 
     return {
-        tab
+        tab,
+        setActiveTabToNext,
+        setActiveTabToPrevious,
     }
 }

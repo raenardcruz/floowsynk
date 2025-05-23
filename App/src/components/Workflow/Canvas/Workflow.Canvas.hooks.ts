@@ -1,7 +1,7 @@
 import { ref, computed } from 'vue'
 import { useTab } from '@/views/Workflow'
 import { DenormalizeVueFlowObject } from '@/components/Composable/protoTransformers'
-import { ReplayData } from 'proto/floowsynk_pb'
+import { ReplayData } from 'proto/workflow/workflow_pb'
 import { useMouse, useManualRefHistory } from '@vueuse/core'
 import type { Node, Edge } from '@vue-flow/core'
 
@@ -13,6 +13,7 @@ const clipBoard = ref({
 })
 const tabStores: Record<string, any> = {}
 const { x, y, } = useMouse({ touch: false })
+const hadOpenModalSidebar = ref(false)
 
 export const useWorkflowCanvasStore = (tabId: string) => {
     if (!tabStores[tabId]) {
@@ -22,6 +23,7 @@ export const useWorkflowCanvasStore = (tabId: string) => {
             replayData: ref<ReplayData.AsObject[]>([]),
             selectedReplayData: ref<number>(0),
             showReplayData: ref(false),
+            hadOpenModalSidebar,
         }
     }
 

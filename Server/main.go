@@ -7,9 +7,13 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/IBM/sarama"
+	"github.com/google/uuid"
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
+	"github.com/raenardcruz/floowsynk/Broker"
+	lg "github.com/raenardcruz/floowsynk/CodeGen/go/login"
+	wf "github.com/raenardcruz/floowsynk/CodeGen/go/workflow"
 	db "github.com/raenardcruz/floowsynk/Database"
-	"github.com/raenardcruz/floowsynk/Server/proto"
 	"github.com/raenardcruz/floowsynk/Server/workflow"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -17,23 +21,39 @@ import (
 
 // LoginServer handles login-related gRPC services
 type LoginServer struct {
-	proto.UnimplementedLoginServiceServer
+	lg.UnimplementedLoginServiceServer
 }
 
 // WorkflowServer handles workflow-related gRPC services
 type WorkflowServer struct {
-	proto.UnimplementedWorkflowServiceServer
+	wf.UnimplementedWorkflowServiceServer
 }
 
 const JobToken = "6c9e5318-6e7b-452d-9e22-9f35a755bcbd"
 
 var DBCon *db.DatabaseConnection
+var producer *sarama.SyncProducer
 
 func main() {
-	err := initializeDatabase()
-	if err != nil {
-		log.Fatalf("Failed to initialize database: %v", err)
+	var err error
+	if err = initializeDatabase(); err != nil {
+		log.Fatalf("Failed to connect to database: %v", err)
+		return
 	}
+	if producer, err = Broker.Init(); err != nil {
+		log.Fatalf("Failed to initialize broker: %v", err)
+		return
+	}
+	if producer == nil {
+		log.Fatalf("Failed to create producer")
+		return
+	}
+	defer func() {
+		if err := (*producer).Close(); err != nil {
+			log.Fatalf("Failed to close producer: %v", err)
+		}
+		log.Println("Cleaned up producer")
+	}()
 
 	grpcServer := setupGRPCServer()
 	httpServer := setupHTTPServer(grpcServer)
@@ -63,8 +83,8 @@ func initializeDatabase() (err error) {
 
 func setupGRPCServer() *grpc.Server {
 	grpcServer := grpc.NewServer()
-	proto.RegisterLoginServiceServer(grpcServer, &LoginServer{})
-	proto.RegisterWorkflowServiceServer(grpcServer, &WorkflowServer{})
+	lg.RegisterLoginServiceServer(grpcServer, &LoginServer{})
+	wf.RegisterWorkflowServiceServer(grpcServer, &WorkflowServer{})
 	reflection.Register(grpcServer)
 	return grpcServer
 }
@@ -100,8 +120,8 @@ func startRESTServer() {
 func setupPlainGRPCServer() {
 	plainGRPCPort := ":50051"
 	plainGRPCServer := grpc.NewServer()
-	proto.RegisterLoginServiceServer(plainGRPCServer, &LoginServer{})
-	proto.RegisterWorkflowServiceServer(plainGRPCServer, &WorkflowServer{})
+	lg.RegisterLoginServiceServer(plainGRPCServer, &LoginServer{})
+	wf.RegisterWorkflowServiceServer(plainGRPCServer, &WorkflowServer{})
 	reflection.Register(plainGRPCServer)
 
 	go func() {
@@ -142,10 +162,12 @@ func runWebhookHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	wp := workflow.WorkflowProcessor{
+		ID:               uuid.NewString(),
 		DBcon:            *DBCon,
 		Workflow:         workflowObj,
 		Stream:           nil,
 		ProcessVariables: make(map[string]interface{}),
+		Producer:         producer,
 	}
 
 	if err := wp.StartWorkflow(); err != nil {

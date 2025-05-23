@@ -1,4 +1,4 @@
-import { Workflow, Node, Edge } from 'proto/floowsynk_pb'
+import { Workflow, Node, Edge } from 'proto/workflow/workflow_pb'
 import {generateUUID} from "@/components/Composable/Utilities"
 
 export const newProcess = (): Workflow.AsObject => {

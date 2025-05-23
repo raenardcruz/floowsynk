@@ -1,18 +1,9 @@
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 import { useTab } from '@/views/Workflow'
 import { useProcessListStore } from '@/components/Workflow/Process'
-import { Workflow } from 'proto/floowsynk_pb'
+import { Workflow } from 'proto/workflow/workflow_pb'
 
-const arraytype = ref('string')
-const modalStates = ref<Record<string, boolean>>({})
 const { processes } = useProcessListStore()
-
-export const useSidebarNodeStore = () => {
-    return {
-        arraytype,
-        modalStates
-    }
-}
 
 export const useSidebarNodeHooks = (tabId: string) => {
     const { tab } = useTab(tabId)

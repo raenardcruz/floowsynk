@@ -1,14 +1,16 @@
 import { ref, computed } from 'vue'
-import { Workflow } from 'proto/floowsynk_pb'
+import { Workflow, WorkflowHistory } from 'proto/workflow/workflow_pb'
 import { createGlobalState } from '@vueuse/core'
 
 export const useProcessListStore = createGlobalState(() => {
     const processes = ref<Workflow.AsObject[]>([])
+    const history = ref<WorkflowHistory.AsObject[]>([])
     const search = ref<string>("")
 
     return {
         processes,
-        search
+        search,
+        history
     }
 })
 

@@ -11,7 +11,11 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/raenardcruz/floowsynk/Server/proto"
+	"github.com/raenardcruz/floowsynk/Broker"
+	"github.com/raenardcruz/floowsynk/Broker/kafka"
+	proto "github.com/raenardcruz/floowsynk/CodeGen/go/workflow"
+	DB "github.com/raenardcruz/floowsynk/Database"
+	"github.com/raenardcruz/floowsynk/Helper"
 )
 
 func (wp *WorkflowProcessor) UpdateStatus(node *proto.Node, status proto.NodeStatus, output interface{}, message string, includeReplayData bool) {
@@ -30,21 +34,53 @@ func (wp *WorkflowProcessor) UpdateStatus(node *proto.Node, status proto.NodeSta
 			}
 		}
 	}
-	res := &proto.RunWorkflowResponse{
-		NodeId: node.Id,
-		Status: status,
+
+	res := &proto.ReplayData{
+		NodeId:  node.Id,
+		Status:  status,
+		Message: message,
 	}
 	if includeReplayData {
-		res.Data = &proto.ReplayData{
-			NodeId:    node.Id,
-			Variables: wp.getVariableMapString(),
-			Data:      node.Data,
-			Status:    getStatusString(status),
-			Message:   message,
-		}
+		res.Variables = wp.getVariableMapString()
+		res.Data = node.Data
 	}
+
 	if wp.Stream != nil {
 		wp.Stream.SendMsg(res)
+		// DB Record format
+		if status != proto.NodeStatus_COMPLETED && status != proto.NodeStatus_FAILED {
+			return
+		}
+		dbRD := DB.ReplayData{
+			ProcessID:  wp.ID,
+			WorkflowID: wp.Workflow.Id,
+			NodeID:     res.NodeId,
+			Data: func() DB.JSONB {
+				dataBytes, err := json.Marshal(res.Data)
+				if err != nil {
+					fmt.Printf("Error marshaling NodeData: %v\n", err)
+					return nil
+				}
+				return DB.JSONB(dataBytes)
+			}(),
+			Variables: func() DB.JSONB {
+				varBytes, err := json.Marshal(res.Variables)
+				if err != nil {
+					fmt.Printf("Error marshaling NodeData: %v\n", err)
+					return nil
+				}
+				return DB.JSONB(varBytes)
+			}(),
+			Status:          int32(res.Status),
+			Message:         res.Message,
+			ProcessSequence: int(wp.Step),
+		}
+		rdStr, err := Helper.Marshal(dbRD)
+		if err != nil {
+			fmt.Printf("Error marshaling RunWorkflowResponse: %v\n", err)
+			return
+		}
+		kafka.SendMessage(*wp.Producer, Broker.WORKFLOW_REPLAY_DATA, wp.ID, rdStr)
 	}
 }
 
@@ -77,6 +113,7 @@ func (wp *WorkflowProcessor) setVariable(varName string, value interface{}) erro
 }
 
 func (wp *WorkflowProcessor) nextProcess(nodeId string, sourceHandle string) error {
+	wp.Step = wp.Step + 1
 	targets, ok := wp.GetNextNodes(nodeId, sourceHandle)
 	if !ok {
 		return nil
@@ -87,21 +124,6 @@ func (wp *WorkflowProcessor) nextProcess(nodeId string, sourceHandle string) err
 		}
 	}
 	return nil
-}
-
-func getStatusString(status proto.NodeStatus) string {
-	switch status {
-	case proto.NodeStatus_RUNNING:
-		return "Running"
-	case proto.NodeStatus_COMPLETED:
-		return "Success"
-	case proto.NodeStatus_FAILED:
-		return "Failed"
-	case proto.NodeStatus_INFO:
-		return "Info"
-	default:
-		return "Unknown"
-	}
 }
 
 func getNodeById(n []*proto.Node, id string) (*proto.Node, bool) {
@@ -194,45 +216,6 @@ func (wp *WorkflowProcessor) makeRequest(url string, method string, headers []*p
 	wp.setVariable("api.body", body)
 
 	return body, nil
-}
-
-func getAllJSONPaths(jsonObj interface{}) ([]string, error) {
-	jsonStr := fmt.Sprintf("%v", jsonObj)
-	var data map[string]interface{}
-	err := json.Unmarshal([]byte(jsonStr), &data)
-	if err != nil {
-		return nil, fmt.Errorf("error unmarshaling JSON: %w", err)
-	}
-
-	paths := []string{}
-	var explore func(interface{}, string)
-
-	explore = func(current interface{}, currentPath string) {
-		switch v := current.(type) {
-		case map[string]interface{}:
-			for key, value := range v {
-				newPath := key
-				if currentPath != "" {
-					newPath = currentPath + "." + key
-				}
-				paths = append(paths, newPath)
-
-				explore(value, newPath)
-			}
-		case []interface{}:
-			for i, value := range v {
-				newPath := fmt.Sprintf("%d", i)
-				if currentPath != "" {
-					newPath = currentPath + "." + fmt.Sprintf("%d", i)
-				}
-				paths = append(paths, newPath)
-				explore(value, newPath)
-			}
-		}
-	}
-
-	explore(data, "")
-	return paths, nil
 }
 
 func RegexReplaceAll(text, pattern, replaceText string) string {

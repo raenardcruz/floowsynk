@@ -1,7 +1,7 @@
 import { useSidebarCanvasStore } from './Workflow.Sidebar.Canvas.hooks'
 import { useWorkflowCanvasGlbalStore } from '@/components/Workflow/Canvas/Workflow.Canvas.hooks'
 import { nodes } from '@/components/Workflow/Nodes'
-import { Node } from 'proto/floowsynk_pb'
+import { Node } from 'proto/workflow/workflow_pb'
 
 export const onDragStart = (node: Node.AsObject) => {
     const {

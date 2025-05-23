@@ -14,6 +14,7 @@
         <Handle class="handle-output" v-if="outputsList" v-for="(output, index) in outputsList" :key="output" :id="output"
             :data-output="output" type="source" :position="Position.Right"
             :style="{ top: `${(100 / (outputsList.length + 1)) * (index + 1)}%` }" />
+        <button class="add-btn" v-for="(output, index) in outputsList" :key="output" v-if="node.selected">+</button>
     </div>
     <Teleport :to="'#' + canvasId" v-if="!isRunning">
         <SideBar :title="label" :caption="node.id" v-model:visible="showSidebar">
@@ -24,7 +25,7 @@
     </Teleport>
     <Teleport :to="`#${canvasId}`">
         <Modal title="Select Process Type" caption="Select the type of process you want to create"
-            v-model:visible="showModal">
+            v-model="showModal">
             <ProcessTypeModal :id="props.tabid" />
         </Modal>
     </Teleport>
@@ -38,7 +39,7 @@ import { SidebarCanvasFields as WorkflowNodeSidebarFields } from "@/components/W
 import { NodeProps } from './FloowsynkNode.types'
 import { useFloowsynkNodeHooks, useFloowsynkNodeWatchers } from './FloowsynkNode.hooks'
 import { clickhandler } from './FloowsynkNode.helper'
-import { Node } from 'proto/floowsynk_pb'
+import { Node } from 'proto/workflow/workflow_pb'
 import { toSentenceCase } from "@/components/Composable/Utilities"
 import ProcessTypeModal from '@/components/Workflow/Modal/ProcessType/Workflow.Modal.ProcessType.vue'
 import { Modal } from '@/components/Composable/UI'
@@ -50,10 +51,10 @@ const { node } = useNode()
 const { canvasId } = useFloowsynkNodeHooks(props.tabid)
 const showSidebar = ref(false)
 const showModal = ref(false)
+const { isRunning, hadOpenModalSidebar } = useWorkflowCanvasStore(props.tabid)
 const { nodestatus, isReplayNodeSelected } = useFloowsynkNodeWatchers(props.tabid, node, showSidebar)
 const clickHandler = () => clickhandler(node, showSidebar, showModal)
 let { icon, nodetype, label, outputsList, inputsList, nodestyle } = node as unknown as Node.AsObject
-const { isRunning } = useWorkflowCanvasStore(props.tabid)
 watch(isRunning, (newValue) => {
     node.draggable = !newValue
     node.deletable = !newValue
@@ -66,6 +67,9 @@ watch(node, (newValue) => {
         nodestyle = (newValue as unknown as Node.AsObject).nodestyle
     }
 })
+watch([showModal, showModal], ([newShowModal, newShowSidebar]) => {
+    hadOpenModalSidebar.value = newShowSidebar || newShowModal
+})  
 onKeyStroke('Escape', () => {
     showSidebar.value = false
     showModal.value = false

@@ -4,7 +4,7 @@
     right: 0;
     flex-direction: column;
     background: var(--grey-5);
-    width: 300px;
+    width: 500px;
     height: 100%;
     box-shadow: -2px 0px 4px grey;
     z-index: 100;
@@ -12,6 +12,7 @@
 }
 .sidebar .title {
     display: flex;
+    position: relative;
     justify-content: space-between;
     align-items: center;
     padding: 10px 20px 0px 20px;
@@ -21,13 +22,19 @@
     color: var(--grey-2);
 }
 .sidebar .caption {
+    display: flex;
+    position: relative;
     padding: 0px 20px 10px 20px;
     font-size: 10px;
     color: var(--grey-3);
     border-bottom: 1px solid var(--grey-4);
 }
 .sidebar .content {
+    display: flex;
+    position: relative;
+    gap: 12px;
     padding: 10px;
     overflow-y: auto;
     height: calc(100% - 40px);
+    flex-direction: column;
 }

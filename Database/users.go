@@ -18,19 +18,19 @@ const (
 	userCacheExpiration = 15 * time.Minute
 )
 
-type UsersModel struct {
+type Users struct {
 	ID        string
 	Username  string
 	Password  string
 	Email     string
 	Role      string
-	CreatedAt string
-	UpdatedAt string
+	CreatedAt int64
+	UpdatedAt int64
 }
 
-func (db *DatabaseConnection) GetUsers() ([]UsersModel, error) {
+func (db *DatabaseConnection) GetUsers() ([]Users, error) {
 	log.Print("Getting users")
-	var users []UsersModel
+	var users []Users
 	if err := db.conn.Find(&users).Error; err != nil {
 		return nil, err
 	}
@@ -38,20 +38,20 @@ func (db *DatabaseConnection) GetUsers() ([]UsersModel, error) {
 	return users, nil
 }
 
-func (db *DatabaseConnection) GetUser(id string) (UsersModel, error) {
+func (db *DatabaseConnection) GetUser(id string) (Users, error) {
 	ctx := context.Background()
 	cacheKey := "user:" + id
 
 	if cachedData, found := GetFromCache(ctx, cacheKey); found {
-		var cachedUser UsersModel
+		var cachedUser Users
 		if err := json.Unmarshal(cachedData, &cachedUser); err == nil {
 			return cachedUser, nil
 		}
 	}
 
-	var user UsersModel
+	var user Users
 	if err := db.conn.First(&user, "id = ?", id).Error; err != nil {
-		return UsersModel{}, err
+		return Users{}, err
 	}
 
 	if err := SetCache(ctx, cacheKey, user, userCacheExpiration); err != nil {
@@ -61,7 +61,7 @@ func (db *DatabaseConnection) GetUser(id string) (UsersModel, error) {
 	return user, nil
 }
 
-func (db *DatabaseConnection) AddUser(u UsersModel) error {
+func (db *DatabaseConnection) AddUser(u Users) error {
 	log.Printf("Adding user %s", u.Username)
 	encPassword, err := crypto.EncryptPassword(u.Password)
 	if err != nil {
@@ -72,6 +72,8 @@ func (db *DatabaseConnection) AddUser(u UsersModel) error {
 		u.ID = uuid.New().String()
 	}
 	u.Password = encPassword
+	u.CreatedAt = time.Now().UTC().Unix()
+	u.UpdatedAt = time.Now().UTC().Unix()
 	if err := db.conn.Create(&u).Error; err != nil {
 		log.Printf("Error adding user: %v", err)
 		return err
@@ -79,21 +81,21 @@ func (db *DatabaseConnection) AddUser(u UsersModel) error {
 	return nil
 }
 
-func (db *DatabaseConnection) GetUserByUsername(username string) (UsersModel, error) {
+func (db *DatabaseConnection) GetUserByUsername(username string) (Users, error) {
 	ctx := context.Background()
 	cacheKey := "user:username:" + username
 
 	if cachedData, found := GetFromCache(ctx, cacheKey); found {
-		var cachedUser UsersModel
+		var cachedUser Users
 		if err := json.Unmarshal(cachedData, &cachedUser); err == nil {
 			return cachedUser, nil
 		}
 	}
 
 	log.Printf("Getting user with username %s", username)
-	var user UsersModel
+	var user Users
 	if err := db.conn.First(&user, "username = ?", username).Error; err != nil {
-		return UsersModel{}, err
+		return Users{}, err
 	}
 
 	if err := SetCache(ctx, cacheKey, user, userCacheExpiration); err != nil {
@@ -103,10 +105,12 @@ func (db *DatabaseConnection) GetUserByUsername(username string) (UsersModel, er
 	return user, nil
 }
 
-func (db *DatabaseConnection) UpdateUser(u UsersModel) error {
+func (db *DatabaseConnection) UpdateUser(u Users) error {
 	ctx := context.Background()
 	cacheKey := "user:" + u.ID
 	cacheKeyByUsername := "user:username:" + u.Username
+
+	u.UpdatedAt = time.Now().UTC().Unix()
 
 	encPassword, err := crypto.EncryptPassword(u.Password)
 	if err != nil {
@@ -114,7 +118,7 @@ func (db *DatabaseConnection) UpdateUser(u UsersModel) error {
 		return err
 	}
 	u.Password = encPassword
-	if err := db.conn.Model(&UsersModel{}).Where("id = ?", u.ID).Updates(&u).Error; err != nil {
+	if err := db.conn.Model(&Users{}).Where("id = ?", u.ID).Updates(&u).Error; err != nil {
 		log.Printf("Error updating user: %v", err)
 		return err
 	}
@@ -132,7 +136,7 @@ func (db *DatabaseConnection) UpdateUser(u UsersModel) error {
 
 func (db *DatabaseConnection) DeleteUser(id string) error {
 	log.Printf("Deleting user with id %s", id)
-	if err := db.conn.Delete(&UsersModel{}, "id = ?", id).Error; err != nil {
+	if err := db.conn.Delete(&Users{}, "id = ?", id).Error; err != nil {
 		log.Printf("Error deleting user: %v", err)
 		return err
 	}
