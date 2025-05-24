@@ -78,6 +78,6 @@ defineProps({
 }
 .collapsible-contents {
     max-height: 300px;
-    overflow-y: auto;
+    overflow-y: hidden;
 }
 </style>
