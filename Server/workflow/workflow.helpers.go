@@ -15,7 +15,6 @@ import (
 	"github.com/raenardcruz/floowsynk/Broker/kafka"
 	proto "github.com/raenardcruz/floowsynk/CodeGen/go/workflow"
 	DB "github.com/raenardcruz/floowsynk/Database"
-	"github.com/raenardcruz/floowsynk/Helper"
 )
 
 func (wp *WorkflowProcessor) UpdateStatus(node *proto.Node, status proto.NodeStatus, output interface{}, message string, includeReplayData bool) {
@@ -51,36 +50,32 @@ func (wp *WorkflowProcessor) UpdateStatus(node *proto.Node, status proto.NodeSta
 		if status != proto.NodeStatus_COMPLETED && status != proto.NodeStatus_FAILED {
 			return
 		}
-		dbRD := DB.ReplayData{
-			ProcessID:  wp.ID,
-			WorkflowID: wp.Workflow.Id,
-			NodeID:     res.NodeId,
-			Data: func() DB.JSONB {
-				dataBytes, err := json.Marshal(res.Data)
-				if err != nil {
-					fmt.Printf("Error marshaling NodeData: %v\n", err)
-					return nil
-				}
-				return DB.JSONB(dataBytes)
-			}(),
-			Variables: func() DB.JSONB {
-				varBytes, err := json.Marshal(res.Variables)
-				if err != nil {
-					fmt.Printf("Error marshaling NodeData: %v\n", err)
-					return nil
-				}
-				return DB.JSONB(varBytes)
-			}(),
-			Status:          int32(res.Status),
-			Message:         res.Message,
-			ProcessSequence: int(wp.Step),
-		}
-		rdStr, err := Helper.Marshal(dbRD)
+		data, err := json.Marshal(res.Data)
 		if err != nil {
 			fmt.Printf("Error marshaling RunWorkflowResponse: %v\n", err)
 			return
 		}
-		kafka.SendMessage(*wp.Producer, Broker.WORKFLOW_REPLAY_DATA, wp.ID, rdStr)
+		variables, err := json.Marshal(res.Variables)
+		if err != nil {
+			fmt.Printf("Error marshaling RunWorkflowResponse: %v\n", err)
+			return
+		}
+		dbRD := DB.ReplayData{
+			ProcessID:       wp.ID,
+			WorkflowID:      wp.Workflow.Id,
+			NodeID:          res.NodeId,
+			Data:            data,
+			Variables:       variables,
+			Status:          int32(res.Status),
+			Message:         res.Message,
+			ProcessSequence: int(wp.Step),
+		}
+		rdBytes, err := json.Marshal(dbRD)
+		if err != nil {
+			fmt.Printf("Error marshaling RunWorkflowResponse: %v\n", err)
+			return
+		}
+		kafka.SendMessage(*wp.Producer, Broker.WORKFLOW_REPLAY_DATA, wp.ID, string(rdBytes))
 	}
 }
 

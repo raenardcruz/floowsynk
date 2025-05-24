@@ -12,6 +12,8 @@ import (
 
 const replayDataCacheExpiration = 15 * time.Minute
 
+type DynamicJSONB map[string]interface{}
+
 type ReplayData struct {
 	ID              string `gorm:"primaryKey"`
 	ProcessID       string

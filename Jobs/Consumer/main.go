@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"log"
 	"os"
@@ -38,6 +39,27 @@ func (ConsumerGroupHandler) ConsumeClaim(session sarama.ConsumerGroupSession, cl
 			log.Printf("Error unmarshalling message: %v", err)
 			continue
 		}
+		// Remove possible enclosing quotes if rd.Data is a JSON string
+		var dataStr string
+		if err := json.Unmarshal(rd.Data, &dataStr); err == nil {
+			rd.Data = []byte(dataStr)
+		}
+		dataDecoded, err := base64.StdEncoding.DecodeString(string(rd.Data))
+		if err != nil {
+			log.Printf("Error decoding Data: %v", err)
+			continue
+		}
+		rd.Data = dataDecoded
+		var variablesStr string
+		if err := json.Unmarshal(rd.Variables, &variablesStr); err == nil {
+			rd.Variables = []byte(variablesStr)
+		}
+		variablesDecoded, err := base64.StdEncoding.DecodeString(string(rd.Variables))
+		if err != nil {
+			log.Printf("Error decoding Variable: %v", err)
+			continue
+		}
+		rd.Variables = variablesDecoded
 		replayData = append(replayData, rd)
 		session.MarkMessage(message, "")
 	}

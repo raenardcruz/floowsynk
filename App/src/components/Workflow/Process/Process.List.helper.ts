@@ -53,7 +53,7 @@ export const historyClicked = async (historyItem: WorkflowHistory.AsObject) => {
     nodeStatuses.value = {}
     replayData.value = []
     showReplayData.value = false
-    const resp = await getWorkflowHistory(historyItem.workflowid)
+    const resp = await getWorkflowHistory(historyItem.id)
     const dataList = resp.getDataList() || []
     for (const response of dataList) {
         switch (response.getStatus()) {
@@ -70,12 +70,7 @@ export const historyClicked = async (historyItem: WorkflowHistory.AsObject) => {
                   nodeStatuses.value[response.getNodeid()] = 'info'
                   break
               }
-              if (response.getData() != undefined) {
-                const data = response.getData()?.toObject()
-                if (data) {
-                  replayData.value.push(data)
-                }
-              }
+              replayData.value.push(response.toObject())
     }
     showReplayData.value = true
 }

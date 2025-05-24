@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -10,7 +12,6 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	wf "github.com/raenardcruz/floowsynk/CodeGen/go/workflow"
 	DB "github.com/raenardcruz/floowsynk/Database"
-	"github.com/raenardcruz/floowsynk/Helper"
 	"github.com/raenardcruz/floowsynk/Server/crypto"
 	"google.golang.org/grpc/metadata"
 )
@@ -170,26 +171,20 @@ func GetWorkflowHistoryImpl(Id string) (*wf.WorkflowHistoryResponse, error) {
 
 	var data []*wf.ReplayData
 	for _, rd := range replayDataList {
-		ndStr, err := Helper.Marshal(rd.Data)
-		if err != nil {
+		var nodeData wf.NodeData
+		if err := json.Unmarshal([]byte(rd.Data), &nodeData); err != nil {
+			log.Printf("Error unmarshalling data: %v", err)
 			return nil, err
 		}
-		nd, err := Helper.Unmarshal[wf.NodeData](ndStr)
-		if err != nil {
-			return nil, err
-		}
-		variableStr, err := Helper.Marshal(rd.Variables)
-		if err != nil {
-			return nil, err
-		}
-		variables, err := Helper.Unmarshal[map[string]string](variableStr)
-		if err != nil {
+		var variables map[string]string
+		if err := json.Unmarshal([]byte(rd.Variables), &variables); err != nil {
+			log.Printf("Error unmarshalling variables: %v", err)
 			return nil, err
 		}
 
 		data = append(data, &wf.ReplayData{
 			NodeId:    rd.NodeID,
-			Data:      &nd,
+			Data:      &nodeData,
 			Variables: variables,
 			Status:    wf.NodeStatus(rd.Status),
 			Message:   rd.Message,
