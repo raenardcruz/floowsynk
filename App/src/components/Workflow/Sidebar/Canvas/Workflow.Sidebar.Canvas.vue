@@ -4,7 +4,7 @@
             <span class="material-symbols-outlined" v-if="showSideBar">keyboard_double_arrow_left</span>
             <span class="material-symbols-outlined" v-else>keyboard_double_arrow_right</span>
         </div>
-        <div class="sidebar">
+        <BaseSidebar>
             <div class="input">
                 <input type="search" placeholder="Search Nodes" v-model="search">
             </div>
@@ -60,7 +60,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </BaseSidebar>
     </div>
 </template>
 
@@ -70,6 +70,7 @@ import { useSidebarCanvasStore, useFloowsynkNodeHooks } from './Workflow.Sidebar
 import { nodes } from "@/components/Workflow/Nodes"
 import { groups } from "@/components/Workflow/Nodes"
 import { onDragStart, expandToggle, groupNodes } from './Workflow.Sidebar.Canvas.helper'
+import BaseSidebar from '@/components/Composable/UI/Sidebar/BaseSidebar.vue'
 
 const {
     showSideBar,
