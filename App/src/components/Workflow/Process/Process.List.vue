@@ -29,17 +29,23 @@
             </div>
         </div>
         <div class="run-history">
-            <Collapsible title="Run History" caption="List of all the processes that have been run" v-model="showContent">
-                <Header columnstyle="repeat(3, 1fr)">
-                    <div class="header">ID</div>
-                    <div class="header">Workflow</div>
-                    <div class="header">Date</div>
-                </Header>
-                <Row columnstyle="repeat(3, 1fr)" v-for="(item, index) in history" :key="index" @click="historyClicked(item)">
-                    <div>{{ item.id }}</div>
-                    <div>{{ item.workflowname }}</div>
-                    <div>{{ item.rundate }}</div>
-                </Row>
+            <Collapsible title="Run History" caption="List of all the processes that have been run"
+                v-model="showContent">
+                <div class="history-container" v-bind="containerProps">
+                    <div v-bind="wrapperProps">
+                        <Header columnstyle="repeat(3, 1fr)">
+                            <div class="header">ID</div>
+                            <div class="header">Workflow</div>
+                            <div class="header">Date</div>
+                        </Header>
+                        <Row columnstyle="repeat(3, 1fr)" v-for="(item, index) in list" :key="index"
+                            @click="historyClicked(item.data)">
+                            <div>{{ item.data.id }}</div>
+                            <div>{{ item.data.workflowname }}</div>
+                            <div>{{ item.data.rundate }}</div>
+                        </Row>
+                    </div>
+                </div>
             </Collapsible>
         </div>
     </div>
@@ -53,7 +59,7 @@ import { ref } from 'vue'
 import { createProcess, cardClicked, initWorkflows, historyClicked } from './Process.List.helper'
 import WorkflowIcon from "@/components/Workflow/Workflow.Icon.vue"
 import { useProcessListStore, useProcessListHooks } from './Process.List.hooks'
-import { useAsyncState } from '@vueuse/core'
+import { useAsyncState, useVirtualList } from '@vueuse/core'
 import Header from '@/components/Composable/UI/Table/Headers.vue'
 import Row from '@/components/Composable/UI/Table/Row.vue'
 import Collapsible from '@/components/Composable/UI/Collapsible/Collapsible.vue'
@@ -63,6 +69,10 @@ const { search, history } = useProcessListStore()
 const { filteredProcesses } = useProcessListHooks()
 const { isLoading } = useAsyncState(initWorkflows, null)
 const showContent = ref(true)
+const { list, containerProps, wrapperProps } = useVirtualList(history, {
+    itemHeight: 40,
+
+})
 </script>
 
 <style scoped src="./Process.List.styles.css"></style>

@@ -1,7 +1,9 @@
 <template>
-    <h2>
-        Fl<span class="material-symbols-outlined">all_inclusive</span>wsynk
-    </h2>
+    <img :src="floowsynk" class="logo" alt="Floowsynk Logo" />
 </template>
+
+<script setup lang="ts">
+import floowsynk from '@/components/Icons/floowsynk.svg'
+</script>
 
 <style scoped src="./Logo.styles.css"></style>

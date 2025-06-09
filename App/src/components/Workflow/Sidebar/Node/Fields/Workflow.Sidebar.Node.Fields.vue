@@ -3,7 +3,8 @@
         <SelectInput
             :options="filteredProcesses"
             :disabled="isRunning"
-            label="Subprocess" />
+            label="Subprocess"
+            v-model="modelValue" />
     </div>
     <template v-for="(value, key) in modelValue" :key="key" v-else-if="modelValue && typeof modelValue === 'object'">
         <component :is="getComponent(key, value)?.component" v-bind="getComponent(key, value)?.props" v-if="value != null" v-model="modelValue[key]" />
