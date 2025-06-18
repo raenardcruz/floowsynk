@@ -14,7 +14,7 @@
         </div>
     </div>
     <Teleport :to="'#' + canvasId"> 
-        <SideBar title="Replay Data" caption="" visible>
+        <SideBar title="Replay Data" caption="" :customStyle="sideBarStyle" visible>
             <p>Id</p>
             <WorkflowNodeSidebarFields nodeType="" :modelValue="replayData[selectedReplayData].nodeid" :tabid="props.tabId" />
             <WorkflowNodeSidebarFields nodeType="" v-model="selectedReplayDataData" :tabid="props.tabId" />
@@ -70,6 +70,11 @@ const getStatus = (status: number) => {
             return 'Info'
     }
 }
+const sideBarStyle = computed(() => {
+    return {
+        position: 'relative',
+    }
+})
 </script>
 
 <style scoped src="./ReplaySteps.styles.css"></style>

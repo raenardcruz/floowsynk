@@ -9,6 +9,10 @@ export const BaseSidebarProps = {
         type: String,
         default: 'left',
     },
+    customStyle: {
+        type: Object,
+        default: () => ({}),
+    }
 }
 
 export const CollapsibleSidebarProps = {

@@ -17,11 +17,11 @@
         <button class="add-btn" v-for="(output, _) in outputsList" :key="output" v-if="node.selected">+</button>
     </div>
     <Teleport :to="'#' + canvasId" v-if="!isRunning">
-        <CollapsibleSidebar position="right" v-model="showSidebar" :showToggleButton="false">
+        <Sidebar :title="label" :caption="node.id" :customStyle="customStyle" position="right" :visible="showSidebar">
             <div v-if="node.data">
                 <WorkflowNodeSidebarFields :nodeType="nodetype" v-model="node.data" :tabid="props.tabid" />
             </div>
-        </CollapsibleSidebar>
+        </Sidebar>
     </Teleport>
     <Teleport :to="`#${canvasId}`">
         <Modal title="Select Process Type" caption="Select the type of process you want to create"
@@ -32,9 +32,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue"
+import { computed, ref, watch } from "vue"
 import { Handle, Position, useNode } from '@vue-flow/core'
-import CollapsibleSidebar from "@/components/Composable/UI/Sidebar/CollapsibleSidebar.vue"
+import Sidebar from "@/components/Composable/UI/Sidebar/Sidebar.vue"
 import { SidebarCanvasFields as WorkflowNodeSidebarFields } from "@/components/Workflow/Sidebar"
 import { NodeProps } from './FloowsynkNode.types'
 import { useFloowsynkNodeHooks, useFloowsynkNodeWatchers } from './FloowsynkNode.hooks'
@@ -73,6 +73,11 @@ watch([showModal, showModal], ([newShowModal, newShowSidebar]) => {
 onKeyStroke('Escape', () => {
     showSidebar.value = false
     showModal.value = false
+})
+const customStyle = computed(() => {
+    return {
+        position: 'relative',
+    }
 })
 </script>
 

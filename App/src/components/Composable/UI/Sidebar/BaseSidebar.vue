@@ -1,5 +1,5 @@
 <template>
-    <div class="sidebar" :style="{ width: props.width }"
+    <div class="sidebar" :style="{ ...customStyle, width: props.width }"
         :class="props.position === 'left' ? 'sidebar-left' : 'sidebar-right'">
         <slot></slot>
     </div>
