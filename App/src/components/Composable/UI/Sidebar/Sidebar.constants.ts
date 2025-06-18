@@ -21,4 +21,8 @@ export const CollapsibleSidebarProps = {
         type: Boolean,
         default: true,
     },
+    showToggleButton: {
+        type: Boolean,
+        default: true,
+    },
 }

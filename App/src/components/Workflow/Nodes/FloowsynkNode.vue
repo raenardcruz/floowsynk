@@ -14,14 +14,14 @@
         <Handle class="handle-output" v-if="outputsList" v-for="(output, index) in outputsList" :key="output" :id="output"
             :data-output="output" type="source" :position="Position.Right"
             :style="{ top: `${(100 / (outputsList.length + 1)) * (index + 1)}%` }" />
-        <button class="add-btn" v-for="(output, index) in outputsList" :key="output" v-if="node.selected">+</button>
+        <button class="add-btn" v-for="(output, _) in outputsList" :key="output" v-if="node.selected">+</button>
     </div>
     <Teleport :to="'#' + canvasId" v-if="!isRunning">
-        <SideBar :title="label" :caption="node.id" v-model:visible="showSidebar">
+        <CollapsibleSidebar position="right" v-model="showSidebar" :showToggleButton="false">
             <div v-if="node.data">
                 <WorkflowNodeSidebarFields :nodeType="nodetype" v-model="node.data" :tabid="props.tabid" />
             </div>
-        </SideBar>
+        </CollapsibleSidebar>
     </Teleport>
     <Teleport :to="`#${canvasId}`">
         <Modal title="Select Process Type" caption="Select the type of process you want to create"
@@ -34,7 +34,7 @@
 <script setup lang="ts">
 import { ref, watch } from "vue"
 import { Handle, Position, useNode } from '@vue-flow/core'
-import { SideBar } from "@/components/Composable/UI"
+import CollapsibleSidebar from "@/components/Composable/UI/Sidebar/CollapsibleSidebar.vue"
 import { SidebarCanvasFields as WorkflowNodeSidebarFields } from "@/components/Workflow/Sidebar"
 import { NodeProps } from './FloowsynkNode.types'
 import { useFloowsynkNodeHooks, useFloowsynkNodeWatchers } from './FloowsynkNode.hooks'

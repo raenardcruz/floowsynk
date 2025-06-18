@@ -1,7 +1,6 @@
 <template>
     <div class="sidebar" :style="{ width: props.width }"
         :class="props.position === 'left' ? 'sidebar-left' : 'sidebar-right'">
-        {{ props.width }}
         <slot></slot>
     </div>
 </template>

@@ -1,11 +1,6 @@
 <template>
-    <div class="logic-main-sidebar" :class="showSideBar ? 'show' : ''">
-        <div class="toggle-sidebar" @click="showSideBar = !showSideBar">
-            <span class="material-symbols-outlined" v-if="showSideBar">keyboard_double_arrow_left</span>
-            <span class="material-symbols-outlined" v-else>keyboard_double_arrow_right</span>
-        </div>
-        <BaseSidebar>
-            <div class="input">
+    <CollapsibleSidebar position="left" v-model="showSideBar">
+         <div class="input">
                 <input type="search" placeholder="Search Nodes" v-model="search">
             </div>
             <div class="nodes expand">
@@ -60,8 +55,7 @@
                     </div>
                 </div>
             </div>
-        </BaseSidebar>
-    </div>
+    </CollapsibleSidebar>
 </template>
 
 
@@ -70,7 +64,7 @@ import { useSidebarCanvasStore, useFloowsynkNodeHooks } from './Workflow.Sidebar
 import { nodes } from "@/components/Workflow/Nodes"
 import { groups } from "@/components/Workflow/Nodes"
 import { onDragStart, expandToggle, groupNodes } from './Workflow.Sidebar.Canvas.helper'
-import BaseSidebar from '@/components/Composable/UI/Sidebar/BaseSidebar.vue'
+import CollapsibleSidebar from '@/components/Composable/UI/Sidebar/CollapsibleSidebar.vue'
 
 const {
     showSideBar,
