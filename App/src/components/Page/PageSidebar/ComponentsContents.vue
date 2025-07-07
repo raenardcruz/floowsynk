@@ -1,27 +1,35 @@
 <template>
   <div class="components-sidebar">
-    <div class="component-groups">
+    <div class="component-section">
         <div class="section-indicator" :style="{ top: `${(activeSection - 1) * 48}px` }"></div>
-        <div class="group" v-for="section in SECTIONS" :key="section.id" :data-tooltip="section.name" @click="activeSection = section.id">
+        <div class="section" v-for="section in SECTIONS" :key="section.id" :data-tooltip="section.name" @click="activeSection = section.id">
             <img :src="section.icon" :alt="section.name" class="section-icon" />
         </div>
     </div>
     <div class="component-list">
       <div
-        v-for="component in COMPONENTS"
-        :key="component.type"
+        v-for="group in sectionGroups"
+        :key="group"
+        class="component-group"
+      >
+      <div class="component-group-label">{{ group }}</div>
+      <div
         class="component-item"
+        v-for="component in getGroupComponents(group)"
+        :key="component.name"
         draggable="true"
         @dragstart="(event) => onDragStart(event, component)"
       >
-      <img :src="component.icon" :alt="component.name" class="component-icon" />
+        <img :src="component.icon" :alt="component.name" class="component-icon" />
         <span>{{ component.label }}</span>
+      </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import { SECTIONS, COMPONENTS } from './ComponentsContents.constants';
 import { useComponentsContents } from './ComponentsContents.hooks'
 
@@ -29,13 +37,26 @@ const { activeSection } = useComponentsContents()
 
 interface ComponentMeta {
   name: string;
-  type: string;
   icon: string;
   label: string;
+  group: string;
+  section: number;
+  description?: string;
 }
+
+const filteredComponents = computed(() => {
+  return COMPONENTS.filter(component => component.section === activeSection.value);
+});
+const sectionGroups = computed(() => {
+  return [...new Set(filteredComponents.value.map(component => component.group))];
+})
 
 function onDragStart(event: DragEvent, component: ComponentMeta) {
   event.dataTransfer?.setData('application/json', JSON.stringify(component));
+}
+
+function getGroupComponents (group: string): ComponentMeta[] {
+  return filteredComponents.value.filter(component => component.group === group);
 }
 </script>
 
@@ -46,7 +67,7 @@ function onDragStart(event: DragEvent, component: ComponentMeta) {
     grid-template-columns: 30px auto;
     height: 100%;
 }
-.component-groups {
+.component-section {
     display: flex;
     flex-direction: column;
     box-shadow: 0 2px 8px var(--grey-3);
@@ -62,7 +83,7 @@ function onDragStart(event: DragEvent, component: ComponentMeta) {
     z-index: 100;
     transition: all 0.3s ease;
 }
-.component-groups .group {
+.component-section .section {
     position: relative;
     display: flex;
     justify-content: center;
@@ -73,7 +94,7 @@ function onDragStart(event: DragEvent, component: ComponentMeta) {
     cursor: pointer;
     transition: all 0.3s ease;
 }
-.component-groups .group[data-tooltip]:hover::before {
+.component-section .section[data-tooltip]:hover::before {
     content: attr(data-tooltip);
     position: absolute;
     left: 110%;
@@ -90,10 +111,10 @@ function onDragStart(event: DragEvent, component: ComponentMeta) {
     opacity: 1;
     box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
-.component-groups .group img {
+.component-section .section img {
     width: 18px;
 }
-.component-groups .group:hover {
+.component-section .section:hover {
     background-color: var(--green-5);
 }
 .component-list {
@@ -101,6 +122,7 @@ function onDragStart(event: DragEvent, component: ComponentMeta) {
   flex-direction: column;
   gap: 0.75rem;
   padding: 10px;
+  overflow: auto;
 }
 .component-item {
   display: flex;
@@ -111,6 +133,8 @@ function onDragStart(event: DragEvent, component: ComponentMeta) {
   background: #f7f7f7;
   cursor: grab;
   transition: background 0.2s;
+  margin : 0 10px 0 10px;
+  box-shadow: 0px 4px 6px var(--grey-4);
 }
 .component-item:active {
   cursor: grabbing;
@@ -119,5 +143,19 @@ function onDragStart(event: DragEvent, component: ComponentMeta) {
 .component-icon {
   width: 24px;
   height: 24px;
+}
+.component-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.component-group-label {
+  font-weight: bold;
+  font-size: 14px;
+  color: var(--grey-8);
+  margin-bottom: 0.25rem;
+}
+.component-item:hover {
+  background: var(--grey-4);
 }
 </style>
