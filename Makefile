@@ -84,7 +84,7 @@ setup:
 	@go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
 	# Install Node.js dependencies
 	@echo 🔧 ... Installing Node.js dependencies...
-	@cd app && npm install
+	@cd App && npm install
 	# Install Go modules
 	@echo 🔧 ... Installing Go modules...
 	@go mod tidy

@@ -1,13 +1,4 @@
 version: '3.8'
-# This Docker Compose configuration file defines the services, networks, and volumes
-# required to run a multi-container Docker application. Each service represents a 
-# containerized application or component, and the configuration specifies how they 
-# interact with each other. The file also includes settings for environment variables, 
-# ports, volumes, and other runtime options to ensure proper orchestration of the 
-# application stack.
-# 
-# Note: Replace the placeholder passwords (e.g., 'floowsynk') with strong, secure passwords
-# to enhance the security of your application.
 services:
   db:
     image: postgres:15
@@ -19,8 +10,9 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - floowsynk_network
 
-    
   redis:
     image: redis:latest
     ports:
@@ -30,24 +22,35 @@ services:
     environment:
       - REDIS_PASSWORD=floowsynk
     command: redis-server --requirepass floowsynk
+    networks:
+      - floowsynk_network
 
   kafka:
     image: confluentinc/cp-kafka:latest
+    container_name: kafka
     environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: 'broker,controller'
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@localhost:9093'
+      CLUSTER_ID: '4L6g3nShT-eMCtK--X86sw'
     ports:
       - "9092:9092"
-
-  zookeeper:
-    image: confluentinc/cp-zookeeper:latest
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-    ports:
-      - "2181:2181"
+      - "9093:9093"
+    volumes:
+      - kafka_data:/var/lib/kafka/data
+    networks:
+      - floowsynk_network
 
 volumes:
   postgres_data:
   redis_data:
+  kafka_data:
+
+networks:
+  floowsynk_network:
+    driver: bridge
