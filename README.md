@@ -57,13 +57,33 @@ Ensure you have the following installed:
   source ~/.zshrc
   ```
 
+
 #### 1.2. Essential Packages (Linux/WSL)
 ```bash
 sudo apt update && sudo apt upgrade -y
-sudo apt install make golang-go code git -y
+sudo apt install make code git -y
 ```
 
-#### 1.3. Node.js via NVM
+#### 1.3. Install Go (Golang)
+
+Follow the [official Go installation instructions](https://go.dev/doc/install) for the latest version, or use the following commands for Linux:
+
+```bash
+GO_VERSION="1.22.4"  # Replace with the latest version if needed
+wget https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz
+sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz
+echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.bashrc
+source ~/.bashrc
+go version
+```
+
+> **Note:** Remove any old versions of Go installed via `apt` to avoid conflicts:
+> ```bash
+> sudo apt remove golang-go
+> ```
+
+
+#### 1.4. Node.js via NVM
 ```bash
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
 source ~/.zshrc  # or source ~/.bashrc
@@ -71,7 +91,8 @@ nvm install 22
 nvm use 22
 ```
 
-#### 1.4. Docker & Docker Compose
+
+#### 1.5. Docker & Docker Compose
 - [Install Docker Desktop](https://www.docker.com/products/docker-desktop) or follow [official instructions](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository):
   ```bash
   sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
@@ -111,14 +132,12 @@ nvm use 22
    make proto
    ```
 
-4. **Set up the database:**
+4. **Start all services:**
    ```bash
-   sudo make db-install
-   ```
-
-5. **Start all services:**
-   ```bash
-   make start
+   make start-server
+   make start-ui
+   make job-interval
+   make job-consumer
    ```
    This starts the frontend, backend, and job processor.
 
@@ -128,23 +147,6 @@ nvm use 22
 
 - **Frontend:** [http://localhost:3000](http://localhost:3000)
 - **Backend API:** [http://localhost:8080](http://localhost:8080)
-
----
-
-### 4. Aliases for Common Tasks
-
-Add to your shell config (`~/.zshrc` or `~/.bashrc`):
-
-```bash
-alias build="make build"
-alias start-server="make start-server"
-alias start-ui="make start-ui"
-alias start-jobs="make start-jobs"
-alias proto="make proto"
-alias start-docker="make start-docker"
-alias stop-docker="make stop-docker"
-alias setup="make setup"
-```
 
 ---
 
@@ -165,53 +167,3 @@ alias setup="make setup"
 - Modify `.proto` files in `proto/` and run `make proto` to regenerate code.
 - Use `make` commands for building, cleaning, and starting services.
 - Use `docker ps` to monitor running containers and `docker-compose logs` for debugging.
-
-## Project Setup
-
-1. Navigate to project:
-   ```bash
-   floowsynk
-   ```
-
-2. Install dependencies:
-   ```bash
-   make install
-   ```
-
-3. Setup database:
-   ```bash
-   sudo make db-install
-   ```
-   > Note: sudo is required for Docker filesystem access
-
-4. Start development server:
-   ```bash
-   make start
-   ```
-
-## Aliases for Common Tasks
-Add the following aliases to your shell configuration file (e.g., `~/.bashrc` or `~/.zshrc`) to streamline your workflow:
-
-```bash
-# Aliases for common tasks
-alias build="make build"
-alias start-server="make start-server"
-alias start-ui="make start-ui"
-alias start-jobs="make start-jobs"
-alias proto="make proto"
-alias start-docker="make start-docker"
-alias stop-docker="make stop-docker"
-alias setup="make setup"
-```
-
-## Troubleshooting
-
-- If WSL commands fail: Ensure Windows features "Virtual Machine Platform" and "Windows Subsystem for Linux" are enabled
-- Docker access denied: Run `sudo usermod -aG docker $USER` and restart your terminal
-- VS Code not found: Install using `sudo apt install code` or download from [VS Code website](https://code.visualstudio.com/)
-
-## Development Tips
-
-- Use `code .` to open current directory in VS Code
-- Run `docker ps` to check running containers
-- Use `make help` to see available commands
