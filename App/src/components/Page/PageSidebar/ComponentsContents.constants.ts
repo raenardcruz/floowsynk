@@ -329,13 +329,6 @@ export const COMPONENTS = [
   },
   // Advanced Elements - Social
   {
-    name: 'social-media-icons',
-    icon: 'src/components/Icons/components/social-media-icons.svg',
-    label: 'Social Media Icons',
-    group: 'Social',
-    section: 4
-  },
-  {
     name: 'social-share-buttons',
     icon: 'src/components/Icons/components/social-share-buttons.svg',
     label: 'Social Share Buttons',
