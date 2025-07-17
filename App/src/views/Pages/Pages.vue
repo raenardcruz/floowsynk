@@ -4,7 +4,15 @@
     <div class="page-contents">
       <PageSidebar style="position: relative;" />
       <div ref="dropZoneRef" class="canvas-container" :class="{ 'dragover': isDragOver }" @dragover.prevent="onDragOver" @dragleave="onDragLeave" @drop="onDrop">
-        {{ convertStyleArrayToProps(styles[selectedItem] || []) }}
+        <RenderZone
+          v-for="item in droppedItems"
+          :key="item.id"
+          :id="item.id"
+          :component="item.component"
+          :style="convertStyleArrayToProps(styles[item.id] || [])"
+          :class="{ 'selected-component': selectedItem === item.id }"
+          @click="selectedItem = item.id"
+        />
       </div>
     </div>
   </div>
@@ -17,6 +25,9 @@ import PageSidebar from '@/components/Page/PageSidebar.vue';
 import { usePagesStore } from './Pages.hooks';
 import { getComponentStyles, convertStyleArrayToProps } from './Pages.methods';
 
+
+import RenderZone from './RenderZone.vue';
+import { COMPONENTS } from '@/components/Page/PageSidebar/ComponentsContents.constants';
 
 const dropZoneRef = ref<HTMLElement | null>(null);
 const isDragOver = ref(false);
@@ -35,11 +46,16 @@ function onDrop(event: DragEvent) {
   isDragOver.value = false;
   const componentName = event.dataTransfer?.getData('text/plain');
   if (componentName) {
+    const component = COMPONENTS.find(c => c.name === componentName);
     selectedItem.value = newComponentId;
-    styles.value[newComponentId] = getComponentStyles(componentName);
+    // Deep clone the style array to ensure each component has its own style
+    const baseStyle = getComponentStyles(componentName);
+    const clonedStyleArray = (Array.isArray(baseStyle) ? baseStyle : [baseStyle]).map(style => ({ ...style }));
+    styles.value[newComponentId] = clonedStyleArray;
     droppedItems.value.push({
       id: newComponentId,
       name: componentName,
+      component: component?.component
     });
   }
 }
@@ -76,5 +92,11 @@ function onDrop(event: DragEvent) {
 }
 .canvas-container.dragover {
   border-color: #42b983;
+}
+.selected-component {
+  border: 1px dashed var(--grey-3);
+  z-index: 2;
+  position: relative;
+  transition: box-shadow 0.2s, border-color 0.2s;
 }
 </style>
