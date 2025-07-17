@@ -12,9 +12,9 @@
         <div class="style-group-label">{{ group }}</div>
         <div class="style-item" v-for="property in getGroupPropertiesValue(group)" :key="property.name">
           <label>{{ property.label }}</label>
-          <input v-if="property.control === 'text'" type="text" />
-          <input v-if="property.control === 'color'" type="color" />
-          <select v-if="property.control === 'select'">
+          <input v-if="property.control === 'text'" type="text" v-model="property.value" />
+          <input v-if="property.control === 'color'" type="color" v-model="property.value" />
+          <select v-if="property.control === 'select'" v-model="property.value">
             <option v-for="option in property.options" :key="option" :value="option">{{ option }}</option>
           </select>
         </div>
@@ -25,10 +25,12 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { SECTIONS, PROPERTIES } from './StylesContents.constants';
+import { SECTIONS } from './StylesContents.constants';
 import { useStylesContents } from './StylesContents.hooks'
+import { usePagesStore } from '@/views/Pages/Pages.hooks'
 
 const { activeStyleSection } = useStylesContents()
+const { selectedItem, styles } = usePagesStore()
 
 const sections = SECTIONS;
 
@@ -44,6 +46,7 @@ interface PropertyMeta {
   group: string;
   section: number;
   control: string;
+  value: any;
   options?: string[];
 }
 
@@ -54,7 +57,7 @@ const sectionIndicatorStyle = computed(() => {
 });
 
 const filteredProperties = computed(() => {
-  return PROPERTIES.filter(property => property.section === activeStyleSection.value);
+  return styles.value[selectedItem.value].filter(property => property.section === activeStyleSection.value);
 });
 const sectionGroupsValue = computed(() => {
   return [...new Set(filteredProperties.value.map(property => property.group))];

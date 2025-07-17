@@ -52,7 +52,7 @@ const sectionGroups = computed(() => {
 })
 
 function onDragStart(event: DragEvent, component: ComponentMeta) {
-  event.dataTransfer?.setData('application/json', JSON.stringify(component));
+  event.dataTransfer?.setData('text/plain', component.name);
 }
 
 function getGroupComponents (group: string): ComponentMeta[] {

@@ -1,3 +1,4 @@
+import Section from '../Tools/Section.vue'
 export const SECTIONS = [
   {
     id: 1,
@@ -72,7 +73,8 @@ export const COMPONENTS = [
     icon: 'src/components/Icons/components/section.svg',
     label: 'Div / Section',
     group: 'Containers',
-    section: 1
+    section: 1,
+    component: Section
   },
   {
     name: 'row',
@@ -379,4 +381,4 @@ export const COMPONENTS = [
     group: 'Interactive',
     section: 4
   }
-]
+].map(c => ({ ...c, component: c.component || null }))
