@@ -9,9 +9,6 @@
           :key="item.id"
           :id="item.id"
           :component="item.component"
-          :style="convertStyleArrayToProps(styles[item.id] || [])"
-          :class="{ 'selected-component': selectedItem === item.id }"
-          @click="selectedItem = item.id"
         />
       </div>
     </div>
@@ -23,7 +20,7 @@ import { ref } from 'vue';
 import Subheader from '@/components/Page/SubHeader.vue';
 import PageSidebar from '@/components/Page/PageSidebar.vue';
 import { usePagesStore } from './Pages.hooks';
-import { getComponentStyles, convertStyleArrayToProps } from './Pages.methods';
+import { getComponentStyles } from './Pages.methods';
 
 
 import RenderZone from './RenderZone.vue';
@@ -31,7 +28,7 @@ import { COMPONENTS } from '@/components/Page/PageSidebar/ComponentsContents.con
 
 const dropZoneRef = ref<HTMLElement | null>(null);
 const isDragOver = ref(false);
-const { droppedItems, styles, selectedItem } = usePagesStore();
+const { droppedItems, styles, selectedItem, activeTab } = usePagesStore();
 
 function onDragOver(_: DragEvent) {
   isDragOver.value = true;
@@ -48,7 +45,6 @@ function onDrop(event: DragEvent) {
   if (componentName) {
     const component = COMPONENTS.find(c => c.name === componentName);
     selectedItem.value = newComponentId;
-    // Deep clone the style array to ensure each component has its own style
     const baseStyle = getComponentStyles(componentName);
     const clonedStyleArray = (Array.isArray(baseStyle) ? baseStyle : [baseStyle]).map(style => ({ ...style }));
     styles.value[newComponentId] = clonedStyleArray;
@@ -57,6 +53,7 @@ function onDrop(event: DragEvent) {
       name: componentName,
       component: component?.component
     });
+    activeTab.value = 2;
   }
 }
 </script>
@@ -92,11 +89,5 @@ function onDrop(event: DragEvent) {
 }
 .canvas-container.dragover {
   border-color: #42b983;
-}
-.selected-component {
-  border: 1px dashed var(--grey-3);
-  z-index: 2;
-  position: relative;
-  transition: box-shadow 0.2s, border-color 0.2s;
 }
 </style>

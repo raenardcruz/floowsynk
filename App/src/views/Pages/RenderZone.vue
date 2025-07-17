@@ -2,6 +2,8 @@
 <template>
   <span
     class="item-wrapper"
+    :class="{ 'selected-component': selectedItem === id }"
+    @click="selectedItem = id; activeTab = 2"
     ref="el"
     @contextmenu.prevent="onContextMenu"
   >
@@ -11,17 +13,20 @@
       @duplicate="handleDuplicate"
       @delete="handleDelete"
     />
-    <component :is="component" :style="style" />
+    <component :is="component" :style="convertStyleArrayToProps(styles[id])" />
   </span>
 </template>
 
 <script setup lang="ts">
 import { ref, toRefs, reactive } from 'vue'
 import ItemToolbar from './ItemToolbar.vue'
+import { usePagesStore } from '@/views/Pages/Pages.hooks'
+import { convertStyleArrayToProps } from './Pages.methods';
 
 const emit = defineEmits(['duplicate', 'delete'])
-const props = defineProps<{ component: any; style: Record<string, string>; }>()
-const { component, style } = toRefs(props)
+const props = defineProps<{ id:string; component: any; }>()
+const { component } = toRefs(props)
+const { selectedItem, styles, activeTab } = usePagesStore()
 
 const el = ref<HTMLElement | null>(null)
 const showToolbar = ref(false)
@@ -63,12 +68,17 @@ function handleDelete() {
 <style scoped>
 .item-wrapper {
   display: inline-block;
-  /* Let the wrapper size itself to its child */
   border: 2px solid transparent;
   transition: border-color 0.2s;
   position: relative;
 }
 .item-wrapper:hover {
-  border-color: #22c55e; /* Tailwind green-500 */
+  border-color: var(--green-3);
+}
+.selected-component {
+  border: 1px dashed var(--grey-3);
+  z-index: 2;
+  position: relative;
+  transition: box-shadow 0.2s, border-color 0.2s;
 }
 </style>
