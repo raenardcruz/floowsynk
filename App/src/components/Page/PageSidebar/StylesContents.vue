@@ -10,11 +10,11 @@
     <div class="style-list">
       <div v-for="group in sectionGroupsValue" :key="group" class="style-group">
         <div class="style-group-label">{{ group }}</div>
-        <div class="style-item" v-for="property in getGroupPropertiesValue(group)" :key="property.name">
+        <div class="style-item" v-for="property in getGroupPropertiesValue(group)" :key="property.name" :data-tooltip="property.description || ''">
           <label>{{ property.label }}</label>
-          <input v-if="property.control === 'text'" type="text" v-model="property.value" />
-          <input v-if="property.control === 'color'" type="color" v-model="property.value" />
-          <select v-if="property.control === 'select'" v-model="property.value">
+          <input class="input" v-if="property.control === 'text'" type="text" v-model="property.value" :placeholder="property.placeholder || ''" />
+          <input class="input" v-if="property.control === 'color'" type="color" v-model="property.value" :placeholder="property.placeholder || ''" />
+          <select class="input" v-if="property.control === 'select'" v-model="property.value" :placeholder="property.placeholder || ''">
             <option v-for="option in property.options" :key="option" :value="option">{{ option }}</option>
           </select>
         </div>
@@ -48,6 +48,8 @@ interface PropertyMeta {
   control: string;
   value: any;
   options?: string[];
+  placeholder?: string;
+  description?: string;
 }
 
 const sectionIndicatorStyle = computed(() => {
@@ -168,5 +170,19 @@ function getGroupPropertiesValue(group: string): PropertyMeta[] {
   font-size: 14px;
   color: var(--grey-8);
 }
-
+.style-item[data-tooltip]:hover::before {
+  content: attr(data-tooltip);
+  position: absolute;
+  background: #222;
+  transform: translateY(130%) translateX(180px);
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: 4px;
+  white-space: nowrap;
+  font-size: 13px;
+  z-index: 10;
+  pointer-events: none;
+  opacity: 1;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
 </style>

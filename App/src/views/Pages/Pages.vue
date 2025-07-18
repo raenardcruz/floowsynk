@@ -80,12 +80,13 @@ function onDrop(event: DragEvent) {
   flex-direction: column;
   flex-grow: 1;
   border: 2px dashed #ccc;
-  padding: 1rem;
   overflow-y: auto;
   position: relative;
   margin: 20px;
   width: 100%;
   transition: border-color 0.2s;
+  transform: scale(0.95);
+  transform-origin: top left;
 }
 .canvas-container.dragover {
   border-color: #42b983;
