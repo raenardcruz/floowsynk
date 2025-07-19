@@ -32,7 +32,8 @@ export const section_styles = [
       'column-reverse',
     ],
     value: 'row',
-    description: 'Specifies the direction of the flexible items.'
+    description: 'Specifies the direction of the flexible items.',
+    dependency: { property: 'display', values: ['flex', 'inline-flex'] }
   },
   {
     name: 'flex-wrap',
@@ -46,7 +47,8 @@ export const section_styles = [
       'wrap-reverse',
     ],
     value: 'nowrap',
-    description: 'Specifies whether the flexible items should wrap or not.'
+    description: 'Specifies whether the flexible items should wrap or not.',
+    dependency: { property: 'display', values: ['flex', 'inline-flex'] }
   },
   {
     name: 'justify-content',
@@ -63,7 +65,8 @@ export const section_styles = [
       'space-evenly',
     ],
     value: 'flex-start',
-    description: 'Aligns the flexible container\'s items when the items do not use all available space on the main-axis.'
+    description: 'Aligns the flexible container\'s items when the items do not use all available space on the main-axis.',
+    dependency: { property: 'display', values: ['flex', 'inline-flex'] }
   },
   {
     name: 'align-items',
@@ -79,7 +82,8 @@ export const section_styles = [
       'baseline',
     ],
     value: 'stretch',
-    description: 'Aligns flex items of the current flex line the same way as justify-content but in the perpendicular direction.'
+    description: 'Aligns flex items of the current flex line the same way as justify-content but in the perpendicular direction.',
+    dependency: { property: 'display', values: ['flex', 'inline-flex'] }
   },
   {
     name: 'align-content',
@@ -96,7 +100,8 @@ export const section_styles = [
       'stretch',
     ],
     value: 'stretch',
-    description: 'Aligns a flex container\'s lines within when there is extra space in the cross-axis, similar to how justify-content aligns individual items within the main-axis.'
+    description: 'Aligns a flex container\'s lines within when there is extra space in the cross-axis, similar to how justify-content aligns individual items within the main-axis.',
+    dependency: { property: 'display', values: ['flex', 'inline-flex'] }
   },
   {
     name: 'flex-grow',
@@ -106,7 +111,8 @@ export const section_styles = [
     control: 'text',
     value: '0',
     placeholder: 'e.g. 0',
-    description: 'Sets the flex grow factor of a flexible item.'
+    description: 'Sets the flex grow factor of a flexible item.',
+    dependency: { property: 'display', values: ['flex', 'inline-flex'] }
   },
   {
     name: 'flex-shrink',
@@ -116,7 +122,8 @@ export const section_styles = [
     control: 'text',
     value: '1',
     placeholder: 'e.g. 1',
-    description: 'Sets the flex shrink factor of a flexible item.'
+    description: 'Sets the flex shrink factor of a flexible item.',
+    dependency: { property: 'display', values: ['flex', 'inline-flex'] }
   },
   {
     name: 'flex-basis',
@@ -126,7 +133,8 @@ export const section_styles = [
     control: 'text',
     value: 'auto',
     placeholder: 'e.g. auto',
-    description: 'Sets the initial main size of a flexible item.'
+    description: 'Sets the initial main size of a flexible item.',
+    dependency: { property: 'display', values: ['flex', 'inline-flex'] }
   },
   {
     name: 'align-self',
@@ -143,7 +151,8 @@ export const section_styles = [
       'stretch',
     ],
     value: 'auto',
-    description: 'Allows the default alignment (or the one specified by align-items) to be overridden for individual flex items.'
+    description: 'Allows the default alignment (or the one specified by align-items) to be overridden for individual flex items.',
+    dependency: { property: 'display', values: ['flex', 'inline-flex'] }
   },
   // Overflow
   { name: 'overflow', label: 'Overflow', group: 'Overflow', section: 1, control: 'select', options: ['visible', 'hidden', 'scroll', 'auto'], value: 'visible', description: 'Controls what happens when content overflows the element.' },

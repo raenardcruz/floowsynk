@@ -10,18 +10,21 @@
     <div class="style-list">
       <div v-for="group in sectionGroupsValue" :key="group" class="style-group">
         <div class="style-group-label">{{ group }}</div>
-        <div class="style-item" v-for="property in getGroupPropertiesValue(group)" :key="property.name"
-          :data-tooltip="property.description || ''">
-          <label>{{ property.label }}</label>
-          <input class="input" v-if="property.control === 'text'" type="text" v-model="property.value"
-            :placeholder="property.placeholder || ''" />
-          <input class="input" v-if="property.control === 'color'" type="color" v-model="property.value"
-            :placeholder="property.placeholder || ''" />
-          <select class="input" v-if="property.control === 'select'" v-model="property.value"
-            :placeholder="property.placeholder || ''">
-            <option v-for="option in property.options" :key="option" :value="option">{{ option }}</option>
-          </select>
-        </div>
+        <template v-for="property in getGroupPropertiesValue(group)" :key="property.name">
+          <div class="style-item"
+            v-if="isPropertyVisible(property)"
+            :data-tooltip="property.description || ''">
+            <label>{{ property.label }}</label>
+            <input class="input" v-if="property.control === 'text'" type="text" v-model="property.value"
+              :placeholder="property.placeholder || ''" />
+            <input class="input" v-if="property.control === 'color'" type="color" v-model="property.value"
+              :placeholder="property.placeholder || ''" />
+            <select class="input" v-if="property.control === 'select'" v-model="property.value"
+              :placeholder="property.placeholder || ''">
+              <option v-for="option in property.options" :key="option" :value="option">{{ option }}</option>
+            </select>
+          </div>
+        </template>
       </div>
     </div>
   </div>
@@ -49,6 +52,10 @@ interface PropertyMeta {
   options?: string[];
   placeholder?: string;
   description?: string;
+  dependency?: {
+    property: string;
+    values: string[];
+  };
 }
 
 const sectionIndicatorStyle = computed(() => {
@@ -70,6 +77,15 @@ const sectionGroupsValue = computed(() => {
 function getGroupPropertiesValue(group: string): PropertyMeta[] {
   return filteredProperties.value.filter(property => property.group === group);
 }
+
+function isPropertyVisible(property: PropertyMeta) {
+  if (!property.dependency) {
+    return true;
+  }
+  const dependentProperty = styles.value[selectedItem.value].find(p => p.name === property?.dependency?.property);
+  return dependentProperty && property.dependency.values.includes(dependentProperty.value);
+}
+
 watch(selectedItem, (newSelectedItem) => {
   if (activeStyleSection.value >= [...new Set(styles.value[newSelectedItem].map(m => m.section))].length) {
     activeStyleSection.value = 0
