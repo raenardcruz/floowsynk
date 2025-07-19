@@ -182,3 +182,8 @@ button:hover {
   border: none !important;
   outline: none !important;
 }
+.dragover {
+  border-style: dashed !important;
+  border-width: 2px !important;
+  border-color: var(--blue-2) !important;
+}

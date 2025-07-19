@@ -21,8 +21,6 @@ import Subheader from '@/components/Page/SubHeader.vue';
 import PageSidebar from '@/components/Page/PageSidebar.vue';
 import { usePagesStore } from './Pages.hooks';
 import { getComponentStyles } from './Pages.methods';
-
-
 import RenderZone from './RenderZone.vue';
 import { COMPONENTS } from '@/components/Page/PageSidebar/ComponentsContents.constants';
 
@@ -87,8 +85,5 @@ function onDrop(event: DragEvent) {
   transition: border-color 0.2s;
   transform: scale(0.95);
   transform-origin: top left;
-}
-.canvas-container.dragover {
-  border-color: #42b983;
 }
 </style>
