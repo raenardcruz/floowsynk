@@ -1,4 +1,4 @@
-import { ref, toRef } from 'vue'
+import { ref, computed, toRef } from 'vue'
 import { createGlobalState } from '@vueuse/core'
 import { convertStyleArrayToProps } from './Pages.methods'
 import { COMPONENTS } from '@/components/Page/PageSidebar/ComponentsContents.constants';
@@ -41,8 +41,8 @@ export const usePageComponent = (id: string) => {
   } = usePagesStore()
 
   const isDragOver = ref(false)
-  const componentStyle = toRef(convertStyleArrayToProps(styles.value[id] || []))
-  const componentProperties = toRef(properties.value[id] || {})
+  const componentStyle = computed(() => convertStyleArrayToProps(styles.value[id] || []))
+  const componentProperties = computed(() => properties.value[id])
   const onDragOver = (_: DragEvent) => {
     isDragOver.value = true;
   }
