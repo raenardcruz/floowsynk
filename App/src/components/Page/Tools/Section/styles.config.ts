@@ -19,6 +19,132 @@ export const section_styles = [
   { name: 'z-index', label: 'Z-Index', group: 'Position', section: 1, control: 'text', value: '', placeholder: 'e.g. 10', dependency: { property: 'position', values: ['absolute', 'fixed', 'relative', 'sticky'] }, description: 'Controls the stack order of the element.' },
   // Display
   { name: 'display', label: 'Display', group: 'Display', section: 1, control: 'select', options: ['block', 'inline', 'inline-block', 'flex', 'grid', 'none'], value: 'flex', description: 'Specifies how the element is displayed.' },
+  {
+    name: 'flex-direction',
+    label: 'Flex Direction',
+    group: 'Display',
+    section: 1,
+    control: 'select',
+    options: [
+      'row',
+      'row-reverse',
+      'column',
+      'column-reverse',
+    ],
+    value: 'row',
+    description: 'Specifies the direction of the flexible items.'
+  },
+  {
+    name: 'flex-wrap',
+    label: 'Flex Wrap',
+    group: 'Display',
+    section: 1,
+    control: 'select',
+    options: [
+      'nowrap',
+      'wrap',
+      'wrap-reverse',
+    ],
+    value: 'nowrap',
+    description: 'Specifies whether the flexible items should wrap or not.'
+  },
+  {
+    name: 'justify-content',
+    label: 'Justify Content',
+    group: 'Display',
+    section: 1,
+    control: 'select',
+    options: [
+      'flex-start',
+      'flex-end',
+      'center',
+      'space-between',
+      'space-around',
+      'space-evenly',
+    ],
+    value: 'flex-start',
+    description: 'Aligns the flexible container\'s items when the items do not use all available space on the main-axis.'
+  },
+  {
+    name: 'align-items',
+    label: 'Align Items',
+    group: 'Display',
+    section: 1,
+    control: 'select',
+    options: [
+      'stretch',
+      'flex-start',
+      'flex-end',
+      'center',
+      'baseline',
+    ],
+    value: 'stretch',
+    description: 'Aligns flex items of the current flex line the same way as justify-content but in the perpendicular direction.'
+  },
+  {
+    name: 'align-content',
+    label: 'Align Content',
+    group: 'Display',
+    section: 1,
+    control: 'select',
+    options: [
+      'flex-start',
+      'flex-end',
+      'center',
+      'space-between',
+      'space-around',
+      'stretch',
+    ],
+    value: 'stretch',
+    description: 'Aligns a flex container\'s lines within when there is extra space in the cross-axis, similar to how justify-content aligns individual items within the main-axis.'
+  },
+  {
+    name: 'flex-grow',
+    label: 'Flex Grow',
+    group: 'Display',
+    section: 1,
+    control: 'text',
+    value: '0',
+    placeholder: 'e.g. 0',
+    description: 'Sets the flex grow factor of a flexible item.'
+  },
+  {
+    name: 'flex-shrink',
+    label: 'Flex Shrink',
+    group: 'Display',
+    section: 1,
+    control: 'text',
+    value: '1',
+    placeholder: 'e.g. 1',
+    description: 'Sets the flex shrink factor of a flexible item.'
+  },
+  {
+    name: 'flex-basis',
+    label: 'Flex Basis',
+    group: 'Display',
+    section: 1,
+    control: 'text',
+    value: 'auto',
+    placeholder: 'e.g. auto',
+    description: 'Sets the initial main size of a flexible item.'
+  },
+  {
+    name: 'align-self',
+    label: 'Align Self',
+    group: 'Display',
+    section: 1,
+    control: 'select',
+    options: [
+      'auto',
+      'flex-start',
+      'flex-end',
+      'center',
+      'baseline',
+      'stretch',
+    ],
+    value: 'auto',
+    description: 'Allows the default alignment (or the one specified by align-items) to be overridden for individual flex items.'
+  },
   // Overflow
   { name: 'overflow', label: 'Overflow', group: 'Overflow', section: 1, control: 'select', options: ['visible', 'hidden', 'scroll', 'auto'], value: 'visible', description: 'Controls what happens when content overflows the element.' },
 

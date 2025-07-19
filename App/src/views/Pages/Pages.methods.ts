@@ -1,5 +1,5 @@
-import { section_styles } from '@/components/Page/Tools/Section.config'
-import { heading_styles } from '@/components/Page/Tools/Heading.config'
+import { section_styles } from '@/components/Page/Tools/Section/styles.config'
+import { heading_styles } from '@/components/Page/Tools/Heading/styles.config'
 
 export const getComponentStyles = (componentName: string): Array<any> => {
     switch (componentName) {

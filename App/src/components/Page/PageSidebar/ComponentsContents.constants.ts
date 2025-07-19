@@ -1,5 +1,5 @@
-import Section from '../Tools/Section.vue'
-import Heading from '../Tools/Heading.vue'
+import Section from '../Tools/Section/Section.vue'
+import Heading from '../Tools/Heading/Heading.vue'
 
 export const SECTIONS = [
   {
