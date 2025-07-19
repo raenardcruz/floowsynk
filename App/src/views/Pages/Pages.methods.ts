@@ -1,9 +1,12 @@
 import { section_styles } from '@/components/Page/Tools/Section.config'
+import { heading_styles } from '@/components/Page/Tools/Heading.config'
 
 export const getComponentStyles = (componentName: string): Array<any> => {
     switch (componentName) {
         case 'section':
             return section_styles
+        case 'heading':
+            return heading_styles
         default:
             return []
     }

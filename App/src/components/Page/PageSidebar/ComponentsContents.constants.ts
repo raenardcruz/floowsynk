@@ -1,4 +1,6 @@
 import Section from '../Tools/Section.vue'
+import Heading from '../Tools/Heading.vue'
+
 export const SECTIONS = [
   {
     id: 1,
@@ -28,7 +30,8 @@ export const COMPONENTS = [
     icon: 'src/components/Icons/components/heading.svg',
     label: 'Heading',
     group: 'Text',
-    section: 1
+    section: 1,
+    component: Heading
   },
   {
     name: 'paragraph',

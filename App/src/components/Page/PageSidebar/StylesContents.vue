@@ -2,19 +2,23 @@
   <div class="styles-sidebar">
     <div class="style-section">
       <div class="section-indicator" :style="sectionIndicatorStyle"></div>
-      <div class="section" v-for="section in sections" :key="section.id" :data-tooltip="section.name"
-        @click="handleSetActiveStyleSection && handleSetActiveStyleSection(section.id)">
+      <div class="section" v-for="(section, index) in validSections" :key="section.id"
+        :data-tooltip="section.name" @click="handleSetActiveStyleSection && handleSetActiveStyleSection(index)">
         <img :src="section.icon" :alt="section.name" class="section-icon" />
       </div>
     </div>
     <div class="style-list">
       <div v-for="group in sectionGroupsValue" :key="group" class="style-group">
         <div class="style-group-label">{{ group }}</div>
-        <div class="style-item" v-for="property in getGroupPropertiesValue(group)" :key="property.name" :data-tooltip="property.description || ''">
+        <div class="style-item" v-for="property in getGroupPropertiesValue(group)" :key="property.name"
+          :data-tooltip="property.description || ''">
           <label>{{ property.label }}</label>
-          <input class="input" v-if="property.control === 'text'" type="text" v-model="property.value" :placeholder="property.placeholder || ''" />
-          <input class="input" v-if="property.control === 'color'" type="color" v-model="property.value" :placeholder="property.placeholder || ''" />
-          <select class="input" v-if="property.control === 'select'" v-model="property.value" :placeholder="property.placeholder || ''">
+          <input class="input" v-if="property.control === 'text'" type="text" v-model="property.value"
+            :placeholder="property.placeholder || ''" />
+          <input class="input" v-if="property.control === 'color'" type="color" v-model="property.value"
+            :placeholder="property.placeholder || ''" />
+          <select class="input" v-if="property.control === 'select'" v-model="property.value"
+            :placeholder="property.placeholder || ''">
             <option v-for="option in property.options" :key="option" :value="option">{{ option }}</option>
           </select>
         </div>
@@ -24,20 +28,15 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { SECTIONS } from './StylesContents.constants';
-import { useStylesContents } from './StylesContents.hooks'
 import { usePagesStore } from '@/views/Pages/Pages.hooks'
 
-const { activeStyleSection } = useStylesContents()
 const { selectedItem, styles } = usePagesStore()
+const activeStyleSection = ref(0);
 
-const sections = SECTIONS;
-
-
-
-function handleSetActiveStyleSection(id: number) {
-  activeStyleSection.value = id;
+function handleSetActiveStyleSection(index: number) {
+  activeStyleSection.value = index;
 }
 
 interface PropertyMeta {
@@ -54,20 +53,28 @@ interface PropertyMeta {
 
 const sectionIndicatorStyle = computed(() => {
   return {
-    top: `${(activeStyleSection.value - 1) * 48}px`
+    top: `${(activeStyleSection.value) * 48}px`
   };
 });
 
+const validSections = computed(() => {
+  const sectionIds = [...new Set(styles.value[selectedItem.value].map(m => m.section))]
+  return SECTIONS.filter(section => sectionIds.includes(section.id));
+});
 const filteredProperties = computed(() => {
-  return styles.value[selectedItem.value].filter(property => property.section === activeStyleSection.value);
+  return styles.value[selectedItem.value].filter(property => property.section === validSections.value[activeStyleSection.value]?.id || '');
 });
 const sectionGroupsValue = computed(() => {
   return [...new Set(filteredProperties.value.map(property => property.group))];
 })
-
 function getGroupPropertiesValue(group: string): PropertyMeta[] {
   return filteredProperties.value.filter(property => property.group === group);
 }
+watch(selectedItem, (newSelectedItem) => {
+  if (activeStyleSection.value >= [...new Set(styles.value[newSelectedItem].map(m => m.section))].length) {
+    activeStyleSection.value = 0
+  }
+}, { immediate: true });
 </script>
 
 <style scoped>
@@ -170,6 +177,7 @@ function getGroupPropertiesValue(group: string): PropertyMeta[] {
   font-size: 14px;
   color: var(--grey-8);
 }
+
 .style-item[data-tooltip]:hover::before {
   content: attr(data-tooltip);
   position: absolute;
@@ -183,6 +191,6 @@ function getGroupPropertiesValue(group: string): PropertyMeta[] {
   z-index: 10;
   pointer-events: none;
   opacity: 1;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 </style>

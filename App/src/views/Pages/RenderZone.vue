@@ -10,7 +10,6 @@
   <component
     :id="id"
     :is="component"
-    :style="[convertStyleArrayToProps(styles[id])]"
     class="components"
     :class="{ 'selected-component': selectedItem === id, 'hovering': isHovering }"
     @mouseenter.stop="onMouseEnter"
@@ -24,13 +23,12 @@
 import { ref, toRefs, useTemplateRef, reactive } from 'vue'
 import ItemToolbar from './ItemToolbar.vue'
 import { usePagesStore } from '@/views/Pages/Pages.hooks'
-import { convertStyleArrayToProps } from './Pages.methods';
 import { onClickOutside } from '@vueuse/core'
 
 const emit = defineEmits(['duplicate', 'delete'])
 const props = defineProps<{ id: string; component: any}>()
 const { component } = toRefs(props)
-const { selectedItem, styles, activeTab } = usePagesStore()
+const { selectedItem, activeTab } = usePagesStore()
 
 const target = useTemplateRef<HTMLElement>('target')
 onClickOutside(target, () => {
