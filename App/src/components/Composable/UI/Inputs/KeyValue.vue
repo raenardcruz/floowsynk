@@ -18,7 +18,7 @@
 
 <script lang="ts" setup>
 import TextInput from './TextInput.vue';
-const value = defineModel()
+const value = defineModel<{ key: string, value: string }>()
 defineProps({
     label: {
         type: String,

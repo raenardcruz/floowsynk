@@ -8,11 +8,14 @@
     @delete="handleDelete"
   />
   <component
+    :id="id"
     :is="component"
-    :style="convertStyleArrayToProps(styles[id])"
-    class="component"
-    :class="{ 'selected-component': selectedItem === id }"
-    @click="selectedItem = id; activeTab = 2"
+    :style="[convertStyleArrayToProps(styles[id])]"
+    class="components"
+    :class="{ 'selected-component': selectedItem === id, 'hovering': isHovering }"
+    @mouseenter.stop="onMouseEnter"
+    @mouseleave.stop="onMouseLeave"
+    @click.stop="selectedItem = id; activeTab = 2"
     ref="el"
     @contextmenu.prevent="onContextMenu" />
 </template>
@@ -25,7 +28,7 @@ import { convertStyleArrayToProps } from './Pages.methods';
 import { onClickOutside } from '@vueuse/core'
 
 const emit = defineEmits(['duplicate', 'delete'])
-const props = defineProps<{ id: string; component: any; }>()
+const props = defineProps<{ id: string; component: any}>()
 const { component } = toRefs(props)
 const { selectedItem, styles, activeTab } = usePagesStore()
 
@@ -37,6 +40,15 @@ onClickOutside(target, () => {
 const el = ref<HTMLElement | null>(null)
 const showToolbar = ref(false)
 const toolbarPosition = reactive({ x: 0, y: 0 })
+const isHovering = ref(false)
+
+function onMouseEnter() {
+  isHovering.value = true
+}
+
+function onMouseLeave() {
+  isHovering.value = false
+}
 
 function onContextMenu(e: MouseEvent) {
   e.preventDefault()
@@ -62,21 +74,9 @@ function handleDelete() {
 </script>
 
 <style scoped>
-.item-wrapper {
-  display: flex;
-  align-items: stretch;
-  justify-content: stretch;
-  position: relative;
-  border: 2px solid transparent;
-  transition: border-color 0.2s;
-  height: 100%;
-  width: 100%;
+.components {
+  z-index: 100;
 }
-
-.item-wrapper:hover {
-  border-color: var(--green-3);
-}
-
 .selected-component::before {
   content: '';
     position: absolute;
@@ -89,12 +89,12 @@ function handleDelete() {
     top: 0px;
     left: 0px;
 }
-.component:hover::before {
+.hovering::before {
   content: '';
   position: absolute;
   height: 100%;
   width: 100%;
-  border: 2px dashed var(--green-3);
+  border: 2px dashed var(--blue-3);
   z-index: 2;
   transition: box-shadow 0.2s, border-color 0.2s;
   display: flex;

@@ -5,10 +5,10 @@
       <PageSidebar style="position: relative;" />
       <div ref="dropZoneRef" class="canvas-container" :class="{ 'dragover': isDragOver }" @dragover.prevent="onDragOver" @dragleave="onDragLeave" @drop="onDrop">
         <RenderZone
-          v-for="item in droppedItems"
-          :key="item.id"
-          :id="item.id"
-          :component="item.component"
+            v-for="(item) in droppedItems.filter(i => i.parent === '')"
+            :key="item.id"
+            :id="item.id"
+            :component="item.component"
         />
       </div>
     </div>
@@ -49,7 +49,8 @@ function onDrop(event: DragEvent) {
     droppedItems.value.push({
       id: newComponentId,
       name: componentName,
-      component: component?.component
+      component: component?.component,
+      parent: '',
     });
     activeTab.value = 2;
   }

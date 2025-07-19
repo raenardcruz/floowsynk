@@ -1,10 +1,16 @@
 import { ref } from 'vue'
 import { createGlobalState } from '@vueuse/core'
 
+export interface componentItem {
+  id: string
+  name: string
+  parent: string
+  component: any
+}
 
 export const usePagesStore = createGlobalState(() => {
     const activeTab = ref<number>(1)
-    const droppedItems = ref<Array<any>>([])
+    const droppedItems = ref<Array<componentItem>>([])
     const styles = ref<Record<string, Array<any>>>({})
     const properties = ref<Record<string, Array<any>>>({})
     const selectedItem = ref<string>('')
