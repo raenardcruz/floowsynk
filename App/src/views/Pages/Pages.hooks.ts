@@ -1,7 +1,7 @@
 import { ref, computed, toRef } from 'vue'
 import { createGlobalState } from '@vueuse/core'
 import { convertStyleArrayToProps } from './Pages.methods'
-import { COMPONENTS } from '@/components/Page/PageSidebar/ComponentsContents.constants';
+import { COMPONENTS } from '@/views/Pages/PageSidebar/ComponentsContents.constants';
 import { getComponentStyles } from '@/views/Pages/Pages.methods';
 
 export interface componentItem {

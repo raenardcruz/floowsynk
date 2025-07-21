@@ -17,12 +17,12 @@
 
 <script setup lang="ts">
 import { ref } from 'vue';
-import Subheader from '@/components/Page/SubHeader.vue';
-import PageSidebar from '@/components/Page/PageSidebar.vue';
+import Subheader from '@/views/Pages/SubHeader.vue';
+import PageSidebar from '@/views/Pages/PageSidebar.vue';
 import { usePagesStore } from './Pages.hooks';
 import { getComponentStyles } from './Pages.methods';
 import RenderZone from './RenderZone.vue';
-import { COMPONENTS } from '@/components/Page/PageSidebar/ComponentsContents.constants';
+import { COMPONENTS } from '@/views/Pages/PageSidebar/ComponentsContents.constants';
 
 const dropZoneRef = ref<HTMLElement | null>(null);
 const isDragOver = ref(false);

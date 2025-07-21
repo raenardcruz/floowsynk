@@ -24,8 +24,8 @@
 </template>
 
 <script setup lang="ts">
-import WorkflowsProcessList from "@/components/Workflow/Process/Process.List.vue";
-import { WorkflowCanvas } from "@/components/Workflow/Canvas";
+import WorkflowsProcessList from "@/views/Workflow/Process/Process.List.vue";
+import { WorkflowCanvas } from "@/views/Workflow/Canvas";
 import { useWorkflowStore } from "./Workflow.hooks";
 import { closeTabById } from './Workflow.helpers';
 
