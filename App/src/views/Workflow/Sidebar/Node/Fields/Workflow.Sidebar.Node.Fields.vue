@@ -19,7 +19,7 @@ import { toSentenceCase } from '@/components/Composable/Utilities'
 import { useWorkflowCanvasStore } from '@/views/Workflow/Canvas/Workflow.Canvas.hooks'
 import { MONACO_EDITOR_DATA_PROPERTIES } from './Workflow.Sidebar.Node.Fields.constants'
 import CheckboxInput from '@/components/Composable/UI/Inputs/Checkbox.vue'
-import TextInput from '@/components/Composable/UI/Inputs/TextInput.vue'
+import TextCodeInput from '@/components/Composable/UI/Inputs/TextCodeInput.vue'
 import SelectInput from '@/components/Composable/UI/Inputs/Select.vue'
 import ListInput from '@/components/Composable/UI/Inputs/ListField.vue'
 
@@ -66,7 +66,7 @@ const getComponent = (key: string, value: any) => {
             case String:
                 const enableEditor = MONACO_EDITOR_DATA_PROPERTIES.includes(key)
                 return {
-                    component: TextInput,
+                    component: TextCodeInput,
                     props: {
                         label,
                         type: 'text',
@@ -79,7 +79,7 @@ const getComponent = (key: string, value: any) => {
                 }
             case Number:
                 return {
-                    component: TextInput,
+                    component: TextCodeInput,
                     props: {
                         label,
                         type: 'number',

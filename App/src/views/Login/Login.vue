@@ -7,20 +7,16 @@
             <div class="bg-2">
                 <div class="login-card">
                     <h1>Login</h1>
+                    <Divider />
                     <form @submit.prevent="handleLogin">
-                        <div class="form-group">
-                            <label for="username">User Name:</label>
-                            <input type="text" id="username" v-model="username" required />
-                        </div>
-                        <div class="form-group">
-                            <label for="password">Password:</label>
-                            <input type="password" id="password" v-model="password" required />
-                        </div>
+                        <TextInput id="username" class="form-item" v-model="username" label="User Name" placeholder="Enter your username" />
+                        <TextInput id="password" class="form-item" type="password" v-model="password" label="Password" placeholder="Enter your password" />
                         <div v-if="loginError" class="tooltip">{{ loginErrorMessage }}</div>
                         <div class="btn-grp">
                             <button>Register</button>
                             <button type="submit">Login</button>
                         </div>
+                        <Divider />
                         <div class="forgot-password">
                             <a href="#">Forgot password?</a>
                         </div>
@@ -48,6 +44,8 @@ import {
 import {
     useLoginStore
 } from './Login.hooks';
+import TextInput from '@/components/Composable/UI/Inputs/TextInput.vue'
+import Divider from 'primevue/divider'
 
 const {
     username,

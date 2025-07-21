@@ -5,3 +5,8 @@ export const getApiUrl = (): string => {
     }
     return apiUrl;
 }
+
+export interface IdProps {
+    id: string
+    tooltip?: string
+}
