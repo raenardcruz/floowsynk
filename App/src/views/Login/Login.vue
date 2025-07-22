@@ -7,7 +7,7 @@
             <div class="bg-2">
                 <div class="login-card">
                     <h1>Login</h1>
-                    <Divider />
+                    <br>
                     <form @submit.prevent="handleLogin">
                         <TextInput id="username" class="form-item" v-model="username" label="User Name" placeholder="Enter your username" />
                         <PasswordInput id="password" class="form-item" v-model="password" label="Password" placeholder="Enter your password" />

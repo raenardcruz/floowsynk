@@ -1,14 +1,15 @@
 <template>
-    <div>
+    <div style="padding: 0px 20px 0px 20px;">
         <h2>Dashboard</h2>
-        <TextInput id="test" v-model="text" label="Test Input" placeholder="Type something..." tooltip="Sample tooltip" type="password"/>
-        {{ text }}
+        <Button id="test" label="test">
+            <template v-slot:icon>
+                <img style="height: 24px;" :src="VieIcon" alt="View Icon" />
+            </template>
+        </Button>
     </div>
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
-import TextInput from '@/components/Composable/UI/Inputs/TextInput.vue'
-
-const text = ref('')
+import Button from '@/components/Composable/UI/Buttons/PrimaryButton.vue'
+import VieIcon from '@/components/Icons/basic/view.svg'
 </script>
