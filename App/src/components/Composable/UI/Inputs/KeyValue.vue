@@ -2,12 +2,12 @@
     <div class="kv-container">
         <div class="label">{{ label }}</div>
         <div class="kv-item">
-            <TextInput
+            <TextCodeInput
                 type="text"
                 v-model="value.key"
                 placeholder="Enter Key"
                 :label="'Key'" />
-            <TextInput
+            <TextCodeInput
                 type="text"
                 v-model="value.value"
                 placeholder="Enter Value"
@@ -17,8 +17,8 @@
 </template>
 
 <script lang="ts" setup>
-import TextInput from './TextInput.vue';
-const value = defineModel()
+import TextCodeInput from './TextCodeInput.vue';
+const value = defineModel<{ key: string, value: string }>()
 defineProps({
     label: {
         type: String,

@@ -3,6 +3,7 @@
 @import 'https://cdn.jsdelivr.net/npm/@vue-flow/controls@latest/dist/style.css';
 @import 'https://cdn.jsdelivr.net/npm/@vue-flow/minimap@latest/dist/style.css';
 @import 'https://cdn.jsdelivr.net/npm/@vue-flow/node-resizer@latest/dist/style.css';
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:wght=400;700&display=swap');
 
 /* Box model */
 *,
@@ -71,7 +72,7 @@
   --brown-2: #6D4C41;
   --brown-3: #8D6E63;
   --brown-4: #A1887F;
-  --brown-5: #D7CCC8;
+  --brown-5: #DBDBDB;
 
   --black-translucent: rgba(0, 0, 0, 0.5);
   --black-translucent-2: rgba(0, 0, 0, 0.2);
@@ -88,9 +89,9 @@
 
 /* Font family */
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  font-size: 16px;
-  line-height: 1.5;
+  font-family: 'Inter', sans-serif; /* Default sans-serif font for body text */
+  font-size: 16px; /* Base font size for readability on most screens */
+  line-height: 1.6; /* Optimal line height for comfortable reading */
   color: var(--grey-1);
   background-color: var(--white-2);
   height: 100vh;
@@ -181,4 +182,9 @@ button:hover {
   background: transparent !important;
   border: none !important;
   outline: none !important;
+}
+.dragover {
+  border-style: dashed !important;
+  border-width: 2px !important;
+  border-color: var(--blue-2) !important;
 }

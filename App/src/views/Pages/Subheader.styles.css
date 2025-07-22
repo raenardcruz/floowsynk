@@ -1,0 +1,30 @@
+.subheader {
+    position: relative;
+    display: grid;
+    grid-template-columns: 240px auto;
+    grid-template-areas: "action-tabs actions";
+    background-color: var(--white-3);
+    height: 50px;
+    width: 100%;
+    box-shadow: 0 0 10px var(--grey-2);
+}
+
+.subheader .action-tabs {
+    grid-area: action-tabs;
+    display: flex;
+    position: relative;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+}
+.subheader .actions {
+    grid-area: actions;
+    display: flex;
+    position: relative;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    height: 100%;
+    width: 100%;
+}

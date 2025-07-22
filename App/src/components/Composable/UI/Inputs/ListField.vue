@@ -19,7 +19,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import Select from './Select.vue' 
-import TextInput from './TextInput.vue'
+import TextCodeInput from './TextCodeInput.vue'
 import Checkbox from './Checkbox.vue'
 import KeyValueField from './KeyValue.vue'
 import { NodeDataArray, ArrayDataType, KeyValue } from 'proto/workflow/workflow_pb'
@@ -81,7 +81,7 @@ const options = [
 const getComponent = (index: number) => {
     const componentMap = {
         [ArrayDataType.STRING]: {
-            component: TextInput,
+            component: TextCodeInput,
             props: {
                 type: 'text',
                 placeholder: 'Enter text',
@@ -89,7 +89,7 @@ const getComponent = (index: number) => {
             }
         },
         [ArrayDataType.INT]: {
-            component: TextInput,
+            component: TextCodeInput,
             props: {
                 type: 'number',
                 placeholder: 'Enter number',

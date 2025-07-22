@@ -25,194 +25,145 @@ The project is organized into the following main directories:
 
 - **proto/**: Source `.proto` files used to generate gRPC code for both frontend and backend.
 
-## Steps to Run the Application
 
-### Prerequisites
-Ensure the following are installed and configured:
-- Docker and Docker Compose
-- Node.js (v22) and npm
-- Go (latest version)
-- Protocol Buffer Compiler (`protoc`)
+## FloowSynk Local Development Setup
 
-### Setup
-1. Clone the repository and navigate to the project directory:
+### 1. Prerequisites
+
+Ensure you have the following installed:
+- **Windows Subsystem for Linux (WSL)** (if on Windows)
+- **Ubuntu** (for WSL users)
+- **Docker & Docker Compose**
+- **Node.js (v22) & npm**
+- **Go (latest version)**
+- **Protocol Buffer Compiler (`protoc`)**
+
+#### 1.1. Windows/WSL Setup (if applicable)
+- Enable WSL and install Ubuntu:
+  ```powershell
+  wsl --install
+  wsl -d ubuntu
+  ```
+- Install Oh My Zsh and set as default shell:
+  ```bash
+  sudo apt install zsh curl git -y
+  sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+  chsh -s /usr/bin/zsh
+  ```
+- Add helpful aliases to `~/.zshrc` or `~/.bashrc`:
+  ```bash
+  alias floowsynk="cd /mnt/c/Users/raena/OneDrive/Desktop/floowsynk"
+  alias fcode="code /mnt/c/Users/raena/OneDrive/Desktop/floowsynk"
+  source ~/.zshrc
+  ```
+
+
+#### 1.2. Essential Packages (Linux/WSL)
+```bash
+sudo apt update && sudo apt upgrade -y
+sudo apt install make code git -y
+```
+
+#### 1.3. Install Go (Golang)
+
+Follow the [official Go installation instructions](https://go.dev/doc/install) for the latest version, or use the following commands for Linux:
+
+```bash
+GO_VERSION="1.22.4"  # Replace with the latest version if needed
+wget https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz
+sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz
+echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.bashrc
+source ~/.bashrc
+go version
+```
+
+> **Note:** Remove any old versions of Go installed via `apt` to avoid conflicts:
+> ```bash
+> sudo apt remove golang-go
+> ```
+
+
+#### 1.4. Node.js via NVM
+```bash
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+source ~/.zshrc  # or source ~/.bashrc
+nvm install 22
+nvm use 22
+```
+
+
+#### 1.5. Docker & Docker Compose
+- [Install Docker Desktop](https://www.docker.com/products/docker-desktop) or follow [official instructions](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository):
+  ```bash
+  sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+  sudo apt install docker-compose
+  ```
+- (Optional) Download `docker-desktop.deb` and run:
+  ```bash
+  sudo apt install ./docker-desktop.deb
+  ```
+- Configure Docker Desktop:
+  - Enable WSL 2 based engine
+  - Add *.docker.internal to hosts file
+  - Enable WSL Integration for Ubuntu
+- Verify installation:
+  ```bash
+  docker --version
+  docker-compose --version
+  ```
+
+---
+
+### 2. Project Setup
+
+1. **Clone the repository:**
    ```bash
    git clone <repository-url>
    cd floowsynk
    ```
 
-2. Install dependencies:
+2. **Install dependencies:**
    ```bash
-   make install
+   make setup
    ```
 
-3. Generate protocol buffer files:
+3. **Generate protocol buffer files:**
    ```bash
    make proto
    ```
 
-4. Set up the database:
+4. **Start all services:**
    ```bash
-   sudo make db-install
+   make start-server
+   make start-ui
+   make job-interval
+   make job-consumer
    ```
+   This starts the frontend, backend, and job processor.
 
-5. Start all services:
-   ```bash
-   make start
-   ```
-   This will start the frontend, backend, and job processor concurrently.
+---
 
-### Access the Application
-- Frontend: Open `http://localhost:3000` in your browser.
-- Backend: API endpoints are available at `http://localhost:8080`.
+### 3. Access the Application
 
-### Troubleshooting
-- If services fail to start, check the logs for errors using:
-  ```bash
-  docker logs <container-name>
-  ```
-- Ensure all dependencies are installed and up-to-date.
+- **Frontend:** [http://localhost:3000](http://localhost:3000)
+- **Backend API:** [http://localhost:8080](http://localhost:8080)
 
-## Development Tips
-- Use `make` commands for common tasks like building, cleaning, and starting services.
-- Modify `.proto` files in the `proto/` directory and regenerate code using `make proto`.
+---
+
+### 5. Troubleshooting
+
+- **WSL issues:** Ensure "Virtual Machine Platform" and "Windows Subsystem for Linux" are enabled.
+- **Docker access denied:** Run `sudo usermod -aG docker $USER` and restart your terminal.
+- **VS Code not found:** Install with `sudo apt install code` or download from [VS Code website](https://code.visualstudio.com/).
+- **Service logs:** Use `docker logs <container-name>` or `docker-compose logs`.
+- **Check containers:** `docker ps`
+- **See available make commands:** `make help`
+
+---
+
+### 6. Development Tips
+
+- Use `code .` to open the project in VS Code.
+- Modify `.proto` files in `proto/` and run `make proto` to regenerate code.
+- Use `make` commands for building, cleaning, and starting services.
 - Use `docker ps` to monitor running containers and `docker-compose logs` for debugging.
-
-## Prerequisites
-
-### Windows Subsystem for Linux (WSL)
-1. Enable WSL by running PowerShell as Administrator:
-   ```powershell
-   wsl --install
-   ```
-   > Note: Restart your computer after installation if prompted
-
-2. Install and set up Ubuntu:
-   ```powershell
-   wsl -d ubuntu
-   ```
-   > Tip: If this fails, try running `wsl --install -d Ubuntu` first
-
-### Shell Setup
-1. Install Oh My Zsh:
-   ```bash
-   # Install required packages
-   sudo apt install zsh curl git -y
-   
-   # Install Oh My Zsh
-   sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-   ```
-
-2. Configure shell aliases:
-   ```bash
-   # Open .zshrc in text editor
-   nano ~/.zshrc
-
-   # Add these lines to the file
-   alias floowsynk="cd /mnt/c/Users/raena/OneDrive/Desktop/floowsynk"
-   alias fcode="code /mnt/c/Users/raena/OneDrive/Desktop/floowsynk"
-   
-   # Save changes (Ctrl+O, then Enter) and exit (Ctrl+X)
-   source ~/.zshrc  # Reload configuration
-   ```
-
-3. Make zsh the default terminal:
-    ```bash
-    # Set default
-    chsh -s /usr/bin/zsh
-
-    # Validate
-    echo $SHELL
-    # should output /usr/bin/zsh
-    ```
-
-### Development Tools
-1. Install essential packages:
-   ```bash
-   # Update package list
-   sudo apt update && sudo apt upgrade -y
-   
-   # Install required tools
-   sudo apt install make golang-go code git -y
-   ```
-
-2. Install Node.js using NVM:
-   ```bash
-   # Install NVM
-   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
-   
-   # Reload shell configuration
-   source ~/.zshrc
-   
-   # Install Node.js
-   nvm install 22
-   nvm use 22
-   ```
-
-### Docker Configuration
-1. Download and install [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-
-2. Configure Docker Desktop:
-   - Open Docker Desktop
-   - Navigate to Settings (⚙️)
-   - Enable required settings:
-     - General > ✓ Use WSL 2 based engine
-     - General > ✓ Add *.docker.internal to hosts file
-     - Resources > WSL Integration > ✓ Ubuntu
-   - Click 'Apply & Restart'
-
-3. Verify Docker installation:
-   ```bash
-   docker --version
-   docker-compose --version
-   ```
-
-## Project Setup
-
-1. Navigate to project:
-   ```bash
-   floowsynk
-   ```
-
-2. Install dependencies:
-   ```bash
-   make install
-   ```
-
-3. Setup database:
-   ```bash
-   sudo make db-install
-   ```
-   > Note: sudo is required for Docker filesystem access
-
-4. Start development server:
-   ```bash
-   make start
-   ```
-
-## Aliases for Common Tasks
-Add the following aliases to your shell configuration file (e.g., `~/.bashrc` or `~/.zshrc`) to streamline your workflow:
-
-```bash
-# Aliases for common tasks
-alias build="make build"
-alias start-server="make start-server"
-alias start-ui="make start-ui"
-alias start-jobs="make start-jobs"
-alias proto="make proto"
-alias start-docker="make start-docker"
-alias stop-docker="make stop-docker"
-alias setup="make setup"
-```
-
-## Troubleshooting
-
-- If WSL commands fail: Ensure Windows features "Virtual Machine Platform" and "Windows Subsystem for Linux" are enabled
-- Docker access denied: Run `sudo usermod -aG docker $USER` and restart your terminal
-- VS Code not found: Install using `sudo apt install code` or download from [VS Code website](https://code.visualstudio.com/)
-
-## Development Tips
-
-- Use `code .` to open current directory in VS Code
-- Run `docker ps` to check running containers
-- Use `make help` to see available commands
