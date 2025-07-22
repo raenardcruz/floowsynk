@@ -10,7 +10,7 @@
                     <Divider />
                     <form @submit.prevent="handleLogin">
                         <TextInput id="username" class="form-item" v-model="username" label="User Name" placeholder="Enter your username" />
-                        <TextInput id="password" class="form-item" type="password" v-model="password" label="Password" placeholder="Enter your password" />
+                        <PasswordInput id="password" class="form-item" v-model="password" label="Password" placeholder="Enter your password" />
                         <div v-if="loginError" class="tooltip">{{ loginErrorMessage }}</div>
                         <div class="btn-grp">
                             <button>Register</button>
@@ -43,9 +43,9 @@ import {
 } from './Login.helpers'
 import {
     useLoginStore
-} from './Login.hooks';
-import TextInput from '@/components/Composable/UI/Inputs/TextInput.vue'
+} from './Login.hooks'
 import Divider from 'primevue/divider'
+import { TextInput, PasswordInput } from '@/components/Composable/UI/Inputs'
 
 const {
     username,

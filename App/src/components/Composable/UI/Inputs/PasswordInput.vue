@@ -1,12 +1,13 @@
-
 <template>
     <FloatLabel variant="on" pt:root:class="text-box" v-tooltip.focus.bottom="tooltip">
-        <InputText
+        <Password
             type="text"
             :id="id"
             v-model="modelValue"
             :placeholder="placeholder"
             autocomplete="off"
+            pt:pcInputText:root:class="text-password"
+            toggleMask
         />
         <label for="on_label">{{ label }}</label>
     </FloatLabel>
@@ -16,14 +17,14 @@
 import { defineModel, defineProps } from 'vue'
 import { IdProps } from '@/components/Composable/constants'
 import FloatLabel from 'primevue/floatlabel';
-import InputText from 'primevue/inputtext';
+import Password from 'primevue/password'
 
 interface Props extends IdProps {
     label: string,
     placeholder?: string,
 }
-
 defineProps<Props>()
+
 const modelValue = defineModel({
     type: String,
     default: ''
@@ -31,21 +32,21 @@ const modelValue = defineModel({
 </script>
 
 <style scoped>
-    .text-box {
+    :deep(.text-box) {
         margin-bottom: 10px;   
     }
-    .text-box input {
+   :deep(.text-password) {
         width: 100%;
         height: 2.5rem;
         font-size: 1rem;
-        border-radius: 20px;
+        border-radius: 20px !important;
         padding-right: 2.5rem;
     }
-    .text-box input:focus {
-        border-color: black;
+    :deep(.text-password:focus) {
+        border-color: black !important;
         color: black;
     }
-    .text-box label {
+    :deep(.text-box label) {
         display: flex;
         position: absolute;
         top: 50%;
