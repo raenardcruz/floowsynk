@@ -1,15 +1,35 @@
 <template>
-    <div style="padding: 0px 20px 0px 20px;">
-        <h2>Dashboard</h2>
-        <Button id="test" label="test">
-            <template v-slot:icon>
-                <img style="height: 24px;" :src="VieIcon" alt="View Icon" />
-            </template>
-        </Button>
+    <div style="padding: 8px">
+        <div class="test">
+            <Tab id="tabs" :tabContents="test" />
+        </div>
     </div>
 </template>
 
 <script lang="ts" setup>
-import Button from '@/components/Composable/UI/Buttons/PrimaryButton.vue'
-import VieIcon from '@/components/Icons/basic/view.svg'
+import { ref } from 'vue'
+import Tab, { TabContent } from '@/components/Composable/UI/Tabs/Tab.vue'
+
+const test: TabContent[] = [
+    {
+    id: 'ID1',
+    label: 'Test 1',
+    content: 'Sample Value 1'
+   },
+   {
+    id: 'ID2',
+    label: 'Test 2',
+    content: 'Sample Value 2'
+   },
+   {
+    id: 'ID3',
+    label: 'Test 3',
+    content: 'Sample Value 3'
+   }
+]
+const tabSelection = ref('ID1')
 </script>
+
+<style scoped>
+
+</style>

@@ -8,7 +8,7 @@ import Tooltip from 'primevue/tooltip';
 
 const app = createApp(App)
 app.use(router)
-app.use(PrimeVue, { ripple: true, theme: {
+app.use(PrimeVue, { ripple: false, theme: {
     preset: Aura,
 } })
 app.directive('tooltip', Tooltip);

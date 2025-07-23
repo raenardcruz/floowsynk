@@ -7,6 +7,7 @@
             <logo />
         </template>
         <template #end>
+            {{ route.name }}
             <div class="logout" @click="logout">
                 <span class="material-symbols-outlined">logout</span>
             </div>
@@ -19,9 +20,11 @@
 <script setup lang="ts">
 import Toolbar from 'primevue/toolbar'
 import Logo from "@/components/Composable/Logo/Logo.vue"
-import AppDrawer from "./AppDrawer";
-import { openAppDrawer, logout, pageInit } from './Home.helper';
+import AppDrawer from "./AppDrawer"
+import { openAppDrawer, logout, pageInit } from './Home.helper'
+import { useRoute } from 'vue-router'
 
+const route = useRoute()
 pageInit();
 </script>
 
