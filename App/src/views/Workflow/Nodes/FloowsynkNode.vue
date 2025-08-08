@@ -1,5 +1,6 @@
 <template>
-    <div class="node no-scroll nopan" :style="nodestyle" :class="{ 'node-selected': node.selected, 'replay-node-selected': isReplayNodeSelected, [nodestatus]: isRunning }"
+    <div class="node no-scroll nopan" :style="nodestyle"
+        :class="{ 'node-selected': node.selected, 'replay-node-selected': isReplayNodeSelected, [nodestatus]: isRunning }"
         @click="clickHandler()">
         <div class="icon" :style="{ background: icon?.color }">
             <span class="material-symbols-outlined">{{ icon?.name }}</span>
@@ -11,8 +12,8 @@
         <Handle class="handle-input" v-if="outputsList" v-for="(input, index) in inputsList" :key="input" :id="input"
             :data-output="input" type="target" :position="Position.Left"
             :style="{ top: `${(100 / (outputsList.length + 1)) * (index + 1)}%` }" />
-        <Handle class="handle-output" v-if="outputsList" v-for="(output, index) in outputsList" :key="output" :id="output"
-            :data-output="output" type="source" :position="Position.Right"
+        <Handle class="handle-output" v-if="outputsList" v-for="(output, index) in outputsList" :key="output"
+            :id="output" :data-output="output" type="source" :position="Position.Right"
             :style="{ top: `${(100 / (outputsList.length + 1)) * (index + 1)}%` }" />
         <button class="add-btn" v-for="(output, _) in outputsList" :key="output" v-if="node.selected">+</button>
     </div>
@@ -24,8 +25,7 @@
         </Sidebar>
     </Teleport>
     <Teleport :to="`#${canvasId}`">
-        <Modal title="Select Process Type" caption="Select the type of process you want to create"
-            v-model="showModal">
+        <Modal title="Select Process Type" caption="Select the type of process you want to create" v-model="showModal">
             <ProcessTypeModal :id="props.tabid" />
         </Modal>
     </Teleport>
@@ -63,13 +63,13 @@ watch(isRunning, (newValue) => {
 watch(node, (newValue) => {
     if (newValue.id === '0') {
         nodetype = (newValue as unknown as Node.AsObject).nodetype
-        icon    = (newValue as unknown as Node.AsObject).icon
+        icon = (newValue as unknown as Node.AsObject).icon
         nodestyle = (newValue as unknown as Node.AsObject).nodestyle
     }
 })
 watch([showModal, showModal], ([newShowModal, newShowSidebar]) => {
     hadOpenModalSidebar.value = newShowSidebar || newShowModal
-})  
+})
 onKeyStroke('Escape', () => {
     showSidebar.value = false
     showModal.value = false

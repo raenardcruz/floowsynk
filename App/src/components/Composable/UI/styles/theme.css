@@ -1,0 +1,196 @@
+/* Theme System with CSS Custom Properties */
+
+:root {
+  /* Color System - Light Theme */
+  --color-primary: var(--blue-1, #14376B);
+  --color-primary-hover: var(--blue-2, #3B82F6);
+  --color-primary-light: var(--blue-3, #60A5FA);
+  --color-primary-lighter: var(--blue-5, #BFDBFE);
+  
+  --color-secondary: var(--grey-2, #374151);
+  --color-secondary-hover: var(--grey-3, #6B7280);
+  --color-secondary-light: var(--grey-4, #D1D5DB);
+  --color-secondary-lighter: var(--grey-5, #F3F4F6);
+  
+  --color-success: var(--green-2, #10B981);
+  --color-success-hover: var(--green-3, #34D399);
+  --color-success-light: var(--green-4, #6EE7B7);
+  --color-success-lighter: var(--green-5, #A7F3D0);
+  
+  --color-warning: var(--orange-2, #FF8F00);
+  --color-warning-hover: var(--orange-3, #FC930F);
+  --color-warning-light: var(--orange-4, #FFB300);
+  --color-warning-lighter: var(--orange-5, #FFC107);
+  
+  --color-error: var(--red-2, #EF4444);
+  --color-error-hover: var(--red-3, #F87171);
+  --color-error-light: var(--red-4, #FCA5A5);
+  --color-error-lighter: var(--red-5, #FECACA);
+  
+  --color-info: var(--blue-4, #3AA9B6);
+  --color-info-hover: var(--blue-6, #b3e5fc);
+  --color-info-light: var(--blue-7, #e0f7ff);
+  --color-info-lighter: var(--blue-7, #e0f7ff);
+  
+  /* Background Colors */
+  --color-background: var(--white-2, #F9FAFB);
+  --color-surface: var(--white-1, #FFFFFF);
+  --color-surface-hover: var(--white-3, #F3F4F6);
+  --color-surface-active: var(--white-4, #E5E7EB);
+  
+  /* Text Colors */
+  --color-text-primary: var(--grey-1, #111827);
+  --color-text-secondary: var(--grey-2, #374151);
+  --color-text-muted: var(--grey-3, #6B7280);
+  --color-text-disabled: var(--grey-4, #D1D5DB);
+  --color-text-inverse: var(--white-1, #FFFFFF);
+  
+  /* Border Colors */
+  --color-border: var(--grey-4, #D1D5DB);
+  --color-border-hover: var(--grey-3, #6B7280);
+  --color-border-focus: var(--blue-2, #3B82F6);
+  --color-border-error: var(--red-2, #EF4444);
+  
+  /* Spacing Scale */
+  --spacing-xs: 0.25rem;   /* 4px */
+  --spacing-sm: 0.5rem;    /* 8px */
+  --spacing-md: 1rem;      /* 16px */
+  --spacing-lg: 1.5rem;    /* 24px */
+  --spacing-xl: 2rem;      /* 32px */
+  --spacing-2xl: 3rem;     /* 48px */
+  --spacing-3xl: 4rem;     /* 64px */
+  
+  /* Border Radius Scale */
+  --radius-sm: 0.25rem;    /* 4px */
+  --radius-md: 0.375rem;   /* 6px */
+  --radius-lg: 0.5rem;     /* 8px */
+  --radius-xl: 0.75rem;    /* 12px */
+  --radius-full: 9999px;
+  
+  /* Shadow Scale */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  
+  /* Typography Scale */
+  --font-size-xs: 0.75rem;     /* 12px */
+  --font-size-sm: 0.875rem;    /* 14px */
+  --font-size-base: 1rem;      /* 16px */
+  --font-size-lg: 1.125rem;    /* 18px */
+  --font-size-xl: 1.25rem;     /* 20px */
+  --font-size-2xl: 1.5rem;     /* 24px */
+  --font-size-3xl: 1.875rem;   /* 30px */
+  
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+  
+  /* Component Specific Variables */
+  --button-height-sm: 2rem;     /* 32px */
+  --button-height-md: 2.5rem;   /* 40px */
+  --button-height-lg: 3rem;     /* 48px */
+  
+  --input-height-sm: 2rem;      /* 32px */
+  --input-height-md: 2.5rem;    /* 40px */
+  --input-height-lg: 3rem;      /* 48px */
+  
+  /* Transition Variables */
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+  --transition-slow: 350ms ease;
+  
+  /* Z-index Scale */
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 1030;
+  --z-modal-backdrop: 1040;
+  --z-modal: 1050;
+  --z-popover: 1060;
+  --z-tooltip: 1070;
+}
+
+/* Dark Theme */
+[data-theme="dark"] {
+  --color-background: var(--grey-1, #111827);
+  --color-surface: var(--grey-2, #374151);
+  --color-surface-hover: var(--grey-3, #6B7280);
+  --color-surface-active: var(--grey-4, #D1D5DB);
+  
+  --color-text-primary: var(--white-1, #FFFFFF);
+  --color-text-secondary: var(--white-3, #F3F4F6);
+  --color-text-muted: var(--white-4, #E5E7EB);
+  --color-text-disabled: var(--grey-3, #6B7280);
+  --color-text-inverse: var(--grey-1, #111827);
+  
+  --color-border: var(--grey-3, #6B7280);
+  --color-border-hover: var(--grey-4, #D1D5DB);
+}
+
+/* Component Base Classes */
+.component-base {
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  color: var(--color-text-primary);
+}
+
+.component-disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.component-loading {
+  position: relative;
+  pointer-events: none;
+}
+
+.component-loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1rem;
+  height: 1rem;
+  margin: -0.5rem 0 0 -0.5rem;
+  border: 2px solid transparent;
+  border-top: 2px solid var(--color-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Focus Styles */
+.focus-ring {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+.focus-ring-inset {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: -2px;
+}
+
+/* Utility Classes */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
