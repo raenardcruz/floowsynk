@@ -7,22 +7,22 @@
   - Create core composables directory structure
   - _Requirements: 2.1, 7.1, 7.2_
 
-- [x] 2. Create foundational composables and utilities
-- [x] 2.1 Implement theme management composable
+- [ ] 2. Create foundational composables and utilities
+- [ ] 2.1 Implement theme management composable
   - Create useTheme composable with VueUse integration
   - Implement theme switching and persistence logic
   - Add CSS custom properties for consistent theming
   - Write unit tests for theme composable
   - _Requirements: 2.2, 3.1, 3.2_
 
-- [x] 2.2 Implement form validation composable
+- [ ] 2.2 Implement form validation composable
   - Create useFormValidation composable with VueUse patterns
   - Add validation rules and error handling logic
   - Implement field-level and form-level validation
   - Write unit tests for validation composable
   - _Requirements: 2.1, 4.2, 7.4_
 
-- [x] 2.3 Implement modal management composable
+- [ ] 2.3 Implement modal management composable
   - Create useModal composable with VueUse integration
   - Add keyboard navigation and accessibility features
   - Implement focus management and outside click handling

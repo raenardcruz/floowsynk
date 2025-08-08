@@ -6,10 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc -b && vite build",
-    "preview": "vite preview",
-    "test": "vitest",
-    "test:ui": "vitest --ui",
-    "test:run": "vitest run"
+    "preview": "vite preview"
   },
   "dependencies": {
     "@editorjs/editorjs": "^2.30.7",
