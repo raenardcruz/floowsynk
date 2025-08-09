@@ -1,139 +1,151 @@
 <template>
-  <button
-    ref="buttonRef"
+  <PrimeButton
+    ref="primevueRef"
     :id="id"
-    :type="type || 'button'"
-    :class="classes"
+    :class="buttonClass"
     :style="style"
-    :disabled="isDisabled"
+    :disabled="disabled || loading"
+    :loading="loading"
+    :label="label"
+    :icon="iconClass"
+    :iconPos="iconPosition"
+    :severity="mappedSeverity"
+    :size="mappedSize"
+    :outlined="variant === 'outline'"
+    :text="variant === 'ghost'"
+    :raised="!variant || variant === 'primary'"
+    :rounded="rounded"
     :aria-label="tooltip || label"
-    :aria-pressed="isPressed"
-    :aria-busy="loading"
     :title="tooltip"
     @click="handleClick"
     @focus="handleFocus"
     @blur="handleBlur"
-    @keydown="handleKeyDown"
-    @keyup="handleKeyUp"
   >
-    <!-- Loading state -->
-    <template v-if="loading">
-      <slot name="loading">
-        <span class="btn-loading-spinner" aria-hidden="true"></span>
-      </slot>
-      <span v-if="loadingText" class="btn-text">{{ loadingText }}</span>
+    <template v-if="$slots.default" #default>
+      <slot />
     </template>
     
-    <!-- Normal state -->
-    <template v-else>
-      <!-- Icon (left position or icon-only) -->
-      <span 
-        v-if="icon && (!iconPosition || iconPosition === 'left')"
-        class="btn-icon"
-        aria-hidden="true"
-      >
-        <slot name="icon">
-          <component v-if="typeof icon !== 'string'" :is="icon" />
-          <span v-else v-html="icon"></span>
-        </slot>
-      </span>
-      
-      <!-- Button text/content -->
-      <span v-if="label || $slots.default" class="btn-text">
-        <slot>{{ label }}</slot>
-      </span>
-      
-      <!-- Icon (right position) -->
-      <span 
-        v-if="icon && iconPosition === 'right'"
-        class="btn-icon"
-        aria-hidden="true"
-      >
-        <slot name="icon">
-          <component v-if="typeof icon !== 'string'" :is="icon" />
-          <span v-else v-html="icon"></span>
-        </slot>
-      </span>
+    <template v-if="$slots.icon" #icon>
+      <slot name="icon" />
     </template>
-  </button>
+  </PrimeButton>
 </template>
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useButtonInteractions, useButtonSize, useButtonLoading, useButtonClasses } from './Button.hooks'
-import type { ButtonProps, ButtonEmits } from './Button.types'
+import PrimeButton from 'primevue/button'
+import type { ButtonWrapperProps, ButtonWrapperEmits } from './Button.types'
 
 // Props and emits
-const props = withDefaults(defineProps<ButtonProps>(), {
+const props = withDefaults(defineProps<ButtonWrapperProps>(), {
   variant: 'primary',
   size: 'medium',
   iconPosition: 'left',
-  type: 'button',
-  block: false,
-  rounded: false,
   disabled: false,
-  loading: false
+  loading: false,
+  rounded: false,
+  block: false
 })
 
-const emit = defineEmits<ButtonEmits>()
+const emit = defineEmits<ButtonWrapperEmits>()
 
 // Template refs
-const buttonRef = ref<HTMLElement>()
+const primevueRef = ref<InstanceType<typeof PrimeButton>>()
 
-// Composables
-const { isPressed, isFocused, isHovered, isDisabled, handleClick, handleFocus, handleBlur } = 
-  useButtonInteractions(buttonRef, props, emit)
+// Map wrapper variants to PrimeVue severity
+const mappedSeverity = computed(() => {
+  const severityMap = {
+    primary: 'primary',
+    secondary: 'secondary', 
+    success: 'success',
+    info: 'info',
+    warning: 'warn',
+    danger: 'danger',
+    outline: 'primary', // Will be handled by outlined prop
+    ghost: 'secondary'  // Will be handled by text prop
+  }
+  return severityMap[props.variant] || 'primary'
+})
 
-// Keyboard event handlers for template
-const handleKeyDown = (event: KeyboardEvent) => {
-  if (event.key === ' ' || event.key === 'Enter') {
-    if (!isDisabled.value) {
-      isPressed.value = true
-      event.preventDefault()
+// Map wrapper sizes to PrimeVue sizes
+const mappedSize = computed(() => {
+  const sizeMap = {
+    small: 'small',
+    medium: undefined, // Default size in PrimeVue
+    large: 'large'
+  }
+  return sizeMap[props.size]
+})
+
+// Handle icon class or component
+const iconClass = computed(() => {
+  if (typeof props.icon === 'string') {
+    return props.icon
+  }
+  return undefined
+})
+
+// Compute button classes including block styling
+const buttonClass = computed(() => {
+  const classes = []
+  
+  if (props.class) {
+    if (typeof props.class === 'string') {
+      classes.push(props.class)
+    } else if (Array.isArray(props.class)) {
+      classes.push(...props.class)
+    } else {
+      Object.entries(props.class).forEach(([className, condition]) => {
+        if (condition) {
+          classes.push(className)
+        }
+      })
     }
+  }
+  
+  if (props.block) {
+    classes.push('w-full')
+  }
+  
+  return classes
+})
+
+// Event handlers
+const handleClick = (event: MouseEvent) => {
+  if (!props.disabled && !props.loading) {
+    emit('click', event)
   }
 }
 
-const handleKeyUp = (event: KeyboardEvent) => {
-  if (event.key === ' ' || event.key === 'Enter') {
-    isPressed.value = false
-    if (!isDisabled.value) {
-      handleClick(event as any)
-    }
-  }
+const handleFocus = (event: FocusEvent) => {
+  emit('focus', event)
 }
 
-const { width, height, isCompact, isWide } = useButtonSize(buttonRef)
-
-const { isLoading, loadingText, startLoading, stopLoading } = useButtonLoading(props)
-
-const { classes } = useButtonClasses(props, { isPressed, isFocused, isHovered, isDisabled })
-
-// Watch for loading state changes
-import { watch } from 'vue'
-watch(() => props.loading, (newLoading) => {
-  if (newLoading) {
-    startLoading()
-  } else {
-    stopLoading()
-  }
-}, { immediate: true })
+const handleBlur = (event: FocusEvent) => {
+  emit('blur', event)
+}
 
 // Expose useful properties for parent components
 defineExpose({
-  buttonRef,
-  width,
-  height,
-  isCompact,
-  isWide,
-  isPressed,
-  isFocused,
-  isHovered,
-  isDisabled,
-  isLoading
+  primevueRef,
+  focus: () => {
+    if (primevueRef.value) {
+      const el = (primevueRef.value as any).$el as HTMLElement
+      el?.focus()
+    }
+  },
+  blur: () => {
+    if (primevueRef.value) {
+      const el = (primevueRef.value as any).$el as HTMLElement
+      el?.blur()
+    }
+  }
 })
 </script>
 
 <style scoped>
-@import './Button.styles.css';
+/* Additional custom styles if needed */
+:deep(.p-button.w-full) {
+  width: 100%;
+}
 </style>

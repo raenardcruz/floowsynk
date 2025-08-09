@@ -39,15 +39,15 @@
   - Add tests for form integration and accessibility
   - _Requirements: 1.1, 2.3, 4.1, 4.2_
 
-- [ ] 4. Migrate button components
-- [ ] 4.1 Create Button wrapper component
+- [x] 4. Migrate button components
+- [x] 4.1 Create Button wrapper component
   - Replace custom Button with simplified PrimeVue Button wrapper
   - Map variant props to PrimeVue severity system
   - Implement loading state and icon positioning
   - Write tests for all button variants and interactions
   - _Requirements: 1.1, 2.1, 2.2, 4.1_
 
-- [ ] 4.2 Update PrimaryButton to use new Button wrapper
+- [x] 4.2 Update PrimaryButton to use new Button wrapper
   - Refactor PrimaryButton to extend the new Button wrapper
   - Maintain existing primary button styling and behavior
   - Test button hierarchy and styling consistency

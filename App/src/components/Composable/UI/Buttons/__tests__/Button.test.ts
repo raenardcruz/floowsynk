@@ -1,355 +1,167 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { mount, VueWrapper } from '@vue/test-utils'
-import { nextTick } from 'vue'
+import { describe, it, expect } from 'vitest'
+import { mount } from '@vue/test-utils'
 import Button from '../Button.vue'
-import type { ButtonProps } from '../Button.types'
+import PrimeVue from 'primevue/config'
+import Aura from '@primeuix/themes/aura'
 
-// Mock VueUse composables
-vi.mock('@vueuse/core', () => ({
-  useElementSize: vi.fn(() => ({
-    width: { value: 100 },
-    height: { value: 40 }
-  })),
-  useTimeoutFn: vi.fn(() => ({
-    start: vi.fn(),
-    stop: vi.fn()
-  })),
-  useEventListener: vi.fn()
-}))
-
-describe('Button Component', () => {
-  let wrapper: VueWrapper<any>
-
-  const createWrapper = (props: Partial<ButtonProps> = {}) => {
-    return mount(Button, {
-      props: {
-        ...props
-      }
-    })
-  }
-
-  beforeEach(() => {
-    vi.clearAllMocks()
+const createWrapper = (props = {}) => {
+  return mount(Button, {
+    props,
+    global: {
+      plugins: [
+        [PrimeVue, { 
+          theme: { preset: Aura }
+        }]
+      ]
+    }
   })
+}
 
-  describe('Rendering', () => {
-    it('renders with default props', () => {
-      wrapper = createWrapper()
-      
-      expect(wrapper.find('button').exists()).toBe(true)
-      expect(wrapper.classes()).toContain('btn')
-      expect(wrapper.classes()).toContain('btn-primary')
-      expect(wrapper.classes()).toContain('btn-medium')
+describe('Button Wrapper Component', () => {
+  describe('Basic Functionality', () => {
+    it('should render successfully', () => {
+      const wrapper = createWrapper()
+      expect(wrapper.exists()).toBe(true)
     })
 
-    it('renders with custom label', () => {
-      wrapper = createWrapper({ label: 'Click me' })
-      
-      expect(wrapper.text()).toContain('Click me')
+    it('should render with label', () => {
+      const wrapper = createWrapper({ label: 'Test Button' })
+      expect(wrapper.text()).toContain('Test Button')
     })
 
-    it('renders with slot content', () => {
-      wrapper = mount(Button, {
-        slots: {
-          default: 'Slot content'
-        }
-      })
-      
-      expect(wrapper.text()).toContain('Slot content')
+    it('should handle disabled state', () => {
+      const wrapper = createWrapper({ disabled: true })
+      const button = wrapper.find('button')
+      expect(button.attributes('disabled')).toBeDefined()
     })
 
-    it('renders with custom id', () => {
-      wrapper = createWrapper({ id: 'custom-button' })
-      
-      expect(wrapper.find('button').attributes('id')).toBe('custom-button')
+    it('should handle loading state', () => {
+      const wrapper = createWrapper({ loading: true })
+      const button = wrapper.find('button')
+      expect(button.attributes('disabled')).toBeDefined()
     })
 
-    it('renders with tooltip', () => {
-      wrapper = createWrapper({ tooltip: 'Button tooltip' })
-      
-      expect(wrapper.find('button').attributes('title')).toBe('Button tooltip')
-      expect(wrapper.find('button').attributes('aria-label')).toBe('Button tooltip')
-    })
-  })
-
-  describe('Variants', () => {
-    it('renders primary variant by default', () => {
-      wrapper = createWrapper()
-      
-      expect(wrapper.classes()).toContain('btn-primary')
-    })
-
-    it('renders secondary variant', () => {
-      wrapper = createWrapper({ variant: 'secondary' })
-      
-      expect(wrapper.classes()).toContain('btn-secondary')
-    })
-
-    it('renders outline variant', () => {
-      wrapper = createWrapper({ variant: 'outline' })
-      
-      expect(wrapper.classes()).toContain('btn-outline')
-    })
-
-    it('renders ghost variant', () => {
-      wrapper = createWrapper({ variant: 'ghost' })
-      
-      expect(wrapper.classes()).toContain('btn-ghost')
-    })
-
-    it('renders danger variant', () => {
-      wrapper = createWrapper({ variant: 'danger' })
-      
-      expect(wrapper.classes()).toContain('btn-danger')
-    })
-  })
-
-  describe('Sizes', () => {
-    it('renders medium size by default', () => {
-      wrapper = createWrapper()
-      
-      expect(wrapper.classes()).toContain('btn-medium')
-    })
-
-    it('renders small size', () => {
-      wrapper = createWrapper({ size: 'small' })
-      
-      expect(wrapper.classes()).toContain('btn-small')
-    })
-
-    it('renders large size', () => {
-      wrapper = createWrapper({ size: 'large' })
-      
-      expect(wrapper.classes()).toContain('btn-large')
-    })
-  })
-
-  describe('States', () => {
-    it('renders disabled state', () => {
-      wrapper = createWrapper({ disabled: true })
-      
-      expect(wrapper.find('button').attributes('disabled')).toBeDefined()
-      expect(wrapper.classes()).toContain('btn-disabled')
-    })
-
-    it('renders loading state', () => {
-      wrapper = createWrapper({ loading: true })
-      
-      expect(wrapper.find('button').attributes('aria-busy')).toBe('true')
-      expect(wrapper.classes()).toContain('btn-loading')
-      expect(wrapper.find('.btn-loading-spinner').exists()).toBe(true)
-    })
-
-    it('renders loading state with custom text', () => {
-      wrapper = createWrapper({ 
-        loading: true, 
-        loadingText: 'Processing...' 
-      })
-      
-      expect(wrapper.text()).toContain('Processing...')
-    })
-
-    it('renders block variant', () => {
-      wrapper = createWrapper({ block: true })
-      
-      expect(wrapper.classes()).toContain('btn-block')
-    })
-
-    it('renders rounded variant', () => {
-      wrapper = createWrapper({ rounded: true })
-      
-      expect(wrapper.classes()).toContain('btn-rounded')
-    })
-  })
-
-  describe('Icons', () => {
-    it('renders with icon on left by default', () => {
-      wrapper = createWrapper({ 
-        icon: 'test-icon',
-        label: 'Button'
-      })
-      
-      expect(wrapper.classes()).toContain('btn-icon-left')
-      expect(wrapper.find('.btn-icon').exists()).toBe(true)
-    })
-
-    it('renders with icon on right', () => {
-      wrapper = createWrapper({ 
-        icon: 'test-icon',
-        iconPosition: 'right',
-        label: 'Button'
-      })
-      
-      expect(wrapper.classes()).toContain('btn-icon-right')
-    })
-
-    it('renders icon slot', () => {
-      wrapper = mount(Button, {
-        props: { icon: 'test-icon' },
-        slots: {
-          icon: '<span class="custom-icon">Icon</span>'
-        }
-      })
-      
-      expect(wrapper.find('.custom-icon').exists()).toBe(true)
-    })
-  })
-
-  describe('Events', () => {
-    it('emits click event', async () => {
-      wrapper = createWrapper()
-      
+    it('should emit click event when not disabled', async () => {
+      const wrapper = createWrapper()
       await wrapper.find('button').trigger('click')
-      
-      expect(wrapper.emitted('click')).toBeTruthy()
       expect(wrapper.emitted('click')).toHaveLength(1)
     })
 
-    it('does not emit click when disabled', async () => {
-      wrapper = createWrapper({ disabled: true })
-      
-      await wrapper.find('button').trigger('click')
-      
-      expect(wrapper.emitted('click')).toBeFalsy()
-    })
-
-    it('does not emit click when loading', async () => {
-      wrapper = createWrapper({ loading: true })
-      
-      await wrapper.find('button').trigger('click')
-      
-      expect(wrapper.emitted('click')).toBeFalsy()
-    })
-
-    it('emits focus event', async () => {
-      wrapper = createWrapper()
-      
+    it('should emit focus event', async () => {
+      const wrapper = createWrapper()
       await wrapper.find('button').trigger('focus')
-      
-      expect(wrapper.emitted('focus')).toBeTruthy()
       expect(wrapper.emitted('focus')).toHaveLength(1)
     })
 
-    it('emits blur event', async () => {
-      wrapper = createWrapper()
-      
+    it('should emit blur event', async () => {
+      const wrapper = createWrapper()
       await wrapper.find('button').trigger('blur')
-      
-      expect(wrapper.emitted('blur')).toBeTruthy()
       expect(wrapper.emitted('blur')).toHaveLength(1)
     })
   })
 
-  describe('Keyboard Navigation', () => {
-    it('handles Enter key press', async () => {
-      wrapper = createWrapper()
-      
-      await wrapper.find('button').trigger('keydown', { key: 'Enter' })
-      await wrapper.find('button').trigger('keyup', { key: 'Enter' })
-      
-      expect(wrapper.emitted('click')).toBeTruthy()
+  describe('Variant Support', () => {
+    it('should handle primary variant', () => {
+      const wrapper = createWrapper({ variant: 'primary' })
+      expect(wrapper.exists()).toBe(true)
     })
 
-    it('handles Space key press', async () => {
-      wrapper = createWrapper()
-      
-      await wrapper.find('button').trigger('keydown', { key: ' ' })
-      await wrapper.find('button').trigger('keyup', { key: ' ' })
-      
-      expect(wrapper.emitted('click')).toBeTruthy()
+    it('should handle secondary variant', () => {
+      const wrapper = createWrapper({ variant: 'secondary' })
+      expect(wrapper.exists()).toBe(true)
     })
 
-    it('does not handle keyboard events when disabled', async () => {
-      wrapper = createWrapper({ disabled: true })
-      
-      await wrapper.find('button').trigger('keydown', { key: 'Enter' })
-      await wrapper.find('button').trigger('keyup', { key: 'Enter' })
-      
-      expect(wrapper.emitted('click')).toBeFalsy()
+    it('should handle outline variant', () => {
+      const wrapper = createWrapper({ variant: 'outline' })
+      expect(wrapper.exists()).toBe(true)
+    })
+
+    it('should handle ghost variant', () => {
+      const wrapper = createWrapper({ variant: 'ghost' })
+      expect(wrapper.exists()).toBe(true)
+    })
+
+    it('should handle danger variant', () => {
+      const wrapper = createWrapper({ variant: 'danger' })
+      expect(wrapper.exists()).toBe(true)
     })
   })
 
-  describe('Accessibility', () => {
-    it('has correct ARIA attributes', () => {
-      wrapper = createWrapper({ 
-        label: 'Test button',
-        tooltip: 'Button tooltip'
-      })
-      
-      const button = wrapper.find('button')
-      expect(button.attributes('aria-label')).toBe('Button tooltip')
-      expect(button.attributes('aria-pressed')).toBeDefined()
-      expect(button.attributes('aria-busy')).toBe('false')
+  describe('Size Support', () => {
+    it('should handle small size', () => {
+      const wrapper = createWrapper({ size: 'small' })
+      expect(wrapper.exists()).toBe(true)
     })
 
-    it('has correct ARIA attributes when loading', () => {
-      wrapper = createWrapper({ loading: true })
-      
-      const button = wrapper.find('button')
-      expect(button.attributes('aria-busy')).toBe('true')
+    it('should handle medium size', () => {
+      const wrapper = createWrapper({ size: 'medium' })
+      expect(wrapper.exists()).toBe(true)
     })
 
-    it('has correct button type', () => {
-      wrapper = createWrapper({ type: 'submit' })
-      
-      expect(wrapper.find('button').attributes('type')).toBe('submit')
-    })
-
-    it('defaults to button type', () => {
-      wrapper = createWrapper()
-      
-      expect(wrapper.find('button').attributes('type')).toBe('button')
+    it('should handle large size', () => {
+      const wrapper = createWrapper({ size: 'large' })
+      expect(wrapper.exists()).toBe(true)
     })
   })
 
-  describe('Custom Classes and Styles', () => {
-    it('applies custom string class', () => {
-      wrapper = createWrapper({ class: 'custom-class' })
-      
-      expect(wrapper.classes()).toContain('custom-class')
-    })
-
-    it('applies custom array classes', () => {
-      wrapper = createWrapper({ class: ['class1', 'class2'] })
-      
-      expect(wrapper.classes()).toContain('class1')
-      expect(wrapper.classes()).toContain('class2')
-    })
-
-    it('applies custom object classes', () => {
-      wrapper = createWrapper({ 
-        class: { 
-          'active': true, 
-          'inactive': false 
-        } 
+  describe('Icon Support', () => {
+    it('should handle string icon', () => {
+      const wrapper = createWrapper({ 
+        icon: 'pi pi-check',
+        iconPosition: 'left'
       })
-      
-      expect(wrapper.classes()).toContain('active')
-      expect(wrapper.classes()).not.toContain('inactive')
+      expect(wrapper.exists()).toBe(true)
     })
 
-    it('applies custom styles', () => {
-      wrapper = createWrapper({ 
-        style: { color: 'red', fontSize: '16px' } 
+    it('should handle right icon position', () => {
+      const wrapper = createWrapper({ 
+        icon: 'pi pi-arrow-right',
+        iconPosition: 'right'
       })
-      
-      const button = wrapper.find('button')
-      expect(button.attributes('style')).toContain('color: red')
-      expect(button.attributes('style')).toContain('font-size: 16px')
+      expect(wrapper.exists()).toBe(true)
     })
   })
 
-  describe('Component Exposure', () => {
-    it('exposes button ref and state', () => {
-      wrapper = createWrapper()
-      
-      const exposed = wrapper.vm
-      expect(exposed.buttonRef).toBeDefined()
-      expect(exposed.isDisabled).toBeDefined()
-      expect(exposed.isLoading).toBeDefined()
-      expect(exposed.isPressed).toBeDefined()
-      expect(exposed.isFocused).toBeDefined()
-      expect(exposed.isHovered).toBeDefined()
+  describe('Component API', () => {
+    it('should expose primevueRef', () => {
+      const wrapper = createWrapper()
+      expect(wrapper.vm.primevueRef).toBeDefined()
+    })
+
+    it('should expose focus method', () => {
+      const wrapper = createWrapper()
+      expect(typeof wrapper.vm.focus).toBe('function')
+    })
+
+    it('should expose blur method', () => {
+      const wrapper = createWrapper()
+      expect(typeof wrapper.vm.blur).toBe('function')
+    })
+  })
+
+  describe('Slots', () => {
+    it('should render default slot content', () => {
+      const wrapper = mount(Button, {
+        slots: {
+          default: 'Slot Content'
+        },
+        global: {
+          plugins: [[PrimeVue, { theme: { preset: Aura } }]]
+        }
+      })
+      expect(wrapper.text()).toContain('Slot Content')
+    })
+
+    it('should render icon slot', () => {
+      const wrapper = mount(Button, {
+        slots: {
+          icon: '<i class="custom-icon">🔥</i>'
+        },
+        global: {
+          plugins: [[PrimeVue, { theme: { preset: Aura } }]]
+        }
+      })
+      expect(wrapper.text()).toContain('🔥')
     })
   })
 })

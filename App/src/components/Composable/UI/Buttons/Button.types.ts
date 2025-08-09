@@ -8,7 +8,31 @@ export interface BaseComponentProps {
   loading?: boolean
 }
 
-export interface ButtonProps extends BaseComponentProps {
+// PrimeVue Button Wrapper types
+export interface ButtonWrapperProps extends BaseComponentProps {
+  label?: string
+  icon?: Component | string
+  iconPosition?: 'left' | 'right'
+  variant?: 'primary' | 'secondary' | 'success' | 'info' | 'warning' | 'danger' | 'outline' | 'ghost'
+  size?: 'small' | 'medium' | 'large'
+  tooltip?: string
+  rounded?: boolean
+  block?: boolean
+}
+
+export interface ButtonWrapperEmits {
+  click: [event: MouseEvent]
+  focus: [event: FocusEvent]
+  blur: [event: FocusEvent]
+}
+
+export interface ButtonWrapperSlots {
+  default?: () => any
+  icon?: () => any
+}
+
+// Legacy Button types (for backward compatibility)
+export interface LegacyButtonProps extends BaseComponentProps {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger'
   size?: 'small' | 'medium' | 'large'
   icon?: Component | string
@@ -21,14 +45,19 @@ export interface ButtonProps extends BaseComponentProps {
   rounded?: boolean
 }
 
-export interface ButtonEmits {
+export interface LegacyButtonEmits {
   click: [event: MouseEvent]
   focus: [event: FocusEvent]
   blur: [event: FocusEvent]
 }
 
-export interface ButtonSlots {
+export interface LegacyButtonSlots {
   default?: () => any
   icon?: () => any
   loading?: () => any
 }
+
+// Export main types
+export type ButtonProps = ButtonWrapperProps
+export type ButtonEmits = ButtonWrapperEmits
+export type ButtonSlots = ButtonWrapperSlots
