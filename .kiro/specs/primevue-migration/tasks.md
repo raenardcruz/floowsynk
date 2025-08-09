@@ -68,15 +68,15 @@
   - Test sidebar integration with main application layout
   - _Requirements: 1.1, 2.1, 2.2, 4.1_
 
-- [ ] 6. Migrate feedback and display components
-- [ ] 6.1 Create Loading wrapper component
+- [x] 6. Migrate feedback and display components
+- [x] 6.1 Create Loading wrapper component
   - Replace custom Loading with PrimeVue ProgressSpinner wrapper
   - Maintain existing loading states and sizing options
   - Add support for different spinner types and colors
   - Test loading component in various contexts
   - _Requirements: 1.1, 2.3, 4.1_
 
-- [ ] 6.2 Create Notif wrapper component
+- [x] 6.2 Create Notif wrapper component
   - Replace custom Notif with PrimeVue Toast wrapper
   - Implement notification management and positioning system
   - Add support for different notification types and durations

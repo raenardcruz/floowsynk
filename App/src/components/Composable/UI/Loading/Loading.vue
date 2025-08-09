@@ -1,96 +1,159 @@
 <template>
-  <div class="loader">
-    <p class="heading">Loading</p>
-    <div class="loading">
-      <div class="load"></div>
-      <div class="load"></div>
-      <div class="load"></div>
-      <div class="load"></div>
-    </div>
-    <div class="caption">{{ text }}</div>
+  <div 
+    :id="id"
+    :class="['loading-wrapper', wrapperClass]"
+    :style="wrapperStyle"
+    :data-testid="dataTestid || 'loading-component'"
+  >
+    <p v-if="showHeading" class="loading-heading">Loading</p>
+    
+    <ProgressSpinner
+      ref="primevueRef"
+      :style="spinnerStyle"
+      :strokeWidth="strokeWidth"
+      :animationDuration="animationDuration"
+      :class="spinnerClass"
+    />
+    
+    <div v-if="showText && text" class="loading-caption">{{ text }}</div>
   </div>
 </template>
 
 <script setup lang="ts">
-defineProps({
-  text: {
-    type: String,
-    default: 'Please wait',
-  },
+import { computed, ref } from 'vue'
+import ProgressSpinner from 'primevue/progressspinner'
+import type { LoadingWrapperProps } from './Loading.types'
+import { defaultLoadingProps, sizeMap, colorMap } from './Loading.config'
+
+// Define props with defaults
+const props = withDefaults(defineProps<LoadingWrapperProps>(), defaultLoadingProps)
+
+// Template ref for PrimeVue component
+const primevueRef = ref()
+
+// Computed properties for styling
+const wrapperClass = computed(() => {
+  const classes = ['loading-wrapper']
+  if (props.class) {
+    if (typeof props.class === 'string') {
+      classes.push(props.class)
+    } else if (Array.isArray(props.class)) {
+      classes.push(...props.class.filter(c => typeof c === 'string'))
+    }
+  }
+  return classes
+})
+
+const wrapperStyle = computed(() => {
+  const styles: Record<string, any> = {}
+  
+  if (props.style) {
+    if (typeof props.style === 'string') {
+      // Parse string styles if needed
+      Object.assign(styles, props.style)
+    } else {
+      Object.assign(styles, props.style)
+    }
+  }
+  
+  return styles
+})
+
+const spinnerStyle = computed(() => {
+  const styles: Record<string, any> = {}
+  
+  // Set size
+  if (props.size && sizeMap[props.size]) {
+    styles.width = sizeMap[props.size]
+    styles.height = sizeMap[props.size]
+  }
+  
+  // Set color
+  if (props.color && colorMap[props.color]) {
+    styles.color = colorMap[props.color]
+  }
+  
+  return styles
+})
+
+const spinnerClass = computed(() => {
+  return `loading-spinner loading-spinner--${props.size} loading-spinner--${props.color}`
+})
+
+
+
+// Expose component methods
+defineExpose({
+  primevueRef
 })
 </script>
 
 <style scoped>
-  .loader {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
-  }
+.loading-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
 
-  .heading {
-    position: relative;
-    display: flex;
-    color: black;
-    letter-spacing: 0.2em;
-    margin-bottom: 1em;
-  }
+.loading-heading {
+  position: relative;
+  display: flex;
+  color: var(--p-text-color, black);
+  letter-spacing: 0.2em;
+  margin-bottom: 1em;
+  font-weight: 500;
+}
 
-  .caption {
-    position: relative;
-    display: flex;
-    color: var(--grey-2);
-    letter-spacing: 0.2em;
-    margin-top: 1em;
-    font-size: 12px;
-  }
+.loading-caption {
+  position: relative;
+  display: flex;
+  color: var(--p-text-muted-color, var(--grey-2, #666));
+  letter-spacing: 0.2em;
+  margin-top: 1em;
+  font-size: 12px;
+}
 
-  .loading {
-    display: flex;
-    width: 5em;
-    align-items: center;
-    justify-content: center;
-  }
+.loading-spinner {
+  /* Additional spinner styling can be added here */
+}
 
-  .load {
-    width: 23px;
-    height: 3px;
-    background-color: limegreen;
-    animation: 1s move_5011 infinite;
-    border-radius: 5px;
-    margin: 0.1em;
-  }
+.loading-spinner--small {
+  /* Small size specific styles */
+}
 
-  .load:nth-child(1) {
-    animation-delay: 0.2s;
-  }
+.loading-spinner--medium {
+  /* Medium size specific styles */
+}
 
-  .load:nth-child(2) {
-    animation-delay: 0.4s;
-  }
+.loading-spinner--large {
+  /* Large size specific styles */
+}
 
-  .load:nth-child(3) {
-    animation-delay: 0.6s;
-  }
+.loading-spinner--primary {
+  /* Primary color specific styles */
+}
 
-  @keyframes move_5011 {
-    0% {
-      width: 0.2em;
-    }
+.loading-spinner--secondary {
+  /* Secondary color specific styles */
+}
 
-    25% {
-      width: 0.7em;
-    }
+.loading-spinner--success {
+  /* Success color specific styles */
+}
 
-    50% {
-      width: 1.5em;
-    }
+.loading-spinner--info {
+  /* Info color specific styles */
+}
 
-    100% {
-      width: 0.2em;
-    }
-  }
+.loading-spinner--warning {
+  /* Warning color specific styles */
+}
+
+.loading-spinner--danger {
+  /* Danger color specific styles */
+}
 </style>

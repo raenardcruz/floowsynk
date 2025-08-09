@@ -37,4 +37,6 @@ export type {
 // Components will be exported individually as they are created
 export { default as SideBar } from './Sidebar'
 export { default as Modal } from './Modal'
+export { default as Loading } from './Loading'
+export { default as Notif } from './Notif'
 export * from './Buttons'
