@@ -7,33 +7,33 @@
   - Configure CSS layer ordering and custom property integration
   - _Requirements: 1.4, 5.1, 5.2_
 
-- [ ] 2. Create migration utilities and helper functions
+- [x] 2. Create migration utilities and helper functions
   - Implement createMigrationWrapper utility for systematic component wrapping
   - Create theme migration utility for CSS custom property conversion
   - Build component registry with mapping and deprecation warning system
   - Add TypeScript interfaces for all wrapper components
   - _Requirements: 3.1, 3.2, 5.3, 5.4_
 
-- [ ] 3. Migrate core input components
-- [ ] 3.1 Create TextInput wrapper component
+- [x] 3. Migrate core input components
+- [x] 3.1 Create TextInput wrapper component
   - Replace custom TextInput with PrimeVue InputText and FloatLabel combination
   - Maintain existing API while adding PrimeVue features
   - Write unit tests for API compatibility and visual regression
   - _Requirements: 1.1, 2.3, 4.1, 4.2_
 
-- [ ] 3.2 Create PasswordInput wrapper component
+- [x] 3.2 Create PasswordInput wrapper component
   - Replace custom PasswordInput with PrimeVue Password component
   - Preserve existing functionality and styling patterns
   - Add tests for password visibility toggle and validation
   - _Requirements: 1.1, 2.3, 4.1, 4.2_
 
-- [ ] 3.3 Create Select wrapper component
+- [x] 3.3 Create Select wrapper component
   - Replace custom Select with PrimeVue Select/Dropdown component
   - Maintain existing option handling and event emission
   - Test dropdown behavior and keyboard navigation
   - _Requirements: 1.1, 2.3, 4.1, 4.2_
 
-- [ ] 3.4 Create Checkbox wrapper component
+- [x] 3.4 Create Checkbox wrapper component
   - Replace custom Checkbox with PrimeVue Checkbox component
   - Preserve existing checked state management and styling
   - Add tests for form integration and accessibility
