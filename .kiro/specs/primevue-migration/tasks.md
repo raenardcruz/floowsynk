@@ -53,15 +53,15 @@
   - Test button hierarchy and styling consistency
   - _Requirements: 1.1, 2.3, 4.1_
 
-- [ ] 5. Migrate layout and container components
-- [ ] 5.1 Create Modal wrapper component
+- [x] 5. Migrate layout and container components
+- [x] 5.1 Create Modal wrapper component
   - Replace custom Modal with simplified PrimeVue Dialog wrapper
   - Implement header, content, and footer slot management
   - Add support for existing modal sizing and positioning
   - Test modal focus management and keyboard navigation
   - _Requirements: 1.1, 2.1, 2.2, 4.1_
 
-- [ ] 5.2 Create Sidebar wrapper component
+- [x] 5.2 Create Sidebar wrapper component
   - Replace custom Sidebar with PrimeVue Sidebar wrapper
   - Maintain existing drawer functionality and positioning
   - Implement responsive behavior and overlay management
