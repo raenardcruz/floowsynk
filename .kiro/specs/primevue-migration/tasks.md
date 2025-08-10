@@ -150,15 +150,15 @@
   - Add TypeScript re-exports for all interfaces and types
   - _Requirements: 3.2, 5.2, 6.4_
 
-- [ ] 11. Update application-wide component usage
-- [ ] 11.1 Update component imports in view files
+- [x] 11. Update application-wide component usage
+- [x] 11.1 Update component imports in view files
   - Replace old component imports with new wrapper imports in all view files
   - Update component usage to match new wrapper APIs
   - Test all views for proper component rendering and functionality
   - Fix any prop or event handling changes
   - _Requirements: 3.2, 4.2, 4.3_
 
-- [ ] 11.2 Update component usage in other components
+- [x] 11.2 Update component usage in other components
   - Find and replace component usage in nested components
   - Update any component composition patterns
   - Test component hierarchy and data flow

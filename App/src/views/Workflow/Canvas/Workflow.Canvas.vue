@@ -85,7 +85,7 @@ import { useWorkflowCanvasHooks, useWorkflowCanvasStore, useWorkflowCanvasGlbalS
 import { useWorkflowCanvasVueFlowEvents } from './VueFlowEvents/Workflow.Canvas.VueFlowEvents'
 import { useWorkflowCanvasControlButtonActions } from './ButtonActions/Workflow.Canvas.ButtonActions'
 import { SidebarCanvas } from '@/views/Workflow/Sidebar'
-import Modal from '@/components/Composable/UI/Modal'
+import { Modal } from '@/components/Composable/UI/Modal'
 import { ProcessTypeModal } from '@/views/Workflow/Modal'
 import DropzoneBackground from './Background'
 import { MiniMap } from '@vue-flow/minimap'

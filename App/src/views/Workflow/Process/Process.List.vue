@@ -60,10 +60,9 @@ import { createProcess, cardClicked, initWorkflows, historyClicked } from './Pro
 import WorkflowIcon from "@/views/Workflow/Workflow.Icon.vue"
 import { useProcessListStore, useProcessListHooks } from './Process.List.hooks'
 import { useAsyncState, useVirtualList } from '@vueuse/core'
-import Header from '@/components/Composable/UI/Table/Headers.vue'
-import Row from '@/components/Composable/UI/Table/Row.vue'
-import Collapsible from '@/components/Composable/UI/Collapsible/Collapsible.vue'
-import Loading from '@/components/Composable/UI/Loading/Loading.vue'
+import { Headers as Header, Row } from '@/components/Composable/UI/Table'
+import { Collapsible } from '@/components/Composable/UI/Collapsible'
+import { Loading } from '@/components/Composable/UI/Loading'
 
 const { search, history } = useProcessListStore()
 const { filteredProcesses } = useProcessListHooks()

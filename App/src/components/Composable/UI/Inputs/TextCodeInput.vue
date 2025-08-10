@@ -95,8 +95,8 @@ import { generateId } from '../utils/component'
 import FloatLabel from 'primevue/floatlabel'
 import InputText from 'primevue/inputtext'
 import Button from 'primevue/button'
-import Modal from '../Modal/Modal.vue'
-import MonacoEditor from '../MonacoEditor/MonacoEditor.vue'
+import { Modal } from '../Modal'
+import { MonacoEditor } from '../MonacoEditor'
 
 import type { 
   TextCodeInputWrapperProps, 

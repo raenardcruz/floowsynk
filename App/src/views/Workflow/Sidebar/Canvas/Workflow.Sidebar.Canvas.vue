@@ -64,7 +64,7 @@ import { useSidebarCanvasStore, useFloowsynkNodeHooks } from './Workflow.Sidebar
 import { nodes } from "@/views/Workflow/Nodes"
 import { groups } from "@/views/Workflow/Nodes"
 import { onDragStart, expandToggle, groupNodes } from './Workflow.Sidebar.Canvas.helper'
-import CollapsibleSidebar from '@/components/Composable/UI/Sidebar/CollapsibleSidebar.vue'
+import { CollapsibleSidebar } from '@/components/Composable/UI/Sidebar'
 
 const {
     showSideBar,

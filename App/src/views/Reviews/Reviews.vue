@@ -4,5 +4,5 @@
 </template>
 
 <script setup lang="ts">
-import Loading from '@/components/Composable/UI/Loading/Loading.vue'
+import { Loading } from '@/components/Composable/UI/Loading'
 </script>

@@ -34,7 +34,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue"
 import { Handle, Position, useNode } from '@vue-flow/core'
-import Sidebar from "@/components/Composable/UI/Sidebar/Sidebar.vue"
+import { Sidebar } from '@/components/Composable/UI/Sidebar'
 import { SidebarCanvasFields as WorkflowNodeSidebarFields } from "@/views/Workflow/Sidebar"
 import { NodeProps } from './FloowsynkNode.types'
 import { useFloowsynkNodeHooks, useFloowsynkNodeWatchers } from './FloowsynkNode.hooks'
@@ -42,7 +42,7 @@ import { clickhandler } from './FloowsynkNode.helper'
 import { Node } from 'proto/workflow/workflow_pb'
 import { toSentenceCase } from "@/components/Composable/Utilities"
 import ProcessTypeModal from '@/views/Workflow/Modal/ProcessType/Workflow.Modal.ProcessType.vue'
-import { Modal } from '@/components/Composable/UI'
+import { Modal } from '@/components/Composable/UI/Modal'
 import { useWorkflowCanvasStore } from '@/views/Workflow/Canvas/Workflow.Canvas.hooks'
 import { onKeyStroke } from '@vueuse/core'
 

@@ -28,14 +28,13 @@
 import { computed, Teleport } from 'vue'
 import { useWorkflowCanvasStore } from '@/views/Workflow/Canvas/Workflow.Canvas.hooks'
 import { StepSelected } from './ReplaySteps.helper'
-import { SideBar } from "@/components/Composable/UI"
+import { SideBar } from '@/components/Composable/UI/Sidebar'
 import { ReplayDataProps } from './ReplaySteps.types'
 import { useFloowsynkNodeHooks } from '@/views/Workflow/Nodes/FloowsynkNode.hooks'
 import { SidebarCanvasFields as WorkflowNodeSidebarFields } from "@/views/Workflow/Sidebar"
 import { useReplayStoreHooks } from './ReplaySteps.hooks'
 import { useVirtualList } from '@vueuse/core'
-import Row from '@/components/Composable/UI/Table/Row.vue'
-import Header from '@/components/Composable/UI/Table/Headers.vue'
+import { Row, Headers as Header } from '@/components/Composable/UI/Table'
 import { NodeStatus } from 'proto/workflow/workflow_pb'
 
 const props = defineProps<ReplayDataProps>()

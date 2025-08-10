@@ -72,7 +72,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import PrimeDialog from 'primevue/dialog'
-import Button from '../Buttons/Button.vue'
+import { Button } from '../Buttons'
 import type { ModalWrapperProps, ModalWrapperEmits } from './Modal.types'
 
 // Props with defaults

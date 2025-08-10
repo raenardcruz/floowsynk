@@ -18,10 +18,7 @@ import { useSidebarNodeHooks } from '../Workflow.Sidebar.Node.hooks'
 import { toSentenceCase } from '@/components/Composable/Utilities'
 import { useWorkflowCanvasStore } from '@/views/Workflow/Canvas/Workflow.Canvas.hooks'
 import { MONACO_EDITOR_DATA_PROPERTIES } from './Workflow.Sidebar.Node.Fields.constants'
-import CheckboxInput from '@/components/Composable/UI/Inputs/Checkbox.vue'
-import TextCodeInput from '@/components/Composable/UI/Inputs/TextCodeInput.vue'
-import SelectInput from '@/components/Composable/UI/Inputs/Select.vue'
-import ListInput from '@/components/Composable/UI/Inputs/ListField.vue'
+import { Checkbox as CheckboxInput, TextCodeInput, Select as SelectInput, ListField as ListInput } from '@/components/Composable/UI/Inputs'
 
 const props = defineProps<SidebarNodeProps>()
 const modelValue = defineModel<Record<string, string>>()
