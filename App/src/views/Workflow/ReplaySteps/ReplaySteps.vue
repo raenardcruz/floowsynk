@@ -28,7 +28,7 @@
 import { computed, Teleport } from 'vue'
 import { useWorkflowCanvasStore } from '@/views/Workflow/Canvas/Workflow.Canvas.hooks'
 import { StepSelected } from './ReplaySteps.helper'
-import { SideBar } from '@/components/Composable/UI/Sidebar'
+import SideBar from '@/components/Composable/UI/Sidebar'
 import { ReplayDataProps } from './ReplaySteps.types'
 import { useFloowsynkNodeHooks } from '@/views/Workflow/Nodes/FloowsynkNode.hooks'
 import { SidebarCanvasFields as WorkflowNodeSidebarFields } from "@/views/Workflow/Sidebar"

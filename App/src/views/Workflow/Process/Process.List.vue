@@ -62,7 +62,7 @@ import { useProcessListStore, useProcessListHooks } from './Process.List.hooks'
 import { useAsyncState, useVirtualList } from '@vueuse/core'
 import { Headers as Header, Row } from '@/components/Composable/UI/Table'
 import { Collapsible } from '@/components/Composable/UI/Collapsible'
-import { Loading } from '@/components/Composable/UI/Loading'
+import Loading from '@/components/Composable/UI/Loading'
 
 const { search, history } = useProcessListStore()
 const { filteredProcesses } = useProcessListHooks()

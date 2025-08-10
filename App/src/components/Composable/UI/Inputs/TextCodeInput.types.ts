@@ -3,11 +3,7 @@
  */
 
 import type { BaseComponentProps } from '../types/base'
-
-export interface EditorConfig {
-  variables: any[]
-  target: string
-}
+import type { EditorConfig } from './Inputs'
 
 export interface TextCodeInputWrapperProps extends BaseComponentProps {
   /** The input value */

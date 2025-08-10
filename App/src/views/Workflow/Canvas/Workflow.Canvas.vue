@@ -26,7 +26,7 @@
         </div>
         <div class="content" :id="canvasId">
             <SidebarCanvas />
-            <Modal title="Process Type" caption="Please select the workflow process type." v-model:visible="show">
+            <Modal title="Process Type" caption="Please select the workflow process type." :visible="show" @update:visible="show = $event">
                 <ProcessTypeModal :id="tab.id" />
             </Modal>
             <div class="workspace">

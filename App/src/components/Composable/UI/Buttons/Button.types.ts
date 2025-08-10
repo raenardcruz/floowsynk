@@ -61,3 +61,8 @@ export interface LegacyButtonSlots {
 export type ButtonProps = ButtonWrapperProps
 export type ButtonEmits = ButtonWrapperEmits
 export type ButtonSlots = ButtonWrapperSlots
+
+// Export additional types for backward compatibility
+export type ButtonVariant = ButtonWrapperProps['variant']
+export type ButtonSize = ButtonWrapperProps['size']
+export type ButtonIconPosition = ButtonWrapperProps['iconPosition']

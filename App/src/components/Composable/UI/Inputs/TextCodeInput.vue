@@ -2,10 +2,10 @@
   <!-- Monaco Editor Modal -->
   <Teleport :to="editorConfig?.target || 'body'" v-if="editorConfig && showEditor">
     <Modal 
-      v-model="showEditor"
+      :visible="showEditor"
       :title="editorModalTitle"
       size="large"
-      @update:modelValue="handleEditorModalClose"
+      @update:visible="handleEditorModalClose"
     >
       <MonacoEditor 
         v-model="internalValue" 
