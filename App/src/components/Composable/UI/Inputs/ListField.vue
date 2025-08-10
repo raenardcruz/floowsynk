@@ -1,216 +1,415 @@
 <template>
-    <div class="array-container">
-        <div class="label">{{ label }}</div>
-        <div class="list-container" v-for="(_, index) in arrayValue" :key="index">
-            <span class="material-symbols-outlined remove-btn" title="Remove Item" @click="removeItem(index)">close</span>
-            <component
-            :key="index"
-            :is="getComponent(index).component"
-            v-bind="getComponent(index).props"
-            v-model="arrayValue[index]" />
-        </div>
-        <div class="action-section">
-            <Select v-model="dataType" :options="options" />
-            <button @click="addList">+</button>
-        </div>
+  <div 
+    :class="[
+      'listfield-wrapper',
+      {
+        'listfield-wrapper--disabled': disabled,
+        'listfield-wrapper--invalid': invalid,
+        'listfield-wrapper--required': required
+      }
+    ]"
+    :data-testid="$props['data-testid']"
+  >
+    <div v-if="label" class="listfield-wrapper__label">
+      {{ label }}
+      <span v-if="required" class="listfield-wrapper__required">*</span>
     </div>
+    
+    <!-- List Items -->
+    <div class="listfield-wrapper__items">
+      <div 
+        v-for="(item, index) in displayItems" 
+        :key="`item-${index}`"
+        class="listfield-wrapper__item"
+      >
+        <Button
+          icon="pi pi-times"
+          severity="danger"
+          size="small"
+          text
+          rounded
+          class="listfield-wrapper__remove-btn"
+          :disabled="disabled"
+          @click="removeItem(index)"
+          :aria-label="`Remove item ${index + 1}`"
+        />
+        
+        <component
+          :is="getComponentForType(currentDataType).component"
+          v-model="displayItems[index]"
+          v-bind="getComponentPropsForIndex(index)"
+          :disabled="disabled"
+          :invalid="invalid"
+        />
+      </div>
+    </div>
+    
+    <!-- Add Item Section -->
+    <div class="listfield-wrapper__actions">
+      <Select
+        v-if="showTypeSelector"
+        v-model="currentDataType"
+        :options="availableTypeOptions"
+        :disabled="disabled"
+        placeholder="Select item type"
+        class="listfield-wrapper__type-selector"
+      />
+      
+      <Button
+        icon="pi pi-plus"
+        :label="addButtonLabel"
+        :disabled="disabled || isMaxItemsReached"
+        @click="addItem"
+        class="listfield-wrapper__add-btn"
+      />
+    </div>
+    
+    <!-- Item Count Info -->
+    <div v-if="showItemCount" class="listfield-wrapper__info">
+      {{ displayItems.length }} item{{ displayItems.length !== 1 ? 's' : '' }}
+      <span v-if="maxItems"> (max {{ maxItems }})</span>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import Select from './Select.vue' 
-import TextCodeInput from './TextCodeInput.vue'
-import Checkbox from './Checkbox.vue'
-import KeyValueField from './KeyValue.vue'
+import { ref, computed, watch } from 'vue'
+import Button from 'primevue/button'
+import Select from './Select.vue'
+
+import type { 
+  ListFieldWrapperProps, 
+  ListFieldWrapperEmits, 
+  ListFieldWrapperExposed,
+  ListFieldItemType
+} from './ListField.types'
+import { 
+  defaultListFieldProps, 
+  listFieldTypeOptions,
+  getComponentPropsForType
+} from './ListField.config'
+
+// Import protocol buffer types for backward compatibility
 import { NodeDataArray, ArrayDataType, KeyValue } from 'proto/workflow/workflow_pb'
 
+// Props with defaults
+const props = withDefaults(
+  defineProps<ListFieldWrapperProps>(),
+  defaultListFieldProps
+)
 
-const value = defineModel({
-    type: Object as () => NodeDataArray.AsObject,
-    default: () => ({
-        type: ArrayDataType.STRING,
-        stringitemsList: [],
-        intitemsList: [],
-        boolitemsList: [],
-        keyvalueitemsList: []
-    })
+// Emits
+const emit = defineEmits<ListFieldWrapperEmits>()
+
+// Internal state
+const currentDataType = ref<ListFieldItemType>('string')
+
+// Computed properties
+const availableTypeOptions = computed(() => {
+  return listFieldTypeOptions
+    .filter(option => props.availableTypes?.includes(option.value))
+    .map(option => ({
+      value: option.value,
+      label: option.label
+    }))
 })
 
-defineProps({
-    label: {
-        type: String,
-        default: ''
-    }
+const isMaxItemsReached = computed(() => {
+  return props.maxItems !== undefined && displayItems.value.length >= props.maxItems
 })
 
-const dataType = ref<ArrayDataType>(value.value.type)
-const stringList = ref<string[]>(value.value.stringitemsList)
-const intList = ref<number[]>(value.value.intitemsList)
-const boolList = ref<boolean[]>(value.value.boolitemsList)
-const keyValueList = ref<KeyValue.AsObject[]>(value.value.keyvalueitemsList)
+const addButtonLabel = computed(() => {
+  return isMaxItemsReached.value ? 'Maximum reached' : 'Add Item'
+})
 
-// Refactored to improve efficiency and readability
-const arrayValue = computed({
-    get() {
-        const listMap = {
-            [ArrayDataType.STRING]: stringList.value,
-            [ArrayDataType.INT]: intList.value,
-            [ArrayDataType.BOOL]: boolList.value,
-            [ArrayDataType.KEYVALUE]: keyValueList.value
-        };
-        return listMap[dataType.value] || [];
-    },
-    set(newValue) {
-        const listSetterMap = {
-            [ArrayDataType.STRING]: () => stringList.value = newValue as string[],
-            [ArrayDataType.INT]: () => intList.value = newValue as number[],
-            [ArrayDataType.BOOL]: () => boolList.value = newValue as boolean[],
-            [ArrayDataType.KEYVALUE]: () => keyValueList.value = newValue as KeyValue.AsObject[]
-        };
-        listSetterMap[dataType.value]?.();
+const showItemCount = computed(() => {
+  return props.maxItems !== undefined || props.minItems > 0
+})
+
+// Handle backward compatibility with protocol buffer types
+const isProtocolBufferModel = computed(() => {
+  return props.modelValue && typeof props.modelValue === 'object' && 'type' in props.modelValue
+})
+
+const displayItems = computed({
+  get() {
+    if (!props.modelValue) return []
+    
+    if (isProtocolBufferModel.value) {
+      // Handle protocol buffer format
+      const pbModel = props.modelValue as NodeDataArray.AsObject
+      const typeMap = {
+        [ArrayDataType.STRING]: pbModel.stringitemsList || [],
+        [ArrayDataType.INT]: pbModel.intitemsList || [],
+        [ArrayDataType.BOOL]: pbModel.boolitemsList || [],
+        [ArrayDataType.KEYVALUE]: pbModel.keyvalueitemsList || []
+      }
+      
+      // Update current data type based on protocol buffer type
+      const pbTypeToLocal = {
+        [ArrayDataType.STRING]: 'string' as ListFieldItemType,
+        [ArrayDataType.INT]: 'number' as ListFieldItemType,
+        [ArrayDataType.BOOL]: 'boolean' as ListFieldItemType,
+        [ArrayDataType.KEYVALUE]: 'keyvalue' as ListFieldItemType
+      }
+      
+      currentDataType.value = pbTypeToLocal[pbModel.type] || 'string'
+      return typeMap[pbModel.type] || []
+    } else {
+      // Handle simple array format
+      return Array.isArray(props.modelValue) ? props.modelValue : []
     }
-});
+  },
+  set(newValue) {
+    if (isProtocolBufferModel.value) {
+      // Update protocol buffer format
+      const pbModel = { ...props.modelValue } as NodeDataArray.AsObject
+      
+      // Clear all arrays
+      pbModel.stringitemsList = []
+      pbModel.intitemsList = []
+      pbModel.boolitemsList = []
+      pbModel.keyvalueitemsList = []
+      
+      // Set the appropriate array based on current type
+      const localToPbType = {
+        string: ArrayDataType.STRING,
+        number: ArrayDataType.INT,
+        boolean: ArrayDataType.BOOL,
+        keyvalue: ArrayDataType.KEYVALUE
+      }
+      
+      pbModel.type = localToPbType[currentDataType.value]
+      
+      switch (currentDataType.value) {
+        case 'string':
+          pbModel.stringitemsList = newValue as string[]
+          break
+        case 'number':
+          pbModel.intitemsList = newValue as number[]
+          break
+        case 'boolean':
+          pbModel.boolitemsList = newValue as boolean[]
+          break
+        case 'keyvalue':
+          pbModel.keyvalueitemsList = newValue as KeyValue.AsObject[]
+          break
+      }
+      
+      emit('update:modelValue', pbModel)
+    } else {
+      // Update simple array format
+      emit('update:modelValue', newValue)
+    }
+  }
+})
 
-const options = [
-    { value: ArrayDataType.STRING, label: 'String' },
-    { value: ArrayDataType.INT, label: 'Number' },
-    { value: ArrayDataType.BOOL, label: 'Boolean' },
-    { value: ArrayDataType.KEYVALUE, label: 'Key Value Pair' }
-]
+// Methods
+const getComponentForType = (type: ListFieldItemType) => {
+  return listFieldTypeOptions.find(option => option.value === type) || listFieldTypeOptions[0]
+}
 
-const getComponent = (index: number) => {
-    const componentMap = {
-        [ArrayDataType.STRING]: {
-            component: TextCodeInput,
-            props: {
-                type: 'text',
-                placeholder: 'Enter text',
-                label: `List Item ${index + 1}`
-            }
-        },
-        [ArrayDataType.INT]: {
-            component: TextCodeInput,
-            props: {
-                type: 'number',
-                placeholder: 'Enter number',
-                label: `List Item ${index + 1}`
-            }
-        },
-        [ArrayDataType.BOOL]: {
-            component: Checkbox,
-            props: {
-                label: `List Item ${index + 1}`
-            }
-        },
-        [ArrayDataType.KEYVALUE]: {
-            component: KeyValueField,
-            props: {
-                label: `List Item ${index + 1}`
-            }
-        }
-    };
-    return componentMap[dataType.value] || null;
-};
+const getComponentPropsForIndex = (index: number) => {
+  return getComponentPropsForType(currentDataType.value, index)
+}
 
-const addList = () => {
-    if (!stringList.value) stringList.value = [];
-    if (!intList.value) intList.value = [];
-    if (!boolList.value) boolList.value = [];
-    if (!keyValueList.value) keyValueList.value = [];
-
-    const listAdderMap = {
-        [ArrayDataType.STRING]: () => stringList.value.push(''),
-        [ArrayDataType.INT]: () => intList.value.push(0),
-        [ArrayDataType.BOOL]: () => boolList.value.push(false),
-        [ArrayDataType.KEYVALUE]: () => keyValueList.value.push({ key: '', value: '' })
-    };
-    listAdderMap[dataType.value]?.();
-};
+const addItem = () => {
+  if (isMaxItemsReached.value) return
+  
+  const componentOption = getComponentForType(currentDataType.value)
+  const newItems = [...displayItems.value, componentOption.defaultValue]
+  displayItems.value = newItems
+  
+  emit('item-added', {
+    id: Date.now(),
+    value: componentOption.defaultValue,
+    type: currentDataType.value
+  }, newItems.length - 1)
+}
 
 const removeItem = (index: number) => {
-    const listRemoverMap = {
-        [ArrayDataType.STRING]: () => stringList.value.splice(index, 1),
-        [ArrayDataType.INT]: () => intList.value.splice(index, 1),
-        [ArrayDataType.BOOL]: () => boolList.value.splice(index, 1),
-        [ArrayDataType.KEYVALUE]: () => keyValueList.value.splice(index, 1)
-    };
-    listRemoverMap[dataType.value]?.();
-};
+  const itemToRemove = {
+    id: index,
+    value: displayItems.value[index],
+    type: currentDataType.value
+  }
+  
+  const newItems = [...displayItems.value]
+  newItems.splice(index, 1)
+  displayItems.value = newItems
+  
+  emit('item-removed', itemToRemove, index)
+}
+
+const clearItems = () => {
+  displayItems.value = []
+}
+
+const getItems = () => {
+  return displayItems.value.map((value, index) => ({
+    id: index,
+    value,
+    type: currentDataType.value
+  }))
+}
+
+const setDataType = (type: ListFieldItemType) => {
+  const oldType = currentDataType.value
+  currentDataType.value = type
+  
+  // Clear items when type changes to avoid type conflicts
+  displayItems.value = []
+  
+  emit('type-changed', type, oldType)
+}
+
+// Watch for data type changes
+watch(currentDataType, (newType, oldType) => {
+  if (newType !== oldType && oldType) {
+    emit('type-changed', newType, oldType)
+  }
+})
+
+// Expose methods
+defineExpose<ListFieldWrapperExposed>({
+  addItem,
+  removeItem,
+  clearItems,
+  getItems,
+  setDataType
+})
 </script>
 
 <style scoped>
-.array-container {
-    display: flex;
-    position: relative;
+.listfield-wrapper {
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  border: 1px solid var(--p-surface-border);
+  min-height: 60px;
+  border-radius: 12px;
+  padding: 20px 16px;
+  margin-top: 12px;
+  background: var(--p-surface-ground);
+}
+
+.listfield-wrapper--disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.listfield-wrapper--invalid {
+  border-color: var(--p-red-500);
+}
+
+.listfield-wrapper__label {
+  display: flex;
+  position: absolute;
+  top: -10px;
+  left: 12px;
+  font-size: 12px;
+  background: var(--p-surface-ground);
+  color: var(--p-text-color);
+  border: 1px solid var(--p-surface-border);
+  border-radius: 8px;
+  padding: 4px 8px;
+  font-weight: 500;
+  box-shadow: 0 2px 4px var(--p-surface-border);
+  align-items: center;
+  gap: 4px;
+}
+
+.listfield-wrapper__required {
+  color: var(--p-red-500);
+}
+
+.listfield-wrapper__items {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.listfield-wrapper__item {
+  display: flex;
+  position: relative;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid var(--p-surface-border);
+  border-radius: 8px;
+  background: var(--p-surface-50);
+}
+
+.listfield-wrapper__remove-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 10;
+}
+
+.listfield-wrapper__item > :not(.listfield-wrapper__remove-btn) {
+  flex: 1;
+  margin-right: 40px; /* Space for remove button */
+}
+
+.listfield-wrapper__actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding-top: 8px;
+  border-top: 1px solid var(--p-surface-border);
+}
+
+.listfield-wrapper__type-selector {
+  flex: 1;
+  min-width: 150px;
+}
+
+.listfield-wrapper__add-btn {
+  flex-shrink: 0;
+}
+
+.listfield-wrapper__info {
+  font-size: 12px;
+  color: var(--p-text-muted-color);
+  text-align: center;
+  padding-top: 8px;
+  border-top: 1px solid var(--p-surface-border);
+}
+
+/* Focus states */
+.listfield-wrapper:focus-within {
+  border-color: var(--p-primary-color);
+  box-shadow: 0 0 0 1px var(--p-primary-color);
+}
+
+/* Invalid state styling */
+.listfield-wrapper--invalid:focus-within {
+  border-color: var(--p-red-500);
+  box-shadow: 0 0 0 1px var(--p-red-500);
+}
+
+/* Empty state */
+.listfield-wrapper__items:empty::after {
+  content: 'No items added yet';
+  display: block;
+  text-align: center;
+  color: var(--p-text-muted-color);
+  font-style: italic;
+  padding: 20px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .listfield-wrapper__actions {
     flex-direction: column;
-    gap: 10px;
-    width: 100%;
-    border: 1px solid var(--grey-4);
-    min-height: 40px;
-    border-radius: 10px;
-    padding: 20px 10px;
-    margin-top: 12px;
-}
-.label {
-    display: flex;
-    position: absolute;
-    top: -10px;
-    left: 10px;
-    font-size: 12px;
-    background: var(--grey-3);
-    color: var(--white-1);
-    border: 1px solid var(--grey-4);
-    border-radius: 10px;
-    padding: 0px 8px;
-    font-weight: 500;
-    box-shadow: 2px 4px 8px var(--grey-4);
-}
-.action-section {
-    display: flex;
-    position: relative;
-    justify-content: center;
-    align-items: center;
-    flex-grow: 1;
-    gap: 10px;
-}
-.action-section button {
-    width: 100%;
-    border-radius: 50px;
-    border: none;
-    background: var(--grey-4);
-    color: var(--white-1);
-    font-size: 20px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-.action-section button:hover {
-    background: var(--blue-2);
-}
-.list-container {
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    justify-content: center;
-    align-items: center;
-    gap: 24px;
-}
-.remove-btn {
-    display: flex;
-    position: absolute;
-    top: 20px;
-    right: 10px;
-    color: var(--red-3);
-    z-index: 100;
-    cursor: pointer;
-    font-size: 18px;
-    background: var(--grey-4);
-    border-radius: 50%;
-    padding: 5px;
-    transition: all 0.3s ease;
-}
-.remove-btn:hover {
-    background: var(--red-3);
-    color: var(--white-1);
-    transform: scale(1.1);
+    align-items: stretch;
+  }
+  
+  .listfield-wrapper__type-selector {
+    min-width: unset;
+  }
 }
 </style>

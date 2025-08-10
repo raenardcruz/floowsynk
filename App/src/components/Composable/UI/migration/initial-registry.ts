@@ -15,6 +15,9 @@ import SideBar from '../Sidebar/Sidebar.vue'
 import Loading from '../Loading/Loading.vue'
 import Notif from '../Notif/Notif.vue'
 import Tabs from '../Tabs/Tabs.vue'
+import KeyValue from '../Inputs/KeyValue.vue'
+import ListField from '../Inputs/ListField.vue'
+import TextCodeInput from '../Inputs/TextCodeInput.vue'
 
 /**
  * Initial component mappings
@@ -62,6 +65,23 @@ const initialMappings: Record<string, ComponentRegistryEntry> = {
     component: Tabs,
     deprecated: false,
     migrationNotes: 'Migrated to PrimeVue TabView wrapper with simplified API and enhanced features'
+  },
+
+  // Input components - migrated to PrimeVue wrappers
+  'KeyValue': {
+    component: KeyValue,
+    deprecated: false,
+    migrationNotes: 'Migrated to PrimeVue InputText wrapper with key-value pair functionality'
+  },
+  'ListField': {
+    component: ListField,
+    deprecated: false,
+    migrationNotes: 'Migrated to PrimeVue components with enhanced list management and protocol buffer compatibility'
+  },
+  'TextCodeInput': {
+    component: TextCodeInput,
+    deprecated: false,
+    migrationNotes: 'Migrated to PrimeVue InputText with Monaco Editor integration for code editing functionality'
   }
 }
 

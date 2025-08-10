@@ -98,22 +98,22 @@
   - Test table performance with large datasets
   - _Requirements: 1.1, 2.1, 4.1_
 
-- [ ] 8. Handle specialized and complex input components
-- [ ] 8.1 Create KeyValue wrapper component
+- [x] 8. Handle specialized and complex input components
+- [x] 8.1 Create KeyValue wrapper component
   - Evaluate PrimeVue alternatives or create custom wrapper
   - Maintain existing key-value pair management functionality
   - Implement add/remove operations and validation
   - Test component with dynamic data and form integration
   - _Requirements: 1.1, 2.3, 4.1_
 
-- [ ] 8.2 Create ListField wrapper component
+- [x] 8.2 Create ListField wrapper component
   - Evaluate PrimeVue alternatives or create custom wrapper
   - Maintain existing list management and item operations
   - Implement drag-and-drop reordering if needed
   - Test list component with various data types
   - _Requirements: 1.1, 2.3, 4.1_
 
-- [ ] 8.3 Create TextCodeInput wrapper component
+- [x] 8.3 Create TextCodeInput wrapper component
   - Evaluate PrimeVue alternatives or maintain custom implementation
   - Preserve code syntax highlighting and editing features
   - Integrate with existing Monaco Editor if applicable
