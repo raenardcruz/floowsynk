@@ -1,5 +1,5 @@
 <template>
-    <CollapsibleSidebar position="left" v-model="showSideBar">
+    <CollapsibleSidebar position="left" v-model="showSideBar" :showCloseButton="false">
          <div class="input">
                 <input type="search" placeholder="Search Nodes" v-model="search">
             </div>

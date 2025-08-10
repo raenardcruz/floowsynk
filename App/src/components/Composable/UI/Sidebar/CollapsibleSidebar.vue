@@ -11,7 +11,7 @@
         :width="width"
         :modal="false"
         :dismissable="false"
-        :showCloseButton="false"
+        :showCloseButton="showCloseButton"
         :closeOnEscape="closeOnEscape"
         :blockScroll="false"
         :style="customStyle"
@@ -47,7 +47,8 @@ const props = withDefaults(defineProps<CollapsibleSidebarProps>(), {
   customStyle: () => ({}),
   closeOnClickOutside: true,
   closeOnEscape: true,
-  showToggleButton: true
+  showToggleButton: true,
+  showCloseButton: false,
 })
 
 // Model for sidebar visibility

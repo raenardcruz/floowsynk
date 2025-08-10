@@ -1,14 +1,14 @@
 <template>
     <div style="padding: 8px">
         <div class="test">
-            <Tab id="tabs" :tabContents="test" v-model="tabSelection" @close="closeTab" />
+            <Tabs id="tabs" :tabContents="test" v-model="tabSelection" @close="closeTab" />
         </div>
     </div>
 </template>
 
 <script lang="ts" setup>
 import { ref } from 'vue'
-import Tab, { TabContent } from '@/components/Composable/UI/Tabs/Tab.vue'
+import { Tabs, type TabContent } from '@/components/Composable/UI/Tabs'
 import Test1 from './Test1.vue'
 import Test2 from './Test2.vue'
 

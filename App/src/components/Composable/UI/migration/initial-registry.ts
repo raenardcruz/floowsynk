@@ -14,6 +14,7 @@ import Modal from '../Modal/Modal.vue'
 import SideBar from '../Sidebar/Sidebar.vue'
 import Loading from '../Loading/Loading.vue'
 import Notif from '../Notif/Notif.vue'
+import Tabs from '../Tabs/Tabs.vue'
 
 /**
  * Initial component mappings
@@ -54,6 +55,13 @@ const initialMappings: Record<string, ComponentRegistryEntry> = {
     component: Notif,
     deprecated: false,
     migrationNotes: 'Migrated to PrimeVue Toast wrapper with enhanced notification management'
+  },
+
+  // Navigation components - migrated to PrimeVue wrappers
+  'Tabs': {
+    component: Tabs,
+    deprecated: false,
+    migrationNotes: 'Migrated to PrimeVue TabView wrapper with simplified API and enhanced features'
   }
 }
 

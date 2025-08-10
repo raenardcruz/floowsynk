@@ -6,7 +6,7 @@
     :header="title"
     :modal="modal"
     :dismissable="dismissable"
-    :showCloseButton="showCloseButton"
+    :showCloseIcon="showCloseButton"
     :closeOnEscape="closeOnEscape"
     :blockScroll="blockScroll"
     :baseZIndex="baseZIndex"

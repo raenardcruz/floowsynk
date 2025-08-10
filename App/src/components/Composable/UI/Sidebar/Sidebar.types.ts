@@ -79,4 +79,5 @@ export interface CollapsibleSidebarProps extends BaseSidebarProps {
   closeOnClickOutside?: boolean
   closeOnEscape?: boolean
   showToggleButton?: boolean
+  showCloseButton?: boolean
 }

@@ -18,7 +18,7 @@
         <button class="add-btn" v-for="(output, _) in outputsList" :key="output" v-if="node.selected">+</button>
     </div>
     <Teleport :to="'#' + canvasId" v-if="!isRunning">
-        <Sidebar :title="label" :caption="node.id" :customStyle="customStyle" position="right" :visible="showSidebar">
+        <Sidebar :modal="false" :title="label" :caption="node.id" :customStyle="customStyle" position="right" :visible="showSidebar" :showCloseButton="false">
             <div v-if="node.data">
                 <WorkflowNodeSidebarFields :nodeType="nodetype" v-model="node.data" :tabid="props.tabid" />
             </div>

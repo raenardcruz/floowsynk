@@ -83,15 +83,15 @@
   - Test notification queuing and dismissal behavior
   - _Requirements: 1.1, 2.1, 2.2, 4.1_
 
-- [ ] 7. Migrate navigation and data components
-- [ ] 7.1 Create Tabs wrapper component
+- [x] 7. Migrate navigation and data components
+- [x] 7.1 Create Tabs wrapper component
   - Replace custom Tab with PrimeVue TabView wrapper
   - Maintain existing tab switching and content management
   - Implement dynamic tab creation and removal
   - Test tab navigation and accessibility features
   - _Requirements: 1.1, 2.1, 2.2, 4.1_
 
-- [ ] 7.2 Migrate Table components to DataTable
+- [x] 7.2 Migrate Table components to DataTable
   - Replace custom Headers and Row components with PrimeVue DataTable
   - Implement column configuration and data binding
   - Add sorting, filtering, and pagination capabilities
