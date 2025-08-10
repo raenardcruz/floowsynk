@@ -34,11 +34,15 @@ export type {
   MigrationConfig
 } from './migration'
 
+export type { MonacoEditorProps } from './MonacoEditor'
+
 // Components will be exported individually as they are created
 export { default as SideBar } from './Sidebar'
 export { default as Modal } from './Modal'
 export { default as Loading } from './Loading'
 export { default as Notif } from './Notif'
+export { default as MonacoEditor } from './MonacoEditor'
 export * from './Buttons'
 export * from './Tabs'
 export * from './Table'
+export * from './Collapsible'

@@ -120,15 +120,15 @@
   - Test code input with different programming languages
   - _Requirements: 1.1, 2.3, 4.1_
 
-- [ ] 9. Evaluate and migrate remaining components
-- [ ] 9.1 Evaluate Collapsible component migration
+- [x] 9. Evaluate and migrate remaining components
+- [x] 9.1 Evaluate Collapsible component migration
   - Compare custom Collapsible with PrimeVue Accordion component
   - Decide whether to migrate or maintain custom implementation
   - If migrating, create wrapper with existing API compatibility
   - Test collapsible behavior and animation consistency
   - _Requirements: 1.1, 3.1, 4.1_
 
-- [ ] 9.2 Assess MonacoEditor integration
+- [x] 9.2 Assess MonacoEditor integration
   - Verify MonacoEditor component works with new PrimeVue setup
   - Update any styling conflicts with PrimeVue theme system
   - Test editor integration with new form components
