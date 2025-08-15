@@ -7,7 +7,7 @@
             <span>out of 30 Processes</span>
         </div>
         <div class="gallery-search">
-            <input class="search-box" type="search" placeholder="Search" v-model="search">
+            <TextInput v-model="search" placeholder="Search" />
         </div>
         <div class="cards-gallery">
             <div class="create" @click="createProcess">
@@ -63,6 +63,7 @@ import { useAsyncState, useVirtualList } from '@vueuse/core'
 import { Headers as Header, Row } from '@/components/Composable/UI/Table'
 import { Collapsible } from '@/components/Composable/UI/Collapsible'
 import Loading from '@/components/Composable/UI/Loading'
+import { TextInput } from '@/components/Composable/UI/Inputs'
 
 const { search, history } = useProcessListStore()
 const { filteredProcesses } = useProcessListHooks()

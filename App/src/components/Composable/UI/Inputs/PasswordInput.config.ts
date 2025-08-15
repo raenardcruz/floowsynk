@@ -1,23 +1,4 @@
 /**
- * Default configuration for PasswordInput wrapper component
- */
-
-import type { PasswordInputProps } from './PasswordInput.types'
-
-/**
- * Default props for PasswordInput wrapper
- */
-export const defaultPasswordInputProps: Partial<PasswordInputProps> = {
-  variant: 'outlined',
-  autocomplete: 'current-password',
-  required: false,
-  invalid: false,
-  readonly: false,
-  toggleMask: true,
-  feedback: false
-}
-
-/**
  * Prop mappings from wrapper props to PrimeVue Password props
  */
 export const passwordInputPropMappings = {

@@ -8,12 +8,22 @@ import type { TextInputProps } from './TextInput.types'
  * Default props for TextInput wrapper
  */
 export const defaultTextInputProps: Partial<TextInputProps> = {
+  class: undefined,
+  id: undefined,
+  style: undefined,
+  disabled: false,
+  loading: false,
   variant: 'outlined',
   type: 'text',
   autocomplete: 'off',
   required: false,
   invalid: false,
-  readonly: false
+  readonly: false,
+  tooltip: '',
+  modelValue: '',
+  label: '',
+  placeholder: '',
+  maxlength: 100,
 }
 
 /**

@@ -38,6 +38,7 @@ export interface PasswordInputProps extends BaseComponentProps {
   mediumLabel?: string
   /** Custom strong password text */
   strongLabel?: string
+  tooltip?: string
 }
 
 /**

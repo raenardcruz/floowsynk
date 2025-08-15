@@ -216,11 +216,5 @@ initializeThemeIntegration()
 
 // Import and run verification in development
 if (process.env.NODE_ENV === 'development') {
-  import('./verification').then(({ verifyMigrationFoundation, logMigrationStatus }) => {
-    // Small delay to ensure everything is loaded
-    setTimeout(() => {
-      verifyMigrationFoundation()
-      logMigrationStatus()
-    }, 100)
-  })
+
 }

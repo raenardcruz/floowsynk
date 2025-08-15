@@ -2,9 +2,7 @@
   <div class="password-input-wrapper" :class="wrapperClasses">
     <FloatLabel 
       v-if="label"
-      variant="on" 
-      pt:root:class="password-input-float-label"
-      v-tooltip.focus.bottom="tooltip"
+      variant="on"
     >
       <Password
         ref="primevueRef"
@@ -23,13 +21,15 @@
         :mediumLabel="mediumLabel"
         :strongLabel="strongLabel"
         :class="inputClasses"
-        :data-testid="$props['data-testid']"
         pt:pcInputText:root:class="password-input-field"
+        pt:maskIcon:class="password-toggle-mask"
+        pt:unmaskIcon:class="password-toggle-unmask"
         @focus="handleFocus"
         @blur="handleBlur"
         @keydown="handleKeydown"
         @keyup="handleKeyup"
         @input="handleInput"
+        v-tooltip.focus.bottom="tooltip"
       />
       <label :for="id || inputId">{{ label }}</label>
     </FloatLabel>
@@ -52,8 +52,9 @@
       :mediumLabel="mediumLabel"
       :strongLabel="strongLabel"
       :class="inputClasses"
-      :data-testid="$props['data-testid']"
       pt:pcInputText:root:class="password-input-field"
+      pt:maskIcon:root:class="password-toggle-mask"
+      pt:unmaskIcon:root:class="password-toggle-unmask"
       v-tooltip.focus.bottom="tooltip"
       @focus="handleFocus"
       @blur="handleBlur"
@@ -70,10 +71,10 @@ import { generateId } from '../utils/component'
 import FloatLabel from 'primevue/floatlabel'
 import Password from 'primevue/password'
 import type { PasswordInputProps, PasswordInputEmits, PasswordInputExposed } from './PasswordInput.types'
-import { defaultPasswordInputProps, passwordInputVariantClasses } from './PasswordInput.config'
+import { passwordInputVariantClasses } from './PasswordInput.config'
 
 // Props with defaults
-const props = withDefaults(defineProps<PasswordInputProps>(), defaultPasswordInputProps)
+const props = defineProps<PasswordInputProps>()
 
 // Model
 const modelValue = defineModel<string>({ default: '' })
@@ -176,7 +177,7 @@ defineExpose<PasswordInputExposed>({
   width: 100%;
   height: 2.5rem;
   font-size: 1rem;
-  border-radius: 20px !important;
+  border-radius: 8px !important;
   padding: 0 2.5rem 0 1rem;
   transition: all 0.2s ease-in-out;
 }
@@ -218,14 +219,12 @@ defineExpose<PasswordInputExposed>({
 }
 
 /* Password toggle button styling */
-:deep(.p-password-toggle-mask) {
-  position: absolute;
-  right: 0.75rem;
-  top: 50%;
+:deep(.password-toggle-mask) {
   transform: translateY(-50%);
-  cursor: pointer;
-  color: var(--p-surface-500, #6b7280);
-  transition: color 0.2s ease-in-out;
+}
+
+:deep(.password-toggle-unmask) {
+  transform: translateY(-50%);
 }
 
 :deep(.p-password-toggle-mask:hover) {

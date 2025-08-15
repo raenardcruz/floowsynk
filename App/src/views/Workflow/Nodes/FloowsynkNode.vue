@@ -25,7 +25,7 @@
         </Sidebar>
     </Teleport>
     <Teleport :to="`#${canvasId}`">
-        <Modal title="Select Process Type" caption="Select the type of process you want to create" :visible="showModal" @update:visible="showModal = $event">
+        <Modal title="Select Process Type" caption="Select the type of process you want to create" :visible="showModal" @update:visible="showModal = $event" bgcolor="none">
             <ProcessTypeModal :id="props.tabid" />
         </Modal>
     </Teleport>

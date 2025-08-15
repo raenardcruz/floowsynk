@@ -28,6 +28,8 @@ export interface TextInputProps extends BaseComponentProps {
   type?: 'text' | 'email' | 'url' | 'tel'
   /** Autocomplete attribute */
   autocomplete?: string
+  tooltip?: string
+  /** Unique identifier for the input */
 }
 
 /**

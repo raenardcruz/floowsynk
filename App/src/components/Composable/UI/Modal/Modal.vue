@@ -195,8 +195,8 @@ const handleUnmaximize = () => {
   emit('unmaximize')
 }
 
-const handleDragEnd = (event: DragEvent) => {
-  emit('dragend', event)
+const handleDragEnd = (event: Event) => {
+  emit('dragend', event as DragEvent)
 }
 
 // Expose useful properties for parent components
@@ -237,6 +237,7 @@ defineExpose({
   flex-direction: column;
   gap: 0.25rem;
   padding: 0.5rem 0;
+  width: 100%;
 }
 
 .modal-title {

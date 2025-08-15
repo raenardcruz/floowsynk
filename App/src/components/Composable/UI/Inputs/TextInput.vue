@@ -4,8 +4,6 @@
     <FloatLabel 
       v-if="label"
       variant="on" 
-      pt:root:class="text-input-float-label"
-      v-tooltip.focus.bottom="tooltip"
     >
       <InputText
         ref="primevueRef"
@@ -19,12 +17,12 @@
         :maxlength="maxlength"
         :autocomplete="autocomplete"
         :class="inputClasses"
-        :data-testid="$props['data-testid']"
         @focus="handleFocus"
         @blur="handleBlur"
         @keydown="handleKeydown"
         @keyup="handleKeyup"
         @input="handleInput"
+        v-tooltip.focus.right="tooltip"
       />
       <label :for="id || inputId">{{ label }}</label>
     </FloatLabel>
@@ -42,7 +40,6 @@
       :maxlength="maxlength"
       :autocomplete="autocomplete"
       :class="inputClasses"
-      :data-testid="$props['data-testid']"
       v-tooltip.focus.bottom="tooltip"
       @focus="handleFocus"
       @blur="handleBlur"
@@ -59,10 +56,10 @@ import { generateId } from '../utils/component'
 import FloatLabel from 'primevue/floatlabel'
 import InputText from 'primevue/inputtext'
 import type { TextInputProps, TextInputEmits, TextInputExposed } from './TextInput.types'
-import { defaultTextInputProps, textInputVariantClasses } from './TextInput.config'
+import { textInputVariantClasses } from './TextInput.config'
 
 // Props with defaults
-const props = withDefaults(defineProps<TextInputProps>(), defaultTextInputProps)
+const props = defineProps<TextInputProps>()
 
 // Model
 const modelValue = defineModel<string>({ default: '' })
@@ -165,7 +162,7 @@ defineExpose<TextInputExposed>({
   width: 100%;
   height: 2.5rem;
   font-size: 1rem;
-  border-radius: 20px;
+  border-radius: 8px;
   padding: 0 1rem;
   transition: all 0.2s ease-in-out;
 }

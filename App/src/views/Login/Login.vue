@@ -10,7 +10,7 @@
                     <br>
                     <form @submit.prevent="handleLogin">
                         <TextInput id="username" class="form-item" v-model="username" label="User Name" placeholder="Enter your username" />
-                        <PasswordInput id="password" class="form-item" v-model="password" label="Password" placeholder="Enter your password" />
+                        <PasswordInput id="password" class="form-item" v-model="password" label="Password" placeholder="Enter your password" toggleMask />
                         <div v-if="loginError" class="tooltip">{{ loginErrorMessage }}</div>
                         <div class="btn-grp">
                             <button>Register</button>
