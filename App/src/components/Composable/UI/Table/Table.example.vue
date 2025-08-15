@@ -1,6 +1,6 @@
 <template>
   <div class="table-examples">
-    <h2>Table Migration Examples</h2>
+    <h2>Table Examples</h2>
     
     <!-- New PrimeVue DataTable Wrapper -->
     <section>

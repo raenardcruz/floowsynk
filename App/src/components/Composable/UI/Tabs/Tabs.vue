@@ -52,7 +52,7 @@ import Tab from 'primevue/tab'
 import TabPanels from 'primevue/tabpanels'
 import TabPanel from 'primevue/tabpanel'
 import CloseSvg from '@/components/Icons/basic/close.svg'
-import { mergeComponentClasses } from '../migration/utils'
+import { mergeComponentClasses } from '../utils'
 import { defaultTabsProps, tabPositionClasses } from './Tabs.config'
 import type { TabsWrapperProps, TabsWrapperEmits, TabContent } from './Tabs.types'
 

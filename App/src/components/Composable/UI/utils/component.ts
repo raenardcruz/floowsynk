@@ -166,3 +166,43 @@ export function deepClone<T>(obj: T): T {
   }
   return obj
 }
+
+/**
+ * Merge component classes with additional classes
+ */
+export function mergeComponentClasses(
+  wrapperClasses: string | object | Array<string | object> | undefined,
+  additionalClasses: string | undefined
+): string | object | Array<string | object> | undefined {
+  if (!wrapperClasses && !additionalClasses) return undefined
+  if (!wrapperClasses) return additionalClasses
+  if (!additionalClasses) return wrapperClasses
+  
+  if (typeof wrapperClasses === 'string') {
+    return `${wrapperClasses} ${additionalClasses}`
+  }
+  
+  if (Array.isArray(wrapperClasses)) {
+    return [...wrapperClasses, additionalClasses]
+  }
+  
+  return [wrapperClasses, additionalClasses]
+}
+
+/**
+ * Extract event handlers from attributes
+ */
+export function extractEventHandlers(attrs: Record<string, any>) {
+  const events: Record<string, any> = {}
+  const otherAttrs: Record<string, any> = {}
+  
+  Object.entries(attrs).forEach(([key, value]) => {
+    if (key.startsWith('on') && typeof value === 'function') {
+      events[key] = value
+    } else {
+      otherAttrs[key] = value
+    }
+  })
+  
+  return { events, otherAttrs }
+}

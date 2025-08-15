@@ -2,7 +2,7 @@
  * TypeScript interfaces for Notif wrapper component
  */
 
-import type { BaseWrapperProps } from '../migration/types'
+import type { BaseWrapperProps } from '../types'
 
 /**
  * Notification severity types

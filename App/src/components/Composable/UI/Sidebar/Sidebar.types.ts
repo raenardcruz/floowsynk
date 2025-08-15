@@ -1,4 +1,4 @@
-import type { BaseWrapperProps } from '../migration/types'
+import type { BaseWrapperProps } from '../types'
 
 /**
  * Sidebar wrapper component props

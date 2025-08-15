@@ -51,7 +51,7 @@
 import { computed, ref, watch } from 'vue'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
-import { mergeComponentClasses } from '../migration/utils'
+import { mergeComponentClasses } from '../utils'
 import { defaultTableProps } from './Table.config'
 import type { TableWrapperProps, TableWrapperEmits } from './Table.types'
 

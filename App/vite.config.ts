@@ -5,6 +5,11 @@ import vue from '@vitejs/plugin-vue'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [vue()],
+  // Suppress source map warnings during development
+  css: {
+    devSourcemap: false
+  },
+
   server: {
     watch: {
       usePolling: true,
@@ -14,6 +19,13 @@ export default defineConfig({
       '/api': {
         target: 'http://localhost:8081',
         changeOrigin: true,
+      }
+    },
+    // Suppress source map warnings
+    hmr: {
+      overlay: {
+        warnings: false,
+        errors: true
       }
     }
   },
@@ -26,6 +38,13 @@ export default defineConfig({
   build: {
     // Optimize bundle size
     rollupOptions: {
+      onwarn(warning, warn) {
+        // Suppress source map warnings for node_modules
+        if (warning.code === 'SOURCEMAP_ERROR' && warning.message.includes('node_modules')) {
+          return
+        }
+        warn(warning)
+      },
       output: {
         // Manual chunk splitting for better caching
         manualChunks: {
@@ -85,6 +104,11 @@ export default defineConfig({
       // Exclude large dependencies that should be loaded separately
       'monaco-editor'
     ]
+  },
+  // Define configuration to handle Monaco Editor properly
+  define: {
+    // Suppress source map warnings in development
+    'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV || 'development')
   },
   test: {
     environment: 'jsdom',

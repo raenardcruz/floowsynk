@@ -4,9 +4,7 @@
  * The Tabs component has been migrated to use PrimeVue TabView as the underlying
  * implementation with a simplified wrapper API that maintains backward compatibility.
  * 
- * Migration Status: ✅ COMPLETED
- * - Tabs: Migrated to PrimeVue TabView wrapper with simplified API
- * - Tab: Maintained for backward compatibility and slot content management
+ * Uses PrimeVue TabView with simplified API and backward compatibility.
  * 
  * Features:
  * - Simplified tab switching and content management

@@ -4,9 +4,7 @@
  * These components have been migrated to use PrimeVue Button as the underlying implementation
  * with simplified wrapper APIs that maintain backward compatibility.
  * 
- * Migration Status: ✅ COMPLETED
- * - Button: Migrated to PrimeVue Button wrapper with variant mapping
- * - PrimaryButton: Migrated to extend Button wrapper with primary styling
+ * Uses PrimeVue Button with variant mapping and enhanced styling.
  * 
  * Features:
  * - Simplified API with sensible defaults

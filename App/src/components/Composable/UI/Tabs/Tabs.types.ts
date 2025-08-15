@@ -3,7 +3,7 @@
  */
 
 import type { Component } from 'vue'
-import type { BaseWrapperProps } from '../migration/types'
+import type { BaseWrapperProps } from '../types'
 
 /**
  * Tab content configuration

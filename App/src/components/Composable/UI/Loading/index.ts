@@ -4,8 +4,7 @@
  * The Loading component has been migrated to use PrimeVue ProgressSpinner as the
  * underlying implementation with a simplified wrapper API that maintains backward compatibility.
  * 
- * Migration Status: ✅ COMPLETED
- * - Loading: Migrated to PrimeVue ProgressSpinner wrapper
+ * Uses PrimeVue ProgressSpinner with enhanced functionality.
  * 
  * Features:
  * - Multiple spinner types and animations

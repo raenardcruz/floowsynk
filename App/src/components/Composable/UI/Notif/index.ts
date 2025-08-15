@@ -4,8 +4,7 @@
  * The Notif component has been migrated to use PrimeVue Toast as the underlying
  * implementation with enhanced notification management and positioning system.
  * 
- * Migration Status: ✅ COMPLETED
- * - Notif: Migrated to PrimeVue Toast wrapper with enhanced features
+ * Uses PrimeVue Toast with enhanced notification management.
  * 
  * Features:
  * - Enhanced notification management and queuing

@@ -3,7 +3,7 @@
  */
 
 import type { Component } from 'vue'
-import type { BaseWrapperProps } from '../migration/types'
+import type { BaseWrapperProps } from '../types'
 
 /**
  * Column configuration for the table

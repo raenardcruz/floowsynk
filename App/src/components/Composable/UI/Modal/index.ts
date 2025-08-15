@@ -4,8 +4,7 @@
  * The Modal component has been migrated to use PrimeVue Dialog as the underlying
  * implementation with a simplified wrapper API that maintains backward compatibility.
  * 
- * Migration Status: ✅ COMPLETED
- * - Modal: Migrated to PrimeVue Dialog wrapper with simplified API
+ * Uses PrimeVue Dialog with simplified API.
  * 
  * Features:
  * - Simplified header, content, and footer slot management

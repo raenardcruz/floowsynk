@@ -5,8 +5,7 @@
  * but has been maintained as a custom implementation due to specific requirements
  * and existing usage patterns in the application.
  * 
- * Migration Status: ✅ EVALUATED - MAINTAINED AS CUSTOM
- * - Collapsible: Maintained as custom implementation with PrimeVue theme integration
+ * Custom implementation with PrimeVue theme integration.
  * 
  * Decision Rationale:
  * - Existing component meets all current requirements
@@ -21,7 +20,7 @@
  * - Full TypeScript support
  * - Maintains existing API for backward compatibility
  * 
- * For detailed analysis, see: ./MIGRATION_ANALYSIS.md
+
  */
 
 // Component export

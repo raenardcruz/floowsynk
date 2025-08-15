@@ -5,10 +5,7 @@
  * implementation, replacing the custom Headers and Row components with a more powerful
  * and feature-rich data table solution.
  * 
- * Migration Status: ✅ COMPLETED
- * - Table: Migrated to PrimeVue DataTable wrapper with column configuration
- * - Headers: Legacy component maintained for backward compatibility during transition
- * - Row: Legacy component maintained for backward compatibility during transition
+ * Uses PrimeVue DataTable with column configuration and legacy component support.
  * 
  * New Features:
  * - Built-in sorting, filtering, and pagination
@@ -18,10 +15,7 @@
  * - Responsive design support
  * - Full TypeScript support
  * 
- * Migration Notes:
- * - New Table component uses column configuration instead of Headers/Row pattern
- * - Legacy Headers and Row components are deprecated but maintained for compatibility
- * - See Table.example.vue for usage examples with the new API
+ * Note: Legacy Headers and Row components are maintained for backward compatibility.
  */
 
 // Primary component export (PrimeVue DataTable wrapper)

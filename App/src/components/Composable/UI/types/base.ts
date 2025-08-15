@@ -17,6 +17,24 @@ export interface BaseComponentProps {
 }
 
 /**
+ * Base wrapper props for PrimeVue components
+ */
+export interface BaseWrapperProps {
+  /** Unique identifier for the component */
+  id?: string
+  /** CSS classes to apply to the component */
+  class?: string | object | Array<string | object>
+  /** Inline styles to apply to the component */
+  style?: string | object
+  /** Whether the component is disabled */
+  disabled?: boolean
+  /** Data test identifier for testing */
+  'data-testid'?: string
+  /** Data test identifier for testing (alternative naming) */
+  dataTestid?: string
+}
+
+/**
  * Base component state interface for internal state management
  */
 export interface ComponentState {

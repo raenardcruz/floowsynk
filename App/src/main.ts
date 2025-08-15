@@ -6,9 +6,7 @@ import PrimeVue from 'primevue/config'
 import Aura from '@primeuix/themes/aura';
 import Tooltip from 'primevue/tooltip';
 
-// Import migration utilities
-import './components/Composable/UI/migration/theme-integration'
-import './components/Composable/UI/migration/initial-registry'
+// PrimeVue theme integration is now handled directly in primevue.config.ts
 
 const app = createApp(App)
 app.use(router)

@@ -4,10 +4,7 @@
  * The Sidebar components have been migrated to use PrimeVue Sidebar as the underlying
  * implementation with simplified wrapper APIs that maintain backward compatibility.
  * 
- * Migration Status: ✅ COMPLETED
- * - Sidebar: Migrated to PrimeVue Sidebar wrapper with drawer functionality
- * - BaseSidebar: Base implementation for sidebar functionality
- * - CollapsibleSidebar: Collapsible variant with enhanced interaction
+ * Uses PrimeVue Sidebar with drawer functionality and enhanced interaction.
  * 
  * Features:
  * - Enhanced drawer functionality and positioning

@@ -4,14 +4,7 @@
  * All input components have been migrated to use PrimeVue input components as the underlying
  * implementation with simplified wrapper APIs that maintain backward compatibility.
  * 
- * Migration Status: ✅ COMPLETED
- * - TextInput: Migrated to PrimeVue InputText with FloatLabel
- * - PasswordInput: Migrated to PrimeVue Password component
- * - Select: Migrated to PrimeVue Select/Dropdown component
- * - Checkbox: Migrated to PrimeVue Checkbox component
- * - KeyValue: Migrated with enhanced key-value pair functionality
- * - ListField: Migrated with enhanced list management and protocol buffer compatibility
- * - TextCodeInput: Migrated with Monaco Editor integration for code editing
+ * All input components use PrimeVue with enhanced functionality and backward compatibility.
  * 
  * Features:
  * - Consistent validation and error handling

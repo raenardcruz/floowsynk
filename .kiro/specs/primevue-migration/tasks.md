@@ -179,3 +179,11 @@
   - Optimize component loading and lazy loading where appropriate
   - Test application performance and loading times
   - _Requirements: 1.1, 3.1_
+
+- [x] 15. Flatten migration structure and remove logging/wrappers
+  - Move essential migration utilities directly into base UI structure
+  - Remove complex migration registry and logging systems
+  - Simplify component exports by removing migration wrapper complexity
+  - Clean up migration-specific files and directories
+  - Update main UI index to remove migration-specific exports
+  - _Requirements: 3.3, 6.4_

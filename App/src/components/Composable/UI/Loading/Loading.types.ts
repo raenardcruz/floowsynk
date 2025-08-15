@@ -2,7 +2,7 @@
  * TypeScript interfaces for Loading wrapper component
  */
 
-import type { BaseWrapperProps } from '../migration/types'
+import type { BaseWrapperProps } from '../types'
 
 /**
  * Loading component size options
