@@ -47,7 +47,7 @@
     position: relative;
     display: flex;
     border-top: solid 1px var(--grey-3);
-    padding: 10px;
+    padding: 16px;
     justify-content: flex-start;
     align-items: center;
     flex-wrap: wrap;
@@ -74,11 +74,9 @@
     display: grid;
     width: 100%;
     transition: 0.5s ease-out;
-    max-height: 0;
-    opacity: 0;
     height: fit-content;
     grid-template-columns: repeat(2, auto);
-    grid-gap: 10px;
+    grid-gap: 8px;
 }
 .nodes.expand {
     max-height: 1000vh; /* Set this to a value that is enough to show your content */
@@ -94,6 +92,7 @@
     border-radius: 8px;
     background: var(--white-2);
     box-shadow: 3px 3px 5px var(--grey-3),-3px -3px 5px var(--white-1);
+    margin-top: 8px;
 }
 
 .node:hover {
@@ -124,6 +123,7 @@
     flex-direction: column;
     text-align: left;
     margin-bottom: 10px;
+    padding: 0 20px;
 }
 .input label {
     font-size: 7px;

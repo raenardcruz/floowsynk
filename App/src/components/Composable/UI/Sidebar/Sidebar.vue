@@ -151,10 +151,6 @@ defineExpose({
 </script>
 
 <style scoped>
-.sidebar-wrapper {
-  /* Custom sidebar wrapper styles */
-}
-
 .sidebar-header-content {
   display: flex;
   flex-direction: column;
@@ -180,7 +176,6 @@ defineExpose({
   display: flex;
   position: relative;
   gap: 0.75rem;
-  padding: 0.625rem;
   overflow-y: auto;
   height: calc(100% - 2.5rem);
   flex-direction: column;
@@ -190,7 +185,6 @@ defineExpose({
   padding: 1rem;
   border-top: 1px solid var(--grey-4);
 }
-
 /* PrimeVue Sidebar customizations */
 :deep(.p-sidebar) {
   background: var(--grey-5);

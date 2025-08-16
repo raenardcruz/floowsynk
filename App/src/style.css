@@ -21,74 +21,107 @@
 }
 
 :root {
-  --blue-1: #14376B;
-  --blue-2: #3B82F6;
-  --blue-3: #60A5FA;
-  --blue-4: #3AA9B6;
-  --blue-5: #BFDBFE;
-  --blue-6: #b3e5fc;
-  --blue-7: #e0f7ff;
+  /* Neutral Palette */
+  --neutral-1: #feffff;
+  --neutral-2: #fefefe;
+  --neutral-3: #fcfdfd;
+  --neutral-4: #fbfcfc;
+  --neutral-5: #fafbfc;
+  --neutral-6: #f9fafb;
+  --neutral-7: #d4d5d5;
+  --neutral-8: #b1b2b2;
+  --neutral-9: #8e8f8f;
+  --neutral-10: #707071;
 
+  /* Blue Palette */
+  --blue-1: #ebf3fe;
+  --blue-2: #d0e1fd;
+  --blue-3: #abc9fb;
+  --blue-4: #84b0f9;
+  --blue-5: #5e99f8;
+  --blue-6: #3b82f6;
+  --blue-7: #326fd1;
+  --blue-8: #2a5caf;
+  --blue-9: #224a8c;
+  --blue-10: #1b3a6f;
+
+  /* Violet Palette */
+  --violet-1: #f3effe;
+  --violet-2: #e3d8fd;
+  --violet-3: #cdb9fb;
+  --violet-4: #b698f9;
+  --violet-5: #a079f8;
+  --violet-6: #8b5cf6;
+  --violet-7: #764ed1;
+  --violet-8: #6341af;
+  --violet-9: #4f348c;
+  --violet-10: #3f296f;
+
+  /* Green Palette */
+  --green-1: #e7f8f2;
+  --green-2: #c6eee1;
+  --green-3: #98e1c9;
+  --green-4: #68d3b0;
+  --green-5: #3bc698;
+  --green-6: #10b981;
+  --green-7: #0e9d6e;
+  --green-8: #0b835c;
+  --green-9: #09694a;
+  --green-10: #07533a;
+
+  /* Orange Palette */
+  --orange-1: #fff4e6;
+  --orange-2: #ffe4c2;
+  --orange-3: #ffcf91;
+  --orange-4: #ffb85e;
+  --orange-5: #ffa32e;
+  --orange-6: #ff8f00;
+  --orange-7: #d97a00;
+  --orange-8: #b56600;
+  --orange-9: #915200;
+  --orange-10: #734000;
+
+  /* Red Palette */
+  --red-1: #fdecec;
+  --red-2: #fbd2d2;
+  --red-3: #f8afaf;
+  --red-4: #f58989;
+  --red-5: #f26666;
+  --red-6: #ef4444;
+  --red-7: #cb3a3a;
+  --red-8: #aa3030;
+  --red-9: #882727;
+  --red-10: #6c1f1f;
+
+  /* Brown Palette */
+  --brown-1: #f0edec;
+  --brown-2: #dcd4d1;
+  --brown-3: #c0b2ad;
+  --brown-4: #a38e87;
+  --brown-5: #876c63;
+  --brown-6: #6d4c41;
+  --brown-7: #5d4137;
+  --brown-8: #4d362e;
+  --brown-9: #3e2b25;
+  --brown-10: #31221d;
+
+  /* Grey Palette - Used throughout the UI */
   --grey-1: #111827;
   --grey-2: #374151;
-  --grey-3: #6B7280;
-  --grey-4: #D1D5DB;
-  --grey-5: #F3F4F6;
+  --grey-3: #6b7280;
+  --grey-4: #d1d5db;
+  --grey-5: #f3f4f6;
+  --grey-6: #f9fafb;
+  --grey-7: #e5e7eb;
+  --grey-8: #9ca3af;
 
-  --white-1: #FFFFFF;
-  --white-2: #F9FAFB;
-  --white-3: #F3F4F6;
-  --white-4: #E5E7EB;
-  --white-5: #D1D5DB;
-
-  --green-1: #064E3B;
-  --green-2: #10B981;
-  --green-3: #34D399;
-  --green-4: #6EE7B7;
-  --green-5: #A7F3D0;
-
-  --violet-1: #4C1D95;
-  --violet-2: #8B5CF6;
-  --violet-3: #A78BFA;
-  --violet-4: #C4B5FD;
-  --violet-5: #DDD6FE;
-
-  --orange-1: #FF6F00;
-  --orange-2: #FF8F00;
-  --orange-3: #FC930F;
-  --orange-4: #FFB300;
-  --orange-5: #FFC107;
-
-  --red-1: #B91C1C;
-  --red-2: #EF4444;
-  --red-3: #F87171;
-  --red-4: #FCA5A5;
-  --red-5: #FECACA;
-
-  --pink-1: #AD1457;
-  --pink-2: #D81B60;
-  --pink-3: #C4597D;
-  --pink-4: #F48FB1;
-  --pink-5: #F8BBD0;
-
-  --brown-1: #4E342E;
-  --brown-2: #6D4C41;
-  --brown-3: #8D6E63;
-  --brown-4: #A1887F;
-  --brown-5: #DBDBDB;
-
-  --black-translucent: rgba(0, 0, 0, 0.5);
-  --black-translucent-2: rgba(0, 0, 0, 0.2);
-  --black-translucent-3: rgba(0, 0, 0, 0.1);
-  --white-translucent: rgba(255, 255, 255, 0.5);
-  --blue-translucent: rgba(30, 58, 138, 0.5);
-  --grey-translucent: rgba(17, 24, 39, 0.5);
-  --green-translucent: rgba(6, 78, 59, 0.5);
-  --violet-translucent: rgba(76, 29, 149, 0.5);
-  --orange-translucent: rgba(255, 111, 0, 0.5);
-  --red-translucent: rgba(185, 28, 28, 0.5);
-  --brown-translucent: rgba(78, 52, 46, 0.5);
+  /* White Palette - Used throughout the UI */
+  --white-1: #ffffff;
+  --white-2: #f9fafb;
+  --white-3: #f3f4f6;
+  --white-4: #e5e7eb;
 }
+
 
 /* Font family */
 body {
@@ -96,7 +129,7 @@ body {
   font-size: 16px; /* Base font size for readability on most screens */
   line-height: 1.6; /* Optimal line height for comfortable reading */
   color: var(--grey-1);
-  background-color: var(--white-2);
+  background-color: var(--neutral-3);
   height: 100vh;
   width: 100vw;
 }
@@ -112,12 +145,12 @@ body #app {
 /* Link styling */
 a {
   text-decoration: none;
-  color: var(--blue-1);
+  color: var(--blue-6);
   transition: all 0.3s;
 }
 
 a:hover {
-  color: var(--blue-2);
+  color: var(--blue-8);
 }
 
 /* Button styling */
@@ -131,8 +164,8 @@ button {
 }
 
 button:hover {
-  background-color: var(--blue-2);
-  color: var(--white-2);
+  background-color: var(--blue-8);
+  color: var(--neutral-6);
 }
 
 @keyframes fadeInFromTop {
@@ -168,7 +201,7 @@ button:hover {
 }
 
 .vue-flow__handle {
-  background: var(--grey-3);
+  background: var(--grey-2);
   height:12px;
   width:5px;
   border-radius: 2px;
@@ -191,4 +224,7 @@ button:hover {
   border-style: dashed !important;
   border-width: 2px !important;
   border-color: var(--blue-2) !important;
+}
+.p-drawer-content {
+  padding: 0px;
 }
