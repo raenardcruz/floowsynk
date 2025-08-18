@@ -4,20 +4,24 @@
             <div class="title">
                 <input type="text" v-model="tab.name" placeholder="Enter Process Title">
                 <div class="tags">
-                    <div class="tag btn" @click="addTag">
+                    <Chip pt:root:class="tag" @click="addTag">
                         <span class="material-symbols-outlined">add</span>
                         <span>Add Tag</span>
-                    </div>
-                    <div class="tag" style="background: var(--blue-2);" v-for="(_, index) in tab.tagsList">
-                        <input type="text" placeholder="New Tag" v-model="tab.tagsList[index]"
+                    </Chip>
+                    <Chip pt:root:class="tag" style="background: var(--blue-5);" v-for="(_, index) in tab.tagsList"
+                        removable>
+                        <input class="tag-input" type="text" placeholder="New Tag" v-model="tab.tagsList[index]"
                             :list="tab.tagsList[index]">
                         <datalist :id="tab.tagsList[index]">
                             <option :value="tag" v-for="tag in tab.tagsList.filter((f: string) => f != 'No Tags')">
                             </option>
                         </datalist>
-                        <span class="material-symbols-outlined" style="color: var(--red-2);"
-                            @click="removeTag(index)">close</span>
-                    </div>
+                        <template #removeicon="">
+                            <span class="material-symbols-outlined" @click="removeTag(index)">close</span>
+                        </template>
+                        <!-- <span class="material-symbols-outlined" style="color: var(--red-2);"
+                            @click="removeTag(index)">close</span> -->
+                    </Chip>
                 </div>
             </div>
             <div class="description">
@@ -26,14 +30,14 @@
         </div>
         <div class="content" :id="canvasId">
             <SidebarCanvas />
-            <Modal title="Process Type" caption="Please select the workflow process type." :visible="show" @update:visible="show = $event">
+            <Modal title="Process Type" caption="Please select the workflow process type." :visible="show"
+                @update:visible="show = $event">
                 <ProcessTypeModal :id="tab.id" />
             </Modal>
             <div class="workspace">
-                <VueFlow class="vue-flow-container" tabindex="0" v-model:nodes="node"
-                    v-model:edges="edge" :only-render-visible-elements="false"
-                    :snapToGrid="true" @connect="onConnectEdge($event)" @drop="onDrop($event)"
-                    @dragover="onDragOver($event)" @dragleave="onDragLeave()"
+                <VueFlow class="vue-flow-container" tabindex="0" v-model:nodes="node" v-model:edges="edge"
+                    :only-render-visible-elements="false" :snapToGrid="true" @connect="onConnectEdge($event)"
+                    @drop="onDrop($event)" @dragover="onDragOver($event)" @dragleave="onDragLeave()"
                     @selection-drag-stop="commit()" @edges-change="commit()" delete-key-code="false"
                     no-wheel-class-name="no-scroll">
                     <DropzoneBackground :style="{
@@ -94,6 +98,7 @@ import FloowsynkNode from '@/views/Workflow/Nodes'
 import { useWorkflowCanvasHelperMethods } from './Helper/Workflow.Canvas.Helper'
 import CustomEdge from '@/views/Workflow/Edges/CustomEdge.vue'
 import ReplaySteps from '../ReplaySteps'
+import Chip from 'primevue/chip'
 
 const props = defineProps<WorkflowCanvasProps>()
 const { tab, canvasId, node, edge } = useWorkflowCanvasHooks(props.id)

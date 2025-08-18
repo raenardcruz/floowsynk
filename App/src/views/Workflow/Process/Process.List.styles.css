@@ -72,7 +72,7 @@
     transition: 0.3s ease-in-out;
     background-size: contain;
     background-position: center;
-    background: var(--grey-4);
+    background: var(--neutral-7);
 }
 .create img {
     width: 100px;
@@ -99,40 +99,40 @@
 .card.default {
     background-size: contain;
     background-position: center;
-    background-color: var(--green-5);
+    background-color: var(--green-4);
     background-blend-mode: multiply;
     background-repeat: no-repeat;
 }
 .card.defaultnode {
     background-size: contain;
     background-position: center;
-    background-color: var(--green-5);
+    background-color: var(--green-4);
     background-blend-mode: multiply;
     background-repeat: no-repeat;
 }
 .card.webhook {
     background-size: contain;
     background-position: center;
-    background-color: var(--brown-5);
+    background-color: var(--brown-4);
     background-blend-mode: multiply;
     background-repeat: no-repeat;
 }
 .card.events {
     background-size: contain;
     background-position: center;
-    background-color: var(--pink-5);
+    background-color: var(--red-3);
     background-blend-mode: multiply;
     background-repeat: no-repeat;
 }
 .card.interval {
     background-size: contain;
     background-position: center;
-    background-color: var(--blue-5);
+    background-color: var(--blue-3);
     background-blend-mode: multiply;
     background-repeat: no-repeat;
 }
 .cards-gallery .card:hover {
-    box-shadow: 6px 6px 6px var(--grey-3);
+    box-shadow: 6px 6px 6px var(--neutral-8);
 }
 .cards-gallery .card .type {
     position: relative;
