@@ -228,3 +228,9 @@ button:hover {
 .p-drawer-content {
   padding: 0px;
 }
+.content-height {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}

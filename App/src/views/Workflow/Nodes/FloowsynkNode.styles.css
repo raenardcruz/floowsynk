@@ -177,3 +177,10 @@
   justify-content: center;
   cursor: pointer;
 }
+.node-sidebar {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 4px 8px;
+}

@@ -1,79 +1,37 @@
 <template>
   <!-- Monaco Editor Modal -->
   <Teleport :to="editorConfig?.target || 'body'" v-if="editorConfig && showEditor">
-    <Modal 
-      :visible="showEditor"
-      :title="editorModalTitle"
-      size="large"
-      @update:visible="handleEditorModalClose"
-    >
-      <MonacoEditor 
-        v-model="internalValue" 
-        :variables="editorConfig.variables" 
-        :disabled="disabled" 
-      />
+    <Modal :visible="showEditor" :title="editorModalTitle" size="large" @update:visible="handleEditorModalClose" bgcolor="none">
+      <MonacoEditor v-model="internalValue" :variables="editorConfig.variables" :disabled="disabled" />
     </Modal>
   </Teleport>
 
-  <div 
-    :class="[
-      'textcodeinput-wrapper',
-      {
-        'textcodeinput-wrapper--disabled': disabled,
-        'textcodeinput-wrapper--invalid': invalid,
-        'textcodeinput-wrapper--required': required,
-        'textcodeinput-wrapper--has-editor': editorConfig && showEditorButton
-      }
-    ]"
-    :data-testid="$props['data-testid']"
-  >
-    <FloatLabel v-if="label">
-      <InputText
-        ref="primevueRef"
-        :id="inputId"
-        v-model="internalValue"
-        :type="inputType"
-        :placeholder="placeholder"
-        :disabled="disabled"
-        :invalid="invalid"
-        :class="[
-          textCodeInputVariantClasses[variant],
-          textCodeInputSizeClasses[size],
+  <FloatLabel v-if="label" variant="on">
+    <IconField>
+      <InputText ref="primevueRef" :id="inputId" v-model="internalValue" :type="inputType" :placeholder="placeholder"
+        :disabled="disabled" :invalid="invalid" :class="[
+          textCodeInputVariantClasses[variant ?? 'outlined'],
+          textCodeInputSizeClasses[size ?? 'medium'],
           'textcodeinput-wrapper__input'
-        ]"
-        @focus="handleFocus"
-        @blur="handleBlur"
-        @keydown="handleKeydown"
-        @keyup="handleKeyup"
-      />
-      <label :for="inputId">
-        {{ label }}
-        <span v-if="required" class="textcodeinput-wrapper__required">*</span>
-      </label>
-    </FloatLabel>
-    
-    <InputText
-      v-else
-      ref="primevueRef"
-      :id="inputId"
-      v-model="internalValue"
-      :type="inputType"
-      :placeholder="placeholder"
-      :disabled="disabled"
-      :invalid="invalid"
-      :class="[
-        textCodeInputVariantClasses[variant],
-        textCodeInputSizeClasses[size],
-        'textcodeinput-wrapper__input'
-      ]"
-      @focus="handleFocus"
-      @blur="handleBlur"
-      @keydown="handleKeydown"
-      @keyup="handleKeyup"
-    />
-    
-    <!-- Code Editor Button -->
-    <Button
+        ]" @focus="handleFocus" @blur="handleBlur" @keydown="handleKeydown" @keyup="handleKeyup" />
+      <InputIcon v-if="editorConfig" pt:root:class="icon-position" @click="openEditor" v-tooltip.bottom="'Code Editor'">
+        <img class="code-icon" :src="MapEmbedSVG" alt="Map Embed Icon" />
+      </InputIcon>
+    </IconField>
+    <label :for="inputId">
+      {{ label }}
+    </label>
+  </FloatLabel>
+
+  <InputText v-else ref="primevueRef" :id="inputId" v-model="internalValue" :type="inputType" :placeholder="placeholder"
+    :disabled="disabled" :invalid="invalid" :class="[
+      textCodeInputVariantClasses[variant ?? 'outlined'],
+      textCodeInputSizeClasses[size ?? 'medium'],
+      'textcodeinput-wrapper__input'
+    ]" @focus="handleFocus" @blur="handleBlur" @keydown="handleKeydown" @keyup="handleKeyup" />
+
+  <!-- Code Editor Button -->
+  <!-- <Button
       v-if="editorConfig && showEditorButton && !showEditor"
       icon="pi pi-code"
       severity="secondary"
@@ -85,8 +43,7 @@
       @click="openEditor"
       :aria-label="`Open code editor for ${label || 'input'}`"
       v-tooltip="'Open Code Editor'"
-    />
-  </div>
+    /> -->
 </template>
 
 <script setup lang="ts">
@@ -97,23 +54,23 @@ import InputText from 'primevue/inputtext'
 import Button from 'primevue/button'
 import { Modal } from '../Modal'
 import { MonacoEditor } from '../MonacoEditor'
+import InputIcon from 'primevue/inputicon'
+import IconField from 'primevue/iconfield'
+import MapEmbedSVG from '@/components/Icons/components/map-embed.svg'
 
-import type { 
-  TextCodeInputWrapperProps, 
-  TextCodeInputWrapperEmits, 
-  TextCodeInputWrapperExposed 
+import type {
+  TextCodeInputWrapperProps,
+  TextCodeInputWrapperEmits,
+  TextCodeInputWrapperExposed
 } from './TextCodeInput.types'
-import { 
-  defaultTextCodeInputProps, 
-  textCodeInputVariantClasses, 
-  textCodeInputSizeClasses 
+import {
+  defaultTextCodeInputProps,
+  textCodeInputVariantClasses,
+  textCodeInputSizeClasses
 } from './TextCodeInput.config'
 
 // Props with defaults
-const props = withDefaults(
-  defineProps<TextCodeInputWrapperProps>(),
-  defaultTextCodeInputProps
-)
+const props = defineProps<TextCodeInputWrapperProps>()
 
 // Emits
 const emit = defineEmits<TextCodeInputWrapperEmits>()
@@ -230,7 +187,8 @@ defineExpose<TextCodeInputWrapperExposed>({
 }
 
 .textcodeinput-wrapper--has-editor .textcodeinput-wrapper__input {
-  padding-right: 2.5rem; /* Space for editor button */
+  padding-right: 2.5rem;
+  /* Space for editor button */
 }
 
 .textcodeinput-wrapper__editor-btn {
@@ -261,7 +219,7 @@ defineExpose<TextCodeInputWrapperExposed>({
   .textcodeinput-wrapper__editor-btn {
     right: 0.25rem;
   }
-  
+
   .textcodeinput-wrapper--has-editor .textcodeinput-wrapper__input {
     padding-right: 2rem;
   }
@@ -283,5 +241,22 @@ defineExpose<TextCodeInputWrapperExposed>({
 
 .textcodeinput-wrapper--has-editor :deep(.p-inputtext-outlined) {
   padding-right: 2.5rem;
+}
+
+.code-icon {
+  height: 24px;
+  width: 24px;
+}
+
+:deep(.icon-position) {
+  transform: translateY(-50%);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50px;
+  transition: all 0.15s ease-in-out;
+}
+
+:deep(.icon-position:hover) {
+  background: var(--blue-2);
 }
 </style>

@@ -14,6 +14,7 @@
     :position="position"
     :minWidth="minWidth"
     :minHeight="minHeight"
+    pt:content:class="content-height"
     @update:visible="handleVisibilityChange"
     @show="handleShow"
     @hide="handleHide"
@@ -228,10 +229,6 @@ defineExpose({
 </script>
 
 <style scoped>
-.modal-wrapper {
-  /* Custom modal wrapper styles */
-}
-
 .modal-header-content {
   display: flex;
   flex-direction: column;
@@ -253,6 +250,7 @@ defineExpose({
 }
 
 .modal-content {
+  height: 100%;
   padding: 0.5rem 0;
   overflow: auto;
   flex: 1;

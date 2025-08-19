@@ -66,7 +66,6 @@ const getComponent = (key: string, value: any) => {
                     component: TextCodeInput,
                     props: {
                         label,
-                        type: 'text',
                         disabled: !isRunning,
                         editorConfig: enableEditor ? {
                             variables: variables.value,
