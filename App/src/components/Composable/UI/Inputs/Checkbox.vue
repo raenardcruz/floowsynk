@@ -27,11 +27,9 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, nextTick } from 'vue'
+import { ref, computed } from 'vue'
 import { generateId } from '../utils/component'
-import Checkbox from 'primevue/checkbox'
 import type { CheckboxProps, CheckboxEmits, CheckboxExposed } from './Checkbox.types'
-import { defaultCheckboxProps, checkboxStateClasses } from './Checkbox.config'
 
 // Props with defaults
 const props = defineProps<CheckboxProps>()
@@ -109,19 +107,6 @@ const handleBlur = (event: FocusEvent) => {
 
 const handleChange = (event: Event) => {
   emit('change', event)
-}
-
-// Exposed methods
-const focus = () => {
-  nextTick(() => {
-    primevueRef.value?.$el?.focus()
-  })
-}
-
-const blur = () => {
-  nextTick(() => {
-    primevueRef.value?.$el?.blur()
-  })
 }
 
 // Expose methods and refs
