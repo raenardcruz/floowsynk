@@ -1,63 +1,37 @@
 <template>
-  <div 
-    :class="[
-      'keyvalue-wrapper',
-      {
-        'keyvalue-wrapper--disabled': disabled,
-        'keyvalue-wrapper--invalid': invalid,
-        'keyvalue-wrapper--required': required
-      }
-    ]"
-    :data-testid="$props['data-testid']"
-  >
+  <div :class="[
+    'keyvalue-wrapper',
+    {
+      'keyvalue-wrapper--disabled': disabled,
+      'keyvalue-wrapper--invalid': invalid,
+      'keyvalue-wrapper--required': required
+    }
+  ]">
     <div v-if="label" class="keyvalue-wrapper__label">
       {{ label }}
-      <span v-if="required" class="keyvalue-wrapper__required">*</span>
     </div>
-    
-    <div class="keyvalue-wrapper__inputs">
-      <div class="keyvalue-wrapper__input-group">
-        <FloatLabel>
-          <InputText
-            ref="keyInputRef"
-            :id="keyInputId"
-            v-model="keyValue"
-            :placeholder="keyPlaceholder"
-            :disabled="disabled"
-            :invalid="invalid"
-            :class="[
-              keyValueVariantClasses[variant],
-              keyValueSizeClasses[size],
-              'keyvalue-wrapper__key-input'
-            ]"
-            @focus="handleKeyFocus"
-            @blur="handleKeyBlur"
-          />
-          <label :for="keyInputId">Key</label>
-        </FloatLabel>
-      </div>
-      
-      <div class="keyvalue-wrapper__input-group">
-        <FloatLabel>
-          <InputText
-            ref="valueInputRef"
-            :id="valueInputId"
-            v-model="valueValue"
-            :placeholder="valuePlaceholder"
-            :disabled="disabled"
-            :invalid="invalid"
-            :class="[
-              keyValueVariantClasses[variant],
-              keyValueSizeClasses[size],
-              'keyvalue-wrapper__value-input'
-            ]"
-            @focus="handleValueFocus"
-            @blur="handleValueBlur"
-          />
-          <label :for="valueInputId">Value</label>
-        </FloatLabel>
-      </div>
-    </div>
+
+    <FloatLabel variant="on" style="margin-top: 8px;">
+      <InputText ref="keyInputRef" :id="keyInputId" v-model="keyValue" :placeholder="keyPlaceholder || 'Key'"
+        :disabled="disabled" :invalid="invalid" :class="[
+          keyValueVariantClasses[variant || 'outlined'],
+          keyValueSizeClasses[size || 'medium'],
+          'keyvalue-wrapper__key-input'
+        ]" @focus="handleKeyFocus" @blur="handleKeyBlur" />
+      <label :for="keyInputId">Key</label>
+    </FloatLabel>
+
+    <FloatLabel variant="on" style="margin-top: 8px;">
+      <InputText ref="valueInputRef" :id="valueInputId" v-model="valueValue" :placeholder="valuePlaceholder || 'Value'"
+        :disabled="disabled" :invalid="invalid" :class="[
+          keyValueVariantClasses[variant || 'outlined'],
+          keyValueSizeClasses[size || 'medium'],
+          'keyvalue-wrapper__value-input'
+        ]" @focus="handleValueFocus" @blur="handleValueBlur" />
+      <label :for="valueInputId">Value</label>
+    </FloatLabel>
+
+    <div class="divider"></div>
   </div>
 </template>
 
@@ -67,23 +41,19 @@ import { generateId } from '../utils/component'
 import FloatLabel from 'primevue/floatlabel'
 import InputText from 'primevue/inputtext'
 
-import type { 
-  KeyValueWrapperProps, 
-  KeyValueWrapperEmits, 
+import type {
+  KeyValueWrapperProps,
+  KeyValueWrapperEmits,
   KeyValueWrapperExposed,
-  KeyValuePair 
+  KeyValuePair
 } from './KeyValue.types'
-import { 
-  defaultKeyValueProps, 
-  keyValueVariantClasses, 
-  keyValueSizeClasses 
+import {
+  keyValueVariantClasses,
+  keyValueSizeClasses
 } from './KeyValue.config'
 
 // Props with defaults
-const props = withDefaults(
-  defineProps<KeyValueWrapperProps>(),
-  defaultKeyValueProps
-)
+const props = defineProps<KeyValueWrapperProps>()
 
 // Emits
 const emit = defineEmits<KeyValueWrapperEmits>()
@@ -175,11 +145,17 @@ defineExpose<KeyValueWrapperExposed>({
   flex-direction: column;
   width: 100%;
   gap: 10px;
-  padding: 20px;
   border-radius: 20px;
   border: 1px solid var(--p-surface-border);
   margin-top: 12px;
   background: var(--p-surface-ground);
+  padding-top: 8px;
+}
+
+.divider {
+  height: 1px;
+  background: var(--neutral-7);
+  margin: 8px 0;
 }
 
 .keyvalue-wrapper--disabled {
@@ -194,7 +170,7 @@ defineExpose<KeyValueWrapperExposed>({
 .keyvalue-wrapper__label {
   display: flex;
   position: absolute;
-  top: -10px;
+  top: -15px;
   left: 10px;
   font-size: 12px;
   background: var(--p-surface-ground);
@@ -236,17 +212,12 @@ defineExpose<KeyValueWrapperExposed>({
     flex-direction: row;
     gap: 12px;
   }
-  
+
   .keyvalue-wrapper__input-group {
     flex: 1;
   }
 }
 
-/* Focus states */
-.keyvalue-wrapper:focus-within {
-  border-color: var(--p-primary-color);
-  box-shadow: 0 0 0 1px var(--p-primary-color);
-}
 
 /* Invalid state styling */
 .keyvalue-wrapper--invalid .keyvalue-wrapper__key-input,

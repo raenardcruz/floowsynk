@@ -42,8 +42,6 @@ export interface ListFieldWrapperProps extends BaseComponentProps {
   maxItems?: number
   /** Minimum number of items required */
   minItems?: number
-  /** Whether to show item type selector */
-  showTypeSelector?: boolean
 }
 
 export interface ListFieldWrapperEmits {

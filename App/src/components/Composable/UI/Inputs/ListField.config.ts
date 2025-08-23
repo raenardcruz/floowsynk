@@ -11,11 +11,9 @@ export const defaultListFieldProps: Partial<ListFieldWrapperProps> = {
   disabled: false,
   required: false,
   invalid: false,
-  availableTypes: ['string', 'number', 'boolean', 'keyvalue'],
   draggable: false,
   maxItems: undefined,
   minItems: 0,
-  showTypeSelector: true
 }
 
 export const listFieldTypeOptions: ListFieldOption[] = [

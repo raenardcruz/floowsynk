@@ -1,69 +1,39 @@
 <template>
-  <div 
-    :class="[
-      'listfield-wrapper',
-      {
-        'listfield-wrapper--disabled': disabled,
-        'listfield-wrapper--invalid': invalid,
-        'listfield-wrapper--required': required
-      }
-    ]"
-    :data-testid="$props['data-testid']"
-  >
+  <div :class="[
+    'listfield-wrapper',
+    {
+      'listfield-wrapper--disabled': disabled,
+      'listfield-wrapper--invalid': invalid,
+      'listfield-wrapper--required': required
+    }
+  ]">
     <div v-if="label" class="listfield-wrapper__label">
       {{ label }}
       <span v-if="required" class="listfield-wrapper__required">*</span>
     </div>
-    
+
     <!-- List Items -->
     <div class="listfield-wrapper__items">
-      <div 
-        v-for="(item, index) in displayItems" 
-        :key="`item-${index}`"
-        class="listfield-wrapper__item"
-      >
-        <Button
-          icon="pi pi-times"
-          severity="danger"
-          size="small"
-          text
-          rounded
-          class="listfield-wrapper__remove-btn"
-          :disabled="disabled"
-          @click="removeItem(index)"
-          :aria-label="`Remove item ${index + 1}`"
-        />
-        
-        <component
-          :is="getComponentForType(currentDataType).component"
-          v-model="displayItems[index]"
-          v-bind="getComponentPropsForIndex(index)"
-          :disabled="disabled"
-          :invalid="invalid"
-        />
+      <div v-for="(item, index) in displayItems" :key="`item-${index}`" class="listfield-wrapper__item">
+        <div style="width: 100%; min-width: 200px; margin: 0;">
+          <component :is="getComponentForType(currentDataType).component" v-model="displayItems[index]"
+            v-bind="getComponentPropsForIndex(index)" :disabled="disabled" :invalid="invalid" />
+        </div>
+        <Button size="small" text :disabled="disabled" @click="removeItem(index)" style="width: 24px; border-radius: 50px;">
+          <img :src="TrashSvg" alt="Remove" style="width: 16px; height: 16px;" />
+        </Button>
       </div>
     </div>
-    
+
     <!-- Add Item Section -->
     <div class="listfield-wrapper__actions">
-      <Select
-        v-if="showTypeSelector"
-        v-model="currentDataType"
-        :options="availableTypeOptions"
-        :disabled="disabled"
-        placeholder="Select item type"
-        class="listfield-wrapper__type-selector"
-      />
-      
-      <Button
-        icon="pi pi-plus"
-        :label="addButtonLabel"
-        :disabled="disabled || isMaxItemsReached"
-        @click="addItem"
-        class="listfield-wrapper__add-btn"
-      />
+      <Select v-model="currentDataType" :options="availableTypeOptions" :disabled="disabled"
+        placeholder="Select item type" class="listfield-wrapper__type-selector" />
+
+      <Button icon="pi pi-plus" :label="addButtonLabel" :disabled="disabled || isMaxItemsReached" @click="addItem"
+        class="listfield-wrapper__add-btn" style="width: 100%; border-radius: 8px;" />
     </div>
-    
+
     <!-- Item Count Info -->
     <div v-if="showItemCount" class="listfield-wrapper__info">
       {{ displayItems.length }} item{{ displayItems.length !== 1 ? 's' : '' }}
@@ -76,27 +46,21 @@
 import { ref, computed, watch } from 'vue'
 import Button from 'primevue/button'
 import Select from './Select.vue'
-
-import type { 
-  ListFieldWrapperProps, 
-  ListFieldWrapperEmits, 
+import type {
+  ListFieldWrapperProps,
+  ListFieldWrapperEmits,
   ListFieldWrapperExposed,
   ListFieldItemType
 } from './ListField.types'
-import { 
-  defaultListFieldProps, 
+import {
   listFieldTypeOptions,
   getComponentPropsForType
 } from './ListField.config'
-
-// Import protocol buffer types for backward compatibility
 import { NodeDataArray, ArrayDataType, KeyValue } from 'proto/workflow/workflow_pb'
+import TrashSvg from '@/components/Icons/basic/trash.svg'
 
 // Props with defaults
-const props = withDefaults(
-  defineProps<ListFieldWrapperProps>(),
-  defaultListFieldProps
-)
+const props = defineProps<ListFieldWrapperProps>()
 
 // Emits
 const emit = defineEmits<ListFieldWrapperEmits>()
@@ -107,7 +71,6 @@ const currentDataType = ref<ListFieldItemType>('string')
 // Computed properties
 const availableTypeOptions = computed(() => {
   return listFieldTypeOptions
-    .filter(option => props.availableTypes?.includes(option.value))
     .map(option => ({
       value: option.value,
       label: option.label
@@ -123,7 +86,7 @@ const addButtonLabel = computed(() => {
 })
 
 const showItemCount = computed(() => {
-  return props.maxItems !== undefined || props.minItems > 0
+  return props.maxItems !== undefined || props.minItems
 })
 
 // Handle backward compatibility with protocol buffer types
@@ -134,7 +97,7 @@ const isProtocolBufferModel = computed(() => {
 const displayItems = computed({
   get() {
     if (!props.modelValue) return []
-    
+
     if (isProtocolBufferModel.value) {
       // Handle protocol buffer format
       const pbModel = props.modelValue as NodeDataArray.AsObject
@@ -144,7 +107,7 @@ const displayItems = computed({
         [ArrayDataType.BOOL]: pbModel.boolitemsList || [],
         [ArrayDataType.KEYVALUE]: pbModel.keyvalueitemsList || []
       }
-      
+
       // Update current data type based on protocol buffer type
       const pbTypeToLocal = {
         [ArrayDataType.STRING]: 'string' as ListFieldItemType,
@@ -152,7 +115,7 @@ const displayItems = computed({
         [ArrayDataType.BOOL]: 'boolean' as ListFieldItemType,
         [ArrayDataType.KEYVALUE]: 'keyvalue' as ListFieldItemType
       }
-      
+
       currentDataType.value = pbTypeToLocal[pbModel.type] || 'string'
       return typeMap[pbModel.type] || []
     } else {
@@ -164,13 +127,13 @@ const displayItems = computed({
     if (isProtocolBufferModel.value) {
       // Update protocol buffer format
       const pbModel = { ...props.modelValue } as NodeDataArray.AsObject
-      
+
       // Clear all arrays
       pbModel.stringitemsList = []
       pbModel.intitemsList = []
       pbModel.boolitemsList = []
       pbModel.keyvalueitemsList = []
-      
+
       // Set the appropriate array based on current type
       const localToPbType = {
         string: ArrayDataType.STRING,
@@ -178,9 +141,9 @@ const displayItems = computed({
         boolean: ArrayDataType.BOOL,
         keyvalue: ArrayDataType.KEYVALUE
       }
-      
+
       pbModel.type = localToPbType[currentDataType.value]
-      
+
       switch (currentDataType.value) {
         case 'string':
           pbModel.stringitemsList = newValue as string[]
@@ -195,7 +158,7 @@ const displayItems = computed({
           pbModel.keyvalueitemsList = newValue as KeyValue.AsObject[]
           break
       }
-      
+
       emit('update:modelValue', pbModel)
     } else {
       // Update simple array format
@@ -215,11 +178,11 @@ const getComponentPropsForIndex = (index: number) => {
 
 const addItem = () => {
   if (isMaxItemsReached.value) return
-  
+
   const componentOption = getComponentForType(currentDataType.value)
   const newItems = [...displayItems.value, componentOption.defaultValue]
   displayItems.value = newItems
-  
+
   emit('item-added', {
     id: Date.now(),
     value: componentOption.defaultValue,
@@ -233,11 +196,11 @@ const removeItem = (index: number) => {
     value: displayItems.value[index],
     type: currentDataType.value
   }
-  
+
   const newItems = [...displayItems.value]
   newItems.splice(index, 1)
   displayItems.value = newItems
-  
+
   emit('item-removed', itemToRemove, index)
 }
 
@@ -256,10 +219,10 @@ const getItems = () => {
 const setDataType = (type: ListFieldItemType) => {
   const oldType = currentDataType.value
   currentDataType.value = type
-  
+
   // Clear items when type changes to avoid type conflicts
   displayItems.value = []
-  
+
   emit('type-changed', type, oldType)
 }
 
@@ -287,12 +250,12 @@ defineExpose<ListFieldWrapperExposed>({
   flex-direction: column;
   gap: 16px;
   width: 100%;
-  border: 1px solid var(--p-surface-border);
+  border: 1px solid var(--neutral-7);
   min-height: 60px;
   border-radius: 12px;
   padding: 20px 16px;
   margin-top: 12px;
-  background: var(--p-surface-ground);
+  background: var(--neutral-6);
 }
 
 .listfield-wrapper--disabled {
@@ -307,10 +270,10 @@ defineExpose<ListFieldWrapperExposed>({
 .listfield-wrapper__label {
   display: flex;
   position: absolute;
-  top: -10px;
+  top: -15px;
   left: 12px;
   font-size: 12px;
-  background: var(--p-surface-ground);
+  background: var(--neutral-2);
   color: var(--p-text-color);
   border: 1px solid var(--p-surface-border);
   border-radius: 8px;
@@ -336,28 +299,24 @@ defineExpose<ListFieldWrapperExposed>({
   position: relative;
   align-items: flex-start;
   gap: 8px;
-  padding: 8px;
-  border: 1px solid var(--p-surface-border);
   border-radius: 8px;
   background: var(--p-surface-50);
+  justify-content: space-between;
+  align-items: center;
 }
 
-.listfield-wrapper__remove-btn {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  z-index: 10;
-}
-
-.listfield-wrapper__item > :not(.listfield-wrapper__remove-btn) {
+.listfield-wrapper__item> :not(.listfield-wrapper__remove-btn) {
   flex: 1;
-  margin-right: 40px; /* Space for remove button */
+  margin-right: 40px;
+  /* Space for remove button */
 }
 
 .listfield-wrapper__actions {
   display: flex;
   gap: 12px;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
   padding-top: 8px;
   border-top: 1px solid var(--p-surface-border);
 }
@@ -407,7 +366,7 @@ defineExpose<ListFieldWrapperExposed>({
     flex-direction: column;
     align-items: stretch;
   }
-  
+
   .listfield-wrapper__type-selector {
     min-width: unset;
   }

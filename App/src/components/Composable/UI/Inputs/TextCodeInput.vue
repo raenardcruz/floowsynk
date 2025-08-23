@@ -1,14 +1,15 @@
 <template>
   <!-- Monaco Editor Modal -->
   <Teleport :to="editorConfig?.target || 'body'" v-if="editorConfig && showEditor">
-    <Modal :visible="showEditor" :title="editorModalTitle" size="large" @update:visible="handleEditorModalClose" bgcolor="none">
+    <Modal :visible="showEditor" :title="editorModalTitle" size="large" @update:visible="handleEditorModalClose"
+      bgcolor="none">
       <MonacoEditor v-model="internalValue" :variables="editorConfig.variables" :disabled="disabled" />
     </Modal>
   </Teleport>
 
   <FloatLabel v-if="label" variant="on">
     <IconField>
-      <InputText ref="primevueRef" :id="inputId" v-model="internalValue" :type="inputType" :placeholder="placeholder"
+      <InputText ref="primevueRef" :id="inputId" v-model="internalValue" :type="inputType" :placeholder="placeholder || label"
         :disabled="disabled" :invalid="invalid" :class="[
           textCodeInputVariantClasses[variant ?? 'outlined'],
           textCodeInputSizeClasses[size ?? 'medium'],
@@ -18,7 +19,7 @@
         <img class="code-icon" :src="MapEmbedSVG" alt="Map Embed Icon" />
       </InputIcon>
     </IconField>
-    <label :for="inputId">
+    <label :for="id || inputId">
       {{ label }}
     </label>
   </FloatLabel>
@@ -29,21 +30,6 @@
       textCodeInputSizeClasses[size ?? 'medium'],
       'textcodeinput-wrapper__input'
     ]" @focus="handleFocus" @blur="handleBlur" @keydown="handleKeydown" @keyup="handleKeyup" />
-
-  <!-- Code Editor Button -->
-  <!-- <Button
-      v-if="editorConfig && showEditorButton && !showEditor"
-      icon="pi pi-code"
-      severity="secondary"
-      text
-      rounded
-      size="small"
-      class="textcodeinput-wrapper__editor-btn"
-      :disabled="disabled"
-      @click="openEditor"
-      :aria-label="`Open code editor for ${label || 'input'}`"
-      v-tooltip="'Open Code Editor'"
-    /> -->
 </template>
 
 <script setup lang="ts">
@@ -51,7 +37,6 @@ import { ref, computed, nextTick } from 'vue'
 import { generateId } from '../utils/component'
 import FloatLabel from 'primevue/floatlabel'
 import InputText from 'primevue/inputtext'
-import Button from 'primevue/button'
 import { Modal } from '../Modal'
 import { MonacoEditor } from '../MonacoEditor'
 import InputIcon from 'primevue/inputicon'
@@ -64,7 +49,6 @@ import type {
   TextCodeInputWrapperExposed
 } from './TextCodeInput.types'
 import {
-  defaultTextCodeInputProps,
   textCodeInputVariantClasses,
   textCodeInputSizeClasses
 } from './TextCodeInput.config'

@@ -7,7 +7,9 @@
             v-model="modelValue" />
     </div>
     <template v-for="(value, key) in modelValue" :key="key" v-else-if="modelValue && typeof modelValue === 'object'">
-        <component :is="getComponent(key, value)?.component" v-bind="getComponent(key, value)?.props" v-if="value != null" v-model="modelValue[key]" />
+        <div v-if="value != null" style="margin-top: 8px;">
+            <component :is="getComponent(key, value)?.component" v-bind="getComponent(key, value)?.props" v-model="modelValue[key]" />
+        </div>
     </template>
 </template>
 
@@ -70,7 +72,7 @@ const getComponent = (key: string, value: any) => {
                         editorConfig: enableEditor ? {
                             variables: variables.value,
                             target: '.content'
-                        } : null,
+                        } : null
                     }
                 }
             case Number:
