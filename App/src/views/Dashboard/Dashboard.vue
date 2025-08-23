@@ -1,7 +1,7 @@
 <template>
     <div style="padding: 8px">
         <div class="test">
-            <Tabs id="tabs" :tabContents="test" v-model="tabSelection" @close="closeTab" />
+            <Checkbox v-model="checkboxValue" label="Testing" />
         </div>
     </div>
 </template>
@@ -11,6 +11,7 @@ import { ref } from 'vue'
 import { Tabs, type TabContent } from '@/components/Composable/UI/Tabs'
 import Test1 from './Test1.vue'
 import Test2 from './Test2.vue'
+import Checkbox from '@/components/Composable/UI/Inputs/Checkbox.vue'
 
 const test: TabContent[] = [
     {
@@ -31,6 +32,7 @@ const test: TabContent[] = [
    }
 ]
 const tabSelection = ref('ID1')
+const checkboxValue = ref(true)
 const closeTab = (id: string) => {
     alert(`Close tab with ID: ${id}`)
 }

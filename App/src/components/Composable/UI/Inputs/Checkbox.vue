@@ -1,7 +1,8 @@
 <template>
   <div class="checkbox-wrapper" :class="wrapperClasses">
     <label class="checkbox-container" :class="containerClasses">
-      <Checkbox
+      <input
+        type="checkbox"
         ref="primevueRef"
         :id="id || checkboxId"
         v-model="modelValue"
@@ -13,8 +14,7 @@
         :name="name"
         :tabindex="tabindex"
         :aria-label="ariaLabel"
-        :aria-labelledby="ariaLabelledby"
-        :data-testid="$props['data-testid']"
+        :aria-labelledby="ariaLabelledby"zzzzzz
         :class="checkboxClasses"
         @focus="handleFocus"
         @blur="handleBlur"
@@ -34,7 +34,7 @@ import type { CheckboxProps, CheckboxEmits, CheckboxExposed } from './Checkbox.t
 import { defaultCheckboxProps, checkboxStateClasses } from './Checkbox.config'
 
 // Props with defaults
-const props = withDefaults(defineProps<CheckboxProps>(), defaultCheckboxProps)
+const props = defineProps<CheckboxProps>()
 
 // Model
 const modelValue = defineModel<boolean | any[]>({ default: false })
@@ -127,8 +127,6 @@ const blur = () => {
 // Expose methods and refs
 defineExpose<CheckboxExposed>({
   primevueRef,
-  focus,
-  blur
 })
 </script>
 

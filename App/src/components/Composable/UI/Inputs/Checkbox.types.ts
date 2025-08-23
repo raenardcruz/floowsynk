@@ -52,8 +52,4 @@ export interface CheckboxEmits {
 export interface CheckboxExposed {
   /** Reference to the underlying PrimeVue Checkbox component */
   primevueRef: any
-  /** Focus the checkbox */
-  focus: () => void
-  /** Blur the checkbox */
-  blur: () => void
 }
