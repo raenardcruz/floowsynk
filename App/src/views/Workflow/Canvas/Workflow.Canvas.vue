@@ -41,7 +41,7 @@
                     @selection-drag-stop="commit()" @edges-change="commit()" delete-key-code="false"
                     no-wheel-class-name="no-scroll">
                     <DropzoneBackground :style="{
-                        backgroundColor: isDragOver ? '#e7f3ff' : 'transparent',
+                        backgroundColor: isDragOver ? '#e7f3ff' : 'var(--neutral-2)',
                         transition: 'background-color 0.2s ease', height: '100%'
                     }">
                         <h2 v-if="isDragOver">DRAG AREA</h2>

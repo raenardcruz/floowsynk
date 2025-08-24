@@ -103,7 +103,6 @@ UI/
 
   <!-- Feedback Components -->
   <Loading v-if="isLoading" />
-  <Notif ref="notifRef" />
 
   <!-- Data Components -->
   <Table :data="users" :columns="userColumns" />

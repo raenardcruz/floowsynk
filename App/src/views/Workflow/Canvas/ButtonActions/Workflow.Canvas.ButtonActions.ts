@@ -1,6 +1,5 @@
 import { useWorkflowCanvasHooks, useWorkflowCanvasStore } from '../Workflow.Canvas.hooks'
 import { WorkflowCanvasProps } from '../Workflow.Canvas.types'
-import { useNotif, NotifOptions, STATUS_ERROR, STATUS_INFO, STATUS_SUCCESS } from '@/components/Composable/UI/Notif'
 import { initWorkflows } from '@/views/Workflow/Process'
 import { useWorkflowStore } from '@/views/Workflow'
 import { NodeStatus, ReplayData, Node } from 'proto/workflow/workflow_pb'
@@ -10,8 +9,10 @@ import {
   executeProcess,
   deleteProcess
 } from '../Workflow.Canvas.api'
+import { useToast } from 'primevue/usetoast'
 
 export const useWorkflowCanvasControlButtonActions = (props: WorkflowCanvasProps, vueFlowInstance: any) => {
+  const toast = useToast()
   const {
     tabs,
     activeTab,
@@ -33,43 +34,24 @@ export const useWorkflowCanvasControlButtonActions = (props: WorkflowCanvasProps
       } else {
         await updateProcess(tab.value)
       }
-      useNotif({
-        duration: 5000,
-        teleportTarget: `#${btoa(tab.value.id)}`,
-        message: "Workflow saved successfully",
-        status: STATUS_SUCCESS
-      } as NotifOptions)
+      console.log("Saved process:", tab.value)
+      toast.add({severity:'success', summary: 'Success', detail: 'Workflow saved successfully', life: 3000});
     }
     catch (error) {
-      useNotif({
-        duration: 5000,
-        teleportTarget: `#${btoa(tab.value.id)}`,
-        message: "Failed to save workflow: " + error,
-        status: STATUS_ERROR
-      } as NotifOptions)
+      toast.add({severity:'error', summary: 'Error', detail: 'Failed to save workflow' + error, life: 3000});
     }
   }
   // Method: Delete
   const removeProcess = async () => {
     try {
       await deleteProcess(tab.value)
-      useNotif({
-        duration: 5000,
-        teleportTarget: `#${btoa(tab.value.id)}`,
-        message: "Workflow deleted successfully",
-        status: STATUS_INFO
-      } as NotifOptions)
+      toast.add({severity:'success', summary: 'Success', detail: 'Workflow deleted successfully', life: 3000});
       await initWorkflows()
       tabs.value.splice(tabs.value.indexOf(tab.value), 1)
       activeTab.value = 'main'
     }
     catch (error) {
-      useNotif({
-        duration: 5000,
-        teleportTarget: `#${btoa(tab.value.id)}`,
-        message: "Failed to delete workflow",
-        status: STATUS_ERROR
-      } as NotifOptions)
+      toast.add({severity:'error', summary: 'Error', detail: 'Failed to delete workflow' + error, life: 3000});
     }
   }
 
@@ -79,12 +61,7 @@ export const useWorkflowCanvasControlButtonActions = (props: WorkflowCanvasProps
     nodeStatuses.value = {}
     isRunning.value = true
     let stream = await executeProcess(tab.value)
-    useNotif({
-      duration: 5000,
-      teleportTarget: `#${btoa(tab.value.id)}`,
-      message: "Workflow started successfully: ",
-      status: STATUS_INFO
-    } as NotifOptions)
+    toast.add({severity:'success', summary: 'Success', detail: 'Workflow started successfully', life: 3000});
     stream.on('data', (response: ReplayData) => {
       const status: NodeStatus = response?.getStatus()
       switch (status) {

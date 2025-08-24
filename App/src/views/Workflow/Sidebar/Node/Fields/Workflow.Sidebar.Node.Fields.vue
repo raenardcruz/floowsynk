@@ -48,7 +48,7 @@ const getComponent = (key: string, value: any) => {
                 component: ListInput,
                 props: {
                     label,
-                    disabled: !isRunning
+                    disabled: isRunning
                 }
             }
         } else {
@@ -68,7 +68,7 @@ const getComponent = (key: string, value: any) => {
                     component: TextCodeInput,
                     props: {
                         label,
-                        disabled: !isRunning,
+                        disabled: isRunning,
                         editorConfig: enableEditor ? {
                             variables: variables.value,
                             target: '.content'
@@ -81,7 +81,7 @@ const getComponent = (key: string, value: any) => {
                     props: {
                         label,
                         type: 'number',
-                        disabled: !isRunning
+                        disabled: isRunning
                     }
                 }
             case Boolean:
@@ -89,7 +89,7 @@ const getComponent = (key: string, value: any) => {
                     component: CheckboxInput,
                     props: {
                         label,
-                        disabled: !isRunning
+                        disabled: isRunning
                     }
                 }
             default:
