@@ -5,11 +5,25 @@ import router from './router'
 import PrimeVue from 'primevue/config'
 import Aura from '@primeuix/themes/aura';
 import Tooltip from 'primevue/tooltip';
+import ToastService from 'primevue/toastservice';
+
+// PrimeVue theme integration is now handled directly in primevue.config.ts
 
 const app = createApp(App)
 app.use(router)
-app.use(PrimeVue, { ripple: true, theme: {
+app.use(PrimeVue, { 
+  ripple: false, 
+  theme: {
     preset: Aura,
-} })
+    options: {
+      darkModeSelector: '[data-theme="dark"]',
+      cssLayer: {
+        name: 'primevue',
+        order: 'base, primevue, utilities'
+      }
+    }
+  }
+})
+app.use(ToastService)
 app.directive('tooltip', Tooltip);
 app.mount('#app')

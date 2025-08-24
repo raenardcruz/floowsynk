@@ -76,20 +76,20 @@
     right: -45px;
 }
 .node-selected {
-    border: 1px solid var(--blue-2);
-    background: linear-gradient(135deg, var(--white-1), var(--blue-5));
+    border: 2px solid var(--blue-5);
+    
 }
 .node.running {
-    box-shadow: 0 4px 8px var(--blue-translucent);
-    background: linear-gradient(135deg, var(--white-1), var(--blue-5));
+    box-shadow: 0 4px 8px var(--blue-4);
+    background: linear-gradient(135deg, var(--white-1), var(--blue-2));
 }
 .node.success {
-    box-shadow: 0 4px 8px var(--green-translucent);
-    background: linear-gradient(135deg, var(--white-1), var(--green-5));
+    box-shadow: 0 4px 8px var(--green-4);
+    background: linear-gradient(135deg, var(--white-1), var(--green-2));
 }
 .node.error {
-    box-shadow: 0 4px 8px var(--red-translucent);
-    background: linear-gradient(135deg, var(--white-1), var(--red-5));
+    box-shadow: 0 4px 8px var(--red-4);
+    background: linear-gradient(135deg, var(--white-1), var(--red-2));
   }
   
   /* Rotating Gradient Border */
@@ -176,4 +176,11 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
+}
+.node-sidebar {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 4px 8px;
 }

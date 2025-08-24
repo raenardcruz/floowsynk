@@ -6,7 +6,7 @@
 </template>
 
 <script lang="js" setup>
-import BaseSidebar, {} from '@/components/Composable/UI/Sidebar/BaseSidebar.vue'
+import { BaseSidebar } from '@/components/Composable/UI/Sidebar'
 import { usePagesStore } from '@/views/Pages/Pages.hooks'
 import ComponentsContents from './PageSidebar/ComponentsContents.vue'
 import StylesContents from './PageSidebar/StylesContents.vue'

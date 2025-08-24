@@ -20,28 +20,28 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    border-radius: 60px;
-    background: linear-gradient(45deg, var(--blue-4), var(--blue-1), var(--violet-1), var(--pink-3), var(--orange-3));
+    border-radius: 16px;
+    background: linear-gradient(45deg, var(--blue-8), var(--violet-6), var(--orange-5));
     height: 350px;
     width: 350px;
     border: 1px solid var(--grey-4);
-    box-shadow: 0 30px 16px var(--black-translucent-2);
     transform: rotate(15deg);
 }
 .bg-2 {
     display: flex;
     justify-content: center;
     align-items: center;
-    border-radius: 60px;
-    background: linear-gradient(45deg,var(--blue-4), var(--blue-1), var(--violet-1), var(--pink-3), var(--orange-3));
+    border-radius: 16px;
+    background: linear-gradient(45deg, var(--blue-8), var(--violet-6), var(--orange-5));
     height: 350px;
     width: 350px;
     border: 1px solid var(--grey-4);
-    box-shadow: 0 30px 16px var(--black-translucent-2);
     transform: rotate(40deg);
 }
 .login-card {
+    position: relative;
     display: flex;
+    width: 450px;
     justify-content: center;
     align-items: center;
     border-radius: 10px;
@@ -49,7 +49,7 @@
     background: var(--white-1);
     padding: 20px;
     transform: rotate(-55deg);
-    box-shadow: inset 10px -11px 16px var(--white-translucent), inset 4px -8px 16px var(--black-translucent);
+    box-shadow: inset 10px -11px 16px var(--white-3), inset 4px -8px 16px var(--grey-3);
 }
 .form-item {
     margin-bottom: 20px;

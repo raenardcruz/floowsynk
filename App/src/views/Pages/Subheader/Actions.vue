@@ -7,7 +7,7 @@
 
 <script setup>
     import { SCREEN_SIZES } from './Action.constants'
-    import Select from '@/components/Composable/UI/Inputs/Select.vue'
+    import { Select } from '@/components/Composable/UI/Inputs'
     import ActionsOptions from './Actions.Options.vue'
 
     const options = SCREEN_SIZES.map(size => {

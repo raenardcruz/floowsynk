@@ -1,97 +1,210 @@
 
 <template>
-    <FloatLabel variant="on" pt:root:class="text-box" v-tooltip.focus.bottom="tooltip">
-        <div class="input-wrapper">
-            <InputText
-                :type="isPasswordType ? (showPassword ? 'text' : 'password') : (type ? type : 'text')"
-                :id="id"
-                v-model="modelValue"
-                :placeholder="placeholder"
-                autocomplete="off"
-            />
-            <button
-                v-if="isPasswordType"
-                type="button"
-                class="toggle-password"
-                @click="toggleShowPassword"
-                :aria-label="showPassword ? 'Hide password' : 'Show password'"
-            >
-                <img style="height: 24px; width: 24px;" :src="showPassword ? HideViewIcon : ViewIcon" alt="Toggle password visibility" />
-            </button>
-        </div>
-        <label for="on_label">{{ label }}</label>
+  <div class="text-input-wrapper" :class="wrapperClasses">
+    <FloatLabel 
+      v-if="label"
+      variant="on" 
+    >
+      <InputText
+        ref="primevueRef"
+        :id="id || inputId"
+        v-model="modelValue"
+        :type="type"
+        :placeholder="placeholder"
+        :disabled="disabled"
+        :readonly="readonly"
+        :invalid="invalid"
+        :maxlength="maxlength"
+        :autocomplete="autocomplete"
+        :class="inputClasses"
+        @focus="handleFocus"
+        @blur="handleBlur"
+        @keydown="handleKeydown"
+        @keyup="handleKeyup"
+        @input="handleInput"
+        v-tooltip.focus.right="tooltip"
+      />
+      <label :for="id || inputId">{{ label }}</label>
     </FloatLabel>
+    
+    <InputText
+      v-else
+      ref="primevueRef"
+      :id="id || inputId"
+      v-model="modelValue"
+      :type="type"
+      :placeholder="placeholder"
+      :disabled="disabled"
+      :readonly="readonly"
+      :invalid="invalid"
+      :maxlength="maxlength"
+      :autocomplete="autocomplete"
+      :class="inputClasses"
+      v-tooltip.focus.bottom="tooltip"
+      @focus="handleFocus"
+      @blur="handleBlur"
+      @keydown="handleKeydown"
+      @keyup="handleKeyup"
+      @input="handleInput"
+    />
+  </div>
 </template>
 
 <script lang="ts" setup>
-import { defineModel, defineProps, ref, computed } from 'vue'
-import { IdProps } from '@/components/Composable/constants'
-import FloatLabel from 'primevue/floatlabel';
-import InputText from 'primevue/inputtext';
-import ViewIcon from '@/components/Icons/basic/view.svg'
-import HideViewIcon from '@/components/Icons/basic/view-hide.svg'
+import { ref, computed, nextTick } from 'vue'
+import { generateId } from '../utils/component'
+import FloatLabel from 'primevue/floatlabel'
+import InputText from 'primevue/inputtext'
+import type { TextInputProps, TextInputEmits, TextInputExposed } from './TextInput.types'
+import { textInputVariantClasses } from './TextInput.config'
 
-interface Props extends IdProps {
-    label: string,
-    placeholder?: string,
-    type?: string,
+// Props with defaults
+const props = defineProps<TextInputProps>()
+
+// Model
+const modelValue = defineModel<string>({ default: '' })
+
+// Emits
+const emit = defineEmits<TextInputEmits>()
+
+// Template ref
+const primevueRef = ref<any>(null)
+
+// Generate unique ID if not provided
+const inputId = computed(() => props.id || generateId('text-input'))
+
+// Computed classes
+const wrapperClasses = computed(() => [
+  'text-input-wrapper',
+  {
+    'text-input-wrapper--disabled': props.disabled,
+    'text-input-wrapper--invalid': props.invalid,
+    'text-input-wrapper--readonly': props.readonly
+  }
+])
+
+const inputClasses = computed(() => [
+  'text-input',
+  textInputVariantClasses[props.variant || 'outlined'],
+  {
+    'text-input--invalid': props.invalid,
+    'text-input--disabled': props.disabled,
+    'text-input--readonly': props.readonly
+  }
+])
+
+// Event handlers
+const handleFocus = (event: FocusEvent) => {
+  emit('focus', event)
 }
 
-const props = defineProps<Props>()
-const modelValue = defineModel({
-    type: String,
-    default: ''
+const handleBlur = (event: FocusEvent) => {
+  emit('blur', event)
+}
+
+const handleKeydown = (event: KeyboardEvent) => {
+  emit('keydown', event)
+}
+
+const handleKeyup = (event: KeyboardEvent) => {
+  emit('keyup', event)
+}
+
+const handleInput = (event: Event) => {
+  emit('input', event)
+}
+
+// Exposed methods
+const focus = () => {
+  nextTick(() => {
+    primevueRef.value?.$el?.focus()
+  })
+}
+
+const blur = () => {
+  nextTick(() => {
+    primevueRef.value?.$el?.blur()
+  })
+}
+
+const select = () => {
+  nextTick(() => {
+    primevueRef.value?.$el?.select()
+  })
+}
+
+// Expose methods and refs
+defineExpose<TextInputExposed>({
+  primevueRef,
+  focus,
+  blur,
+  select
 })
-
-const showPassword = ref(false)
-const isPasswordType = computed(() => props.type === 'password')
-const toggleShowPassword = () => {
-    showPassword.value = !showPassword.value
-}
 </script>
 
 <style scoped>
-    .text-box {
-        margin-bottom: 10px;   
-    }
-    .input-wrapper {
-        position: relative;
-        display: flex;
-        align-items: center;
-    }
-    .text-box input {
-        width: 100%;
-        height: 2.5rem;
-        font-size: 1rem;
-        border-radius: 20px;
-        padding-right: 2.5rem;
-    }
-    .toggle-password {
-        position: absolute;
-        right: 0.5rem;
-        background: none;
-        border: none;
-        cursor: pointer;
-        font-size: 1.2rem;
-        z-index: 2;
-        padding: 0 0.5rem;
-        color: #888;
-    }
-    .toggle-password:focus {
-        outline: none;
-    }
-    .text-box input:focus {
-        border-color: black;
-        color: black;
-    }
-    .text-box label {
-        display: flex;
-        position: absolute;
-        top: 50%;
-        left: 1rem;
-        transform: translateY(-50%);
-        color: var(--grey-1) !important;
-        font-size: 0.875rem;
-        transition: all 0.2s ease-in-out;
-    }
+.text-input-wrapper {
+  position: relative;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.text-input-wrapper--disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+:deep(.text-input-float-label) {
+  width: 100%;
+}
+
+:deep(.text-input) {
+  width: 100%;
+  height: 2.5rem;
+  font-size: 1rem;
+  border-radius: 8px;
+  padding: 0 1rem;
+  transition: all 0.2s ease-in-out;
+}
+
+:deep(.text-input:focus) {
+  border-color: var(--p-primary-color, black);
+  color: var(--p-surface-900, black);
+  box-shadow: 0 0 0 1px var(--p-primary-color, black);
+}
+
+:deep(.text-input--invalid) {
+  border-color: var(--p-red-500, #ef4444);
+}
+
+:deep(.text-input--invalid:focus) {
+  border-color: var(--p-red-500, #ef4444);
+  box-shadow: 0 0 0 1px var(--p-red-500, #ef4444);
+}
+
+:deep(.text-input-float-label label) {
+  display: flex;
+  position: absolute;
+  top: 50%;
+  left: 1rem;
+  transform: translateY(-50%);
+  color: var(--p-surface-500, var(--grey-1)) !important;
+  font-size: 0.875rem;
+  transition: all 0.2s ease-in-out;
+  pointer-events: none;
+}
+
+:deep(.text-input-float-label .p-float-label-active label) {
+  top: -0.5rem;
+  left: 0.75rem;
+  font-size: 0.75rem;
+  background: var(--p-surface-0, white);
+  padding: 0 0.25rem;
+  color: var(--p-primary-color, black) !important;
+}
+
+/* Dark theme support */
+[data-theme="dark"] :deep(.text-input-float-label .p-float-label-active label) {
+  background: var(--p-surface-900, #111827);
+}
 </style>

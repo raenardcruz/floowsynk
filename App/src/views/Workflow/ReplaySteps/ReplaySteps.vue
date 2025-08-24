@@ -6,21 +6,24 @@
                 <div class="replay-data-message">Message</div>
                 <div class="">Status</div>
             </Header>
-            <Row v-for="(item, index) in list" :key="index" @click="StepSelected(props.tabId, item.index)" :selected="selectedReplayData === item.index">
+            <Row v-for="(item, index) in list" :key="index" @click="StepSelected(props.tabId, item.index)"
+                :selected="selectedReplayData === item.index">
                 <div class="replay-data-nodeid">{{ item.data.nodeid }}</div>
                 <div class="replay-data-message">{{ item.data.message }}</div>
-                <div class="replay-data-status" :class="getStatus(item.data.status)">{{ getStatus(item.data.status) }}</div>
+                <div class="replay-data-status" :class="getStatus(item.data.status)">{{ getStatus(item.data.status) }}
+                </div>
             </Row>
         </div>
     </div>
-    <Teleport :to="'#' + canvasId"> 
-        <SideBar title="Replay Data" caption="" :customStyle="sideBarStyle" visible>
+    <Teleport :to="'#' + canvasId">
+        <div class="replay-data--sidebar">
             <p>Id</p>
-            <WorkflowNodeSidebarFields nodeType="" :modelValue="replayData[selectedReplayData].nodeid" :tabid="props.tabId" />
+            <WorkflowNodeSidebarFields nodeType="" :modelValue="replayData[selectedReplayData].nodeid"
+                :tabid="props.tabId" />
             <WorkflowNodeSidebarFields nodeType="" v-model="selectedReplayDataData" :tabid="props.tabId" />
             <h4>Variables</h4>
             <WorkflowNodeSidebarFields nodeType="" :modelValue="variables" :tabid="props.tabId" />
-        </SideBar>
+        </div>
     </Teleport>
 </template>
 
@@ -28,14 +31,12 @@
 import { computed, Teleport } from 'vue'
 import { useWorkflowCanvasStore } from '@/views/Workflow/Canvas/Workflow.Canvas.hooks'
 import { StepSelected } from './ReplaySteps.helper'
-import { SideBar } from "@/components/Composable/UI"
 import { ReplayDataProps } from './ReplaySteps.types'
 import { useFloowsynkNodeHooks } from '@/views/Workflow/Nodes/FloowsynkNode.hooks'
 import { SidebarCanvasFields as WorkflowNodeSidebarFields } from "@/views/Workflow/Sidebar"
 import { useReplayStoreHooks } from './ReplaySteps.hooks'
 import { useVirtualList } from '@vueuse/core'
-import Row from '@/components/Composable/UI/Table/Row.vue'
-import Header from '@/components/Composable/UI/Table/Headers.vue'
+import { Row, Headers as Header } from '@/components/Composable/UI/Table'
 import { NodeStatus } from 'proto/workflow/workflow_pb'
 
 const props = defineProps<ReplayDataProps>()
@@ -70,11 +71,7 @@ const getStatus = (status: number) => {
             return 'Info'
     }
 }
-const sideBarStyle = computed(() => {
-    return {
-        position: 'relative',
-    }
-})
+
 </script>
 
 <style scoped src="./ReplaySteps.styles.css"></style>

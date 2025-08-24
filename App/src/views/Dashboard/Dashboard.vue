@@ -1,14 +1,21 @@
 <template>
-    <div>
-        <h2>Dashboard</h2>
-        <TextInput id="test" v-model="text" label="Test Input" placeholder="Type something..." tooltip="Sample tooltip" type="password"/>
-        {{ text }}
+    <div style="padding: 8px">
+        <div class="test">
+            <Button label="Test Toast" @click="() => showToast()" />
+        </div>
     </div>
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
-import TextInput from '@/components/Composable/UI/Inputs/TextInput.vue'
+import Button from 'primevue/button'
+import { useToast } from 'primevue/usetoast'
 
-const text = ref('')
+const toast = useToast()
+const showToast = () => {
+    toast.add({severity:'info', summary: 'Info Message', detail:'Message Content', life: 3000});
+}
 </script>
+
+<style scoped>
+
+</style>

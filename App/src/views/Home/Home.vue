@@ -1,24 +1,30 @@
 <template>
-    <div class="header fade-in">
-        <div class="navigation" @click="openAppDrawer">
-            <span class="material-symbols-outlined">apps</span>
-        </div>
-        <div class="logo">
+    <Toolbar pt:root:class="header">
+        <template #start>
+            <div class="navigation" @click="openAppDrawer">
+                <span class="material-symbols-outlined">apps</span>
+            </div>
             <logo />
-        </div>
-        <div class="logout" @click="logout">
-            <span class="material-symbols-outlined">logout</span>
-        </div>
-    </div>
+        </template>
+        <template #end>
+            {{ route.name }}
+            <div class="logout" @click="logout">
+                <span class="material-symbols-outlined">logout</span>
+            </div>
+        </template>
+    </Toolbar>
     <app-drawer />
     <router-view class="fade-in" />
 </template>
 
 <script setup lang="ts">
-import Logo from "@/components/Composable/Logo/Logo.vue";
-import AppDrawer from "./AppDrawer";
-import { openAppDrawer, logout, pageInit } from './Home.helper';
+import Toolbar from 'primevue/toolbar'
+import Logo from "@/components/Composable/Logo/Logo.vue"
+import AppDrawer from "./AppDrawer"
+import { openAppDrawer, logout, pageInit } from './Home.helper'
+import { useRoute } from 'vue-router'
 
+const route = useRoute()
 pageInit();
 </script>
 

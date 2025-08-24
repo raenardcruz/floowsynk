@@ -1,5 +1,6 @@
 <template>
-    <div class="node no-scroll nopan" :style="nodestyle" :class="{ 'node-selected': node.selected, 'replay-node-selected': isReplayNodeSelected, [nodestatus]: isRunning }"
+    <div class="node no-scroll nopan" :style="nodestyle"
+        :class="{ 'node-selected': node.selected, 'replay-node-selected': isReplayNodeSelected, [nodestatus]: isRunning }"
         @click="clickHandler()">
         <div class="icon" :style="{ background: icon?.color }">
             <span class="material-symbols-outlined">{{ icon?.name }}</span>
@@ -11,21 +12,20 @@
         <Handle class="handle-input" v-if="outputsList" v-for="(input, index) in inputsList" :key="input" :id="input"
             :data-output="input" type="target" :position="Position.Left"
             :style="{ top: `${(100 / (outputsList.length + 1)) * (index + 1)}%` }" />
-        <Handle class="handle-output" v-if="outputsList" v-for="(output, index) in outputsList" :key="output" :id="output"
-            :data-output="output" type="source" :position="Position.Right"
+        <Handle class="handle-output" v-if="outputsList" v-for="(output, index) in outputsList" :key="output"
+            :id="output" :data-output="output" type="source" :position="Position.Right"
             :style="{ top: `${(100 / (outputsList.length + 1)) * (index + 1)}%` }" />
         <button class="add-btn" v-for="(output, _) in outputsList" :key="output" v-if="node.selected">+</button>
     </div>
     <Teleport :to="'#' + canvasId" v-if="!isRunning">
-        <Sidebar :title="label" :caption="node.id" :customStyle="customStyle" position="right" :visible="showSidebar">
-            <div v-if="node.data">
+        <Sidebar :modal="false" :title="label" :caption="node.id" :customStyle="customStyle" position="right" :visible="showSidebar" :showCloseButton="false">
+            <div class="node-sidebar" v-if="node.data">
                 <WorkflowNodeSidebarFields :nodeType="nodetype" v-model="node.data" :tabid="props.tabid" />
             </div>
         </Sidebar>
     </Teleport>
     <Teleport :to="`#${canvasId}`">
-        <Modal title="Select Process Type" caption="Select the type of process you want to create"
-            v-model="showModal">
+        <Modal title="Select Process Type" caption="Select the type of process you want to create" :visible="showModal" @update:visible="showModal = $event" bgcolor="none">
             <ProcessTypeModal :id="props.tabid" />
         </Modal>
     </Teleport>
@@ -34,7 +34,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue"
 import { Handle, Position, useNode } from '@vue-flow/core'
-import Sidebar from "@/components/Composable/UI/Sidebar/Sidebar.vue"
+import { Sidebar } from '@/components/Composable/UI/Sidebar'
 import { SidebarCanvasFields as WorkflowNodeSidebarFields } from "@/views/Workflow/Sidebar"
 import { NodeProps } from './FloowsynkNode.types'
 import { useFloowsynkNodeHooks, useFloowsynkNodeWatchers } from './FloowsynkNode.hooks'
@@ -42,7 +42,7 @@ import { clickhandler } from './FloowsynkNode.helper'
 import { Node } from 'proto/workflow/workflow_pb'
 import { toSentenceCase } from "@/components/Composable/Utilities"
 import ProcessTypeModal from '@/views/Workflow/Modal/ProcessType/Workflow.Modal.ProcessType.vue'
-import { Modal } from '@/components/Composable/UI'
+import { Modal } from '@/components/Composable/UI/Modal'
 import { useWorkflowCanvasStore } from '@/views/Workflow/Canvas/Workflow.Canvas.hooks'
 import { onKeyStroke } from '@vueuse/core'
 
@@ -63,13 +63,13 @@ watch(isRunning, (newValue) => {
 watch(node, (newValue) => {
     if (newValue.id === '0') {
         nodetype = (newValue as unknown as Node.AsObject).nodetype
-        icon    = (newValue as unknown as Node.AsObject).icon
+        icon = (newValue as unknown as Node.AsObject).icon
         nodestyle = (newValue as unknown as Node.AsObject).nodestyle
     }
 })
 watch([showModal, showModal], ([newShowModal, newShowSidebar]) => {
     hadOpenModalSidebar.value = newShowSidebar || newShowModal
-})  
+})
 onKeyStroke('Escape', () => {
     showSidebar.value = false
     showModal.value = false

@@ -6,7 +6,7 @@
     padding: 8px;
     overflow-y: auto;
     border: 1px solid var(--grey-4);
-    border-radius: 8px;
+    border-radius: 18px;
     background: var(--grey-6);
  }
 .replay-data-nodeid,
@@ -34,13 +34,24 @@
 }
 
 .Success {
-    background: var(--green-2);
+    background: var(--green-4);
 }
 
 .Info {
-    background: var(--blue-2);
+    background: var(--blue-4);
 }
 
 .Failed {
-    background: var(--red-2);
+    background: var(--red-4);
+}
+.replay-data--sidebar {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 8px;
+    border: 1px solid var(--neutral-7);
+    height: 100%;
+    border-radius: 18px;
+    background: var(--neutral-6);
 }

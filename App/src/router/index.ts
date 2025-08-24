@@ -27,34 +27,42 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/Home'),
     children: [
       {
+        name: "Dashboard",
         path: "",
         component: () => import('@/views/Dashboard')
       },
       {
+        name: "Pages",
         path: "pages",
         component: () => import('@/views/Pages')
       },
       {
+        name: "Workflow",
         path: "workflow",
         component: () => import('@/views/Workflow')
       },
       {
+        name: "Connectors",
         path: "connectors",
         component: () => import('@/views/Connectors')
       },
       {
+        name: "Reviews",
         path: "reviews",
         component: () => import('@/views/Reviews')
       },
       {
+        name: "Accounts",
         path: "accounts",
         component: () => import('@/views/Accounts')
       },
       {
+        name: "Logs",
         path: "logs",
         component: () => import('@/views/Logs')
       },
       {
+        name: "Settings",
         path: "settings",
         component: () => import('@/views/Settings')
       },
