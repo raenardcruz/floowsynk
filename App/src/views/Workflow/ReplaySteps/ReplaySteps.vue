@@ -19,10 +19,10 @@
         <div class="replay-data--sidebar">
             <p>Id</p>
             <WorkflowNodeSidebarFields nodeType="" :modelValue="replayData[selectedReplayData].nodeid"
-                :tabid="props.tabId" />
-            <WorkflowNodeSidebarFields nodeType="" v-model="selectedReplayDataData" :tabid="props.tabId" />
+                :tabid="props.tabId" disabled />
+            <WorkflowNodeSidebarFields nodeType="" v-model="selectedReplayDataData" :tabid="props.tabId" disabled />
             <h4>Variables</h4>
-            <WorkflowNodeSidebarFields nodeType="" :modelValue="variables" :tabid="props.tabId" />
+            <WorkflowNodeSidebarFields nodeType="" :modelValue="variables" :tabid="props.tabId" disabled />
         </div>
     </Teleport>
 </template>

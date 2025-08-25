@@ -2,7 +2,7 @@
     <div class="input" v-if="props.nodeType == 'subprocess'">
         <SelectInput
             :options="filteredProcesses"
-            :disabled="isRunning"
+            :disabled="disabled"
             label="Subprocess"
             v-model="modelValue" />
     </div>
@@ -18,7 +18,6 @@ import WorkflowNodeSidebarFields from './Workflow.Sidebar.Node.Fields.vue'
 import { SidebarNodeProps } from '../Workflow.Sidebar.Node.types'
 import { useSidebarNodeHooks } from '../Workflow.Sidebar.Node.hooks'
 import { toSentenceCase } from '@/components/Composable/Utilities'
-import { useWorkflowCanvasStore } from '@/views/Workflow/Canvas/Workflow.Canvas.hooks'
 import { MONACO_EDITOR_DATA_PROPERTIES } from './Workflow.Sidebar.Node.Fields.constants'
 import { Checkbox as CheckboxInput, TextCodeInput, Select as SelectInput, ListField as ListInput } from '@/components/Composable/UI/Inputs'
 
@@ -38,7 +37,6 @@ const isNodeArray = (obj: any): boolean => {
         return false
     }
 }
-const { isRunning } = useWorkflowCanvasStore(props.tabid)
 
 const getComponent = (key: string, value: any) => {
     const label = toSentenceCase(key)
@@ -48,7 +46,7 @@ const getComponent = (key: string, value: any) => {
                 component: ListInput,
                 props: {
                     label,
-                    disabled: isRunning
+                    disabled: props.disabled
                 }
             }
         } else {
@@ -57,6 +55,7 @@ const getComponent = (key: string, value: any) => {
                 props: {
                     nodeType: props.nodeType,
                     tabid: props.tabid,
+                    disabled: props.disabled,
                 }
             }
         }
@@ -68,7 +67,7 @@ const getComponent = (key: string, value: any) => {
                     component: TextCodeInput,
                     props: {
                         label,
-                        disabled: isRunning,
+                        disabled: props.disabled,
                         editorConfig: enableEditor ? {
                             variables: variables.value,
                             target: '.content'
@@ -81,7 +80,7 @@ const getComponent = (key: string, value: any) => {
                     props: {
                         label,
                         type: 'number',
-                        disabled: isRunning
+                        disabled: props.disabled
                     }
                 }
             case Boolean:
@@ -89,7 +88,7 @@ const getComponent = (key: string, value: any) => {
                     component: CheckboxInput,
                     props: {
                         label,
-                        disabled: isRunning
+                        disabled: props.disabled
                     }
                 }
             default:

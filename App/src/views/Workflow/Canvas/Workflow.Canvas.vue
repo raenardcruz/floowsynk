@@ -1,16 +1,16 @@
 <template>
-    <div class="tab-container">
-        <div class="title-section">
-            <div class="title">
-                <input type="text" v-model="tab.name" placeholder="Enter Process Title">
-                <div class="tags">
-                    <Chip pt:root:class="tag" @click="addTag">
+    <div class="canvas">
+        <div class="canvas__header">
+            <div class="canvas_titlecontainer">
+                <input class="canvas__headerinput canvas__label" type="text" v-model="tab.name" placeholder="Enter Process Title">
+                <div class="canvas_tags">
+                    <Chip pt:root:class="canvas__tag" @click="addTag">
                         <span class="material-symbols-outlined">add</span>
                         <span>Add Tag</span>
                     </Chip>
-                    <Chip pt:root:class="tag" style="background: var(--blue-5);" v-for="(_, index) in tab.tagsList"
+                    <Chip pt:root:class="canvas__tag canvas__tag--active" v-for="(_, index) in tab.tagsList"
                         removable>
-                        <input class="tag-input" type="text" placeholder="New Tag" v-model="tab.tagsList[index]"
+                        <input class="canvas__headerinput canvas__tagtext" type="text" placeholder="New Tag" v-model="tab.tagsList[index]"
                             :list="tab.tagsList[index]">
                         <datalist :id="tab.tagsList[index]">
                             <option :value="tag" v-for="tag in tab.tagsList.filter((f: string) => f != 'No Tags')">
@@ -25,7 +25,7 @@
                 </div>
             </div>
             <div class="description">
-                <input type="text" v-model="tab.description" placeholder="Enter Description">
+                <input class="canvas__headerinput canvas__description" type="text" v-model="tab.description" placeholder="Enter Description">
             </div>
         </div>
         <div class="content" :id="canvasId">
