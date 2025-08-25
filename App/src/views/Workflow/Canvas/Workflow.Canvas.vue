@@ -40,12 +40,13 @@
                     @drop="onDrop($event)" @dragover="onDragOver($event)" @dragleave="onDragLeave()"
                     @selection-drag-stop="commit()" @edges-change="commit()" delete-key-code="false"
                     no-wheel-class-name="no-scroll">
-                    <DropzoneBackground :style="{
+                    <Background />
+                    <!-- <DropzoneBackground :style="{
                         backgroundColor: isDragOver ? '#e7f3ff' : 'var(--neutral-2)',
                         transition: 'background-color 0.2s ease', height: '100%'
                     }">
                         <h2 v-if="isDragOver">DRAG AREA</h2>
-                    </DropzoneBackground>
+                    </DropzoneBackground> -->
                     <MiniMap />
                     <Controls style="display: flex;" position="top-right">
                         <ControlButton title="Reset Transform" @click="resetTransform">
@@ -91,8 +92,8 @@ import { useWorkflowCanvasControlButtonActions } from './ButtonActions/Workflow.
 import { SidebarCanvas } from '@/views/Workflow/Sidebar'
 import { Modal } from '@/components/Composable/UI/Modal'
 import { ProcessTypeModal } from '@/views/Workflow/Modal'
-import DropzoneBackground from './Background'
 import { MiniMap } from '@vue-flow/minimap'
+import { Background } from '@vue-flow/background'
 import { ControlButton, Controls } from '@vue-flow/controls'
 import FloowsynkNode from '@/views/Workflow/Nodes'
 import { useWorkflowCanvasHelperMethods } from './Helper/Workflow.Canvas.Helper'
