@@ -1,5 +1,5 @@
 <template>
-    <div class="heading-component" :style="componentStyle">Test</div>
+    <p class="paragraph-component" :style="componentStyle">test</p>
 </template>
 
 <script setup lang="ts">
@@ -9,10 +9,9 @@
 </script>
 
 <style scoped>
-.heading-component {
+.paragraph-component {
     display: flex;
     position: relative;
-    height: 44px;
-    width: 100%;
+    width: fit-content;
 }
 </style>

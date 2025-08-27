@@ -1,5 +1,6 @@
 import Section from '../Tools/Section/Section.vue'
 import Heading from '../Tools/Heading/Heading.vue'
+import Paragraph from '../Tools/Paragraph/Paragraph.vue'
 
 export const SECTIONS = [
   {
@@ -38,7 +39,8 @@ export const COMPONENTS = [
     icon: 'src/components/Icons/components/paragraph.svg',
     label: 'Paragraph',
     group: 'Text',
-    section: 1
+    section: 1,
+    component: Paragraph
   },
   {
     name: 'list',

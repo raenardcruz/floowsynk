@@ -1,5 +1,6 @@
 import { section_styles } from '@/views/Pages/Tools/Section/styles.config'
 import { heading_styles } from '@/views/Pages/Tools/Heading/styles.config'
+import { paragraph_styles } from '@/views/Pages/Tools/Paragraph/style.config'
 
 export const getComponentStyles = (componentName: string): Array<any> => {
     switch (componentName) {
@@ -7,6 +8,8 @@ export const getComponentStyles = (componentName: string): Array<any> => {
             return section_styles
         case 'heading':
             return heading_styles
+        case 'paragraph':
+            return paragraph_styles
         default:
             return []
     }
