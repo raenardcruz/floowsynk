@@ -1,8 +1,7 @@
-import { ref, computed, toRef } from 'vue'
+import { ref, computed } from 'vue'
 import { createGlobalState } from '@vueuse/core'
-import { convertStyleArrayToProps } from './Pages.methods'
-import { COMPONENTS } from '@/views/Pages/PageSidebar/ComponentsContents.constants';
-import { getComponentStyles } from '@/views/Pages/Pages.methods';
+import { convertStyleArrayToProps } from './Tools/Tools.config'
+import { COMPONENT_MAPPING, COMPONENT_NAMES } from './Tools/Tools.components';
 
 export interface componentItem {
   id: string
@@ -54,9 +53,9 @@ export const usePageComponent = (id: string) => {
     const newComponentId = crypto.randomUUID();
     const componentName = event.dataTransfer?.getData('text/plain');
     if (componentName) {
-      const component = COMPONENTS.find(c => c.name === componentName);
+      const component = COMPONENT_MAPPING[componentName as COMPONENT_NAMES];
       selectedItem.value = newComponentId;
-      const baseStyle = getComponentStyles(componentName);
+      const baseStyle = component.styleConfig || [];
       const clonedStyleArray = (Array.isArray(baseStyle) ? baseStyle : [baseStyle]).map(style => ({ ...style }));
       styles.value[newComponentId] = clonedStyleArray;
       droppedItems.value.push({

@@ -20,9 +20,8 @@ import { ref } from 'vue';
 import Subheader from '@/views/Pages/SubHeader.vue';
 import PageSidebar from '@/views/Pages/PageSidebar.vue';
 import { usePagesStore } from './Pages.hooks';
-import { getComponentStyles } from './Pages.methods';
 import RenderZone from './RenderZone.vue';
-import { COMPONENTS } from '@/views/Pages/PageSidebar/ComponentsContents.constants';
+import { COMPONENT_MAPPING, COMPONENT_NAMES } from './Tools/Tools.components';
 
 const dropZoneRef = ref<HTMLElement | null>(null);
 const isDragOver = ref(false);
@@ -41,9 +40,9 @@ function onDrop(event: DragEvent) {
   isDragOver.value = false;
   const componentName = event.dataTransfer?.getData('text/plain');
   if (componentName) {
-    const component = COMPONENTS.find(c => c.name === componentName);
+    const component = COMPONENT_MAPPING[componentName as COMPONENT_NAMES];
     selectedItem.value = newComponentId;
-    const baseStyle = getComponentStyles(componentName);
+    const baseStyle = component.styleConfig || [];
     const clonedStyleArray = (Array.isArray(baseStyle) ? baseStyle : [baseStyle]).map(style => ({ ...style }));
     styles.value[newComponentId] = clonedStyleArray;
     droppedItems.value.push({

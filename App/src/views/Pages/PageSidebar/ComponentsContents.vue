@@ -8,14 +8,14 @@
     </div>
     <div class="component-list">
       <div
-        v-for="group in sectionGroups"
+        v-for="group in SECTIONS.find(s => s.id === activeSection)?.groups"
         :key="group"
         class="component-group"
       >
       <div class="component-group-label">{{ group }}</div>
       <div
         class="component-item"
-        v-for="component in getGroupComponents(group)"
+        v-for="component in getGroupComponents(group as COMPONENT_GROUPS)"
         :key="component.name"
         draggable="true"
         @dragstart="(event) => onDragStart(event, component)"
@@ -29,8 +29,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import { SECTIONS, COMPONENTS } from './ComponentsContents.constants';
+import { SECTIONS, COMPONENT_GROUPS, COMPONENT_MAPPING } from '../Tools/Tools.components';
 import { useComponentsContents } from './ComponentsContents.hooks'
 
 const { activeSection } = useComponentsContents()
@@ -39,24 +38,24 @@ interface ComponentMeta {
   name: string;
   icon: string;
   label: string;
-  group: string;
-  section: number;
   description?: string;
 }
-
-const filteredComponents = computed(() => {
-  return COMPONENTS.filter(component => component.section === activeSection.value);
-});
-const sectionGroups = computed(() => {
-  return [...new Set(filteredComponents.value.map(component => component.group))];
-})
 
 function onDragStart(event: DragEvent, component: ComponentMeta) {
   event.dataTransfer?.setData('text/plain', component.name);
 }
 
 function getGroupComponents (group: string): ComponentMeta[] {
-  return filteredComponents.value.filter(component => component.group === group);
+  return Object.entries(COMPONENT_MAPPING)
+    .filter(([_, cmObject]) => cmObject.group === group)
+    .map(([key, cmObject]) => {
+      return {
+        name: key,
+        icon: cmObject.icon,
+        label: cmObject.label,
+        description: cmObject.description || '',
+      }
+    });
 }
 </script>
 

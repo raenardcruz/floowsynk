@@ -32,7 +32,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import { SECTIONS } from './StylesContents.constants';
+import { SECTIONS } from '../Tools/Tools.components';
 import { usePagesStore } from '@/views/Pages/Pages.hooks'
 
 const { selectedItem, styles } = usePagesStore()
