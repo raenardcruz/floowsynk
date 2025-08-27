@@ -1,20 +1,3 @@
-import { section_styles } from '@/views/Pages/Tools/Section/styles.config'
-import { heading_styles } from '@/views/Pages/Tools/Heading/styles.config'
-import { paragraph_styles } from '@/views/Pages/Tools/Paragraph/style.config'
-
-export const getComponentStyles = (componentName: string): Array<any> => {
-    switch (componentName) {
-        case 'section':
-            return section_styles
-        case 'heading':
-            return heading_styles
-        case 'paragraph':
-            return paragraph_styles
-        default:
-            return []
-    }
-}
-
 export const convertStyleArrayToProps = (style: Array<any>): Record<string, any> => {
     const properties: Record<string, any> = {}
     style.forEach((item) => {
