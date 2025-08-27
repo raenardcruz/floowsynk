@@ -20,9 +20,9 @@ import { ref } from 'vue';
 import Subheader from '@/views/Pages/SubHeader.vue';
 import PageSidebar from '@/views/Pages/PageSidebar.vue';
 import { usePagesStore } from './Pages.hooks';
-import { getComponentStyles } from './Pages.methods';
+import { getComponentStyles } from './Tools/Tools.config';
 import RenderZone from './RenderZone.vue';
-import { COMPONENTS } from '@/views/Pages/PageSidebar/ComponentsContents.constants';
+import { COMPONENTS } from './Tools/Tools.components';
 
 const dropZoneRef = ref<HTMLElement | null>(null);
 const isDragOver = ref(false);

@@ -30,7 +30,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { SECTIONS, COMPONENTS } from './ComponentsContents.constants';
+import { SECTIONS, COMPONENTS } from '../Tools/Tools.components';
 import { useComponentsContents } from './ComponentsContents.hooks'
 
 const { activeSection } = useComponentsContents()
