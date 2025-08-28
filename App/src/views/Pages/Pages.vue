@@ -19,41 +19,14 @@
 import { ref } from 'vue';
 import Subheader from '@/views/Pages/SubHeader.vue';
 import PageSidebar from '@/views/Pages/PageSidebar.vue';
-import { usePagesStore } from './Pages.hooks';
+import { usePagesStore, usePageComponent } from './Pages.hooks';
 import RenderZone from './RenderZone.vue';
-import { COMPONENT_MAPPING, COMPONENT_NAMES } from './Tools/Tools.components';
 
 const dropZoneRef = ref<HTMLElement | null>(null);
 const isDragOver = ref(false);
-const { droppedItems, styles, selectedItem, activeTab } = usePagesStore();
+const { droppedItems } = usePagesStore();
 
-function onDragOver(_: DragEvent) {
-  isDragOver.value = true;
-}
-
-function onDragLeave(_: DragEvent) {
-  isDragOver.value = false;
-}
-
-function onDrop(event: DragEvent) {
-  const newComponentId = crypto.randomUUID();
-  isDragOver.value = false;
-  const componentName = event.dataTransfer?.getData('text/plain');
-  if (componentName) {
-    const component = COMPONENT_MAPPING[componentName as COMPONENT_NAMES];
-    selectedItem.value = newComponentId;
-    const baseStyle = component.styleConfig || [];
-    const clonedStyleArray = (Array.isArray(baseStyle) ? baseStyle : [baseStyle]).map(style => ({ ...style }));
-    styles.value[newComponentId] = clonedStyleArray;
-    droppedItems.value.push({
-      id: newComponentId,
-      name: componentName,
-      component: component?.component,
-      parent: '',
-    });
-    activeTab.value = 2;
-  }
-}
+const { onDragOver, onDragLeave, onDrop } = usePageComponent('');
 </script>
 
 <style scoped>

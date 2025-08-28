@@ -6,6 +6,8 @@ import { section_styles } from '@/views/Pages/Tools/Section/styles.config'
 import { heading_styles } from '@/views/Pages/Tools/Heading/styles.config'
 import { paragraph_styles } from '@/views/Pages/Tools/Paragraph/style.config'
 
+import { heading_properties } from '@/views/Pages/Tools/Heading/properties.config'
+
 export enum COMPONENT_GROUPS {
   TEXT = 'Text',
   MEDIA = 'Media',
@@ -138,7 +140,8 @@ export const COMPONENT_MAPPING: Record<COMPONENT_NAMES, ComponentInfo> = {
     label: 'Heading',
     group: COMPONENT_GROUPS.TEXT,
     component: Heading,
-    styleConfig: section_styles
+    styleConfig: heading_styles,
+    propertiesConfig: heading_properties
   },
   [COMPONENT_NAMES.PARAGRAPH]: {
     icon: 'src/components/Icons/components/paragraph.svg',
