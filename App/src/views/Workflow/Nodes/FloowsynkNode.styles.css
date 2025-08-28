@@ -177,10 +177,28 @@
   justify-content: center;
   cursor: pointer;
 }
-.node-sidebar {
+.node-variables__container {
   position: relative;
   display: flex;
   flex-direction: column;
   gap: 8px;
   padding: 4px 8px;
+}
+.node-variables__label {
+  display: flex;
+  position: relative;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 8px;;
+  font-size: 14px;
+  font-weight: bold;
+  color: var(--grey-2);
+}
+.node-variables__labelicon {
+  font-size: 16px;
+  color: var(--grey-3);
+}
+.node-variables__caption {
+  font-size: 12px;
+  color: var(--grey-4);
 }
