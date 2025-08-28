@@ -58,6 +58,8 @@ export const usePageComponent = (id: string) => {
       const baseStyle = component.styleConfig || [];
       const clonedStyleArray = (Array.isArray(baseStyle) ? baseStyle : [baseStyle]).map(style => ({ ...style }));
       styles.value[newComponentId] = clonedStyleArray;
+      const clonedPropertiesArray = (component.propertiesConfig || []).map(prop => ({ ...prop }));
+      properties.value[newComponentId] = clonedPropertiesArray || [];
       droppedItems.value.push({
         id: newComponentId,
         name: componentName,

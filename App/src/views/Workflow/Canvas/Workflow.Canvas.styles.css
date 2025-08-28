@@ -46,10 +46,9 @@
     gap: 4px;
   }
   .canvas__tag {
-    padding: 0px 8px;
+    padding: 4px 8px;
     cursor: pointer !important;
     transition: all 0.15s ease-in-out;
-    height: 40px;
     
     &:hover {
       filter: brightness(0.8);

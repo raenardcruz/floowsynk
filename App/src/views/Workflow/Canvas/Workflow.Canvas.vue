@@ -4,11 +4,11 @@
             <div class="canvas_titlecontainer">
                 <input class="canvas__headerinput canvas__label" type="text" v-model="tab.name" placeholder="Enter Process Title">
                 <div class="canvas_tags">
-                    <Chip pt:root:class="canvas__tag" @click="addTag">
+                    <Tag pt:root:class="canvas__tag" @click="addTag" rounded>
                         <span class="material-symbols-outlined">add</span>
                         <span>Add Tag</span>
-                    </Chip>
-                    <Chip pt:root:class="canvas__tag canvas__tag--active" v-for="(_, index) in tab.tagsList"
+                    </Tag>
+                    <Tag rounded pt:root:class="canvas__tag canvas__tag--active" v-for="(_, index) in tab.tagsList"
                         removable>
                         <input class="canvas__headerinput canvas__tagtext" type="text" placeholder="New Tag" v-model="tab.tagsList[index]"
                             :list="tab.tagsList[index]">
@@ -16,12 +16,8 @@
                             <option :value="tag" v-for="tag in tab.tagsList.filter((f: string) => f != 'No Tags')">
                             </option>
                         </datalist>
-                        <template #removeicon="">
-                            <span class="material-symbols-outlined" @click="removeTag(index)">close</span>
-                        </template>
-                        <!-- <span class="material-symbols-outlined" style="color: var(--red-2);"
-                            @click="removeTag(index)">close</span> -->
-                    </Chip>
+                        <span class="material-symbols-outlined" @click="removeTag(index)">close</span>
+                    </Tag>
                 </div>
             </div>
             <div class="description">
@@ -41,12 +37,6 @@
                     @selection-drag-stop="commit()" @edges-change="commit()" delete-key-code="false"
                     no-wheel-class-name="no-scroll">
                     <Background />
-                    <!-- <DropzoneBackground :style="{
-                        backgroundColor: isDragOver ? '#e7f3ff' : 'var(--neutral-2)',
-                        transition: 'background-color 0.2s ease', height: '100%'
-                    }">
-                        <h2 v-if="isDragOver">DRAG AREA</h2>
-                    </DropzoneBackground> -->
                     <MiniMap />
                     <Controls style="display: flex;" position="top-right">
                         <ControlButton title="Reset Transform" @click="resetTransform">
@@ -86,7 +76,7 @@
 import { ref } from 'vue'
 import { VueFlow, useVueFlow } from '@vue-flow/core'
 import { WorkflowCanvasProps } from './Workflow.Canvas.types'
-import { useWorkflowCanvasHooks, useWorkflowCanvasStore, useWorkflowCanvasGlbalStore } from './Workflow.Canvas.hooks'
+import { useWorkflowCanvasHooks, useWorkflowCanvasStore } from './Workflow.Canvas.hooks'
 import { useWorkflowCanvasVueFlowEvents } from './VueFlowEvents/Workflow.Canvas.VueFlowEvents'
 import { useWorkflowCanvasControlButtonActions } from './ButtonActions/Workflow.Canvas.ButtonActions'
 import { SidebarCanvas } from '@/views/Workflow/Sidebar'
@@ -100,6 +90,7 @@ import { useWorkflowCanvasHelperMethods } from './Helper/Workflow.Canvas.Helper'
 import CustomEdge from '@/views/Workflow/Edges/CustomEdge.vue'
 import ReplaySteps from '../ReplaySteps'
 import Chip from 'primevue/chip'
+import Tag from 'primevue/tag'
 
 const props = defineProps<WorkflowCanvasProps>()
 const { tab, canvasId, node, edge } = useWorkflowCanvasHooks(props.id)
@@ -117,7 +108,6 @@ const {
     showReplayData,
     isRunning,
 } = useWorkflowCanvasStore(props.id)
-const { isDragOver } = useWorkflowCanvasGlbalStore()
 </script>
 
 <style scoped src="./Workflow.Canvas.styles.css"></style>
