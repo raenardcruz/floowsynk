@@ -10,6 +10,7 @@
                 :data-tooltip="property.description || ''">
                 <TextInput :label="property.label" v-if="property.control === DataTypes.TEXT" v-model="property.value"
                   :placeholder="property.placeholder || ''" />
+                  <CustomList v-if="property.control === DataTypes.LIST" :label="property.label" v-model="property.value" :template="property.dataModel" />
                 <input class="input" v-if="property.control === DataTypes.COLOR" type="color" v-model="property.value"
                   :placeholder="property.placeholder || ''" />
                 <select class="input" v-if="property.control === DataTypes.SELECT" v-model="property.value"
@@ -34,24 +35,9 @@ import Accordion from 'primevue/accordion'
 import AccordionPanel from 'primevue/accordionpanel'
 import AccordionHeader from 'primevue/accordionheader'
 import AccordionContent from 'primevue/accordioncontent'
+import CustomList from '@/components/Composable/UI/Inputs/CustomList.vue'
 
 const { selectedItem, properties } = usePagesStore()
-
-interface PropertyMeta {
-  name: string;
-  label: string;
-  group: string;
-  section: number;
-  control: string;
-  value: any;
-  options?: string[];
-  placeholder?: string;
-  description?: string;
-  dependency?: {
-    property: string;
-    values: string[];
-  };
-}
 
 const filteredProperties = computed(() => {
   return properties.value[selectedItem.value] || [];
@@ -60,11 +46,11 @@ const filteredProperties = computed(() => {
 const sectionGroups = computed(() => {
   return [...new Set(filteredProperties.value.map(property => property.group))];
 })
-function getGroupProperties(group: string): PropertyMeta[] {
+function getGroupProperties(group: string): any[] {
   return filteredProperties.value.filter(property => property.group === group);
 }
 
-function isPropertyVisible(property: PropertyMeta) {
+function isPropertyVisible(property: any) {
   if (!property.dependency) {
     return true;
   }

@@ -1,7 +1,7 @@
 <template>
-    <Fieldset :pt="{ content: { class: 'custom-list' } }" :legend="label">
+    <Fieldset :pt="{ root: { style: 'width: 100%' }, content: { class: 'custom-list' } }" :legend="label">
         <div class="custom-list__items">
-            <Panel v-for="(item, index) in modelValue" :key="index">
+            <Panel v-for="(item, index) in modelValue" :key="index" :header="`Item ${index + 1}`" toggleable>
                 <component
                     v-for="fieldItem in Object.keys(item)"
                     :is="componentSwitcher(item, fieldItem).component"
@@ -16,16 +16,14 @@
 </template>
 
 <script setup lang="ts">
-import type { CustomListProps, CustomListEmits } from './CustomList.types'
+import type { CustomListProps } from './CustomList.types'
 import Button from '@/components/Composable/UI/Buttons/PrimaryButton.vue'
 import TextInput from '@/components/Composable/UI/Inputs/TextInput.vue'
-import Divider from 'primevue/divider'
 import Fieldset from 'primevue/fieldset'
 import Panel from 'primevue/panel'
 
 
 const props = defineProps<CustomListProps>()
-const emits = defineEmits<CustomListEmits>()
 const modelValue = defineModel<any[]>({ default: [] })
 
 const clickHandler = () => {

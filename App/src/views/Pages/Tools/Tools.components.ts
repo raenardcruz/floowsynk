@@ -7,12 +7,26 @@ import { menu_bar_properties } from '@/views/Pages/Tools/MenuBar/config'
 export enum COMPONENT_GROUPS {
   CONTAINERS = 'Containers',
   COMPONENTS = 'Components',
+  TEXT = 'Text',
+  MEDIA = 'Media',
+  BUTTONS_AND_LINKS = 'Buttons and Links',
+  GRID = 'Grid',
+  FLEXBOX = 'Flexbox',
+  NAVIGATION = 'Navigation',
+  SECTIONS = 'Sections',
+  INPUT_FIELDS = 'Input Fields',
+  SELECTION_AND_OPTIONS = 'Selection and Options',
+  FORM_BUTTON = 'Form Button',
+  DYNAMIC_CONTENT = 'Dynamic Content',
+  SOCIAL = 'Social',
+  EMBEDDINGS = 'Embeddings',
+  INTERACTIVE = 'Interactive',
 }
 
 export const SECTIONS = [
   {
     id: 1,
-    name: 'Basic',
+    name: 'Default',
     icon: 'src/components/Icons/components/common.svg',
     groups: [
       COMPONENT_GROUPS.CONTAINERS

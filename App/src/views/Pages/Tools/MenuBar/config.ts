@@ -23,7 +23,7 @@ export const menu_bar_properties: ComponentProperty[] = [
         group: 'General', 
         section: 1, 
         control: DataTypes.LIST, 
-        value: [{ label: 'Test', link: 'https://google.com' }, { label: 'Test 2' }], 
+        value: [], 
         description: 'Add Menu Bar Items', 
         dataModel: { label: '', link: '', badge: null, icon: null } as menuItemsDataModel,
     },

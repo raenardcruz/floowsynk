@@ -5,7 +5,3 @@ export interface CustomListProps extends BaseComponentProps {
   label?: string
   template: any
 }
-
-export interface CustomListEmits {
-    'update:modelValue': [value: any]
-}
