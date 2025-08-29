@@ -2,6 +2,7 @@
     <div style="padding: 8px">
         <div class="test">
             <MenuBar :model="items"/>
+            <CustomList id="test" :template="template" label="Sample Label" v-model="a" />
         </div>
     </div>
 </template>
@@ -9,54 +10,18 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 import MenuBar from 'primevue/menubar'
+import CustomList from '@/components/Composable/UI/Inputs/CustomList.vue'
 
 const items = ref([
     {
-        label: 'Home',
-        icon: 'pi pi-home'
+        label: 'Home'
     },
-    {
-        label: 'Features',
-        icon: 'pi pi-star'
-    },
-    {
-        label: 'Projects',
-        icon: 'pi pi-search',
-        items: [
-            {
-                label: 'Components',
-                icon: 'pi pi-bolt'
-            },
-            {
-                label: 'Blocks',
-                icon: 'pi pi-server'
-            },
-            {
-                label: 'UI Kit',
-                icon: 'pi pi-pencil'
-            },
-            {
-                label: 'Templates',
-                icon: 'pi pi-palette',
-                items: [
-                    {
-                        label: 'Apollo',
-                        icon: 'pi pi-palette'
-                    },
-                    {
-                        label: 'Ultima',
-                        icon: 'pi pi-palette'
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        label: 'Contact',
-        icon: 'pi pi-envelope'
-    }
 ]);
-
+const a = ref()
+const template = {
+    name: '',
+    age: ''
+}
 </script>
 
 <style scoped>

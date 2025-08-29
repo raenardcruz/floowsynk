@@ -8,11 +8,11 @@
             v-if="isPropertyVisible(property)"
             :data-tooltip="property.description || ''">
             <label>{{ property.label }}</label>
-            <input class="input" v-if="property.control === 'text'" type="text" v-model="property.value"
+            <input class="input" v-if="property.control === DataTypes.TEXT" type="text" v-model="property.value"
               :placeholder="property.placeholder || ''" />
-            <input class="input" v-if="property.control === 'color'" type="color" v-model="property.value"
+            <input class="input" v-if="property.control === DataTypes.COLOR" type="color" v-model="property.value"
               :placeholder="property.placeholder || ''" />
-            <select class="input" v-if="property.control === 'select'" v-model="property.value"
+            <select class="input" v-if="property.control === DataTypes.SELECT" v-model="property.value"
               :placeholder="property.placeholder || ''">
               <option v-for="option in property.options" :key="option" :value="option">{{ option }}</option>
             </select>
@@ -26,6 +26,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { usePagesStore } from '@/views/Pages/Pages.hooks'
+import { DataTypes } from '../Tools/Tools.types'
 
 const { selectedItem, properties } = usePagesStore()
 

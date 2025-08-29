@@ -16,6 +16,6 @@ const { activeTab } = usePagesStore()
 const tabs = [
     { name: 'Components', component: ComponentsContents },
     { name: 'Styles', component: StylesContents },
-    { name: 'Properties', component: PropertiesContents }
+    { name: 'Layout', component: PropertiesContents }
 ]
 </script>
