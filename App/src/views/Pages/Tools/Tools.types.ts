@@ -13,7 +13,7 @@ export interface ComponentProperty {
     name: string
     label: string
     group: string
-    section: number
+    section: number | string
     control: DataTypes,
     value: any,
     options?: Array<any> | null,

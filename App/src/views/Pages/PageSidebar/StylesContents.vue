@@ -2,9 +2,9 @@
   <div class="styles-sidebar">
     <div class="style-section">
       <div class="section-indicator" :style="sectionIndicatorStyle"></div>
-      <div class="section" v-for="(section, index) in validSections" :key="section.id"
-        :data-tooltip="section.name" @click="handleSetActiveStyleSection && handleSetActiveStyleSection(index)">
-        <img :src="section.icon" :alt="section.name" class="section-icon" />
+      <div class="section" v-for="(section, index) in validSections" :key="index"
+        :data-tooltip="section" @click="handleSetActiveStyleSection && handleSetActiveStyleSection(index)">
+        {{ section }}
       </div>
     </div>
     <div class="style-list">
@@ -15,11 +15,11 @@
             v-if="isPropertyVisible(property)"
             :data-tooltip="property.description || ''">
             <label>{{ property.label }}</label>
-            <input class="input" v-if="property.control === 'text'" type="text" v-model="property.value"
+            <input class="input" v-if="property.control === DataTypes.TEXT" type="text" v-model="property.value"
               :placeholder="property.placeholder || ''" />
-            <input class="input" v-if="property.control === 'color'" type="color" v-model="property.value"
+            <input class="input" v-if="property.control === DataTypes.COLOR" type="color" v-model="property.value"
               :placeholder="property.placeholder || ''" />
-            <select class="input" v-if="property.control === 'select'" v-model="property.value"
+            <select class="input" v-if="property.control === DataTypes.SELECT" v-model="property.value"
               :placeholder="property.placeholder || ''">
               <option v-for="option in property.options" :key="option" :value="option">{{ option }}</option>
             </select>
@@ -32,8 +32,8 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import { SECTIONS } from '../Tools/Tools.components';
 import { usePagesStore } from '@/views/Pages/Pages.hooks'
+import { DataTypes } from '../Tools/Tools.types'
 
 const { selectedItem, styles } = usePagesStore()
 const activeStyleSection = ref(0);
@@ -65,11 +65,10 @@ const sectionIndicatorStyle = computed(() => {
 });
 
 const validSections = computed(() => {
-  const sectionIds = [...new Set(styles.value[selectedItem.value].map(m => m.section))]
-  return SECTIONS.filter(section => sectionIds.includes(section.id));
+  return [...new Set(styles.value[selectedItem.value].map(m => m.section))]
 });
 const filteredProperties = computed(() => {
-  return styles.value[selectedItem.value].filter(property => property.section === validSections.value[activeStyleSection.value]?.id || '');
+  return styles.value[selectedItem.value].filter(property => property.section === validSections.value[activeStyleSection.value] || '');
 });
 const sectionGroupsValue = computed(() => {
   return [...new Set(filteredProperties.value.map(property => property.group))];
@@ -124,11 +123,12 @@ watch(selectedItem, (newSelectedItem) => {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 24px;
+  height: fit-content;
   width: 100%;
   height: 48px;
   cursor: pointer;
   transition: all 0.3s ease;
+  writing-mode: vertical-lr;
 }
 
 .style-section .section[data-tooltip]:hover::before {

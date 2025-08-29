@@ -10,7 +10,7 @@
                 <img v-if="item?.icon" :src="item.icon" alt="icon" height="20" class="mr-2"/>
                 <span v-if="item?.link"><a :href="item.link">{{ item?.label || '' }}</a></span>
                 <span v-else>{{ item?.label || '' }}</span>
-                <Badge v-if="item?.badge" :value="item.badge" class="ml-2"></Badge>
+                <Badge v-if="item?.badge || item.badge > 0" :value="item.badge" class="ml-2"></Badge>
             </span>
         </template>
         <template #end>
@@ -48,6 +48,7 @@ import { PageComponentProps, usePageComponent } from '@/views/Pages/Pages.hooks'
     display: flex;
     width: 100%;
     align-items: center;
+    min-height: 40px;
 }
 :deep(.menu-end) {
     width: 100%;

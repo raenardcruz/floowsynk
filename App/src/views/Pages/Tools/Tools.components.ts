@@ -2,7 +2,7 @@ import Section from '../Tools/Section/Section.vue'
 import MenuBar from './MenuBar/MenuBar.vue'
 
 import { section_styles } from '@/views/Pages/Tools/Section/config'
-import { menu_bar_properties } from '@/views/Pages/Tools/MenuBar/config'
+import { menu_bar_properties, menu_bar_style } from '@/views/Pages/Tools/MenuBar/config'
 
 export enum COMPONENT_GROUPS {
   CONTAINERS = 'Containers',
@@ -70,7 +70,8 @@ export const COMPONENT_MAPPING: Record<COMPONENT_NAMES, ComponentInfo> = {
     label: 'Menu bar',
     group: COMPONENT_GROUPS.COMPONENTS,
     component: MenuBar,
-    propertiesConfig: menu_bar_properties
+    propertiesConfig: menu_bar_properties,
+    styleConfig: menu_bar_style
   }
 }
 
