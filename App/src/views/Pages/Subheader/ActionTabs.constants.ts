@@ -16,7 +16,7 @@ export const ACTION_TABS: ActionTab[] = [
     },
     {
         id: 3,
-        label: 'Properties',
-        icon: 'src/components/Icons/settings2.svg'
+        label: 'Layout',
+        icon: 'src/components/Icons/org.svg'
     }
 ]

@@ -1,34 +1,37 @@
 <template>
-  <ItemToolbar
-    v-if="showToolbar"
-    ref="target"
-    :x="toolbarPosition.x"
-    :y="toolbarPosition.y"
-    @duplicate="handleDuplicate"
-    @delete="handleDelete"
-  />
-  <component
-    :id="id"
-    :is="component"
-    class="components"
-    :class="{ 'selected-component': selectedItem === id, 'hovering': isHovering }"
-    @mouseenter.stop="onMouseEnter"
-    @mouseleave.stop="onMouseLeave"
-    @click.stop="selectedItem = id; activeTab = 2"
-    ref="el"
-    @contextmenu.prevent="onContextMenu" />
+  <BlockUI pt:mask:class="selected-component" :blocked="selectedItem === id" @click="clickHandler">
+    <component :id="id" :is="component" class="components" :class="{ 'hovering': isHovering }"
+      @mouseenter.stop="onMouseEnter" @mouseleave.stop="onMouseLeave" @click.stop="selectedItem = id; activeTab = 2"
+      ref="el" @contextmenu.prevent="onContextMenu" />
+  </BlockUI>
+  <Popover ref="op" v-if="filteredProperties.length > 0">
+    <div class="properties__header">
+      <span class="material-symbols-outlined">
+        instant_mix
+      </span>
+      <div class="properties__label">Properties</div>
+      <div class="properties__caption">{{ component.__name }}</div>
+    </div>
+    <Divider />
+    <Properties />
+  </Popover>
 </template>
 
 <script setup lang="ts">
-import { ref, toRefs, useTemplateRef, reactive } from 'vue'
-import ItemToolbar from './ItemToolbar.vue'
+import { ref, toRefs, useTemplateRef, reactive, computed } from 'vue'
 import { usePagesStore } from '@/views/Pages/Pages.hooks'
 import { onClickOutside } from '@vueuse/core'
+import BlockUI from 'primevue/blockui'
+import Popover from 'primevue/popover'
+import Properties from './Properties.vue'
+import Divider from 'primevue/divider'
 
+
+const op = ref()
 const emit = defineEmits(['duplicate', 'delete'])
-const props = defineProps<{ id: string; component: any}>()
+const props = defineProps<{ id: string; component: any }>()
 const { component } = toRefs(props)
-const { selectedItem, activeTab } = usePagesStore()
+const { selectedItem, activeTab, properties } = usePagesStore()
 
 const target = useTemplateRef<HTMLElement>('target')
 onClickOutside(target, () => {
@@ -61,32 +64,37 @@ function hideToolbar() {
   showToolbar.value = false
 }
 
-function handleDuplicate() {
-  emit('duplicate')
-  hideToolbar()
+function clickHandler(event: any) {
+  op.value.toggle(event)
 }
-function handleDelete() {
-  emit('delete')
-  hideToolbar()
-}
+
+onClickOutside(op, () => {
+  op.value.Hide()
+})
+
+const filteredProperties = computed(() => {
+  return properties.value[selectedItem.value] || [];
+});
 </script>
 
 <style scoped>
 .components {
   z-index: 100;
 }
-.selected-component::before {
-  content: '';
+
+:deep(.selected-component) {
+  background: none !important;
+  z-index: -1;
+  &::before {
+    content: '';
     position: absolute;
-    height: 100%;
-    width: 100%;
-    border: 2px dashed var(--grey-3);
-    z-index: 2;
-    transition: box-shadow 0.2s, border-color 0.2s;
     display: flex;
-    top: 0px;
-    left: 0px;
+    border: 2px dashed var(--grey-3);
+    width: 100%;
+    height: 100%;
+  }
 }
+
 .hovering::before {
   content: '';
   position: absolute;
@@ -98,5 +106,30 @@ function handleDelete() {
   display: flex;
   top: 0px;
   left: 0px;
+}
+
+.properties {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.properties__header {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.properties__label {
+  font-size: 14px;
+  font-weight: bold;
+  color: var(--grey-2);
+}
+
+.properties__caption {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--grey-3);
 }
 </style>

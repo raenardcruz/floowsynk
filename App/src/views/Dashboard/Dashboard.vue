@@ -1,18 +1,26 @@
 <template>
     <div style="padding: 8px">
         <div class="test">
-            <Button label="Test Toast" @click="() => showToast()" />
+            <MenuBar :model="items"/>
+            <CustomList id="test" :template="template" label="Sample Label" v-model="a" />
         </div>
     </div>
 </template>
 
 <script lang="ts" setup>
-import Button from 'primevue/button'
-import { useToast } from 'primevue/usetoast'
+import { ref } from 'vue'
+import MenuBar from 'primevue/menubar'
+import CustomList from '@/components/Composable/UI/Inputs/CustomList.vue'
 
-const toast = useToast()
-const showToast = () => {
-    toast.add({severity:'info', summary: 'Info Message', detail:'Message Content', life: 3000});
+const items = ref([
+    {
+        label: 'Home'
+    },
+]);
+const a = ref()
+const template = {
+    name: '',
+    age: ''
 }
 </script>
 
