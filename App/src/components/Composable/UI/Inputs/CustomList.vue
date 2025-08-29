@@ -21,6 +21,8 @@ import Button from '@/components/Composable/UI/Buttons/PrimaryButton.vue'
 import TextInput from '@/components/Composable/UI/Inputs/TextInput.vue'
 import Fieldset from 'primevue/fieldset'
 import Panel from 'primevue/panel'
+import Select from 'primevue/select'
+import { iconList } from '@/views/Pages/Tools/Tools.constants'
 
 
 const props = defineProps<CustomListProps>()
@@ -30,6 +32,18 @@ const clickHandler = () => {
     modelValue.value = [...modelValue.value, { ...props.template }]
 }
 const componentSwitcher = (item: any, fieldItem: string) => {
+    if (fieldItem.toLowerCase() === 'icon') {
+        return {
+            component: Select,
+            props: {
+                label: fieldItem,
+                options: iconList,
+                placeholder: `Select ${fieldItem}`,
+                filter: true,
+                editable: true
+            }
+        }
+    }
     switch (typeof item[fieldItem]) {
         case 'string':
             return {

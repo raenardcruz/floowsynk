@@ -7,7 +7,7 @@
         </template>
         <template #item="{ item }">
             <span class="menu-item">
-                <img v-if="item?.icon" :src="item.icon" alt="icon" height="20" class="mr-2"/>
+                <span v-if="item?.icon" class="material-symbols-outlined">{{ item.icon }}</span>
                 <span v-if="item?.link"><a :href="item.link">{{ item?.label || '' }}</a></span>
                 <span v-else>{{ item?.label || '' }}</span>
                 <Badge v-if="item?.badge || item.badge > 0" :value="item.badge" class="ml-2"></Badge>
@@ -57,5 +57,10 @@ import { PageComponentProps, usePageComponent } from '@/views/Pages/Pages.hooks'
 }
 :deep(.menu-list) {
     width: 100%;
+}
+.menu-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 </style>

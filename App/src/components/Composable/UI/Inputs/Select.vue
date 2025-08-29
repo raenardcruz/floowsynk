@@ -24,12 +24,9 @@
         :scrollHeight="scrollHeight"
         :loading="loading"
         :class="selectClasses"
-        :data-testid="$props['data-testid']"
         @change="handleChange"
         @show="handleShow"
         @hide="handleHide"
-        @focus="handleFocus"
-        @blur="handleBlur"
         @filter="handleFilter"
       >
         <template #option="{ option }">
@@ -64,12 +61,9 @@
       :scrollHeight="scrollHeight"
       :loading="loading"
       :class="selectClasses"
-      :data-testid="$props['data-testid']"
       @change="handleChange"
       @show="handleShow"
       @hide="handleHide"
-      @focus="handleFocus"
-      @blur="handleBlur"
       @filter="handleFilter"
     >
       <template #option="{ option }">
@@ -90,10 +84,10 @@ import { generateId } from '../utils/component'
 import FloatLabel from 'primevue/floatlabel'
 import Select from 'primevue/select'
 import type { SelectProps, SelectEmits, SelectExposed } from './Select.types'
-import { defaultSelectProps, selectVariantClasses } from './Select.config'
+import { selectVariantClasses } from './Select.config'
 
 // Props with defaults
-const props = withDefaults(defineProps<SelectProps>(), defaultSelectProps)
+const props = defineProps<SelectProps>()
 
 // Model
 const modelValue = defineModel<any>()
@@ -144,14 +138,6 @@ const handleShow = () => {
 
 const handleHide = () => {
   emit('hide')
-}
-
-const handleFocus = (event: FocusEvent) => {
-  emit('focus', event)
-}
-
-const handleBlur = (event: FocusEvent) => {
-  emit('blur', event)
 }
 
 const handleFilter = (event: any) => {
