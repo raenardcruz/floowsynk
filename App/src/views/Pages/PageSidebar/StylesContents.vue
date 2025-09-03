@@ -2,9 +2,9 @@
   <div class="styles-sidebar">
     <div class="style-section">
       <div class="section-indicator" :style="sectionIndicatorStyle"></div>
-      <div class="section" v-for="(section, index) in validSections" :key="index"
+      <div class="section" v-for="(section, index) in validTabs" :key="index"
         :data-tooltip="section" @click="handleSetActiveStyleSection && handleSetActiveStyleSection(index)">
-        {{ section }}
+        <span class="material-symbols-outlined">{{ TabIconMapping[section] }}</span>
       </div>
     </div>
     <div class="style-list">
@@ -33,7 +33,8 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { usePagesStore } from '@/views/Pages/Pages.hooks'
-import { DataTypes } from '../Tools/Tools.types'
+import { DataTypes, ComponentProperty } from '../Tools/Tools.types'
+import { TabIconMapping } from '../Tools/Tools.constants'
 
 const { selectedItem, styles } = usePagesStore()
 const activeStyleSection = ref(0);
@@ -42,51 +43,35 @@ function handleSetActiveStyleSection(index: number) {
   activeStyleSection.value = index;
 }
 
-interface PropertyMeta {
-  name: string;
-  label: string;
-  group: string;
-  section: number;
-  control: string;
-  value: any;
-  options?: string[];
-  placeholder?: string;
-  description?: string;
-  dependency?: {
-    property: string;
-    values: string[];
-  };
-}
-
 const sectionIndicatorStyle = computed(() => {
   return {
     top: `${(activeStyleSection.value) * 48}px`
   };
 });
 
-const validSections = computed(() => {
-  return [...new Set(styles.value[selectedItem.value].map(m => m.section))]
+const validTabs = computed(() => {
+  return [...new Set(styles.value[selectedItem.value].map(m => m.tab))]
 });
 const filteredProperties = computed(() => {
-  return styles.value[selectedItem.value].filter(property => property.section === validSections.value[activeStyleSection.value] || '');
+  return styles.value[selectedItem.value].filter(property => property.tab === validTabs.value[activeStyleSection.value] || '');
 });
 const sectionGroupsValue = computed(() => {
   return [...new Set(filteredProperties.value.map(property => property.group))];
 })
-function getGroupPropertiesValue(group: string): PropertyMeta[] {
+function getGroupPropertiesValue(group: string): ComponentProperty[] {
   return filteredProperties.value.filter(property => property.group === group);
 }
 
-function isPropertyVisible(property: PropertyMeta) {
+function isPropertyVisible(property: ComponentProperty): boolean {
   if (!property.dependency) {
     return true;
   }
-  const dependentProperty = styles.value[selectedItem.value].find(p => p.name === property?.dependency?.property);
-  return dependentProperty && property.dependency.values.includes(dependentProperty.value);
+  const dependentProperty = styles.value[selectedItem.value].find(p => p.name === property?.dependency?.name);
+  return dependentProperty ? property.dependency.regexExp.test(dependentProperty.value.toString()) : false
 }
 
 watch(selectedItem, (newSelectedItem) => {
-  if (activeStyleSection.value >= [...new Set(styles.value[newSelectedItem].map(m => m.section))].length) {
+  if (activeStyleSection.value >= [...new Set(styles.value[newSelectedItem].map(m => m.tab))].length) {
     activeStyleSection.value = 0
   }
 }, { immediate: true });
@@ -128,7 +113,6 @@ watch(selectedItem, (newSelectedItem) => {
   height: 48px;
   cursor: pointer;
   transition: all 0.3s ease;
-  writing-mode: vertical-lr;
 }
 
 .style-section .section[data-tooltip]:hover::before {

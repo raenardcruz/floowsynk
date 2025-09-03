@@ -2,6 +2,7 @@ import { ref, computed } from 'vue'
 import { createGlobalState } from '@vueuse/core'
 import { convertStyleArrayToProps } from './Tools/Tools.config'
 import { COMPONENT_MAPPING, COMPONENT_NAMES } from './Tools/Tools.components';
+import { ComponentProperty, ComponentStyle } from './Tools/Tools.types';
 
 export interface componentItem {
   id: string
@@ -17,8 +18,8 @@ export interface PageComponentProps {
 export const usePagesStore = createGlobalState(() => {
   const activeTab = ref<number>(1)
   const droppedItems = ref<Array<componentItem>>([])
-  const styles = ref<Record<string, Array<any>>>({})
-  const properties = ref<Record<string, Array<any>>>({})
+  const styles = ref<Record<string, Array<ComponentStyle>>>({})
+  const properties = ref<Record<string, Array<ComponentProperty>>>({})
   const selectedItem = ref<string>('')
 
   return {
