@@ -9,14 +9,22 @@ export enum DataTypes {
     ICON = 'Icon'
 }
 
-export interface ComponentProperty {
+export interface BaseComponent {
     name: string
     label: string
     group: string
-    section: number | string
     control: DataTypes,
     value: any,
     options?: Array<any> | null,
     description?: string,
+    placeholder?: string,
+    dependency?: { name: string, regexExp: RegExp } | null,
+}
+
+export interface ComponentProperty extends BaseComponent {
     dataModel?: any | null
+}
+
+export interface ComponentStyle extends BaseComponent {
+    tab: string,
 }

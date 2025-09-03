@@ -1,3 +1,24 @@
+export enum Tabs {
+  DEFAULT = 'Root',
+  LOGO = 'Logo',
+  ITEMLABEL = 'Item Labels',
+  ITEMICON = 'Item Icons',
+}
+export enum Groups {
+  GENERAL = 'General',
+  DIMENSIONS = 'Dimensions',
+  TYPOGRAPHY = 'Typography',
+}
+export const GroupIconMapping: Record<string, string> = {
+  [Groups.GENERAL]: 'setting',
+  [Groups.DIMENSIONS]: 'aspect_ratio',
+}
+export const TabIconMapping: Record<string, string> = {
+  [Tabs.DEFAULT]: 'dashboard',
+  [Tabs.LOGO]: 'stars',
+  [Tabs.ITEMLABEL]: 'bookmark',
+  [Tabs.ITEMICON]: 'layers',
+}
 export const iconList = [
   "search",
   "menu",
