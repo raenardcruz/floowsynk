@@ -3,11 +3,13 @@ export enum Tabs {
   LOGO = 'Logo',
   ITEMLABEL = 'Item Labels',
   ITEMICON = 'Item Icons',
+  ENDITEM = 'End Item',
 }
 export enum Groups {
   GENERAL = 'General',
   DIMENSIONS = 'Dimensions',
   TYPOGRAPHY = 'Typography',
+  SPACING = 'Spacing',
 }
 export const GroupIconMapping: Record<string, string> = {
   [Groups.GENERAL]: 'setting',
@@ -18,6 +20,7 @@ export const TabIconMapping: Record<string, string> = {
   [Tabs.LOGO]: 'stars',
   [Tabs.ITEMLABEL]: 'bookmark',
   [Tabs.ITEMICON]: 'layers',
+  [Tabs.ENDITEM]: 'flag',
 }
 export const iconList = [
   "search",
