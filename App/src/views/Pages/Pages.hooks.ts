@@ -21,6 +21,7 @@ export const usePagesStore = createGlobalState(() => {
   const styles = ref<Record<string, Array<ComponentStyle>>>({})
   const properties = ref<Record<string, Array<ComponentProperty>>>({})
   const selectedItem = ref<string>('')
+  const isTestMode = ref<boolean>(false)
 
   return {
     activeTab,
@@ -28,6 +29,7 @@ export const usePagesStore = createGlobalState(() => {
     styles,
     properties,
     selectedItem,
+    isTestMode,
   }
 })
 

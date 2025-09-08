@@ -4,7 +4,6 @@
     grid-template-columns: 240px auto;
     grid-template-areas: "action-tabs actions";
     background-color: var(--white-3);
-    height: 50px;
     width: 100%;
     box-shadow: 0 0 10px var(--grey-2);
 }
