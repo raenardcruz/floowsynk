@@ -1,9 +1,11 @@
 import Section from '../Tools/Section/Section.vue'
 import MenuBar from './MenuBar/MenuBar.vue'
+import Accordion from './Accordion/Accordion.vue'
 
 import { section_styles } from '@/views/Pages/Tools/Section/config'
 import { menu_bar_properties, menu_bar_style } from '@/views/Pages/Tools/MenuBar/config'
-
+import { accordion_styles } from '@/views/Pages/Tools/Accordion/config'
+ 
 export enum COMPONENT_GROUPS {
   CONTAINERS = 'Containers',
   COMPONENTS = 'Components',
@@ -44,7 +46,8 @@ export const SECTIONS = [
 
 export enum COMPONENT_NAMES {
   SECTION = 'section',
-  MENUABR = 'menuabr'
+  MENUABR = 'menubar',
+  ACCORDION = 'accordion',
 }
 
 export interface ComponentInfo {
@@ -72,6 +75,13 @@ export const COMPONENT_MAPPING: Record<COMPONENT_NAMES, ComponentInfo> = {
     component: MenuBar,
     propertiesConfig: menu_bar_properties,
     styleConfig: menu_bar_style
+  },
+  [COMPONENT_NAMES.ACCORDION]: {
+    icon: 'src/components/Icons/components/accordion.svg',
+    label: 'Accordion',
+    group: COMPONENT_GROUPS.CONTAINERS,
+    component: Accordion,
+    styleConfig: accordion_styles
   }
 }
 

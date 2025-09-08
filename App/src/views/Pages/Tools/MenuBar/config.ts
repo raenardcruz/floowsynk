@@ -41,9 +41,12 @@ export const menu_bar_properties: ComponentProperty[] = [
 ]
 
 export const menu_bar_style: ComponentStyle[] = [
+    // Root Style
+    { name: 'width', label: 'Width', group: Groups.DIMENSIONS, tab: Tabs.DEFAULT, control: DataTypes.TEXT, value: '', description: 'Sets the width of the element.' },
+    { name: 'background', label: 'Background', group: 'Background', tab: Tabs.DEFAULT, control: DataTypes.COLOR, value: '', placeholder: 'e.g. #ffffff', description: 'Sets the background color of the element.' },
     // Logo Styles
-    { name: 'height', label: 'Height', group: Groups.DIMENSIONS, tab: Tabs.LOGO, control: DataTypes.TEXT, value: '44px', description: 'Sets the height of the element.' },
-    { name: 'width', label: 'Width', group: Groups.DIMENSIONS, tab: Tabs.LOGO, control: DataTypes.TEXT, value: '44px', description: 'Sets the width of the element.' },
+    { name: 'height', label: 'Height', group: Groups.DIMENSIONS, tab: Tabs.LOGO, control: DataTypes.TEXT, value: '', description: 'Sets the height of the element.' },
+    { name: 'width', label: 'Width', group: Groups.DIMENSIONS, tab: Tabs.LOGO, control: DataTypes.TEXT, value: '', description: 'Sets the width of the element.' },
     { name: 'border-radius', label: 'Border Radius', group: Groups.DIMENSIONS, tab: Tabs.LOGO, control: DataTypes.TEXT, value: '0', description: 'Sets how round the logo.' },
     { name: 'border-width', label: 'Border Thickness', group: Groups.DIMENSIONS, tab: Tabs.LOGO, control: DataTypes.TEXT, value: '0', description: 'Sets the thickness of the border.', dependency: { name: 'border-radius', regexExp: /^-?\d+(\.\d+)?(px|cm|mm|in|pt|pc|%|em|ex|ch|rem|vw|vh|vmin|vmax|fr)$/ } },
     { name: 'border-style', label: 'Border Style', group: Groups.DIMENSIONS, tab: Tabs.LOGO, control: DataTypes.SELECT, options: ['solid', 'dashed', 'dotted'], value: 'solid', description: 'Sets the style of the border.', dependency: { name: 'border-radius', regexExp: /^-?\d+(\.\d+)?(px|cm|mm|in|pt|pc|%|em|ex|ch|rem|vw|vh|vmin|vmax|fr)$/ } },
