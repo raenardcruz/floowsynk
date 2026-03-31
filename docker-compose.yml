@@ -28,9 +28,11 @@ services:
     build:
       context: .
       dockerfile: App/Dockerfile
+      args:
+        - VITE_SERVER=${VITE_SERVER:-https://floowsynkapi.raenardcruz.com}
     ports:
       - "3000:80"
     environment:
-      - VITE_SERVER=https://floowsynkapi.raenardcruz.com
+      - VITE_SERVER=${VITE_SERVER:-https://floowsynkapi.raenardcruz.com}
     depends_on:
       - server

@@ -191,10 +191,10 @@ func corsMiddleware(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, x-user-agent, x-grpc-web")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, x-user-agent, x-grpc-web, grpc-timeout, x-accept-content-transfer-encoding, x-accept-response-streaming, x-requested-with")
 		w.Header().Set("Access-Control-Expose-Headers", "grpc-status, grpc-message")
 		if r.Method == "OPTIONS" {
-			w.WriteHeader(http.StatusOK)
+			w.WriteHeader(http.StatusNoContent)
 			return
 		}
 		h.ServeHTTP(w, r)

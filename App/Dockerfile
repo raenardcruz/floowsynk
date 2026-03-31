@@ -12,6 +12,10 @@ COPY App/package*.json ./App/
 WORKDIR /app/App
 RUN npm install
 
+# Pass environment variables at build time (Vite)
+ARG VITE_SERVER
+ENV VITE_SERVER=$VITE_SERVER
+
 # Copy source code
 COPY App/ .
 
