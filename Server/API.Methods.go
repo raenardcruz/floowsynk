@@ -1,19 +1,16 @@
 package main
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
-	wf "github.com/raenardcruz/floowsynk/CodeGen/go/workflow"
+	"github.com/raenardcruz/floowsynk/Common"
 	DB "github.com/raenardcruz/floowsynk/Database"
 	"github.com/raenardcruz/floowsynk/Server/crypto"
-	"google.golang.org/grpc/metadata"
 )
 
 const UserRoleService = DB.UserRoleService
@@ -31,53 +28,42 @@ func generateToken(id string, username, role string, expiry int64) string {
 	return tokenString
 }
 
-func getTokenFromContext(ctx context.Context) (token string, err error) {
-	md, ok := metadata.FromIncomingContext(ctx)
-	if !ok {
-		return "", fmt.Errorf("metadata not found")
-	}
-	token = strings.Join(md.Get("Authorization"), "")
-	if token == "" {
-		return "", fmt.Errorf("token not found")
-	}
-	return token, nil
-}
 
-func validateToken(tokenString string) *ValidateResults {
+func validateToken(tokenString string) *Common.ValidateResults {
 	if tokenString == DB.AppConfig.Job_Token {
-		return &ValidateResults{
-			id:       "",
-			username: "job",
-			role:     UserRoleService,
-			status:   http.StatusOK,
+		return &Common.ValidateResults{
+			Id:       "",
+			Username: "job",
+			Role:     UserRoleService,
+			Status:   http.StatusOK,
 		}
 	}
 	token, err := jwt.ParseWithClaims(tokenString, jwt.MapClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return jwtKey, nil
 	})
 	if err != nil {
-		return &ValidateResults{status: http.StatusUnauthorized, message: err.Error()}
+		return &Common.ValidateResults{Status: http.StatusUnauthorized, Message: err.Error()}
 	}
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		return &ValidateResults{
-			id:       claims["id"].(string),
-			username: claims["username"].(string),
-			role:     claims["role"].(string),
-			status:   http.StatusOK,
+		return &Common.ValidateResults{
+			Id:       claims["id"].(string),
+			Username: claims["username"].(string),
+			Role:     claims["role"].(string),
+			Status:   http.StatusOK,
 		}
 	}
 
-	return &ValidateResults{status: http.StatusUnauthorized, message: "Invalid token"}
+	return &Common.ValidateResults{Status: http.StatusUnauthorized, Message: "Invalid token"}
 }
 
 func ExtendToken(token string) (string, error) {
 	results := validateToken(token)
-	if results.status != http.StatusOK {
+	if results.Status != http.StatusOK {
 		return "", fmt.Errorf("Unauthorized")
 	}
 
-	newToken := generateToken(results.id, results.username, results.role, time.Now().Add(time.Minute*60).UTC().Unix())
+	newToken := generateToken(results.Id, results.Username, results.Role, time.Now().Add(time.Minute*60).UTC().Unix())
 	return newToken, nil
 }
 
@@ -107,7 +93,7 @@ func Login(userName string, password string) (string, error) {
 	return "", fmt.Errorf("invalid password")
 }
 
-func GetWorkflow(id string) (workflow *wf.Workflow, err error) {
+func GetWorkflow(id string) (workflow *Common.Workflow, err error) {
 	workflow, err = DBCon.GetWorkflow(id)
 	if err != nil {
 		return workflow, err
@@ -115,20 +101,20 @@ func GetWorkflow(id string) (workflow *wf.Workflow, err error) {
 	return workflow, nil
 }
 
-func ListWorkflows(offset int32, limit int32) (wl *wf.WorkflowList, err error) {
+func ListWorkflows(offset int32, limit int32) (wl *Common.WorkflowList, err error) {
 	wl, err = DBCon.GetWorkflows(int(limit), int(offset))
 	if err != nil {
 		return nil, err
 	}
 	return wl, nil
 }
-func UpdateWorkflow(workflow *wf.Workflow) (w *wf.Workflow, err error) {
+func UpdateWorkflow(workflow *Common.Workflow) (w *Common.Workflow, err error) {
 	if err := DBCon.UpdateWorkflow(workflow); err != nil {
 		return nil, err
 	}
 	return workflow, nil
 }
-func CreateWorkflow(workflow *wf.Workflow) (*wf.Workflow, error) {
+func CreateWorkflow(workflow *Common.Workflow) (*Common.Workflow, error) {
 	id, err := DBCon.CreateWorkflow(workflow)
 	if err != nil {
 		return nil, err
@@ -139,19 +125,19 @@ func CreateWorkflow(workflow *wf.Workflow) (*wf.Workflow, error) {
 func DeleteWorkflow(id string) error {
 	return DBCon.DeleteWorkflow(id)
 }
-func ListWorkflowHistoryImpl() (*wf.WorkflowHistoryList, error) {
+func ListWorkflowHistoryImpl() (*Common.WorkflowHistoryList, error) {
 	history, err := DBCon.GetWorkflowHistory()
 	if err != nil {
 		return nil, err
 	}
 
-	var hl []*wf.WorkflowHistory
+	var hl []*Common.WorkflowHistory
 	for _, data := range history {
 		w, err := DBCon.GetWorkflow(data.WorkflowID)
 		if err != nil {
 			continue
 		}
-		hl = append(hl, &wf.WorkflowHistory{
+		hl = append(hl, &Common.WorkflowHistory{
 			Id:           data.ProcessID,
 			WorkflowId:   data.WorkflowID,
 			WorkflowName: w.Name,
@@ -159,19 +145,19 @@ func ListWorkflowHistoryImpl() (*wf.WorkflowHistoryList, error) {
 		})
 	}
 
-	return &wf.WorkflowHistoryList{
+	return &Common.WorkflowHistoryList{
 		History: hl,
 	}, nil
 }
-func GetWorkflowHistoryImpl(Id string) (*wf.WorkflowHistoryResponse, error) {
+func GetWorkflowHistoryImpl(Id string) (*Common.WorkflowHistoryResponse, error) {
 	replayDataList, err := DBCon.GetReplayDataGroupedByProcessID(Id)
 	if err != nil {
 		return nil, err
 	}
 
-	var data []*wf.ReplayData
+	var data []*Common.ReplayData
 	for _, rd := range replayDataList {
-		var nodeData wf.NodeData
+		var nodeData Common.NodeData
 		if err := json.Unmarshal([]byte(rd.Data), &nodeData); err != nil {
 			log.Printf("Error unmarshalling data: %v", err)
 			return nil, err
@@ -182,16 +168,16 @@ func GetWorkflowHistoryImpl(Id string) (*wf.WorkflowHistoryResponse, error) {
 			return nil, err
 		}
 
-		data = append(data, &wf.ReplayData{
+		data = append(data, &Common.ReplayData{
 			NodeId:    rd.NodeID,
 			Data:      &nodeData,
 			Variables: variables,
-			Status:    wf.NodeStatus(rd.Status),
+			Status:    Common.NodeStatus(rd.Status),
 			Message:   rd.Message,
 		})
 	}
 
-	return &wf.WorkflowHistoryResponse{
+	return &Common.WorkflowHistoryResponse{
 		Data: data,
 	}, nil
 }

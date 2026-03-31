@@ -6,13 +6,11 @@ OS="$(uname -s)"
 # Read JSON flags if setup.json exists
 SETUP_JSON="setup.json"
 SKIP_DOCKER=false
-SKIP_PROTOBUF=false
 SKIP_NPM=false
 SKIP_GO=false
 
 if [[ -f "$SETUP_JSON" ]] && command -v jq >/dev/null 2>&1; then
   SKIP_DOCKER=$(jq -r '.skip_docker' "$SETUP_JSON")
-  SKIP_PROTOBUF=$(jq -r '.skip_protobuf' "$SETUP_JSON")
   SKIP_NPM=$(jq -r '.skip_npm' "$SETUP_JSON")
   SKIP_GO=$(jq -r '.skip_go' "$SETUP_JSON")
 fi
@@ -101,19 +99,6 @@ else
   echo "⏩ Skipping Node.js/npm installation as requested."
 fi
 
-# Install protobuf compiler
-if [[ "$SKIP_PROTOBUF" != "true" ]]; then
-  if [[ "$OS" == "Linux" ]]; then
-    sudo apt-get install -y protobuf-compiler
-  elif [[ "$OS" == "Darwin" ]]; then
-    brew install protobuf
-  fi
-  # Install protoc-gen-go and protoc-gen-go-grpc
-  go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
-  go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
-else
-  echo "⏩ Skipping Protobuf installation as requested."
-fi
 
 # Verify installations
 echo "\nVerifying installations..."
@@ -122,7 +107,6 @@ docker --version
 go version
 node --version
 npm --version
-protoc --version
 
 # Print completion message
 echo "\nAll dependencies have been installed successfully!"

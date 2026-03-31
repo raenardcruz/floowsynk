@@ -97,9 +97,7 @@ export default defineConfig({
       'vue-router',
       'primevue/config',
       '@primeuix/themes/aura',
-      '@vueuse/core',
-      'google-protobuf',
-      'grpc-web'
+      '@vueuse/core'
     ],
     exclude: [
       // Exclude large dependencies that should be loaded separately

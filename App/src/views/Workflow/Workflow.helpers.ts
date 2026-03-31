@@ -1,5 +1,5 @@
 import { useWorkflowStore } from './Workflow.hooks'
-import { Workflow } from 'proto/workflow/workflow_pb'
+import { Workflow } from '@/utils/types'
 
 const { activeTab, tabs } = useWorkflowStore();
 
@@ -8,7 +8,7 @@ export const selectTab = (tabId: string) => {
 }
 
 export const closeTabById = (tabId: string) => {
-    const index = tabs.value.findIndex((tab: Workflow.AsObject) => tab.id === tabId);
+    const index = tabs.value.findIndex((tab: Workflow) => tab.id === tabId);
     if (index !== -1) {
         tabs.value.splice(index, 1);
         if (activeTab.value === tabId) {

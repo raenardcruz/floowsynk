@@ -40,9 +40,7 @@ type Config struct {
 	Redis_DB           int
 	App_Admin_Password string
 	App_Admin_Username string
-	Server_GRPC_Port   string
 	Server_REST_Port   string
-	Server_Plain_Port  string
 	Kafka_Brokers      string
 	Job_Token          string
 	JWT_Secret         string
@@ -66,9 +64,7 @@ func init() {
 		Redis_DB:           getEnvAsInt("REDIS_DB", 0),
 		App_Admin_Password: getEnv("APP_ADMIN_PASSWORD", "floowsynk"),
 		App_Admin_Username: getEnv("APP_ADMIN_USERNAME", "admin"),
-		Server_GRPC_Port:   getEnv("SERVER_GRPC_PORT", "8090"),
 		Server_REST_Port:   getEnv("SERVER_REST_PORT", "8091"),
-		Server_Plain_Port:  getEnv("SERVER_PLAIN_GRPC_PORT", "50051"),
 		Kafka_Brokers:      getEnv("KAFKA_BROKERS", "localhost:9092"),
 		Job_Token:          getEnv("JOB_TOKEN", "6c9e5318-6e7b-452d-9e22-9f35a755bcbd"),
 		JWT_Secret:         getEnv("JWT_SECRET", "secret_key"),

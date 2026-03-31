@@ -8,7 +8,7 @@
             </Header>
             <Row v-for="(item, index) in list" :key="index" @click="StepSelected(props.tabId, item.index)"
                 :selected="selectedReplayData === item.index">
-                <div class="replay-data-nodeid">{{ item.data.nodeid }}</div>
+                <div class="replay-data-nodeid">{{ item.data.nodeId }}</div>
                 <div class="replay-data-message">{{ item.data.message }}</div>
                 <div class="replay-data-status" :class="getStatus(item.data.status)">{{ getStatus(item.data.status) }}
                 </div>
@@ -16,9 +16,9 @@
         </div>
     </div>
     <Teleport :to="'#' + canvasId">
-        <div class="replay-data--sidebar">
+        <div class="replay-data--sidebar" v-if="replayData[selectedReplayData]">
             <p>Id</p>
-            <WorkflowNodeSidebarFields nodeType="" :modelValue="replayData[selectedReplayData].nodeid"
+            <WorkflowNodeSidebarFields nodeType="" :modelValue="replayData[selectedReplayData].nodeId"
                 :tabid="props.tabId" disabled />
             <WorkflowNodeSidebarFields nodeType="" v-model="selectedReplayDataData" :tabid="props.tabId" disabled />
             <h4>Variables</h4>
@@ -37,7 +37,7 @@ import { SidebarCanvasFields as WorkflowNodeSidebarFields } from "@/views/Workfl
 import { useReplayStoreHooks } from './ReplaySteps.hooks'
 import { useVirtualList } from '@vueuse/core'
 import { Row, Headers as Header } from '@/components/Composable/UI/Table'
-import { NodeStatus } from 'proto/workflow/workflow_pb'
+import { NodeStatus } from '@/utils/types'
 
 const props = defineProps<ReplayDataProps>()
 const { selectedReplayDataData } = useReplayStoreHooks(props.tabId)
@@ -52,25 +52,24 @@ const { list, containerProps, wrapperProps } = useVirtualList(replayData, {
     itemHeight: 40,
 })
 const variables = computed(() => {
-    const variablesMap = replayData.value[selectedReplayData.value].variablesMap
-    let result: Record<string, string> = {}
-    variablesMap.forEach((item: any) => {
-        result[item[0]] = item[1].toString()
-    })
-    return result
+    if (!replayData.value[selectedReplayData.value]) return {}
+    const data = replayData.value[selectedReplayData.value].data || {}
+    return data
 })
-const getStatus = (status: number) => {
-    switch (status) {
-        case NodeStatus.COMPLETED:
-            return 'Success'
-        case NodeStatus.FAILED:
-            return 'Failed'
-        case NodeStatus.INFO:
-            return 'Info'
-        default:
-            return 'Info'
+    const getStatus = (status: string | number) => {
+        switch (status) {
+            case NodeStatus.COMPLETED:
+            case 'SUCCESS':
+            case 'COMPLETED':
+                return 'Success'
+            case NodeStatus.FAILED:
+            case 'ERROR':
+            case 'FAILED':
+                return 'Failed'
+            default:
+                return 'Info'
+        }
     }
-}
 
 </script>
 

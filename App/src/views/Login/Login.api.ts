@@ -1,18 +1,12 @@
-import { LoginServicePromiseClient } from 'proto/login/login_grpc_web_pb'
-import { Credential, Token } from 'proto/login/login_pb'
-import { getApiUrl } from '@/components/Composable/constants'
+import api from '@/utils/api';
+import { LoginResponse } from '@/utils/types';
 
-export const LoginRequest = async (session: any): Promise<Token> => {
-    const client = new LoginServicePromiseClient(getApiUrl());
-    const request = new Token();
-    request.setToken(session);
-    return await client.extendToken(request, {});
+export const LoginRequest = async (session: string): Promise<LoginResponse> => {
+    const response = await api.post<LoginResponse>('/api/extend-token', { token: session });
+    return response.data;
 }
 
-export const LoginRequestUserPass = async (username: string, password: string): Promise<Token> => {
-    const client = new LoginServicePromiseClient(getApiUrl());
-    const request = new Credential();
-    request.setUsername(username);
-    request.setPassword(password);
-    return await client.login(request, {});
+export const LoginRequestUserPass = async (username: string, password: string): Promise<LoginResponse> => {
+    const response = await api.post<LoginResponse>('/api/login', { username, password });
+    return response.data;
 }

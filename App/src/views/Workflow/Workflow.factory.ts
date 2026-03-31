@@ -1,19 +1,14 @@
-import { Workflow, Node, Edge } from 'proto/workflow/workflow_pb'
-import {generateUUID} from "@/components/Composable/Utilities"
+import { generateUUID } from "@/components/Composable/Utilities"
 
-export const newProcess = (): Workflow.AsObject => {
+export const newProcess = (): any => {
     return {
         id: generateUUID(),
-        type: 'default',
         name: 'Untitled',
         description: '',
-        nodesList: [] as Node.AsObject[],
-        edgesList: [] as Edge.AsObject[],
-        tagsList: [],
+        nodes: [],
+        edges: [],
         isnew: true,
-        createdat: new Date().toISOString(),
-        updatedat: new Date().toISOString(),
-        createdby: 'system',
-        updatedby: 'system'
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
     }
 }

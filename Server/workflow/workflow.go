@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 
-	proto "github.com/raenardcruz/floowsynk/CodeGen/go/workflow"
+	"github.com/raenardcruz/floowsynk/Common"
 )
 
 const (
@@ -54,12 +54,12 @@ func (wp *WorkflowProcessor) Process(nodeId string) (err error) {
 	wp.ProcessVariables[INPUT] = wp.ProcessVariables[OUTPUT]
 	sourceHandle := ""
 	node, exist := getNodeById(wp.Workflow.Nodes, nodeId)
-	wp.UpdateStatus(node, proto.NodeStatus_RUNNING, nil, "", false)
+	wp.UpdateStatus(node, Common.RUNNING, nil, "", false)
 	if !exist {
 		return nil
 	}
 
-	nodeProcessors := map[string]func(*proto.Node) (string, error){
+	nodeProcessors := map[string]func(*Common.Node) (string, error){
 		defaultnodeType: wp.DefaultNodeProcess,
 		intervalType:    wp.DefaultNodeProcess,
 		webhookType:     wp.DefaultNodeProcess,
@@ -101,6 +101,6 @@ func (wp *WorkflowProcessor) Process(nodeId string) (err error) {
 	return nil
 }
 
-func (wp *WorkflowProcessor) ConditionNodeProcessWrapper(node *proto.Node) (string, error) {
+func (wp *WorkflowProcessor) ConditionNodeProcessWrapper(node *Common.Node) (string, error) {
 	return wp.ConditionNodeProcess(node)
 }

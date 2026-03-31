@@ -1,27 +1,13 @@
 <template>
-    <div style="padding: 8px">
-        <div class="test">
-            <accordion />
-        </div>
+    <div style="padding: 16px">
+        <h1 class="text-2xl font-bold mb-4">Dashboard</h1>
+        <p>Welcome to your Floowsynk dashboard.</p>
     </div>
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
-import Accordion from '../Pages/Tools/Accordion/Accordion.vue';
-
-const items = ref([
-    {
-        label: 'Home'
-    },
-]);
-const a = ref()
-const template = {
-    name: '',
-    age: ''
-}
+// Dashboard logic goes here
 </script>
 
 <style scoped>
-
 </style>

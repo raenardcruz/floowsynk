@@ -44,7 +44,7 @@ UI/
 - **Select**: PrimeVue Select/Dropdown component
 - **Checkbox**: PrimeVue Checkbox component
 - **KeyValue**: Enhanced key-value pair functionality
-- **ListField**: Enhanced list management with protocol buffer compatibility
+- **ListField**: Enhanced list management with a simplified API
 - **TextCodeInput**: Monaco Editor integration for code editing
 
 #### Button Components ✅ MIGRATED

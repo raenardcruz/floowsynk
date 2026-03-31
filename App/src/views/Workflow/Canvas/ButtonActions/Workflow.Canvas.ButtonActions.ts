@@ -3,11 +3,12 @@ import { useWorkflowCanvasHooks, useWorkflowCanvasStore } from '../Workflow.Canv
 import { WorkflowCanvasProps } from '../Workflow.Canvas.types'
 import { initWorkflows } from '@/views/Workflow/Process'
 import { useWorkflowStore } from '@/views/Workflow'
-import { NodeStatus, ReplayData, Node } from 'proto/workflow/workflow_pb'
+import { WorkflowWebSocket } from '@/utils/websocket'
+import { NodeStatus } from '@/utils/types'
+import api from '@/utils/api';
 import {
   createProcess,
   updateProcess,
-  executeProcess,
   deleteProcess
 } from '../Workflow.Canvas.api'
 import { useToast } from 'primevue/usetoast'
@@ -66,34 +67,42 @@ export const useWorkflowCanvasControlButtonActions = (props: WorkflowCanvasProps
     replayData.value = []
     nodeStatuses.value = {}
     isRunning.value = true
-    let stream = await executeProcess(tab.value)
-    toast.add({severity:'success', summary: 'Success', detail: 'Workflow started successfully', life: 3000});
-    stream.on('data', (response: ReplayData) => {
-      const status: NodeStatus = response?.getStatus()
-      switch (status) {
-        case NodeStatus.RUNNING:
-          nodeStatuses.value[response.getNodeid()] = 'running'
-          break
-        case NodeStatus.COMPLETED:
-          nodeStatuses.value[response.getNodeid()] = 'success'
-          replayData.value.push(response.toObject())
-          break
-        case NodeStatus.FAILED:
-          nodeStatuses.value[response.getNodeid()] = 'error'
-          replayData.value.push(response.toObject())
-          break
-        case NodeStatus.INFO:
-          nodeStatuses.value[response.getNodeid()] = 'info'
-          replayData.value.push(response.toObject())
-          break
-        default:
-          nodeStatuses.value[response.getNodeid()] = 'error'
-          break
+
+    const ws = new WorkflowWebSocket(tab.value.id)
+    ws.connect(
+      (data) => {
+        const { nodeId, status, message } = data
+        switch (status) {
+          case NodeStatus.RUNNING:
+            nodeStatuses.value[nodeId] = 'running'
+            break
+          case NodeStatus.COMPLETED:
+            nodeStatuses.value[nodeId] = 'success'
+            replayData.value.push(data)
+            break
+          case NodeStatus.FAILED:
+            nodeStatuses.value[nodeId] = 'error'
+            replayData.value.push(data)
+            break
+          default:
+            nodeStatuses.value[nodeId] = 'info'
+            replayData.value.push(data)
+            break
+        }
+      },
+      (error) => {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'WebSocket connection failed', life: 3000 });
+        isRunning.value = false
+      },
+      () => {
+        showReplayData.value = true
+        isRunning.value = false
+      },
+      {
+        token: localStorage.getItem('sessionToken') ?? '',
+        workflowId: tab.value.id,
       }
-    })
-    stream.on('end', () => {
-      showReplayData.value = true
-    })
+    )
   }
 
   const resetTransform = function () {
