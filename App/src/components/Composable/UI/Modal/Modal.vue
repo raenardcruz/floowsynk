@@ -14,6 +14,7 @@
     :position="position"
     :minWidth="minWidth"
     :minHeight="minHeight"
+    :dismissableMask="false"
     pt:content:class="content-height"
     @update:visible="handleVisibilityChange"
     @show="handleShow"
