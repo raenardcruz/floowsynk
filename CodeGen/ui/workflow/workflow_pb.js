@@ -784,7 +784,8 @@ proto.proto.WorkflowHistory.toObject = function(includeInstance, msg) {
 id: jspb.Message.getFieldWithDefault(msg, 1, ""),
 workflowid: jspb.Message.getFieldWithDefault(msg, 2, ""),
 workflowname: jspb.Message.getFieldWithDefault(msg, 3, ""),
-rundate: jspb.Message.getFieldWithDefault(msg, 4, "")
+rundate: jspb.Message.getFieldWithDefault(msg, 4, ""),
+status: jspb.Message.getFieldWithDefault(msg, 5, 0)
   };
 
   if (includeInstance) {
@@ -836,6 +837,10 @@ proto.proto.WorkflowHistory.deserializeBinaryFromReader = function(msg, reader) 
     case 4:
       var value = /** @type {string} */ (reader.readStringRequireUtf8());
       msg.setRundate(value);
+      break;
+    case 5:
+      var value = /** @type {!proto.proto.NodeStatus} */ (reader.readEnum());
+      msg.setStatus(value);
       break;
     default:
       reader.skipField();
@@ -891,6 +896,13 @@ proto.proto.WorkflowHistory.serializeBinaryToWriter = function(message, writer) 
   if (f.length > 0) {
     writer.writeString(
       4,
+      f
+    );
+  }
+  f = message.getStatus();
+  if (f !== 0.0) {
+    writer.writeEnum(
+      5,
       f
     );
   }
@@ -966,6 +978,24 @@ proto.proto.WorkflowHistory.prototype.getRundate = function() {
  */
 proto.proto.WorkflowHistory.prototype.setRundate = function(value) {
   return jspb.Message.setProto3StringField(this, 4, value);
+};
+
+
+/**
+ * optional NodeStatus Status = 5;
+ * @return {!proto.proto.NodeStatus}
+ */
+proto.proto.WorkflowHistory.prototype.getStatus = function() {
+  return /** @type {!proto.proto.NodeStatus} */ (jspb.Message.getFieldWithDefault(this, 5, 0));
+};
+
+
+/**
+ * @param {!proto.proto.NodeStatus} value
+ * @return {!proto.proto.WorkflowHistory} returns this
+ */
+proto.proto.WorkflowHistory.prototype.setStatus = function(value) {
+  return jspb.Message.setProto3EnumField(this, 5, value);
 };
 
 

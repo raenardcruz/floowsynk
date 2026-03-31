@@ -156,6 +156,7 @@ func ListWorkflowHistoryImpl() (*wf.WorkflowHistoryList, error) {
 			WorkflowId:   data.WorkflowID,
 			WorkflowName: w.Name,
 			RunDate:      time.Unix(data.CreatedAt, 0).Format("Jan 02, 2006"),
+			Status:       wf.NodeStatus(data.Status),
 		})
 	}
 

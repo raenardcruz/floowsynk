@@ -54,6 +54,9 @@ export class WorkflowHistory extends jspb.Message {
   getRundate(): string;
   setRundate(value: string): WorkflowHistory;
 
+  getStatus(): NodeStatus;
+  setStatus(value: NodeStatus): WorkflowHistory;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): WorkflowHistory.AsObject;
   static toObject(includeInstance: boolean, msg: WorkflowHistory): WorkflowHistory.AsObject;
@@ -68,6 +71,7 @@ export namespace WorkflowHistory {
     workflowid: string;
     workflowname: string;
     rundate: string;
+    status: NodeStatus;
   };
 }
 

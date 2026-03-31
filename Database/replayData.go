@@ -39,6 +39,12 @@ func (db *DatabaseConnection) CreateReplayData(data *ReplayData) (string, error)
 	if result.Error != nil {
 		return "", result.Error
 	}
+
+	// Invalidate Cache
+	ctx := context.Background()
+	DeleteCache(ctx, "replayHistoryList")
+	DeleteCache(ctx, "ReplayData:"+data.ProcessID)
+
 	log.Printf("Replay Data %v added to DB", data)
 	log.Printf("SQL: %v, Rows Affected: %d", result.Statement.SQL.String(), result.RowsAffected)
 	return data.ID, nil
@@ -50,12 +56,14 @@ func (db *DatabaseConnection) CreateBatchReplayData(dataList []ReplayData) ([]st
 	}
 
 	var ids []string
+	processIDs := make(map[string]struct{})
 	for i := range dataList {
 		dataList[i].CreatedAt = time.Now().UTC().Unix()
 		if dataList[i].ID == "" {
 			dataList[i].ID = uuid.NewString()
 		}
 		ids = append(ids, dataList[i].ID)
+		processIDs[dataList[i].ProcessID] = struct{}{}
 	}
 
 	const chunkSize = 500
@@ -71,6 +79,13 @@ func (db *DatabaseConnection) CreateBatchReplayData(dataList []ReplayData) ([]st
 		}
 		log.Printf("Batch Replay Data chunk added to DB: %v", ids[i:end])
 		log.Printf("SQL: %v, Rows Affected: %d", result.Statement.SQL.String(), result.RowsAffected)
+	}
+
+	// Invalidate Cache
+	ctx := context.Background()
+	DeleteCache(ctx, "replayHistoryList")
+	for pID := range processIDs {
+		DeleteCache(ctx, "ReplayData:"+pID)
 	}
 
 	return ids, nil
@@ -89,7 +104,7 @@ func (db *DatabaseConnection) GetWorkflowHistory() ([]ReplayData, error) {
 		}
 	}
 
-	result := db.conn.Select("process_id, workflow_id, min(created_at) as created_at").Group("process_id, workflow_id").Find(&replayData)
+	result := db.conn.Select("process_id, workflow_id, min(created_at) as created_at, MAX(CASE WHEN status = 2 THEN 2 WHEN status = 1 THEN 1 ELSE 0 END) as status").Group("process_id, workflow_id").Find(&replayData)
 
 	if result.Error != nil {
 		return nil, result.Error
@@ -116,7 +131,7 @@ func (db *DatabaseConnection) GetReplayDataGroupedByProcessID(processID string) 
 		}
 	}
 
-	result := db.conn.Where("process_id = ?", processID).Find(&replayData)
+	result := db.conn.Where("process_id = ?", processID).Order("process_sequence ASC").Find(&replayData)
 	if result.Error != nil {
 		return nil, result.Error
 	}

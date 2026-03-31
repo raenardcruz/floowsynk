@@ -220,6 +220,7 @@ type WorkflowHistory struct {
 	WorkflowId    string                 `protobuf:"bytes,2,opt,name=WorkflowId,proto3" json:"WorkflowId,omitempty"`
 	WorkflowName  string                 `protobuf:"bytes,3,opt,name=WorkflowName,proto3" json:"WorkflowName,omitempty"`
 	RunDate       string                 `protobuf:"bytes,4,opt,name=RunDate,proto3" json:"RunDate,omitempty"`
+	Status        NodeStatus             `protobuf:"varint,5,opt,name=Status,proto3,enum=proto.NodeStatus" json:"Status,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -280,6 +281,13 @@ func (x *WorkflowHistory) GetRunDate() string {
 		return x.RunDate
 	}
 	return ""
+}
+
+func (x *WorkflowHistory) GetStatus() NodeStatus {
+	if x != nil {
+		return x.Status
+	}
+	return NodeStatus_RUNNING
 }
 
 type WorkflowHistoryRequest struct {
@@ -1710,14 +1718,15 @@ const file_workflow_proto_rawDesc = "" +
 	"\x14RunWorkflowIdRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"G\n" +
 	"\x13WorkflowHistoryList\x120\n" +
-	"\ahistory\x18\x01 \x03(\v2\x16.proto.WorkflowHistoryR\ahistory\"\x7f\n" +
+	"\ahistory\x18\x01 \x03(\v2\x16.proto.WorkflowHistoryR\ahistory\"\xaa\x01\n" +
 	"\x0fWorkflowHistory\x12\x0e\n" +
 	"\x02Id\x18\x01 \x01(\tR\x02Id\x12\x1e\n" +
 	"\n" +
 	"WorkflowId\x18\x02 \x01(\tR\n" +
 	"WorkflowId\x12\"\n" +
 	"\fWorkflowName\x18\x03 \x01(\tR\fWorkflowName\x12\x18\n" +
-	"\aRunDate\x18\x04 \x01(\tR\aRunDate\"(\n" +
+	"\aRunDate\x18\x04 \x01(\tR\aRunDate\x12)\n" +
+	"\x06Status\x18\x05 \x01(\x0e2\x11.proto.NodeStatusR\x06Status\"(\n" +
 	"\x16WorkflowHistoryRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"@\n" +
 	"\x17WorkflowHistoryResponse\x12%\n" +
@@ -1960,51 +1969,52 @@ var file_workflow_proto_goTypes = []any{
 }
 var file_workflow_proto_depIdxs = []int32{
 	4,  // 0: proto.WorkflowHistoryList.history:type_name -> proto.WorkflowHistory
-	7,  // 1: proto.WorkflowHistoryResponse.data:type_name -> proto.ReplayData
-	14, // 2: proto.ReplayData.data:type_name -> proto.NodeData
-	22, // 3: proto.ReplayData.variables:type_name -> proto.ReplayData.VariablesEntry
-	1,  // 4: proto.ReplayData.status:type_name -> proto.NodeStatus
-	11, // 5: proto.WorkflowList.workflows:type_name -> proto.Workflow
-	13, // 6: proto.Workflow.nodes:type_name -> proto.Node
-	12, // 7: proto.Workflow.edges:type_name -> proto.Edge
-	13, // 8: proto.Edge.sourcenode:type_name -> proto.Node
-	13, // 9: proto.Edge.targetnode:type_name -> proto.Node
-	14, // 10: proto.Node.data:type_name -> proto.NodeData
-	16, // 11: proto.Node.icon:type_name -> proto.NodeIcon
-	18, // 12: proto.Node.position:type_name -> proto.NodePosition
-	17, // 13: proto.Node.dimensions:type_name -> proto.NodeDimensions
-	20, // 14: proto.Node.handleBounds:type_name -> proto.NodeHandleBounds
-	18, // 15: proto.Node.computedPosition:type_name -> proto.NodePosition
-	15, // 16: proto.NodeData.headers:type_name -> proto.NodeDataArray
-	15, // 17: proto.NodeData.list:type_name -> proto.NodeDataArray
-	15, // 18: proto.NodeData.weeks:type_name -> proto.NodeDataArray
-	0,  // 19: proto.NodeDataArray.type:type_name -> proto.ArrayDataType
-	19, // 20: proto.NodeDataArray.keyValueItems:type_name -> proto.KeyValue
-	21, // 21: proto.NodeHandleBounds.source:type_name -> proto.Handle
-	21, // 22: proto.NodeHandleBounds.target:type_name -> proto.Handle
-	9,  // 23: proto.WorkflowService.GetWorkflow:input_type -> proto.GetWorkflowRequest
-	8,  // 24: proto.WorkflowService.ListWorkflows:input_type -> proto.PageRequest
-	11, // 25: proto.WorkflowService.UpdateWorkflow:input_type -> proto.Workflow
-	11, // 26: proto.WorkflowService.CreateWorkflow:input_type -> proto.Workflow
-	11, // 27: proto.WorkflowService.DeleteWorkflow:input_type -> proto.Workflow
-	11, // 28: proto.WorkflowService.QuickRun:input_type -> proto.Workflow
-	2,  // 29: proto.WorkflowService.RunWorkflowId:input_type -> proto.RunWorkflowIdRequest
-	23, // 30: proto.WorkflowService.ListWorkflowHistory:input_type -> google.protobuf.Empty
-	5,  // 31: proto.WorkflowService.GetWorkflowHistory:input_type -> proto.WorkflowHistoryRequest
-	11, // 32: proto.WorkflowService.GetWorkflow:output_type -> proto.Workflow
-	10, // 33: proto.WorkflowService.ListWorkflows:output_type -> proto.WorkflowList
-	11, // 34: proto.WorkflowService.UpdateWorkflow:output_type -> proto.Workflow
-	11, // 35: proto.WorkflowService.CreateWorkflow:output_type -> proto.Workflow
-	23, // 36: proto.WorkflowService.DeleteWorkflow:output_type -> google.protobuf.Empty
-	7,  // 37: proto.WorkflowService.QuickRun:output_type -> proto.ReplayData
-	7,  // 38: proto.WorkflowService.RunWorkflowId:output_type -> proto.ReplayData
-	3,  // 39: proto.WorkflowService.ListWorkflowHistory:output_type -> proto.WorkflowHistoryList
-	6,  // 40: proto.WorkflowService.GetWorkflowHistory:output_type -> proto.WorkflowHistoryResponse
-	32, // [32:41] is the sub-list for method output_type
-	23, // [23:32] is the sub-list for method input_type
-	23, // [23:23] is the sub-list for extension type_name
-	23, // [23:23] is the sub-list for extension extendee
-	0,  // [0:23] is the sub-list for field type_name
+	1,  // 1: proto.WorkflowHistory.Status:type_name -> proto.NodeStatus
+	7,  // 2: proto.WorkflowHistoryResponse.data:type_name -> proto.ReplayData
+	14, // 3: proto.ReplayData.data:type_name -> proto.NodeData
+	22, // 4: proto.ReplayData.variables:type_name -> proto.ReplayData.VariablesEntry
+	1,  // 5: proto.ReplayData.status:type_name -> proto.NodeStatus
+	11, // 6: proto.WorkflowList.workflows:type_name -> proto.Workflow
+	13, // 7: proto.Workflow.nodes:type_name -> proto.Node
+	12, // 8: proto.Workflow.edges:type_name -> proto.Edge
+	13, // 9: proto.Edge.sourcenode:type_name -> proto.Node
+	13, // 10: proto.Edge.targetnode:type_name -> proto.Node
+	14, // 11: proto.Node.data:type_name -> proto.NodeData
+	16, // 12: proto.Node.icon:type_name -> proto.NodeIcon
+	18, // 13: proto.Node.position:type_name -> proto.NodePosition
+	17, // 14: proto.Node.dimensions:type_name -> proto.NodeDimensions
+	20, // 15: proto.Node.handleBounds:type_name -> proto.NodeHandleBounds
+	18, // 16: proto.Node.computedPosition:type_name -> proto.NodePosition
+	15, // 17: proto.NodeData.headers:type_name -> proto.NodeDataArray
+	15, // 18: proto.NodeData.list:type_name -> proto.NodeDataArray
+	15, // 19: proto.NodeData.weeks:type_name -> proto.NodeDataArray
+	0,  // 20: proto.NodeDataArray.type:type_name -> proto.ArrayDataType
+	19, // 21: proto.NodeDataArray.keyValueItems:type_name -> proto.KeyValue
+	21, // 22: proto.NodeHandleBounds.source:type_name -> proto.Handle
+	21, // 23: proto.NodeHandleBounds.target:type_name -> proto.Handle
+	9,  // 24: proto.WorkflowService.GetWorkflow:input_type -> proto.GetWorkflowRequest
+	8,  // 25: proto.WorkflowService.ListWorkflows:input_type -> proto.PageRequest
+	11, // 26: proto.WorkflowService.UpdateWorkflow:input_type -> proto.Workflow
+	11, // 27: proto.WorkflowService.CreateWorkflow:input_type -> proto.Workflow
+	11, // 28: proto.WorkflowService.DeleteWorkflow:input_type -> proto.Workflow
+	11, // 29: proto.WorkflowService.QuickRun:input_type -> proto.Workflow
+	2,  // 30: proto.WorkflowService.RunWorkflowId:input_type -> proto.RunWorkflowIdRequest
+	23, // 31: proto.WorkflowService.ListWorkflowHistory:input_type -> google.protobuf.Empty
+	5,  // 32: proto.WorkflowService.GetWorkflowHistory:input_type -> proto.WorkflowHistoryRequest
+	11, // 33: proto.WorkflowService.GetWorkflow:output_type -> proto.Workflow
+	10, // 34: proto.WorkflowService.ListWorkflows:output_type -> proto.WorkflowList
+	11, // 35: proto.WorkflowService.UpdateWorkflow:output_type -> proto.Workflow
+	11, // 36: proto.WorkflowService.CreateWorkflow:output_type -> proto.Workflow
+	23, // 37: proto.WorkflowService.DeleteWorkflow:output_type -> google.protobuf.Empty
+	7,  // 38: proto.WorkflowService.QuickRun:output_type -> proto.ReplayData
+	7,  // 39: proto.WorkflowService.RunWorkflowId:output_type -> proto.ReplayData
+	3,  // 40: proto.WorkflowService.ListWorkflowHistory:output_type -> proto.WorkflowHistoryList
+	6,  // 41: proto.WorkflowService.GetWorkflowHistory:output_type -> proto.WorkflowHistoryResponse
+	33, // [33:42] is the sub-list for method output_type
+	24, // [24:33] is the sub-list for method input_type
+	24, // [24:24] is the sub-list for extension type_name
+	24, // [24:24] is the sub-list for extension extendee
+	0,  // [0:24] is the sub-list for field type_name
 }
 
 func init() { file_workflow_proto_init() }
