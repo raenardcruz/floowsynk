@@ -2,12 +2,10 @@ version: '3.8'
 services:
   db:
     image: postgres:15
-    env_file:
-      - ./Server/.env
     environment:
-      POSTGRES_USER: ${DB_USER:-root}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-floowsynk}
-      POSTGRES_DB: ${DB_NAME:-floowsynk}
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: floowsynk
+      POSTGRES_DB: floowsynk
     ports:
       - "5432:5432"
     volumes:
@@ -21,9 +19,9 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
-    # environment:
-    #   - REDIS_PASSWORD=floowsynk
-    command: redis-server
+    environment:
+      - REDIS_PASSWORD=floowsynk
+    command: redis-server --requirepass floowsynk
     networks:
       - floowsynk_network
 

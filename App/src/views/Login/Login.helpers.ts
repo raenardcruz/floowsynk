@@ -5,11 +5,10 @@ import {
     SESSION_TOKEN_KEY,
     SESSION_EXPIRY_KEY,
     ERROR_SESSION_EXTENSION,
-    ERROR_USER_PASS
-} from './Login.constants';
+    ERROR_USER_PASS } from './Login.constants';
 import { LoginRequest, LoginRequestUserPass } from './Login.api'
+import { Token } from 'proto/login/login_pb'
 import { useStorage } from '@vueuse/core';
-import { LoginResponse } from "@/utils/types";
 
 const {
     username,
@@ -24,8 +23,8 @@ const sessionExpiry = useStorage(SESSION_EXPIRY_KEY, '');
 const loginHandler = async (usePass: boolean) => {
     const { session } = App.store;
     try {
-        let resp: LoginResponse = usePass ? await LoginRequestUserPass(username.value, password.value) : await LoginRequest(session.value);
-        const token = resp.token;
+        let resp: Token = usePass ? await LoginRequestUserPass(username.value, password.value) : await LoginRequest(session.value);
+        const token = resp.getToken();
         const expiryDate = new Date();
         expiryDate.setMinutes(expiryDate.getMinutes() + 60);
         session.value = token;

@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/lib/pq"
-	"github.com/raenardcruz/floowsynk/Common"
+	pb "github.com/raenardcruz/floowsynk/CodeGen/go/workflow"
 )
 
 const workflowCacheExpiration = 15 * time.Minute
@@ -40,7 +40,7 @@ func (j *JSONB) Scan(value interface{}) error {
 	return nil
 }
 
-func (db *DatabaseConnection) CreateWorkflow(workflow *Common.Workflow) (string, error) {
+func (db *DatabaseConnection) CreateWorkflow(workflow *pb.Workflow) (string, error) {
 	nodes, err := json.Marshal(workflow.Nodes)
 	if err != nil {
 		return "", err
@@ -64,32 +64,32 @@ func (db *DatabaseConnection) CreateWorkflow(workflow *Common.Workflow) (string,
 		UpdatedAt:   time.Now().UTC().Unix(),
 	}
 
-	if err := db.conn.Save(&wf).Error; err != nil {
+	if err := db.conn.Create(&wf).Error; err != nil {
 		return "", err
 	}
 	return wf.ID, nil
 }
 
-func (db *DatabaseConnection) GetWorkflows(limit, offset int) (*Common.WorkflowList, error) {
+func (db *DatabaseConnection) GetWorkflows(limit, offset int) (*pb.WorkflowList, error) {
 	var workflows []Workflow
 	if err := db.conn.Limit(limit).Offset(offset).Find(&workflows).Error; err != nil {
 		log.Printf("Error querying workflows: %v", err)
 		return nil, err
 	}
 
-	wl := &Common.WorkflowList{Workflows: make([]*Common.Workflow, 0)}
+	wl := &pb.WorkflowList{Workflows: make([]*pb.Workflow, 0)}
 	for _, wf := range workflows {
-		var nodes []*Common.Node
+		var nodes []*pb.Node
 		if err := json.Unmarshal(wf.Nodes, &nodes); err != nil {
 			log.Printf("Error unmarshalling nodes: %v", err)
 			return nil, err
 		}
-		var edges []*Common.Edge
+		var edges []*pb.Edge
 		if err := json.Unmarshal(wf.Edges, &edges); err != nil {
 			log.Printf("Error unmarshalling edges: %v", err)
 			return nil, err
 		}
-		wl.Workflows = append(wl.Workflows, &Common.Workflow{
+		wl.Workflows = append(wl.Workflows, &pb.Workflow{
 			Id:          wf.ID,
 			Name:        wf.Name,
 			Type:        wf.Type,
@@ -104,12 +104,12 @@ func (db *DatabaseConnection) GetWorkflows(limit, offset int) (*Common.WorkflowL
 	return wl, nil
 }
 
-func (db *DatabaseConnection) GetWorkflow(id string) (*Common.Workflow, error) {
+func (db *DatabaseConnection) GetWorkflow(id string) (*pb.Workflow, error) {
 	ctx := context.Background()
 	cacheKey := "workflow:" + id
 
 	if cachedData, found := GetFromCache(ctx, cacheKey); found {
-		var cachedWorkflow Common.Workflow
+		var cachedWorkflow pb.Workflow
 		if err := json.Unmarshal(cachedData, &cachedWorkflow); err == nil {
 			return &cachedWorkflow, nil
 		}
@@ -121,8 +121,8 @@ func (db *DatabaseConnection) GetWorkflow(id string) (*Common.Workflow, error) {
 		return nil, err
 	}
 
-	var nodes []*Common.Node
-	var edges []*Common.Edge
+	var nodes []*pb.Node
+	var edges []*pb.Edge
 	if err := json.Unmarshal(wf.Nodes, &nodes); err != nil {
 		log.Printf("Error unmarshalling nodes: %v", err)
 		return nil, err
@@ -132,7 +132,7 @@ func (db *DatabaseConnection) GetWorkflow(id string) (*Common.Workflow, error) {
 		return nil, err
 	}
 
-	workflow := &Common.Workflow{
+	workflow := &pb.Workflow{
 		Id:          wf.ID,
 		Name:        wf.Name,
 		Type:        wf.Type,
@@ -151,12 +151,12 @@ func (db *DatabaseConnection) GetWorkflow(id string) (*Common.Workflow, error) {
 	return workflow, nil
 }
 
-func (db *DatabaseConnection) GetWebhookWorkflow(id string) (*Common.Workflow, error) {
+func (db *DatabaseConnection) GetWebhookWorkflow(id string) (*pb.Workflow, error) {
 	ctx := context.Background()
 	cacheKey := "webhook_workflow:" + id
 
 	if cachedData, found := GetFromCache(ctx, cacheKey); found {
-		var cachedWorkflow Common.Workflow
+		var cachedWorkflow pb.Workflow
 		if err := json.Unmarshal(cachedData, &cachedWorkflow); err == nil {
 			return &cachedWorkflow, nil
 		}
@@ -168,8 +168,8 @@ func (db *DatabaseConnection) GetWebhookWorkflow(id string) (*Common.Workflow, e
 		return nil, err
 	}
 
-	var nodes []*Common.Node
-	var edges []*Common.Edge
+	var nodes []*pb.Node
+	var edges []*pb.Edge
 	if err := json.Unmarshal(wf.Nodes, &nodes); err != nil {
 		log.Printf("Error unmarshalling nodes: %v", err)
 		return nil, err
@@ -179,7 +179,7 @@ func (db *DatabaseConnection) GetWebhookWorkflow(id string) (*Common.Workflow, e
 		return nil, err
 	}
 
-	workflow := &Common.Workflow{
+	workflow := &pb.Workflow{
 		Id:          wf.ID,
 		Name:        wf.Name,
 		Type:        wf.Type,
@@ -195,12 +195,12 @@ func (db *DatabaseConnection) GetWebhookWorkflow(id string) (*Common.Workflow, e
 	return workflow, nil
 }
 
-func (db *DatabaseConnection) GetIntervalWorkflows() (*Common.WorkflowList, error) {
+func (db *DatabaseConnection) GetIntervalWorkflows() (*pb.WorkflowList, error) {
 	ctx := context.Background()
 	cacheKey := "interval_workflows:"
 
 	if cachedData, found := GetFromCache(ctx, cacheKey); found {
-		var cachedWorkflowList Common.WorkflowList
+		var cachedWorkflowList pb.WorkflowList
 		if err := json.Unmarshal(cachedData, &cachedWorkflowList); err == nil {
 			return &cachedWorkflowList, nil
 		}
@@ -212,19 +212,19 @@ func (db *DatabaseConnection) GetIntervalWorkflows() (*Common.WorkflowList, erro
 		return nil, err
 	}
 
-	wl := &Common.WorkflowList{Workflows: make([]*Common.Workflow, 0)}
+	wl := &pb.WorkflowList{Workflows: make([]*pb.Workflow, 0)}
 	for _, wf := range workflows {
-		var nodes []*Common.Node
+		var nodes []*pb.Node
 		if err := json.Unmarshal(wf.Nodes, &nodes); err != nil {
 			log.Printf("Error unmarshalling nodes: %v", err)
 			return nil, err
 		}
-		var edges []*Common.Edge
+		var edges []*pb.Edge
 		if err := json.Unmarshal(wf.Edges, &edges); err != nil {
 			log.Printf("Error unmarshalling edges: %v", err)
 			return nil, err
 		}
-		wl.Workflows = append(wl.Workflows, &Common.Workflow{
+		wl.Workflows = append(wl.Workflows, &pb.Workflow{
 			Id:          wf.ID,
 			Name:        wf.Name,
 			Type:        wf.Type,
@@ -244,7 +244,7 @@ func (db *DatabaseConnection) GetIntervalWorkflows() (*Common.WorkflowList, erro
 	return wl, nil
 }
 
-func (db *DatabaseConnection) UpdateWorkflow(workflow *Common.Workflow) error {
+func (db *DatabaseConnection) UpdateWorkflow(workflow *pb.Workflow) error {
 	ctx := context.Background()
 	cacheKey := "workflow:" + workflow.Id
 

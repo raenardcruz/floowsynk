@@ -1,8 +1,8 @@
 import { useProcessListStore } from './Process.List.hooks'
 import { getAllWorkflows, listWorkflowRunHistory, getWorkflowHistory } from './Process.List.api'
 import { useWorkflowStore, newProcess } from '@/views/Workflow'
-// import { startNodes } from '@/views/Workflow/Nodes/FloowsynkNode.contants' // Missing import or unused?
-import { Workflow, WorkflowHistory, NodeStatus } from '@/utils/types'
+import { startNodes } from '@/views/Workflow/Nodes/FloowsynkNode.contants'
+import { Workflow, WorkflowHistory, NodeStatus } from 'proto/workflow/workflow_pb'
 import { useWorkflowCanvasStore } from '../Canvas/Workflow.Canvas.hooks'
 
 export const initWorkflows = async () => {
@@ -10,18 +10,19 @@ export const initWorkflows = async () => {
     processes.value = []
     const [ respHistory, respProcesses ] = await Promise.all([ listWorkflowRunHistory(), getAllWorkflows(10, 0) ])
     
-    const workflows: Workflow[] = respProcesses.workflows || []
+    const workflows: Workflow[] = respProcesses.getWorkflowsList() || []
     workflows.forEach((process: Workflow) => {
-        processes.value.push({ isnew: false, ...process })
+        const p = process.toObject()
+        processes.value.push({ isnew: false, ...p })
     })
 
-    const historyItems: WorkflowHistory[] = respHistory || []
-    historyItems.forEach((data: WorkflowHistory) => {
-        history.value.push(data)
+    const historyList: WorkflowHistory[] = respHistory.getHistoryList() || []
+    historyList.forEach((data: WorkflowHistory) => {
+        history.value.push(data.toObject())
     })
 }
 
-export const cardClicked = (e: MouseEvent, process: Workflow) => {
+export const cardClicked = (e: MouseEvent, process: Workflow.AsObject) => {
     const { tabs, activeTab } = useWorkflowStore()
     if (!tabs.value.some(existingTab => existingTab.id === process.id)) {
         tabs.value.push(process)
@@ -33,46 +34,43 @@ export const cardClicked = (e: MouseEvent, process: Workflow) => {
 export const createProcess = () => {
     const { tabs, activeTab } = useWorkflowStore()
     let newProc = newProcess()
-    // if (newProc.nodes) {
-    //     newProc.nodes.push(startNodes["defaultnode"])
-    // }
+    if (newProc.nodesList) {
+        newProc.nodesList.push(startNodes["defaultnode"])
+    }
     tabs.value.push(newProc)
     activeTab.value = newProc.id
 }
 
-export const historyClicked = async (historyItem: WorkflowHistory) => {
+export const historyClicked = async (historyItem: WorkflowHistory.AsObject) => {
     const { tabs, activeTab } = useWorkflowStore()
     const { processes } = useProcessListStore()
-    if (!tabs.value.some(existingTab => existingTab.id === historyItem.workflowId)) {
-        const proc = processes.value.find(p => p.id === historyItem.workflowId);
-        if (proc) {
-            tabs.value.push(proc)
-        }
+    if (!tabs.value.some(existingTab => existingTab.id === historyItem.workflowid)) {
+        tabs.value.push(processes.value.find(process => process.id === historyItem.workflowid) as Workflow.AsObject)
     }
-    activeTab.value = historyItem.workflowId
-    const { replayData, showReplayData, isRunning, nodeStatuses } = useWorkflowCanvasStore(historyItem.workflowId)
+    activeTab.value = historyItem.workflowid
+    const { replayData, showReplayData, isRunning, nodeStatuses } = useWorkflowCanvasStore(historyItem.workflowid)
     isRunning.value = true
     nodeStatuses.value = {}
     replayData.value = []
     showReplayData.value = false
     const resp = await getWorkflowHistory(historyItem.id)
-    const dataList = resp || []
+    const dataList = resp.getDataList() || []
     for (const response of dataList) {
-        switch (response.status) {
+        switch (response.getStatus()) {
                 case NodeStatus.RUNNING:
-                  nodeStatuses.value[response.nodeId] = 'running'
+                  nodeStatuses.value[response.getNodeid()] = 'running'
                   break
                 case NodeStatus.COMPLETED:
-                  nodeStatuses.value[response.nodeId] = 'success'
+                  nodeStatuses.value[response.getNodeid()] = 'success'
                   break
                 case NodeStatus.FAILED:
-                  nodeStatuses.value[response.nodeId] = 'error'
+                  nodeStatuses.value[response.getNodeid()] = 'error'
                   break
-                default:
-                  nodeStatuses.value[response.nodeId] = 'info'
+                case NodeStatus.INFO:
+                  nodeStatuses.value[response.getNodeid()] = 'info'
                   break
               }
-              replayData.value.push(response)
+              replayData.value.push(response.toObject())
     }
     showReplayData.value = true
 }

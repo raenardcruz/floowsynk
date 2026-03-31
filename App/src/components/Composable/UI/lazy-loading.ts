@@ -124,6 +124,14 @@ export const LazyViews = {
       delay: 200,
       timeout: 15000
     }
+  ),
+
+  // Pages view - heavy due to page builder functionality
+  Pages: createLazyComponent(
+    () => import('../../../views/Pages/Pages.vue'),
+    {
+      delay: 200
+    }
   )
 }
 
@@ -232,9 +240,11 @@ export const BUNDLE_SPLITTING_CONFIG = {
     'KeyValue'
   ],
 
+  // Route-specific components
   routeSpecific: [
     'Workflow',
-    'WorkflowCanvas'
+    'WorkflowCanvas', 
+    'Pages'
   ]
 }
 

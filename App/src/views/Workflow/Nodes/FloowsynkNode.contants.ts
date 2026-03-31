@@ -1,4 +1,9 @@
 import { Group } from '@/views/Workflow'
+import {
+    Node,
+    NodeDataArray,
+    ArrayDataType 
+} from 'proto/workflow/workflow_pb'
 
 export const groups: Group[] = [
     {
@@ -45,9 +50,9 @@ export const groups: Group[] = [
     }
 ]
 
-export const nodes: any[] = [
+export const nodes: Node.AsObject[] = [
     {
-        id: '', nodeType: 'setVariable', label: 'Set Variable', position: { x: 0, y: 0 },
+        id: '', nodetype: 'setVariable', label: 'Set Variable', position: { x: 0, y: 0 },
         groupList: [1],
         icon: {
             name: "memory",
@@ -55,66 +60,66 @@ export const nodes: any[] = [
         },
         data: {
             name: "",
-            value: "",
-            inputs: ["input"],
-            outputs: ["output"]
+            value: ""
         },
+        inputsList: ["input"],
+        outputsList: ["output"]
     },
     {
-        id: '', nodeType: 'condition', label: 'Condition', position: { x: 0, y: 0 },
+        id: '', nodetype: 'condition', label: 'Condition', position: { x: 0, y: 0 },
         groupList: [2],
         icon: {
             name: "question_mark",
             color: "linear-gradient(135deg, var(--red-1), var(--red-8))" // red
         },
         data: {
+            expression: ""
+        },
+        inputsList: ["input"],
+        outputsList: ["True", "False"]
+    },
+    {
+        id: '', nodetype: 'loop', label: 'Loop', position: { x: 0, y: 0 },
+        groupList: [2],
+        icon: {
+            name: "all_inclusive",
+            color: "linear-gradient(135deg, var(--blue-1), var(--blue-8))" // blue
+        },
+        data: {
+            iteration: 1
+        },
+        inputsList: ["input"],
+        outputsList: ["output"]
+    },
+    {
+        id: '', nodetype: 'foreach', label: 'For Each', position: { x: 0, y: 0 },
+        groupList: [2],
+        icon: {
+            name: "all_inclusive",
+            color: "linear-gradient(135deg, var(--blue-1), var(--blue-8))" // blue
+        },
+        data: {
+            listvar: ""
+        },
+        inputsList: ["input"],
+        outputsList: ["output"]
+    },
+    {
+        id: '', nodetype: 'while', label: 'While', position: { x: 0, y: 0 },
+        groupList: [2],
+        icon: {
+            name: "all_inclusive",
+            color: "linear-gradient(135deg, var(--blue-1), var(--blue-8))" // blue
+        },
+        data: {
             expression: "",
-            inputs: ["input"],
-            outputs: ["True", "False"]
+            limit: 1000
         },
+        inputsList: ["input"],
+        outputsList: ["output"]
     },
     {
-        id: '', nodeType: 'loop', label: 'Loop', position: { x: 0, y: 0 },
-        groupList: [2],
-        icon: {
-            name: "all_inclusive",
-            color: "linear-gradient(135deg, var(--blue-1), var(--blue-8))" // blue
-        },
-        data: {
-            iteration: 1,
-            inputs: ["input"],
-            outputs: ["output"]
-        },
-    },
-    {
-        id: '', nodeType: 'foreach', label: 'For Each', position: { x: 0, y: 0 },
-        groupList: [2],
-        icon: {
-            name: "all_inclusive",
-            color: "linear-gradient(135deg, var(--blue-1), var(--blue-8))" // blue
-        },
-        data: {
-            listvar: "",
-            inputs: ["input"],
-            outputs: ["output"]
-        },
-    },
-    {
-        id: '', nodeType: 'while', label: 'While', position: { x: 0, y: 0 },
-        groupList: [2],
-        icon: {
-            name: "all_inclusive",
-            color: "linear-gradient(135deg, var(--blue-1), var(--blue-8))" // blue
-        },
-        data: {
-            expression: "",
-            limit: 1000,
-            inputs: ["input"],
-            outputs: ["output"]
-        },
-    },
-    {
-        id: '', nodeType: 'api', label: 'Rest API', position: { x: 0, y: 0 },
+        id: '', nodetype: 'api', label: 'Rest API', position: { x: 0, y: 0 },
         groupList: [4],
         icon: {
             name: "language",
@@ -123,46 +128,49 @@ export const nodes: any[] = [
         data: {
             url: "",
             method: "GET",
-            headers: [
-                {
-                    key: "Content-Type",
-                    value: "application/json"
-                }
-            ],
+            headers: {
+                type: 3,
+                keyvalueitemsList: [
+                    {
+                        key: "Content-Type",
+                        value: "application/json"
+                    }
+                ],
+            },
             payload: "",
-            variable: "",
-            inputs: ["input"],
-            outputs: ["output"]
+            variable: ""
         },
+        inputsList: ["input"],
+        outputsList: ["output"]
     },
     {
-        id: '', nodeType: 'log', label: 'Logging', position: { x: 0, y: 0 },
+        id: '', nodetype: 'log', label: 'Logging', position: { x: 0, y: 0 },
         groupList: [6],
         icon: {
             name: "edit_document",
             color: "linear-gradient(135deg, var(--grey-1), var(--grey-2))" // grey
         },
         data: {
-            message: "",
-            inputs: ["input"],
-            outputs: ["output"]
+            message: ""
         },
+        inputsList: ["input"],
+        outputsList: ["output"]
     },
     {
-        id: '', nodeType: 'getGuid', label: 'Get Guid', position: { x: 0, y: 0 },
+        id: '', nodetype: 'getGuid', label: 'Get Guid', position: { x: 0, y: 0 },
         groupList: [1],
         icon: {
             name: "frame_source",
             color: "linear-gradient(135deg, var(--blue-3), var(--blue-5))" // light blue
         },
         data: {
-            variable: "",
-            inputs: ["input"],
-            outputs: ["output"]
+            variable: ""
         },
-    },
+        inputsList: ["input"],
+        outputsList: ["output"]
+    } as any,
     {
-        id: '', nodeType: 'text', label: 'Text', position: { x: 0, y: 0 },
+        id: '', nodetype: 'text', label: 'Text', position: { x: 0, y: 0 },
         groupList: [1],
         icon: {
             name: "article",
@@ -170,13 +178,13 @@ export const nodes: any[] = [
         },
         data: {
             message: "",
-            variable: "",
-            inputs: ["input"],
-            outputs: ["output"]
+            variable: ""
         },
+        inputsList: ["input"],
+        outputsList: ["output"]
     },
     {
-        id: '', nodeType: 'math', label: 'math', position: { x: 0, y: 0 },
+        id: '', nodetype: 'math', label: 'math', position: { x: 0, y: 0 },
         groupList: [1],
         icon: {
             name: "calculate",
@@ -184,27 +192,29 @@ export const nodes: any[] = [
         },
         data: {
             expression: "",
-            variable: "",
-            inputs: ["input"],
-            outputs: ["output"]
+            variable: ""
         },
+        inputsList: ["input"],
+        outputsList: ["output"]
     },
     {
-        id: '', nodeType: 'list', label: 'List', position: { x: 0, y: 0 },
+        id: '', nodetype: 'list', label: 'List', position: { x: 0, y: 0 },
         groupList: [1],
         icon: {
             name: "list",
             color: "linear-gradient(135deg, var(--green-3), var(--green-8))" // light green
         },
         data: {
-            list: [],
-            variable: "",
-            inputs: ["input"],
-            outputs: ["output"]
+            list: {
+                type: ArrayDataType.STRING
+            },
+            variable: ""
         },
+        inputsList: ["input"],
+        outputsList: ["output"]
     },
     {
-        id: '', nodeType: 'count', label: 'List Count', position: { x: 0, y: 0 },
+        id: '', nodetype: 'count', label: 'List Count', position: { x: 0, y: 0 },
         groupList: [1],
         icon: {
             name: "tag",
@@ -212,13 +222,13 @@ export const nodes: any[] = [
         },
         data: {
             listvariable: "",
-            variable: "",
-            inputs: ["input"],
-            outputs: ["output"]
+            variable: ""
         },
+        inputsList: ["input"],
+        outputsList: ["output"]
     },
     {
-        id: '', nodeType: 'map', label: 'Map', position: { x: 0, y: 0 },
+        id: '', nodetype: 'map', label: 'Map', position: { x: 0, y: 0 },
         groupList: [3],
         icon: {
             name: "map",
@@ -227,13 +237,13 @@ export const nodes: any[] = [
         data: {
             listvariable: "",
             template: "",
-            variable: "",
-            inputs: ["input"],
-            outputs: ["output"]
+            variable: ""
         },
+        inputsList: ["input"],
+        outputsList: ["output"]
     },
     {
-        id: '', nodeType: 'replace', label: 'Replace', position: { x: 0, y: 0 },
+        id: '', nodetype: 'replace', label: 'Replace', position: { x: 0, y: 0 },
         groupList: [1],
         icon: {
             name: "swap_horiz",
@@ -243,13 +253,13 @@ export const nodes: any[] = [
             text: "",
             pattern: "",
             replacetext: "",
-            variable: "",
-            inputs: ["input"],
-            outputs: ["output"]
+            variable: ""
         },
+        inputsList: ["input"],
+        outputsList: ["output"]
     },
     {
-        id: '', nodeType: 'findAll', label: 'Find All', position: { x: 0, y: 0 },
+        id: '', nodetype: 'findAll', label: 'Find All', position: { x: 0, y: 0 },
         groupList: [1],
         icon: {
             name: "find_replace",
@@ -258,101 +268,102 @@ export const nodes: any[] = [
         data: {
             text: "",
             pattern: "",
-            variable: "",
-            inputs: ["input"],
-            outputs: ["output"]
+            variable: ""
         },
+        inputsList: ["input"],
+        outputsList: ["output"]
     },
     {
-        id: '', nodeType: 'image', label: 'Output Image', position: { x: 0, y: 0 },
+        // Implement logic on Front End
+        id: '', nodetype: 'image', label: 'Output Image', position: { x: 0, y: 0 },
         groupList: [7],
         icon: {
             name: "image",
             color: "linear-gradient(135deg, var(--green-4), var(--green-8))" // lime
         },
         data: {
-            value: "",
-            inputs: ["input"],
-            outputs: ["output"]
+            value: ""
         },
+        inputsList: ["input"],
+        outputsList: ["output"]
     },
     {
-        id: '', nodeType: 'subprocess', label: 'Sub Process', position: { x: 0, y: 0 },
+        // Implement Logic
+        id: '', nodetype: 'subprocess', label: 'Sub Process', position: { x: 0, y: 0 },
         groupList: [1],
         icon: {
             name: "account_tree",
             color: "linear-gradient(135deg, var(--blue-2), var(--blue-8))" // blue
         },
         data: {
-            subprocessid: "",
-            inputs: ["input"],
-            outputs: ["output"]
+            subprocessid: ""
         },
+        inputsList: ["input"],
+        outputsList: ["output"]
     }
 ]
 
-const startNodesArray: any[] = [
+const startNodesArray: Node.AsObject[] = [
     {
         id: '0',
-        nodeType: 'defaultnode',
+        nodetype: 'defaultnode',
         label: '',
         draggable: false,
         icon: { name: 'flag_circle', color: 'var(--green-5)' }, // green
+        outputsList: ['output'],
         groupList: [1],
         position: { x: 100, y: 100 },
-        data: {
-            inputs: [],
-            outputs: ['output'],
-        }
+        inputsList: []
     },
     {
         id: '0',
-        nodeType: 'interval',
+        nodetype: 'interval',
         label: '',
         draggable: false,
         icon: { name: 'calendar_month', color: 'var(--blue-6)' }, // light blue
         data: {
             type: 'seconds',
             interval: 1,
-            weeks: [true, true, true, true, true, true, true],
-            inputs: [],
-            outputs: ['output'],
+            weeks: {
+                type: ArrayDataType.BOOL,
+                boolitemsList: [true, true, true, true, true, true, true]
+            } as NodeDataArray.AsObject,
         },
+        inputsList: [],
+        outputsList: ['output'],
         groupList: [1],
         position: { x: 100, y: 100 },
     },
     {
         id: '0',
-        nodeType: 'webhook',
+        nodetype: 'webhook',
         label: '',
         draggable: false,
         icon: { name: 'webhook', color: 'var(--brown-7)' }, // orange
+        inputsList: [],
+        outputsList: ['output'],
         groupList: [1],
         position: { x: 100, y: 100 },
-        data: {
-            inputs: [],
-            outputs: ['output'],
-        }
     },
     {
         id: '0',
-        nodeType: 'events',
+        nodetype: 'events',
         label: '',
         draggable: false,
         icon: { name: 'event', color: 'var(--red-5)' }, // pink
         data: {
-            name: '',
-            inputs: [],
-            outputs: ['output'],
+            name: ''
         },
+        inputsList: [],
+        outputsList: ['output'],
         groupList: [1],
         position: { x: 100, y: 100 },
     },
 ]
 
-const startNodes: { [key: string]: any } = {}
+const startNodes: { [key: string]: Node.AsObject } = {}
 startNodesArray.forEach(node => {
-    startNodes[node.nodeType] = node
+    startNodes[node.nodetype] = node
 })
 
 export {

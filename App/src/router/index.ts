@@ -32,6 +32,11 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/Dashboard')
       },
       {
+        name: "Pages",
+        path: "pages",
+        component: () => import('@/views/Pages')
+      },
+      {
         name: "Workflow",
         path: "workflow",
         component: () => import('@/views/Workflow')

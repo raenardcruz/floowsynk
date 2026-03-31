@@ -10,15 +10,20 @@ The project is organized into the following main directories:
   - `src/`: Main source code for the frontend.
     - `components/`: Reusable Vue components.
     - `views/`: Page-level components for different routes.
+    - `proto/`: Generated protocol buffer files for gRPC communication.
     - `router/`: Vue Router configuration.
   - `public/`: Static assets like images and icons.
   - `vite.config.ts`: Configuration for the Vite build tool.
 
 - **Server/**: Backend server written in Go.
   - `API.go`: Defines API endpoints.
+  - `proto/`: Generated protocol buffer files for gRPC communication.
   - `db/`: Database models and queries.
   - `workflow/`: Workflow-related logic and helpers.
 
+- **Jobs/**: Contains the job processor for handling background tasks.
+
+- **proto/**: Source `.proto` files used to generate gRPC code for both frontend and backend.
 
 
 ## FloowSynk Local Development Setup
@@ -31,6 +36,7 @@ Ensure you have the following installed:
 - **Docker & Docker Compose**
 - **Node.js (v22) & npm**
 - **Go (latest version)**
+- **Protocol Buffer Compiler (`protoc`)**
 
 #### 1.1. Windows/WSL Setup (if applicable)
 - Enable WSL and install Ubuntu:
@@ -121,6 +127,10 @@ nvm use 22
    make setup
    ```
 
+3. **Generate protocol buffer files:**
+   ```bash
+   make proto
+   ```
 
 4. **Start all services:**
    ```bash
@@ -136,7 +146,7 @@ nvm use 22
 ### 3. Access the Application
 
 - **Frontend:** [http://localhost:3000](http://localhost:3000)
-- **Backend API:** [http://localhost:8081](http://localhost:8081)
+- **Backend API:** [http://localhost:8080](http://localhost:8080)
 
 ---
 
@@ -154,5 +164,6 @@ nvm use 22
 ### 6. Development Tips
 
 - Use `code .` to open the project in VS Code.
+- Modify `.proto` files in `proto/` and run `make proto` to regenerate code.
 - Use `make` commands for building, cleaning, and starting services.
 - Use `docker ps` to monitor running containers and `docker-compose logs` for debugging.

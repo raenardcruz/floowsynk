@@ -13,12 +13,12 @@ import (
 
 	"github.com/raenardcruz/floowsynk/Broker"
 	"github.com/raenardcruz/floowsynk/Broker/kafka"
-	"github.com/raenardcruz/floowsynk/Common"
+	proto "github.com/raenardcruz/floowsynk/CodeGen/go/workflow"
 	DB "github.com/raenardcruz/floowsynk/Database"
 )
 
-func (wp *WorkflowProcessor) UpdateStatus(node *Common.Node, status Common.NodeStatus, output interface{}, message string, includeReplayData bool) {
-	if (output != nil) && (status == Common.COMPLETED || status == Common.FAILED) {
+func (wp *WorkflowProcessor) UpdateStatus(node *proto.Node, status proto.NodeStatus, output interface{}, message string, includeReplayData bool) {
+	if (output != nil) && (status == proto.NodeStatus_COMPLETED || status == proto.NodeStatus_FAILED) {
 		switch v := output.(type) {
 		case string:
 			wp.ProcessVariables[OUTPUT] = v
@@ -34,7 +34,7 @@ func (wp *WorkflowProcessor) UpdateStatus(node *Common.Node, status Common.NodeS
 		}
 	}
 
-	res := &Common.ReplayData{
+	res := &proto.ReplayData{
 		NodeId:  node.Id,
 		Status:  status,
 		Message: message,
@@ -45,9 +45,9 @@ func (wp *WorkflowProcessor) UpdateStatus(node *Common.Node, status Common.NodeS
 	}
 
 	if wp.Stream != nil {
-		wp.Stream.Send(res)
+		wp.Stream.SendMsg(res)
 		// DB Record format
-		if status != Common.COMPLETED && status != Common.FAILED {
+		if status != proto.NodeStatus_COMPLETED && status != proto.NodeStatus_FAILED {
 			return
 		}
 		data, err := json.Marshal(res.Data)
@@ -121,7 +121,7 @@ func (wp *WorkflowProcessor) nextProcess(nodeId string, sourceHandle string) err
 	return nil
 }
 
-func getNodeById(n []*Common.Node, id string) (*Common.Node, bool) {
+func getNodeById(n []*proto.Node, id string) (*proto.Node, bool) {
 	for _, node := range n {
 		if node.Id == id {
 			return node, true
@@ -130,11 +130,11 @@ func getNodeById(n []*Common.Node, id string) (*Common.Node, bool) {
 	return nil, false
 }
 
-func (wp *WorkflowProcessor) GetNextNodes(nodeId string, sourceHandle string) ([]*Common.Node, bool) {
+func (wp *WorkflowProcessor) GetNextNodes(nodeId string, sourceHandle string) ([]*proto.Node, bool) {
 	edges := wp.Workflow.Edges
-	targets := make([]*Common.Node, 0)
+	targets := make([]*proto.Node, 0)
 	for _, edge := range edges {
-		if edge.Source == nodeId && (sourceHandle == "" || edge.SourceHandle == sourceHandle) {
+		if edge.Source == nodeId && (sourceHandle == "" || edge.Sourcehandle == sourceHandle) {
 			node, ok := getNodeById(wp.Workflow.Nodes, edge.Target)
 			if !ok {
 				return nil, false
@@ -170,7 +170,7 @@ func generateGUID() string {
 	return hex.EncodeToString(bytes)
 }
 
-func (wp *WorkflowProcessor) makeRequest(url string, method string, headers interface{}, payload interface{}) (body interface{}, err error) {
+func (wp *WorkflowProcessor) makeRequest(url string, method string, headers []*proto.KeyValue, payload interface{}) (body interface{}, err error) {
 	client := &http.Client{}
 	var req *http.Request
 
@@ -191,18 +191,8 @@ func (wp *WorkflowProcessor) makeRequest(url string, method string, headers inte
 		}
 	}
 
-	// Handle headers as a list of KeyValue pairs or map
-	if headers != nil {
-		switch h := headers.(type) {
-		case []*Common.KeyValue:
-			for _, header := range h {
-				req.Header.Add(header.Key, header.Value)
-			}
-		case map[string]string:
-			for k, v := range h {
-				req.Header.Add(k, v)
-			}
-		}
+	for _, header := range headers {
+		req.Header.Add(header.Key, header.Value)
 	}
 
 	resp, err := client.Do(req)
@@ -228,15 +218,15 @@ func RegexReplaceAll(text, pattern, replaceText string) string {
 	return re.ReplaceAllString(text, replaceText)
 }
 
-func CopyNode(n *Common.Node) Common.Node {
+func CopyNode(n *proto.Node) proto.Node {
 	data, err := json.Marshal(n)
 	if err != nil {
-		return Common.Node{}
+		return proto.Node{}
 	}
-	var newNode Common.Node
+	var newNode proto.Node
 	err = json.Unmarshal(data, &newNode)
 	if err != nil {
-		return Common.Node{}
+		return proto.Node{}
 	}
 	return newNode
 }

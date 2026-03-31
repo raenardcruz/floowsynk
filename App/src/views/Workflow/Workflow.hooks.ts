@@ -1,11 +1,11 @@
 import { ref, computed } from "vue"
-import { Workflow } from "@/utils/types"
+import { Workflow } from 'proto/workflow/workflow_pb'
 import { newProcess } from "./Workflow.factory"
 import { createGlobalState } from '@vueuse/core'
 
 export const useWorkflowStore = createGlobalState(() => {
     const activeTab = ref<string>('main')
-    const tabs = ref<Workflow[]>([])
+    const tabs = ref<Workflow.AsObject[]>([])
 
     return {
         activeTab,
@@ -15,9 +15,9 @@ export const useWorkflowStore = createGlobalState(() => {
 
 export const useTab = (tabId: string) => {
     const { tabs } = useWorkflowStore()
-    const tab = computed<Workflow>({
+    const tab = computed<Workflow.AsObject>({
         get() {
-            return (tabs.value.find(tab => tab.id === tabId) || newProcess()) as Workflow
+            return tabs.value.find(tab => tab.id === tabId) || newProcess()
         },
         set(newValue) {
             const index = tabs.value.findIndex(tab => tab.id === tabId)

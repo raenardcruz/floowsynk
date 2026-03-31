@@ -3,25 +3,36 @@ package main
 import (
 	"encoding/json"
 	"log"
+	"net"
 	"net/http"
 	"strings"
 
 	"github.com/IBM/sarama"
 	"github.com/google/uuid"
+	"github.com/improbable-eng/grpc-web/go/grpcweb"
 	"github.com/raenardcruz/floowsynk/Broker"
-	"github.com/raenardcruz/floowsynk/Common"
+	lg "github.com/raenardcruz/floowsynk/CodeGen/go/login"
+	wf "github.com/raenardcruz/floowsynk/CodeGen/go/workflow"
 	db "github.com/raenardcruz/floowsynk/Database"
-	"github.com/raenardcruz/floowsynk/Server/crypto"
 	"github.com/raenardcruz/floowsynk/Server/workflow"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
+
+// LoginServer handles login-related gRPC services
+type LoginServer struct {
+	lg.UnimplementedLoginServiceServer
+}
+
+// WorkflowServer handles workflow-related gRPC services
+type WorkflowServer struct {
+	wf.UnimplementedWorkflowServiceServer
+}
+
+const JobToken = "6c9e5318-6e7b-452d-9e22-9f35a755bcbd"
 
 var DBCon *db.DatabaseConnection
 var producer *sarama.SyncProducer
-var jwtKey = []byte("secret_key")
-
-func initJWTKey() {
-	jwtKey = []byte(db.AppConfig.JWT_Secret)
-}
 
 func main() {
 	var err error
@@ -44,7 +55,21 @@ func main() {
 		log.Println("Cleaned up producer")
 	}()
 
+	grpcServer := setupGRPCServer()
+	httpServer := setupHTTPServer(grpcServer)
+
 	startRESTServer()
+	setupPlainGRPCServer()
+
+	grpcPort := ":8080"
+	log.Println("gRPC Web server started at", grpcPort)
+	listener, err := net.Listen("tcp", grpcPort)
+	if err != nil {
+		log.Fatalf("Failed to start gRPC server: %v", err)
+	}
+	if err := http.Serve(listener, corsMiddleware(httpServer)); err != nil {
+		log.Fatalf("Failed to serve gRPC: %v", err)
+	}
 }
 
 func initializeDatabase() (err error) {
@@ -52,59 +77,63 @@ func initializeDatabase() (err error) {
 	if DBCon, err = db.ConnectToDatabase(); err != nil {
 		return err
 	}
-	initJWTKey()
-	crypto.SetKey(db.AppConfig.Crypto_Key)
 	DBCon.MigrateAndSeedDatabase()
 	return nil
 }
 
+func setupGRPCServer() *grpc.Server {
+	grpcServer := grpc.NewServer()
+	lg.RegisterLoginServiceServer(grpcServer, &LoginServer{})
+	wf.RegisterWorkflowServiceServer(grpcServer, &WorkflowServer{})
+	reflection.Register(grpcServer)
+	return grpcServer
+}
+
+func setupHTTPServer(grpcServer *grpc.Server) *http.ServeMux {
+	wrap := grpcweb.WrapServer(grpcServer)
+	httpServer := http.NewServeMux()
+	httpServer.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		wrap.ServeHTTP(w, r)
+	})
+	return httpServer
+}
+
 func startRESTServer() {
-	restAPIPort := db.AppConfig.Server_REST_Port
-	mux := http.NewServeMux()
+	restAPIPort := ":8081"
+	restServer := http.NewServeMux()
 
-	// Auth routes
-	mux.HandleFunc("/api/login", LoginHandler)
-	mux.HandleFunc("/api/extend-token", AuthMiddleware(ExtendTokenHandler))
+	// Define the route for the webhook handler
+	restServer.HandleFunc("/api/webhook/", runWebhookHandler)
 
-	// Workflow routes
-	mux.HandleFunc("/api/workflows", AuthMiddleware(func(w http.ResponseWriter, r *http.Request, results *Common.ValidateResults) {
-		switch r.Method {
-		case http.MethodGet:
-			ListWorkflowsHandler(w, r, results)
-		case http.MethodPost:
-			CreateWorkflowHandler(w, r, results)
-		default:
-			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+	go func() {
+		log.Println("REST API server started at", restAPIPort)
+		listener, err := net.Listen("tcp", restAPIPort)
+		if err != nil {
+			log.Fatalf("Failed to start REST API server: %v", err)
 		}
-	}))
-
-	mux.HandleFunc("/api/workflows/", AuthMiddleware(func(w http.ResponseWriter, r *http.Request, results *Common.ValidateResults) {
-		switch r.Method {
-		case http.MethodGet:
-			GetWorkflowHandler(w, r, results)
-		case http.MethodPut:
-			UpdateWorkflowHandler(w, r, results)
-		case http.MethodDelete:
-			DeleteWorkflowHandler(w, r, results)
-		default:
-			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		if err := http.Serve(listener, corsMiddleware(restServer)); err != nil {
+			log.Fatalf("Failed to serve REST API: %v", err)
 		}
-	}))
+	}()
+}
 
-	// Workflow History routes
-	mux.HandleFunc("/api/workflow-history", AuthMiddleware(ListWorkflowHistoryHandler))
-	mux.HandleFunc("/api/workflow-history/", AuthMiddleware(GetWorkflowHistoryHandler))
+func setupPlainGRPCServer() {
+	plainGRPCPort := ":50051"
+	plainGRPCServer := grpc.NewServer()
+	lg.RegisterLoginServiceServer(plainGRPCServer, &LoginServer{})
+	wf.RegisterWorkflowServiceServer(plainGRPCServer, &WorkflowServer{})
+	reflection.Register(plainGRPCServer)
 
-	// Real-time monitoring via WebSockets
-	mux.HandleFunc("/api/ws/workflow/run", WorkflowRunWsHandler)
-
-	// Webhook handler (no auth, uses workflow-specific secret in reality, but here simplified)
-	mux.HandleFunc("/api/webhook/", runWebhookHandler)
-
-	log.Println("REST API and WebSocket server started at", restAPIPort)
-	if err := http.ListenAndServe(":"+restAPIPort, corsMiddleware(mux)); err != nil {
-		log.Fatalf("Failed to start server: %v", err)
-	}
+	go func() {
+		log.Println("Plain gRPC server started at", plainGRPCPort)
+		listener, err := net.Listen("tcp", plainGRPCPort)
+		if err != nil {
+			log.Fatalf("Failed to start plain gRPC server: %v", err)
+		}
+		if err := plainGRPCServer.Serve(listener); err != nil {
+			log.Fatalf("Failed to serve plain gRPC: %v", err)
+		}
+	}()
 }
 
 func runWebhookHandler(w http.ResponseWriter, r *http.Request) {
@@ -113,12 +142,18 @@ func runWebhookHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Extract workflow ID from the route after /webhook/
 	pathParts := strings.Split(r.URL.Path, "/")
 	if len(pathParts) < 4 || pathParts[2] != "webhook" {
 		http.Error(w, "Invalid webhook route", http.StatusBadRequest)
 		return
 	}
 	workflowID := pathParts[3]
+
+	if workflowID == "" {
+		http.Error(w, "Missing workflow ID", http.StatusBadRequest)
+		return
+	}
 
 	workflowObj, err := DBCon.GetWebhookWorkflow(workflowID)
 	if err != nil {
@@ -145,14 +180,17 @@ func runWebhookHandler(w http.ResponseWriter, r *http.Request) {
 		"variables": wp.ProcessVariables,
 	}
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+	w.WriteHeader(http.StatusOK)
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		http.Error(w, "Failed to encode response as JSON", http.StatusInternalServerError)
+	}
 }
 
 func corsMiddleware(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, x-user-agent")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, x-user-agent, x-grpc-web")
 		if r.Method == "OPTIONS" {
 			w.WriteHeader(http.StatusOK)
 			return

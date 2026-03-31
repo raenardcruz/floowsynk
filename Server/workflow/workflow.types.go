@@ -2,18 +2,24 @@ package workflow
 
 import (
 	"github.com/IBM/sarama"
-	"github.com/raenardcruz/floowsynk/Common"
+	proto "github.com/raenardcruz/floowsynk/CodeGen/go/workflow"
 	db "github.com/raenardcruz/floowsynk/Database"
+	"google.golang.org/grpc"
 )
 
-type Stream interface {
-	Send(*Common.ReplayData) error
+type KeyValue struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
+}
+type GrpcWorkflowStream interface {
+	Send(*proto.ReplayData) error
+	grpc.ServerStream
 }
 
 type WorkflowProcessor struct {
 	ID               string
-	Stream           Stream
-	Workflow         *Common.Workflow
+	Stream           GrpcWorkflowStream
+	Workflow         *proto.Workflow
 	ProcessVariables map[string]interface{}
 	DBcon            db.DatabaseConnection
 	Producer         *sarama.SyncProducer

@@ -6,15 +6,15 @@
             <span class="material-symbols-outlined">{{ icon?.name }}</span>
         </div>
         <div class="content">
-            <div class="label" v-if="label && label.length > 0">{{ label }}</div>
+            <div class="label" v-if="label.length > 0">{{ label }}</div>
             <div class="type">{{ toSentenceCase(nodetype) }}</div>
         </div>
-        <Handle class="handle-input" v-for="(input, index) in inputs" :key="input" :id="input"
+        <Handle class="handle-input" v-if="outputsList" v-for="(input, index) in inputsList" :key="input" :id="input"
             :data-output="input" type="target" :position="Position.Left"
-            :style="{ top: `${(100 / (outputs.length + 1)) * (index + 1)}%` }" />
-        <Handle class="handle-output" v-for="(output, index) in outputs" :key="output"
+            :style="{ top: `${(100 / (outputsList.length + 1)) * (index + 1)}%` }" />
+        <Handle class="handle-output" v-if="outputsList" v-for="(output, index) in outputsList" :key="output"
             :id="output" :data-output="output" type="source" :position="Position.Right"
-            :style="{ top: `${(100 / (outputs.length + 1)) * (index + 1)}%` }" />
+            :style="{ top: `${(100 / (outputsList.length + 1)) * (index + 1)}%` }" />
     </div>
 
     <Popover pt:root:class="node-variables" ref="op">
@@ -36,12 +36,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed } from "vue"
+import { ref, watch } from "vue"
 import { Handle, Position, useNode } from '@vue-flow/core'
 import { SidebarCanvasFields as WorkflowNodeSidebarFields } from "@/views/Workflow/Sidebar"
 import { NodeProps } from './FloowsynkNode.types'
 import { useFloowsynkNodeHooks, useFloowsynkNodeWatchers } from './FloowsynkNode.hooks'
 import { clickhandler } from './FloowsynkNode.helper'
+import { Node } from 'proto/workflow/workflow_pb'
 import { toSentenceCase } from "@/components/Composable/Utilities"
 import ProcessTypeModal from '@/views/Workflow/Modal/ProcessType/Workflow.Modal.ProcessType.vue'
 import { Modal } from '@/components/Composable/UI/Modal'
@@ -62,14 +63,7 @@ const clickHandler = (event: any) => {
     op.value.toggle(event)
     clickhandler(node, showSidebar, showModal)
 }
-// Using computed properties to ensure reactivity and correct types
-const icon = computed(() => node.data?.icon)
-const nodetype = computed(() => node.data?.nodetype || '')
-const label = computed(() => node.data?.label || '')
-const nodestyle = computed(() => node.data?.nodestyle)
-const inputs = computed(() => (node.data?.inputs || []) as string[])
-const outputs = computed(() => (node.data?.outputs || []) as string[])
-
+let { icon, nodetype, label, outputsList, inputsList, nodestyle } = node as unknown as Node.AsObject
 watch(isRunning, (newValue) => {
     node.draggable = !newValue
     node.deletable = !newValue
@@ -77,7 +71,9 @@ watch(isRunning, (newValue) => {
 })
 watch(node, (newValue) => {
     if (newValue.id === '0') {
-        // Handled by computed properties now
+        nodetype = (newValue as unknown as Node.AsObject).nodetype
+        icon = (newValue as unknown as Node.AsObject).icon
+        nodestyle = (newValue as unknown as Node.AsObject).nodestyle
     }
 })
 watch([showModal, showModal], ([newShowModal, newShowSidebar]) => {

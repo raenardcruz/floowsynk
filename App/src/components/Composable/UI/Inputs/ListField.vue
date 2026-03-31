@@ -14,7 +14,7 @@
 
     <!-- List Items -->
     <div class="listfield-wrapper__items">
-      <div v-for="(_, index) in displayItems" :key="`item-${index}`" class="listfield-wrapper__item">
+      <div v-for="(item, index) in displayItems" :key="`item-${index}`" class="listfield-wrapper__item">
         <div style="width: 100%; min-width: 200px; margin: 0;">
           <component :is="getComponentForType(currentDataType).component" v-model="displayItems[index]"
             v-bind="getComponentPropsForIndex(index)" :disabled="disabled" :invalid="invalid" />
@@ -56,7 +56,7 @@ import {
   listFieldTypeOptions,
   getComponentPropsForType
 } from './ListField.config'
-import { ArrayDataType, NodeDataArray, KeyValue } from '@/utils/types'
+import { NodeDataArray, ArrayDataType, KeyValue } from 'proto/workflow/workflow_pb'
 import TrashSvg from '@/components/Icons/basic/trash.svg'
 
 // Props with defaults
@@ -89,8 +89,8 @@ const showItemCount = computed(() => {
   return props.maxItems !== undefined || props.minItems
 })
 
-// Handle JSON based data structure from types.ts
-const isStructuredList = computed(() => {
+// Handle backward compatibility with protocol buffer types
+const isProtocolBufferModel = computed(() => {
   return props.modelValue && typeof props.modelValue === 'object' && 'type' in props.modelValue
 })
 
@@ -98,68 +98,68 @@ const displayItems = computed({
   get() {
     if (!props.modelValue) return []
 
-    if (isStructuredList.value) {
-      // Handle structured list format
-      const model = props.modelValue as NodeDataArray
+    if (isProtocolBufferModel.value) {
+      // Handle protocol buffer format
+      const pbModel = props.modelValue as NodeDataArray.AsObject
       const typeMap = {
-        [ArrayDataType.STRING]: model.stringItems || [],
-        [ArrayDataType.INT]: model.intItems || [],
-        [ArrayDataType.BOOL]: model.boolItems || [],
-        [ArrayDataType.KEYVALUE]: model.keyValueItems || []
+        [ArrayDataType.STRING]: pbModel.stringitemsList || [],
+        [ArrayDataType.INT]: pbModel.intitemsList || [],
+        [ArrayDataType.BOOL]: pbModel.boolitemsList || [],
+        [ArrayDataType.KEYVALUE]: pbModel.keyvalueitemsList || []
       }
 
-      // Update current data type based on structured list type
-      const typeToLocalMap = {
+      // Update current data type based on protocol buffer type
+      const pbTypeToLocal = {
         [ArrayDataType.STRING]: 'string' as ListFieldItemType,
         [ArrayDataType.INT]: 'number' as ListFieldItemType,
         [ArrayDataType.BOOL]: 'boolean' as ListFieldItemType,
         [ArrayDataType.KEYVALUE]: 'keyvalue' as ListFieldItemType
       }
 
-      currentDataType.value = typeToLocalMap[model.type] || 'string'
-      return typeMap[model.type] || []
+      currentDataType.value = pbTypeToLocal[pbModel.type] || 'string'
+      return typeMap[pbModel.type] || []
     } else {
       // Handle simple array format
       return Array.isArray(props.modelValue) ? props.modelValue : []
     }
   },
   set(newValue) {
-    if (isStructuredList.value) {
-      // Update structured list format
-      const model = { ...props.modelValue } as NodeDataArray
+    if (isProtocolBufferModel.value) {
+      // Update protocol buffer format
+      const pbModel = { ...props.modelValue } as NodeDataArray.AsObject
 
       // Clear all arrays
-      model.stringItems = []
-      model.intItems = []
-      model.boolItems = []
-      model.keyValueItems = []
+      pbModel.stringitemsList = []
+      pbModel.intitemsList = []
+      pbModel.boolitemsList = []
+      pbModel.keyvalueitemsList = []
 
       // Set the appropriate array based on current type
-      const localToTypeMap = {
+      const localToPbType = {
         string: ArrayDataType.STRING,
         number: ArrayDataType.INT,
         boolean: ArrayDataType.BOOL,
         keyvalue: ArrayDataType.KEYVALUE
       }
 
-      model.type = localToTypeMap[currentDataType.value]
+      pbModel.type = localToPbType[currentDataType.value]
 
       switch (currentDataType.value) {
         case 'string':
-          model.stringItems = newValue as string[]
+          pbModel.stringitemsList = newValue as string[]
           break
         case 'number':
-          model.intItems = newValue as number[]
+          pbModel.intitemsList = newValue as number[]
           break
         case 'boolean':
-          model.boolItems = newValue as boolean[]
+          pbModel.boolitemsList = newValue as boolean[]
           break
         case 'keyvalue':
-          model.keyValueItems = newValue as KeyValue[]
+          pbModel.keyvalueitemsList = newValue as KeyValue.AsObject[]
           break
       }
 
-      emit('update:modelValue', model)
+      emit('update:modelValue', pbModel)
     } else {
       // Update simple array format
       emit('update:modelValue', newValue)

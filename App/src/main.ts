@@ -7,7 +7,8 @@ import Aura from '@primeuix/themes/aura';
 import Tooltip from 'primevue/tooltip';
 import ToastService from 'primevue/toastservice';
 
-// App initialization
+// PrimeVue theme integration is now handled directly in primevue.config.ts
+
 const app = createApp(App)
 app.use(router)
 app.use(PrimeVue, { 

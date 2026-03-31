@@ -4,9 +4,7 @@ import vue from '@vitejs/plugin-vue'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [
-    vue(),
-  ],
+  plugins: [vue()],
   // Suppress source map warnings during development
   css: {
     devSourcemap: false
@@ -25,7 +23,10 @@ export default defineConfig({
     },
     // Suppress source map warnings
     hmr: {
-      overlay: true
+      overlay: {
+        warnings: false,
+        errors: true
+      }
     }
   },
   resolve: {

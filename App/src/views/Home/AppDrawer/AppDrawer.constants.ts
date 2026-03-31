@@ -5,6 +5,11 @@ export const apps = [
         "path": "/"
     },
     {
+        "name": "Pages",
+        "icon": "/src/components/Icons/pages.svg",
+        "path": "/pages"
+    },
+    {
         "name": "Workflow",
         "icon": "/src/components/Icons/workflow.svg",
         "path": "/workflow"

@@ -1,8 +1,9 @@
 import { ref, computed } from 'vue'
 import { useTab } from '@/views/Workflow'
-import { ReplayData } from '@/utils/types'
+import { DenormalizeVueFlowObject } from '@/components/Composable/protoTransformers'
+import { ReplayData } from 'proto/workflow/workflow_pb'
 import { useMouse, useManualRefHistory } from '@vueuse/core'
-import type { Node } from '@vue-flow/core'
+import type { Node, Edge } from '@vue-flow/core'
 
 // Global Refs
 const isDragOver = ref(false)
@@ -19,7 +20,7 @@ export const useWorkflowCanvasStore = (tabId: string) => {
         tabStores[tabId] = {
             isRunning: ref(false),
             nodeStatuses: ref<Record<string, string>>({}),
-            replayData: ref<ReplayData[]>([]),
+            replayData: ref<ReplayData.AsObject[]>([]),
             selectedReplayData: ref<number>(0),
             showReplayData: ref(false),
             hadOpenModalSidebar,
@@ -40,20 +41,21 @@ export const useWorkflowCanvasHooks = (tabId: string) => {
     const { tab } = useTab(tabId)
     const canvasId = computed(() => btoa(tab.value.id))
     const node = computed({
-        get: () => tab.value.nodes.map((n: any) => {
+        get: () => tab.value.nodesList.map((node: Object) => {
+            const denormalizedNode = DenormalizeVueFlowObject(node);
             return {
-                ...n,
-                position: n.position || { x: 0, y: 0 },
+                ...denormalizedNode,
+                position: denormalizedNode.position || { x: 0, y: 0 },
             } as Node<any, any, string>;
         }),
         set: (newNodes: any[]) => { 
-            tab.value.nodes = [...newNodes]
+            tab.value.nodesList = [...newNodes]
         }
     })
     const edge = computed({
-        get: () => tab.value.edges.map((e: any) => e),
+        get: () => tab.value.edgesList.map((edge: Edge<any, any, string>) => DenormalizeVueFlowObject(edge)),
         set: (newEdges: any[]) => { 
-            tab.value.edges = [...newEdges]
+            tab.value.edgesList = [...newEdges]
         }
     })
     const { commit, undo, redo, history } = useManualRefHistory(tab, { clone: true, capacity: 200 })

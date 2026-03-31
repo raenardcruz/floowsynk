@@ -2,14 +2,15 @@ package main
 
 import (
 	"context"
+	"io"
 	"log"
 	"time"
 
-	"github.com/google/uuid"
-	"github.com/raenardcruz/floowsynk/Broker"
-	"github.com/raenardcruz/floowsynk/Common"
+	wf "github.com/raenardcruz/floowsynk/CodeGen/go/workflow"
 	db "github.com/raenardcruz/floowsynk/Database"
-	"github.com/raenardcruz/floowsynk/Server/workflow"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/metadata"
 )
 
 const JobToken = "6c9e5318-6e7b-452d-9e22-9f35a755bcbd"
@@ -23,31 +24,25 @@ func (job *IntervalJob) ProcessIntervalWorkflows() {
 		workflows, err := DBCon.GetIntervalWorkflows()
 		if err != nil {
 			log.Printf("Error fetching workflows from database: %v", err)
-			time.Sleep(10 * time.Second)
 			continue
 		}
 
-		for _, wf := range workflows.Workflows {
-			go job.processNode(wf)
+		for _, workflow := range workflows.Workflows {
+			go job.processNode(workflow)
 		}
-		time.Sleep(1 * time.Minute)
 	}
 }
 
-func (job *IntervalJob) processNode(wf *Common.Workflow) {
-	if len(wf.Nodes) == 0 {
-		return
-	}
-	node := wf.Nodes[0]
-	interval := node.Data.Interval
-	intervalType := node.Data.Type
-	weeks := node.Data.Weeks
+func (job *IntervalJob) processNode(workflow *wf.Workflow) {
+	ctx := metadata.AppendToOutgoingContext(context.Background(), "Authorization", JobToken)
+	node := workflow.Nodes[0]
+	interval := node.Data.GetInterval()
+	intervalType := node.Data.GetType()
+	weeks := node.Data.GetWeeks()
 
 	currentDay := time.Now().Weekday()
-	if weeks != nil && len(weeks.BoolItems) > int(currentDay) {
-		if !weeks.BoolItems[int(currentDay)] {
-			return
-		}
+	if !weeks.BoolItems[int(currentDay)] {
+		return
 	}
 
 	duration := time.Duration(interval)
@@ -65,8 +60,7 @@ func (job *IntervalJob) processNode(wf *Common.Workflow) {
 		return
 	}
 
-	cacheKey := "workflow:interval:" + wf.Id
-	ctx := context.Background()
+	cacheKey := "workflow:interval:" + workflow.Id
 	exists, err := db.CacheExists(ctx, cacheKey)
 	if err != nil {
 		log.Printf("Error checking Redis cache for node %v: %v", node.Id, err)
@@ -79,29 +73,41 @@ func (job *IntervalJob) processNode(wf *Common.Workflow) {
 
 	err = db.SetCache(ctx, cacheKey, "running", duration)
 	if err != nil {
-		log.Printf("Error setting Redis cache for workflow %v: %v", wf.Id, err)
+		log.Printf("Error setting Redis cache for workflow %v: %v", workflow.Id, err)
 		return
 	}
 
-	log.Printf("Executing workflow %s", wf.Id)
-	
-	producer, err := Broker.Init()
+	log.Printf("Processing workflow %v", workflow.Id)
+	// Add logic to execute the node's workflow
+	conn, err := grpc.NewClient("localhost:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		log.Printf("Error initializing broker: %v", err)
+		log.Printf("Error connecting to gRPC server: %v", err)
 		return
 	}
-	
-	wp := workflow.WorkflowProcessor{
-		ID:               uuid.NewString(),
-		DBcon:            *DBCon,
-		Workflow:         wf,
-		Stream:           nil, // No streaming for background jobs
-		ProcessVariables: make(map[string]interface{}),
-		Producer:         producer,
+	defer conn.Close()
+
+	client := wf.NewWorkflowServiceClient(conn)
+
+	log.Printf("Executing workflow %s", workflow.Id)
+	stream, err := client.RunWorkflowId(ctx, &wf.RunWorkflowIdRequest{
+		Id: workflow.Id,
+	})
+	if err != nil {
+		log.Printf("Error running workflow %v: %v", workflow.Id, err)
+		return
 	}
 
-	if err := wp.StartWorkflow(); err != nil {
-		log.Printf("Error running workflow %v: %v", wf.Id, err)
+	for {
+		resp, err := stream.Recv()
+		if err != nil {
+			if err == io.EOF {
+				log.Printf("Stream closed for workflow %v", workflow.Id)
+				break
+			}
+			log.Printf("Error receiving workflow response for id %v: %v", workflow.Id, err)
+			break
+		}
+		log.Printf("Received response for workflow %v: %v", workflow.Id, resp)
 	}
 }
 

@@ -1,6 +1,0 @@
-{
-  "skip_docker": false,
-  "skip_protobuf": false,
-  "skip_npm": false,
-  "skip_go": false
-}
