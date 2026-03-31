@@ -46,37 +46,35 @@ func (wp *WorkflowProcessor) UpdateStatus(node *proto.Node, status proto.NodeSta
 
 	if wp.Stream != nil {
 		wp.Stream.SendMsg(res)
-		// DB Record format
-		if status != proto.NodeStatus_COMPLETED && status != proto.NodeStatus_FAILED {
-			return
-		}
-		data, err := json.Marshal(res.Data)
-		if err != nil {
-			fmt.Printf("Error marshaling RunWorkflowResponse: %v\n", err)
-			return
-		}
-		variables, err := json.Marshal(res.Variables)
-		if err != nil {
-			fmt.Printf("Error marshaling RunWorkflowResponse: %v\n", err)
-			return
-		}
-		dbRD := DB.ReplayData{
-			ProcessID:       wp.ID,
-			WorkflowID:      wp.Workflow.Id,
-			NodeID:          res.NodeId,
-			Data:            data,
-			Variables:       variables,
-			Status:          int32(res.Status),
-			Message:         res.Message,
-			ProcessSequence: int(wp.Step),
-		}
-		rdBytes, err := json.Marshal(dbRD)
-		if err != nil {
-			fmt.Printf("Error marshaling RunWorkflowResponse: %v\n", err)
-			return
-		}
-		kafka.SendMessage(*wp.Producer, Broker.WORKFLOW_REPLAY_DATA, wp.ID, string(rdBytes))
 	}
+
+	// DB Record format
+	data, err := json.Marshal(res.Data)
+	if err != nil {
+		fmt.Printf("Error marshaling RunWorkflowResponse: %v\n", err)
+		return
+	}
+	variables, err := json.Marshal(res.Variables)
+	if err != nil {
+		fmt.Printf("Error marshaling RunWorkflowResponse: %v\n", err)
+		return
+	}
+	dbRD := DB.ReplayData{
+		ProcessID:       wp.ID,
+		WorkflowID:      wp.Workflow.Id,
+		NodeID:          res.NodeId,
+		Data:            data,
+		Variables:       variables,
+		Status:          int32(res.Status),
+		Message:         res.Message,
+		ProcessSequence: int(wp.Step),
+	}
+	rdBytes, err := json.Marshal(dbRD)
+	if err != nil {
+		fmt.Printf("Error marshaling RunWorkflowResponse: %v\n", err)
+		return
+	}
+	kafka.SendMessage(*wp.Producer, Broker.WORKFLOW_REPLAY_DATA, wp.ID, string(rdBytes))
 }
 
 func (wp *WorkflowProcessor) getVariableMapString() map[string]string {

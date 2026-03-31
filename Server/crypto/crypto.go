@@ -8,6 +8,10 @@ import (
 
 var key string = "HGD86teHeCb3Gl7Q"
 
+func SetKey(newKey string) {
+	key = newKey
+}
+
 func EncryptPassword(password string) (string, error) {
 	block, err := aes.NewCipher([]byte(key))
 	if err != nil {

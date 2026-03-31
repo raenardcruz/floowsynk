@@ -1,0 +1,17 @@
+
+services:
+  db:
+    image: postgres:15
+    env_file:
+      - ../Server/.env
+    environment:
+      POSTGRES_USER: ${DB_USER:-root}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-floowsynk}
+      POSTGRES_DB: ${DB_NAME:-floowsynk}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

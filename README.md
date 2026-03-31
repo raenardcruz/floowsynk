@@ -1,169 +1,143 @@
-# FloowSynk Local Development Setup
+# 🌊 Floowsynk
 
-## Purpose of the Application
-FloowSynk is a workflow management platform designed to streamline and automate business processes. It provides a user-friendly interface for creating, managing, and monitoring workflows, along with integration capabilities for external services.
+Floowsynk is a high-performance **Workflow Automation & Orchestration Platform** designed to streamline complex business processes. It combines a powerful Go backend with a modern Vue.js frontend to provide a seamless experience for building, monitoring, and managing automated workflows.
 
-## Code Structure
-The project is organized into the following main directories:
+---
 
-- **app/**: Contains the frontend application built with Vue.js and Vite. It includes components, assets, and configuration files for the UI.
-  - `src/`: Main source code for the frontend.
-    - `components/`: Reusable Vue components.
-    - `views/`: Page-level components for different routes.
-    - `proto/`: Generated protocol buffer files for gRPC communication.
-    - `router/`: Vue Router configuration.
-  - `public/`: Static assets like images and icons.
-  - `vite.config.ts`: Configuration for the Vite build tool.
+## 🛠 Technology Stack
 
-- **Server/**: Backend server written in Go.
-  - `API.go`: Defines API endpoints.
-  - `proto/`: Generated protocol buffer files for gRPC communication.
-  - `db/`: Database models and queries.
-  - `workflow/`: Workflow-related logic and helpers.
+Floowsynk is built with a modern, scalable stack focusing on performance and developer experience:
 
-- **Jobs/**: Contains the job processor for handling background tasks.
+### **Frontend**
+- **Framework**: [Vue.js 3](https://vuejs.org/) (Composition API)
+- **Build Tool**: [Vite](https://vitejs.dev/)
+- **UI Library**: [PrimeVue](https://primevue.org/)
+- **Orchestration Canvas**: [Vue Flow](https://vueflow.dev/)
+- **Styling**: Vanilla CSS & PrimeVue Themes
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
 
-- **proto/**: Source `.proto` files used to generate gRPC code for both frontend and backend.
+### **Backend**
+- **Language**: [Go (Golang) 1.23+](https://go.dev/)
+- **Primary API**: [gRPC](https://grpc.io/) & [gRPC-Web](https://github.com/improbable-eng/grpc-web)
+- **REST Gateway**: [net/http](https://pkg.go.dev/net/http) (Webhook support)
+- **Database (ORM)**: [GORM](https://gorm.io/) with **PostgreSQL 15**
+- **Caching**: [Redis](https://redis.io/)
+- **Event Streaming**: [Apache Kafka](https://kafka.apache.org/)
 
+### **Infrastructure & DevOps**
+- **Containerization**: [Docker](https://www.docker.com/) & [Docker Compose](https://docs.docker.com/compose/)
+- **Automation**: `Makefile` for streamlined local development
 
-## FloowSynk Local Development Setup
+---
 
-### 1. Prerequisites
+## 🏗 Project Architecture
 
+The repository is organized into distinct, specialized components:
+
+| Component | Description |
+| :--- | :--- |
+| **`App/`** | Vue 3 frontend application (Dashboard, Canvas, Tools). |
+| **`Server/`** | Go backend serving gRPC and REST APIs. |
+| **`Jobs/`** | Background workers (Kafka Consumers, Interval Processors, Cache Cleaners). |
+| **`Broker/`** | Kafka integration and messaging logic. |
+| **`Database/`** | GORM models, migrations, and database connection logic. |
+| **`proto/`** | Protocol Buffer definitions for API contracts. |
+| **`CodeGen/`** | Auto-generated gRPC code for both Go and TypeScript. |
+
+---
+
+## 🚀 Getting Started (Local Development)
+
+Follow these steps to set up Floowsynk in your local environment.
+
+### **1. Prerequisites**
 Ensure you have the following installed:
-- **Windows Subsystem for Linux (WSL)** (if on Windows)
-- **Ubuntu** (for WSL users)
+- **Go 1.23+**
+- **Node.js (v20+) & npm**
 - **Docker & Docker Compose**
-- **Node.js (v22) & npm**
-- **Go (latest version)**
-- **Protocol Buffer Compiler (`protoc`)**
+- **Protobuf Compiler (`protoc`)** (Automatically installed via `make setup` on macOS/Linux)
 
-#### 1.1. Windows/WSL Setup (if applicable)
-- Enable WSL and install Ubuntu:
-  ```powershell
-  wsl --install
-  wsl -d ubuntu
-  ```
-- Install Oh My Zsh and set as default shell:
-  ```bash
-  sudo apt install zsh curl git -y
-  sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-  chsh -s /usr/bin/zsh
-  ```
-- Add helpful aliases to `~/.zshrc` or `~/.bashrc`:
-  ```bash
-  alias floowsynk="cd /mnt/c/Users/raena/OneDrive/Desktop/floowsynk"
-  alias fcode="code /mnt/c/Users/raena/OneDrive/Desktop/floowsynk"
-  source ~/.zshrc
-  ```
-
-
-#### 1.2. Essential Packages (Linux/WSL)
+### **2. One-Click Setup**
+Run the following command to install all dependencies and initialize the database containers:
 ```bash
-sudo apt update && sudo apt upgrade -y
-sudo apt install make code git -y
+make setup
 ```
 
-#### 1.3. Install Go (Golang)
+### **3. Running the Services**
 
-Follow the [official Go installation instructions](https://go.dev/doc/install) for the latest version, or use the following commands for Linux:
+You can start the different components using separate `make` commands. It is recommended to run them in multiple terminal windows/tabs:
 
-```bash
-GO_VERSION="1.22.4"  # Replace with the latest version if needed
-wget https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz
-sudo rm -rf /usr/local/go && sudo tar -C /usr/local -xzf go${GO_VERSION}.linux-amd64.tar.gz
-echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.bashrc
-source ~/.bashrc
-go version
-```
-
-> **Note:** Remove any old versions of Go installed via `apt` to avoid conflicts:
-> ```bash
-> sudo apt remove golang-go
-> ```
-
-
-#### 1.4. Node.js via NVM
-```bash
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
-source ~/.zshrc  # or source ~/.bashrc
-nvm install 22
-nvm use 22
-```
-
-
-#### 1.5. Docker & Docker Compose
-- [Install Docker Desktop](https://www.docker.com/products/docker-desktop) or follow [official instructions](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository):
+- **Start Infrastructure** (Postgres, Redis, Kafka):
   ```bash
-  sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-  sudo apt install docker-compose
+  make start-docker
   ```
-- (Optional) Download `docker-desktop.deb` and run:
+
+- **Start Backend API**:
   ```bash
-  sudo apt install ./docker-desktop.deb
+  make start-server
   ```
-- Configure Docker Desktop:
-  - Enable WSL 2 based engine
-  - Add *.docker.internal to hosts file
-  - Enable WSL Integration for Ubuntu
-- Verify installation:
+
+- **Start Frontend UI**:
   ```bash
-  docker --version
-  docker-compose --version
+  make start-ui
+  ```
+
+- **Start Workers** (Required for workflow execution):
+  ```bash
+  # Start the job consumer (Kafka-driven)
+  make job-consumer
+
+  # Start the interval processor (Time-driven)
+  make job-interval
   ```
 
 ---
 
-### 2. Project Setup
+## 🐳 Deployment (Docker Compose)
 
-1. **Clone the repository:**
+For a production-like environment or a quick deployment, you can run the entire stack using Docker Compose:
+
+1. **Build and Start**:
    ```bash
-   git clone <repository-url>
-   cd floowsynk
+   docker compose -f docker/postgres.yml up -d
+   docker compose -f docker/redis.yml up -d
+   docker compose -f docker/kafka.yml up -d
+   docker compose up --build -d
    ```
 
-2. **Install dependencies:**
-   ```bash
-   make setup
-   ```
+2. **Accessing the App**:
+   - **Frontend UI**: [http://localhost:3000](http://localhost:3000)
+   - **REST API**: [http://localhost:8082](http://localhost:8082)
+   - **gRPC API**: [http://localhost:8083](http://localhost:8083)
 
-3. **Generate protocol buffer files:**
+3. **Stop & Cleanup**:
    ```bash
-   make proto
+   docker compose down -v
    ```
-
-4. **Start all services:**
-   ```bash
-   make start-server
-   make start-ui
-   make job-interval
-   make job-consumer
-   ```
-   This starts the frontend, backend, and job processor.
 
 ---
 
-### 3. Access the Application
+## ⚙️ Environment Configuration
 
-- **Frontend:** [http://localhost:3000](http://localhost:3000)
-- **Backend API:** [http://localhost:8080](http://localhost:8080)
+Environment variables are managed via `.env` files located in the `Server/` directory.
 
----
-
-### 5. Troubleshooting
-
-- **WSL issues:** Ensure "Virtual Machine Platform" and "Windows Subsystem for Linux" are enabled.
-- **Docker access denied:** Run `sudo usermod -aG docker $USER` and restart your terminal.
-- **VS Code not found:** Install with `sudo apt install code` or download from [VS Code website](https://code.visualstudio.com/).
-- **Service logs:** Use `docker logs <container-name>` or `docker-compose logs`.
-- **Check containers:** `docker ps`
-- **See available make commands:** `make help`
+> [!TIP]
+> Make sure to configure your `DB_USER`, `DB_PASSWORD`, and `KAFKA_BROKERS` accordingly if you are not using the default Docker setup.
 
 ---
 
-### 6. Development Tips
+## 💡 Development Tips
 
-- Use `code .` to open the project in VS Code.
-- Modify `.proto` files in `proto/` and run `make proto` to regenerate code.
-- Use `make` commands for building, cleaning, and starting services.
-- Use `docker ps` to monitor running containers and `docker-compose logs` for debugging.
+- **Generate Protos**: If you modify `.proto` files, run `make proto` to update the generated code in both frontend and backend.
+- **Troubleshooting**: If you encounter connection issues with Kafka or Postgres, verify the container status with `docker ps`.
+- **Cleaning Cache**: Use `make job-clearcache` to purge internal workflow caches.
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please ensure that you update tests and documentation when adding new features or fixing bugs.
+
+---
+
+*Built with ❤️ by the Floowsynk Team.*

@@ -1,5 +1,5 @@
 <template>
-  <Tabs 
+  <PrimeTabs 
     :id="id"
     v-model:value="internalValue"
     :class="mergedClasses"
@@ -9,9 +9,9 @@
     pt:root:class="tab-container"
     @tab-click="handleTabClick"
   >
-    <TabList pt:activeBar:class="active-bar">
-      <Tab 
-        v-for="(tab, idx) in tabContents || []" 
+    <PrimeTabList pt:activeBar:class="active-bar">
+      <PrimeTab 
+        v-for="tab in tabContents || []" 
         :key="tab.id" 
         :value="tab.id" 
         pt:root:class="tab"
@@ -29,28 +29,28 @@
             @click.prevent="handleTabClose(tab.id)" 
           />
         </div>
-      </Tab>
-    </TabList>
-    <TabPanels>
-      <TabPanel 
+      </PrimeTab>
+    </PrimeTabList>
+    <PrimeTabPanels>
+      <PrimeTabPanel 
         v-for="tab in tabContents || []" 
         :key="tab.id" 
         :value="tab.id"
       >
         <component :is="tab.content" v-if="typeof tab.content === 'object'" />
         <span v-else>{{ tab.content }}</span>
-      </TabPanel>
-    </TabPanels>
-  </Tabs>
+      </PrimeTabPanel>
+    </PrimeTabPanels>
+  </PrimeTabs>
 </template>
 
 <script lang="ts" setup>
 import { computed, onMounted, ref, watch } from 'vue'
-import Tabs from 'primevue/tabs'
-import TabList from 'primevue/tablist'
-import Tab from 'primevue/tab'
-import TabPanels from 'primevue/tabpanels'
-import TabPanel from 'primevue/tabpanel'
+import PrimeTabs from 'primevue/tabs'
+import PrimeTabList from 'primevue/tablist'
+import PrimeTab from 'primevue/tab'
+import PrimeTabPanels from 'primevue/tabpanels'
+import PrimeTabPanel from 'primevue/tabpanel'
 import CloseSvg from '@/components/Icons/basic/close.svg'
 import { mergeComponentClasses } from '../utils'
 import { defaultTabsProps, tabPositionClasses } from './Tabs.config'

@@ -79,7 +79,7 @@ export type ComponentVariant = 'primary' | 'secondary' | 'success' | 'warning' |
 /**
  * Button specific props interface
  */
-export interface ButtonProps extends BaseComponentProps {
+export interface BaseButtonProps extends BaseComponentProps {
   /** Button visual variant */
   variant?: ComponentVariant | 'outline' | 'ghost'
   /** Button size */

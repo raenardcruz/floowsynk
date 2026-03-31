@@ -190,7 +190,7 @@ export class ComponentPreloader {
   static preloadOnHover(
     element: HTMLElement,
     componentName: keyof typeof LazyComponents
-  ): void {
+  ): () => void {
     let timeoutId: number
 
     const handleMouseEnter = () => {

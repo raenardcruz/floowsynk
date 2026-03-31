@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"log"
 	"time"
@@ -79,7 +80,8 @@ func (job *IntervalJob) processNode(workflow *wf.Workflow) {
 
 	log.Printf("Processing workflow %v", workflow.Id)
 	// Add logic to execute the node's workflow
-	conn, err := grpc.NewClient("localhost:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	grpcAddr := fmt.Sprintf("%s:%s", db.AppConfig.Server_GRPC_Host, db.AppConfig.Server_Plain_Port)
+	conn, err := grpc.NewClient(grpcAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Printf("Error connecting to gRPC server: %v", err)
 		return

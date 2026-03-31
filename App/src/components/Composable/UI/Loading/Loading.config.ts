@@ -2,12 +2,10 @@
  * Configuration for Loading wrapper component
  */
 
-import type { LoadingWrapperProps } from './Loading.types'
-
 /**
  * Default props for Loading wrapper component
  */
-export const defaultLoadingProps: Partial<LoadingWrapperProps> = {
+export const defaultLoadingProps = {
   text: 'Please wait',
   size: 'medium',
   color: 'primary',
@@ -16,7 +14,7 @@ export const defaultLoadingProps: Partial<LoadingWrapperProps> = {
   strokeWidth: '2',
   animationDuration: '2s',
   dataTestid: undefined
-}
+} as const
 
 /**
  * Size mappings for PrimeVue ProgressSpinner

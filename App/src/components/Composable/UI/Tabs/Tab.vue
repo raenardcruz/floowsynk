@@ -1,7 +1,7 @@
 <template>
-    <Tabs :id="id" v-model:value="modelValue" pt:root:class="tab-container">
-        <TabList pt:activeBar:class="active-bar">
-            <Tab v-for="(tab, idx) in tabContents || []" :key="idx" :value="tab.id" pt:root:class="tab">
+    <PrimeTabs :id="id" v-model:value="modelValue" pt:root:class="tab-container">
+        <PrimeTabList pt:activeBar:class="active-bar">
+            <PrimeTab v-for="(tab, idx) in tabContents || []" :key="idx" :value="tab.id" pt:root:class="tab">
                 <div class="tab-label-container">
                     <div :style="labelStyle[idx]">
                         <component :is="tab.icon" v-if="tab.icon != undefined" />
@@ -9,24 +9,24 @@
                     </div>
                     <img v-if="tab.canClose" :src="CloseSvg" alt="Close Icon" class="close-icon" @click.prevent="emit('close', tab.id)" />
                 </div>
-            </Tab>
-        </TabList>
-        <TabPanels>
-            <TabPanel v-for="(tab, idx) in tabContents || []" :key="idx" :value="tab.id">
+            </PrimeTab>
+        </PrimeTabList>
+        <PrimeTabPanels>
+            <PrimeTabPanel v-for="(tab, idx) in tabContents || []" :key="idx" :value="tab.id">
                 <component :is="tab.content" v-if="typeof tab.content === 'object'" />
                 <span v-else>{{ tab.content }}</span>
-            </TabPanel>
-        </TabPanels>
-    </Tabs>
+            </PrimeTabPanel>
+        </PrimeTabPanels>
+    </PrimeTabs>
 </template>
 
 <script lang="ts" setup>
-import { computed, defineModel, defineProps, type Component, onMounted, defineEmits } from 'vue'
-import Tabs from 'primevue/tabs'
-import TabList from 'primevue/tablist'
-import Tab from 'primevue/tab'
-import TabPanels from 'primevue/tabpanels'
-import TabPanel from 'primevue/tabpanel'
+import { computed, type Component, onMounted } from 'vue'
+import PrimeTabs from 'primevue/tabs'
+import PrimeTabList from 'primevue/tablist'
+import PrimeTab from 'primevue/tab'
+import PrimeTabPanels from 'primevue/tabpanels'
+import PrimeTabPanel from 'primevue/tabpanel'
 import { IdProps } from '@/components/Composable/constants'
 import CloseSvg from '@/components/Icons/basic/close.svg'
 

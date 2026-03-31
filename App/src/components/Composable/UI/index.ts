@@ -27,7 +27,6 @@ export { default as Modal } from './Modal'
 
 // Feedback Components
 export { default as Loading } from './Loading'
-export { default as Notif } from './Notif'
 
 // Specialized Components
 export { default as MonacoEditor } from './MonacoEditor'

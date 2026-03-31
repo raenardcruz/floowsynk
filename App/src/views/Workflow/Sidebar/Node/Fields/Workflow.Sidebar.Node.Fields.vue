@@ -69,8 +69,7 @@ const getComponent = (key: string, value: any) => {
                         label,
                         disabled: props.disabled,
                         editorConfig: enableEditor ? {
-                            variables: variables.value,
-                            target: '.content'
+                            variables: variables.value
                         } : null
                     }
                 }

@@ -1,4 +1,10 @@
 package Broker
+	
+import (
+	"strings"
+
+	db "github.com/raenardcruz/floowsynk/Database"
+)
 
 const (
 	WORKFLOW_REPLAY_DATA = "workflow-replay-data"
@@ -13,8 +19,9 @@ var topics = []TopicConfig{
 }
 
 func GetConfig() Config {
+	brokers := strings.Split(db.AppConfig.Kafka_Brokers, ",")
 	return Config{
-		brokers: []string{"localhost:9092"},
+		brokers: brokers,
 		topics:  topics,
 	}
 }

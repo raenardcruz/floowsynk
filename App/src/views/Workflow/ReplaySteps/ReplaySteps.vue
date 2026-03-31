@@ -28,7 +28,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, Teleport } from 'vue'
+import { computed } from 'vue'
 import { useWorkflowCanvasStore } from '@/views/Workflow/Canvas/Workflow.Canvas.hooks'
 import { StepSelected } from './ReplaySteps.helper'
 import { ReplayDataProps } from './ReplaySteps.types'

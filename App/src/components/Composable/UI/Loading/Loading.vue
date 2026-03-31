@@ -1,21 +1,21 @@
 <template>
   <div 
-    :id="id"
-    :class="['loading-wrapper', wrapperClass]"
+    :id="props.id"
+    :class="wrapperClass"
     :style="wrapperStyle"
-    :data-testid="dataTestid || 'loading-component'"
+    :data-testid="props.dataTestid || 'loading-component'"
   >
-    <p v-if="showHeading" class="loading-heading">Loading</p>
+    <p v-if="props.showHeading" class="loading-heading">Loading</p>
     
     <ProgressSpinner
       ref="primevueRef"
       :style="spinnerStyle"
-      :strokeWidth="strokeWidth"
-      :animationDuration="animationDuration"
+      :strokeWidth="props.strokeWidth"
+      :animationDuration="props.animationDuration"
       :class="spinnerClass"
     />
     
-    <div v-if="showText && text" class="loading-caption">{{ text }}</div>
+    <div v-if="props.showText && props.text" class="loading-caption">{{ props.text }}</div>
   </div>
 </template>
 
@@ -34,11 +34,16 @@ const primevueRef = ref()
 // Computed properties for styling
 const wrapperClass = computed(() => {
   const classes = ['loading-wrapper']
-  if (props.class) {
-    if (typeof props.class === 'string') {
-      classes.push(props.class)
-    } else if (Array.isArray(props.class)) {
-      classes.push(...props.class.filter(c => typeof c === 'string'))
+  const customClass = props.class
+  if (customClass) {
+    if (typeof customClass === 'string') {
+      classes.push(customClass)
+    } else if (Array.isArray(customClass)) {
+      classes.push(...(customClass as string[]).filter(c => typeof c === 'string'))
+    } else if (typeof customClass === 'object') {
+      Object.entries(customClass).forEach(([key, value]) => {
+        if (value) classes.push(key)
+      })
     }
   }
   return classes
@@ -49,8 +54,8 @@ const wrapperStyle = computed(() => {
   
   if (props.style) {
     if (typeof props.style === 'string') {
-      // Parse string styles if needed
-      Object.assign(styles, props.style)
+      // Basic string style handling
+      return props.style
     } else {
       Object.assign(styles, props.style)
     }
@@ -63,14 +68,14 @@ const spinnerStyle = computed(() => {
   const styles: Record<string, any> = {}
   
   // Set size
-  if (props.size && sizeMap[props.size]) {
-    styles.width = sizeMap[props.size]
-    styles.height = sizeMap[props.size]
+  if (props.size && (sizeMap as any)[props.size]) {
+    styles.width = (sizeMap as any)[props.size]
+    styles.height = (sizeMap as any)[props.size]
   }
   
   // Set color
-  if (props.color && colorMap[props.color]) {
-    styles.color = colorMap[props.color]
+  if (props.color && (colorMap as any)[props.color]) {
+    styles.color = (colorMap as any)[props.color]
   }
   
   return styles
@@ -79,8 +84,6 @@ const spinnerStyle = computed(() => {
 const spinnerClass = computed(() => {
   return `loading-spinner loading-spinner--${props.size} loading-spinner--${props.color}`
 })
-
-
 
 // Expose component methods
 defineExpose({

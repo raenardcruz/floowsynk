@@ -2,7 +2,7 @@
  * Default configuration for Tabs wrapper component
  */
 
-import type { TabsWrapperProps } from './Tabs.types'
+/* TabsWrapperProps import removed as it was unused */
 
 /**
  * Default props for the Tabs wrapper component

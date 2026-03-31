@@ -2,7 +2,7 @@
   <!-- Monaco Editor Modal -->
   <Teleport :to="editorConfig?.target || 'body'" v-if="editorConfig && showEditor">
     <Modal :visible="showEditor" :title="editorModalTitle" size="large" @update:visible="handleEditorModalClose"
-      bgcolor="none">
+      bgcolor="none" @click.stop>
       <MonacoEditor v-model="internalValue" :variables="editorConfig.variables" :disabled="disabled" />
     </Modal>
   </Teleport>

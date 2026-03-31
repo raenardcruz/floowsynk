@@ -33,6 +33,7 @@ message WorkflowHistory {
     string WorkflowId = 2;
     string WorkflowName = 3;
     string RunDate = 4;
+    NodeStatus Status = 5;
 }
 
 message WorkflowHistoryRequest {

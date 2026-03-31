@@ -14,7 +14,7 @@
 
     <!-- List Items -->
     <div class="listfield-wrapper__items">
-      <div v-for="(item, index) in displayItems" :key="`item-${index}`" class="listfield-wrapper__item">
+      <div v-for="(_, index) in displayItems" :key="`item-${index}`" class="listfield-wrapper__item">
         <div style="width: 100%; min-width: 200px; margin: 0;">
           <component :is="getComponentForType(currentDataType).component" v-model="displayItems[index]"
             v-bind="getComponentPropsForIndex(index)" :disabled="disabled" :invalid="invalid" />

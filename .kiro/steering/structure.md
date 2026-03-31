@@ -29,7 +29,6 @@ App/
 │   │   ├── Login/          # Authentication
 │   │   ├── Dashboard/      # Dashboard view
 │   │   ├── Workflow/       # Workflow builder and management
-│   │   ├── Pages/          # Page builder functionality
 │   │   └── [Other Views]/  # Additional feature views
 │   ├── router/             # Vue Router configuration
 │   └── main.ts             # Application entry point

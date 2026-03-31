@@ -2,8 +2,6 @@
  * TypeScript interfaces for Loading wrapper component
  */
 
-import type { BaseWrapperProps } from '../types'
-
 /**
  * Loading component size options
  */
@@ -16,8 +14,17 @@ export type LoadingColor = 'primary' | 'secondary' | 'success' | 'info' | 'warni
 
 /**
  * Props for the Loading wrapper component
+ * Flattened to ensure correct property resolution in withDefaults
  */
-export interface LoadingWrapperProps extends BaseWrapperProps {
+export interface LoadingWrapperProps {
+  /** Unique identifier for the component */
+  id?: string
+  /** CSS classes to apply to the component */
+  class?: string | object | Array<string | object>
+  /** Inline styles to apply to the component */
+  style?: string | object
+  /** Whether the component is disabled */
+  disabled?: boolean
   /** Loading text to display */
   text?: string
   /** Size of the loading spinner */
@@ -34,6 +41,8 @@ export interface LoadingWrapperProps extends BaseWrapperProps {
   animationDuration?: string
   /** Data test identifier for testing */
   dataTestid?: string
+  /** Data test identifier for testing (alternative naming) */
+  'data-testid'?: string
 }
 
 /**
