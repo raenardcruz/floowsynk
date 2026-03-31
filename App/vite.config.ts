@@ -7,6 +7,10 @@ export default defineConfig({
   plugins: [
     vue(),
   ],
+  // esbuild specific optimizations
+  esbuild: {
+    drop: ['console', 'debugger'],
+  },
   // Suppress source map warnings during development
   css: {
     devSourcemap: false
@@ -70,21 +74,8 @@ export default defineConfig({
         }
       }
     },
-    // Enable minification
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        // Remove console logs in production
-        drop_console: true,
-        drop_debugger: true,
-        // Remove unused code
-        dead_code: true,
-        // Optimize conditionals
-        conditionals: true,
-        // Remove unused variables
-        unused: true
-      }
-    },
+    // Enable minification using esbuild (faster and default)
+    minify: true,
     // Source maps for debugging (can be disabled in production)
     sourcemap: false,
     // Chunk size warning limit

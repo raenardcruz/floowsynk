@@ -41,6 +41,7 @@ type Config struct {
 	App_Admin_Password string
 	App_Admin_Username string
 	Server_GRPC_Port   string
+	Server_GRPC_Host   string
 	Server_REST_Port   string
 	Server_Plain_Port  string
 	Kafka_Brokers      string
@@ -67,6 +68,7 @@ func init() {
 		App_Admin_Password: getEnv("APP_ADMIN_PASSWORD", "floowsynk"),
 		App_Admin_Username: getEnv("APP_ADMIN_USERNAME", "admin"),
 		Server_GRPC_Port:   getEnv("SERVER_GRPC_PORT", "8090"),
+		Server_GRPC_Host:   getEnv("SERVER_GRPC_HOST", "localhost"),
 		Server_REST_Port:   getEnv("SERVER_REST_PORT", "8091"),
 		Server_Plain_Port:  getEnv("SERVER_PLAIN_GRPC_PORT", "50051"),
 		Kafka_Brokers:      getEnv("KAFKA_BROKERS", "localhost:9092"),

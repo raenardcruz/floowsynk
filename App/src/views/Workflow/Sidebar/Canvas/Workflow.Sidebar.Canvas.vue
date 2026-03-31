@@ -62,7 +62,7 @@
 import { useSidebarCanvasStore, useFloowsynkNodeHooks } from './Workflow.Sidebar.Canvas.hooks'
 import { nodes } from "@/views/Workflow/Nodes"
 import { groups } from "@/views/Workflow/Nodes"
-import { onDragStart, expandToggle, groupNodes } from './Workflow.Sidebar.Canvas.helper'
+import { onDragStart, groupNodes } from './Workflow.Sidebar.Canvas.helper'
 import { CollapsibleSidebar } from '@/components/Composable/UI/Sidebar'
 import { TextInput } from '@/components/Composable/UI/Inputs'
 import Accordion from 'primevue/accordion'
@@ -73,7 +73,6 @@ import AccordionContent from 'primevue/accordioncontent'
 const {
     showSideBar,
     search,
-    expandGroup,
 } = useSidebarCanvasStore()
 const { searchNode } = useFloowsynkNodeHooks()
 </script>

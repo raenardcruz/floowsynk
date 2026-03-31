@@ -5,7 +5,7 @@
       variant="on" 
       pt:root:class="select-float-label"
     >
-      <Select
+      <PrimeSelect
         ref="primevueRef"
         :id="id || selectId"
         v-model="modelValue"
@@ -37,11 +37,11 @@
           />
           <span v-else>{{ option.label }}</span>
         </template>
-      </Select>
+      </PrimeSelect>
       <label :for="id || selectId">{{ label }}</label>
     </FloatLabel>
     
-    <Select
+    <PrimeSelect
       v-else
       ref="primevueRef"
       :id="id || selectId"
@@ -74,7 +74,7 @@
         />
         <span v-else>{{ option.label }}</span>
       </template>
-    </Select>
+    </PrimeSelect>
   </div>
 </template>
 
@@ -82,7 +82,7 @@
 import { ref, computed, nextTick } from 'vue'
 import { generateId } from '../utils/component'
 import FloatLabel from 'primevue/floatlabel'
-import Select from 'primevue/select'
+import PrimeSelect from 'primevue/select'
 import type { SelectProps, SelectEmits, SelectExposed } from './Select.types'
 import { selectVariantClasses } from './Select.config'
 
@@ -106,26 +106,30 @@ const optionLabel = 'label'
 const optionValue = 'value'
 
 // Computed classes
-const wrapperClasses = computed(() => [
-  'select-wrapper',
-  {
-    'select-wrapper--disabled': props.disabled || props.isRunning,
-    'select-wrapper--invalid': props.invalid,
-    'select-wrapper--readonly': props.readonly,
-    'select-wrapper--loading': props.loading
-  }
-])
+const wrapperClasses = computed(() => {
+  return [
+    'select-wrapper',
+    {
+      'select-wrapper--disabled': props.disabled || props.isRunning,
+      'select-wrapper--invalid': props.invalid,
+      'select-wrapper--readonly': props.readonly,
+      'select-wrapper--loading': props.loading
+    }
+  ] as any
+})
 
-const selectClasses = computed(() => [
-  'select-input',
-  selectVariantClasses[props.variant || 'outlined'],
-  {
-    'select-input--invalid': props.invalid,
-    'select-input--disabled': props.disabled || props.isRunning,
-    'select-input--readonly': props.readonly,
-    'select-input--loading': props.loading
-  }
-])
+const selectClasses = computed(() => {
+  return [
+    'select-input',
+    selectVariantClasses[props.variant || 'outlined'],
+    {
+      'select-input--invalid': props.invalid,
+      'select-input--disabled': props.disabled || props.isRunning,
+      'select-input--readonly': props.readonly,
+      'select-input--loading': props.loading
+    }
+  ] as any
+})
 
 // Event handlers
 const handleChange = (event: any) => {

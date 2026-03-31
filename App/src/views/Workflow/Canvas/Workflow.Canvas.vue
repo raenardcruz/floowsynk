@@ -89,7 +89,6 @@ import FloowsynkNode from '@/views/Workflow/Nodes'
 import { useWorkflowCanvasHelperMethods } from './Helper/Workflow.Canvas.Helper'
 import CustomEdge from '@/views/Workflow/Edges/CustomEdge.vue'
 import ReplaySteps from '../ReplaySteps'
-import Chip from 'primevue/chip'
 import Tag from 'primevue/tag'
 
 const props = defineProps<WorkflowCanvasProps>()

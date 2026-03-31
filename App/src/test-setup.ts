@@ -65,7 +65,7 @@ vi.mock('primevue/checkbox', () => ({
 }))
 
 // Mock tooltip directive
-global.vTooltip = {
+;(global as any).vTooltip = {
   mounted() {},
   updated() {},
   unmounted() {}

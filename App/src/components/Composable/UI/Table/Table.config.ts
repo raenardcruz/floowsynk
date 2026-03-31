@@ -2,8 +2,6 @@
  * Default configuration for Table wrapper component
  */
 
-import type { TableWrapperProps } from './Table.types'
-
 /**
  * Default props for the Table wrapper component
  */

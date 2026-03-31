@@ -18,7 +18,7 @@ export function useButtonState(props: ButtonWrapperProps) {
 }
 
 export function useButtonInteractions(
-  buttonRef: Ref<any>,
+  _buttonRef: Ref<any>,
   props: ButtonWrapperProps,
   emit: (event: string, ...args: any[]) => void
 ) {
@@ -59,7 +59,7 @@ export function useButtonInteractions(
 }
 
 // Legacy exports for backward compatibility
-export function useButtonSize(buttonRef: Ref<HTMLElement | undefined>) {
+export function useButtonSize(_buttonRef: Ref<HTMLElement | undefined>) {
   const width = ref(0)
   const height = ref(0)
   const isCompact = computed(() => width.value < 100)
@@ -88,7 +88,7 @@ export function useButtonLoading(props: ButtonWrapperProps) {
   }
 }
 
-export function useButtonClasses(props: ButtonWrapperProps, state: ReturnType<typeof useButtonState>) {
+export function useButtonClasses(props: ButtonWrapperProps, _state: ReturnType<typeof useButtonState>) {
   const classes = computed(() => {
     const baseClasses = ['p-button-wrapper']
     

@@ -111,7 +111,7 @@ describe('Tabs', () => {
 
       // Simulate internal value change
       await wrapper.vm.$nextTick()
-      wrapper.vm.internalValue = 'tab2'
+      ;(wrapper.vm as any).internalValue = 'tab2'
       await nextTick()
 
       expect(wrapper.emitted('update:modelValue')).toBeTruthy()
@@ -145,7 +145,7 @@ describe('Tabs', () => {
         value: 'tab2'
       }
 
-      await wrapper.vm.handleTabClick(mockEvent)
+      await (wrapper.vm as any).handleTabClick(mockEvent)
 
       expect(wrapper.emitted('tab-click')).toBeTruthy()
       const emittedEvent = wrapper.emitted('tab-click')?.[0]?.[0] as any
@@ -214,12 +214,12 @@ describe('Tabs', () => {
       })
 
       // Check row direction (default)
-      const rowStyle = wrapper.vm.getLabelStyle(mockTabContents[0])
+      const rowStyle = (wrapper.vm as any).getLabelStyle(mockTabContents[0])
       expect(rowStyle.flexDirection).toBe('row')
       expect(rowStyle.fontSize).toBe('16px')
 
       // Check column direction
-      const columnStyle = wrapper.vm.getLabelStyle(mockTabContents[2])
+      const columnStyle = (wrapper.vm as any).getLabelStyle(mockTabContents[2])
       expect(columnStyle.flexDirection).toBe('column')
       expect(columnStyle.fontSize).toBe('8px')
     })
@@ -233,7 +233,7 @@ describe('Tabs', () => {
         }
       })
 
-      const mergedClasses = wrapper.vm.mergedClasses
+      const mergedClasses = (wrapper.vm as any).mergedClasses
       expect(mergedClasses).toContain('custom-class')
       expect(mergedClasses).toContain('tabs-bottom')
     })
@@ -247,7 +247,7 @@ describe('Tabs', () => {
         }
       })
 
-      const mergedStyle = wrapper.vm.mergedStyle
+      const mergedStyle = (wrapper.vm as any).mergedStyle
       expect(mergedStyle.backgroundColor).toBe('red')
       expect(mergedStyle.borderRadius).toBe('16px') // Default style should be preserved
     })
@@ -288,7 +288,7 @@ describe('Tabs', () => {
       })
 
       await wrapper.vm.$nextTick()
-      expect(wrapper.vm.internalValue).toBe('tab1')
+      expect((wrapper.vm as any).internalValue).toBe('tab1')
     })
 
     it('should initialize with provided modelValue', async () => {
@@ -300,7 +300,7 @@ describe('Tabs', () => {
       })
 
       await wrapper.vm.$nextTick()
-      expect(wrapper.vm.internalValue).toBe('tab2')
+      expect((wrapper.vm as any).internalValue).toBe('tab2')
     })
   })
 

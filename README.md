@@ -99,6 +99,9 @@ For a production-like environment or a quick deployment, you can run the entire 
 
 1. **Build and Start**:
    ```bash
+   docker compose -f docker/postgres.yml up -d
+   docker compose -f docker/redis.yml up -d
+   docker compose -f docker/kafka.yml up -d
    docker compose up --build -d
    ```
 
