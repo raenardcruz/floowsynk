@@ -20,9 +20,9 @@ export class Credential extends jspb.Message {
 
 export namespace Credential {
   export type AsObject = {
-    username: string,
-    password: string,
-  }
+    username: string;
+    password: string;
+  };
 }
 
 export class Token extends jspb.Message {
@@ -39,7 +39,7 @@ export class Token extends jspb.Message {
 
 export namespace Token {
   export type AsObject = {
-    token: string,
-  }
+    token: string;
+  };
 }
 

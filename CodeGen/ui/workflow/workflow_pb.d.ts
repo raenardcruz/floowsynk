@@ -17,8 +17,8 @@ export class RunWorkflowIdRequest extends jspb.Message {
 
 export namespace RunWorkflowIdRequest {
   export type AsObject = {
-    id: string,
-  }
+    id: string;
+  };
 }
 
 export class WorkflowHistoryList extends jspb.Message {
@@ -37,8 +37,8 @@ export class WorkflowHistoryList extends jspb.Message {
 
 export namespace WorkflowHistoryList {
   export type AsObject = {
-    historyList: Array<WorkflowHistory.AsObject>,
-  }
+    historyList: Array<WorkflowHistory.AsObject>;
+  };
 }
 
 export class WorkflowHistory extends jspb.Message {
@@ -64,11 +64,11 @@ export class WorkflowHistory extends jspb.Message {
 
 export namespace WorkflowHistory {
   export type AsObject = {
-    id: string,
-    workflowid: string,
-    workflowname: string,
-    rundate: string,
-  }
+    id: string;
+    workflowid: string;
+    workflowname: string;
+    rundate: string;
+  };
 }
 
 export class WorkflowHistoryRequest extends jspb.Message {
@@ -85,8 +85,8 @@ export class WorkflowHistoryRequest extends jspb.Message {
 
 export namespace WorkflowHistoryRequest {
   export type AsObject = {
-    id: string,
-  }
+    id: string;
+  };
 }
 
 export class WorkflowHistoryResponse extends jspb.Message {
@@ -105,8 +105,8 @@ export class WorkflowHistoryResponse extends jspb.Message {
 
 export namespace WorkflowHistoryResponse {
   export type AsObject = {
-    dataList: Array<ReplayData.AsObject>,
-  }
+    dataList: Array<ReplayData.AsObject>;
+  };
 }
 
 export class ReplayData extends jspb.Message {
@@ -137,12 +137,12 @@ export class ReplayData extends jspb.Message {
 
 export namespace ReplayData {
   export type AsObject = {
-    nodeid: string,
-    data?: NodeData.AsObject,
-    variablesMap: Array<[string, string]>,
-    status: NodeStatus,
-    message: string,
-  }
+    nodeid: string;
+    data?: NodeData.AsObject;
+    variablesMap: Array<[string, string]>;
+    status: NodeStatus;
+    message: string;
+  };
 }
 
 export class PageRequest extends jspb.Message {
@@ -162,9 +162,9 @@ export class PageRequest extends jspb.Message {
 
 export namespace PageRequest {
   export type AsObject = {
-    limit: number,
-    offset: number,
-  }
+    limit: number;
+    offset: number;
+  };
 }
 
 export class GetWorkflowRequest extends jspb.Message {
@@ -181,8 +181,8 @@ export class GetWorkflowRequest extends jspb.Message {
 
 export namespace GetWorkflowRequest {
   export type AsObject = {
-    id: string,
-  }
+    id: string;
+  };
 }
 
 export class WorkflowList extends jspb.Message {
@@ -204,9 +204,9 @@ export class WorkflowList extends jspb.Message {
 
 export namespace WorkflowList {
   export type AsObject = {
-    total: number,
-    workflowsList: Array<Workflow.AsObject>,
-  }
+    total: number;
+    workflowsList: Array<Workflow.AsObject>;
+  };
 }
 
 export class Workflow extends jspb.Message {
@@ -264,21 +264,21 @@ export class Workflow extends jspb.Message {
 
 export namespace Workflow {
   export type AsObject = {
-    id: string,
-    name: string,
-    description: string,
-    nodesList: Array<Node.AsObject>,
-    edgesList: Array<Edge.AsObject>,
-    type: string,
-    createdat: string,
-    updatedat: string,
-    createdby: string,
-    updatedby: string,
-    tagsList: Array<string>,
-    isnew?: boolean,
-  }
+    id: string;
+    name: string;
+    description: string;
+    nodesList: Array<Node.AsObject>;
+    edgesList: Array<Edge.AsObject>;
+    type: string;
+    createdat: string;
+    updatedat: string;
+    createdby: string;
+    updatedby: string;
+    tagsList: Array<string>;
+    isnew?: boolean;
+  };
 
-  export enum IsnewCase { 
+  export enum IsnewCase {
     _ISNEW_NOT_SET = 0,
     ISNEW = 12,
   }
@@ -344,22 +344,22 @@ export class Edge extends jspb.Message {
 
 export namespace Edge {
   export type AsObject = {
-    id: string,
-    type: string,
-    label: string,
-    tabid: string,
-    source: string,
-    target: string,
-    sourcex: number,
-    sourcey: number,
-    targetx: number,
-    targety: number,
-    animated: boolean,
-    sourcenode?: Node.AsObject,
-    targetnode?: Node.AsObject,
-    sourcehandle: string,
-    targethandle: string,
-  }
+    id: string;
+    type: string;
+    label: string;
+    tabid: string;
+    source: string;
+    target: string;
+    sourcex: number;
+    sourcey: number;
+    targetx: number;
+    targety: number;
+    animated: boolean;
+    sourcenode?: Node.AsObject;
+    targetnode?: Node.AsObject;
+    sourcehandle: string;
+    targethandle: string;
+  };
 }
 
 export class Node extends jspb.Message {
@@ -447,55 +447,55 @@ export class Node extends jspb.Message {
 
 export namespace Node {
   export type AsObject = {
-    id: string,
-    nodetype: string,
-    label: string,
-    data?: NodeData.AsObject,
-    groupList: Array<number>,
-    nodestyle?: string,
-    inputsList: Array<string>,
-    outputsList: Array<string>,
-    draggable?: boolean,
-    icon?: NodeIcon.AsObject,
-    position?: NodePosition.AsObject,
-    nodestatus?: string,
-    type?: string,
-    dimensions?: NodeDimensions.AsObject,
-    handlebounds?: NodeHandleBounds.AsObject,
-    computedposition?: NodePosition.AsObject,
-  }
+    id: string;
+    nodetype: string;
+    label: string;
+    data?: NodeData.AsObject;
+    groupList: Array<number>;
+    nodestyle?: string;
+    inputsList: Array<string>;
+    outputsList: Array<string>;
+    draggable?: boolean;
+    icon?: NodeIcon.AsObject;
+    position?: NodePosition.AsObject;
+    nodestatus?: string;
+    type?: string;
+    dimensions?: NodeDimensions.AsObject;
+    handlebounds?: NodeHandleBounds.AsObject;
+    computedposition?: NodePosition.AsObject;
+  };
 
-  export enum DataCase { 
+  export enum DataCase {
     _DATA_NOT_SET = 0,
     DATA = 4,
   }
 
-  export enum NodestyleCase { 
+  export enum NodestyleCase {
     _NODESTYLE_NOT_SET = 0,
     NODESTYLE = 6,
   }
 
-  export enum DraggableCase { 
+  export enum DraggableCase {
     _DRAGGABLE_NOT_SET = 0,
     DRAGGABLE = 9,
   }
 
-  export enum IconCase { 
+  export enum IconCase {
     _ICON_NOT_SET = 0,
     ICON = 10,
   }
 
-  export enum PositionCase { 
+  export enum PositionCase {
     _POSITION_NOT_SET = 0,
     POSITION = 11,
   }
 
-  export enum NodestatusCase { 
+  export enum NodestatusCase {
     _NODESTATUS_NOT_SET = 0,
     NODESTATUS = 12,
   }
 
-  export enum TypeCase { 
+  export enum TypeCase {
     _TYPE_NOT_SET = 0,
     TYPE = 13,
   }
@@ -622,136 +622,136 @@ export class NodeData extends jspb.Message {
 
 export namespace NodeData {
   export type AsObject = {
-    name?: string,
-    value?: string,
-    expression?: string,
-    iteration?: number,
-    listvar?: string,
-    limit?: number,
-    url?: string,
-    method?: string,
-    headers?: NodeDataArray.AsObject,
-    payload?: string,
-    variable?: string,
-    message?: string,
-    list?: NodeDataArray.AsObject,
-    listvariable?: string,
-    template?: string,
-    text?: string,
-    pattern?: string,
-    replacetext?: string,
-    subprocessid?: string,
-    type?: string,
-    interval?: number,
-    weeks?: NodeDataArray.AsObject,
-  }
+    name?: string;
+    value?: string;
+    expression?: string;
+    iteration?: number;
+    listvar?: string;
+    limit?: number;
+    url?: string;
+    method?: string;
+    headers?: NodeDataArray.AsObject;
+    payload?: string;
+    variable?: string;
+    message?: string;
+    list?: NodeDataArray.AsObject;
+    listvariable?: string;
+    template?: string;
+    text?: string;
+    pattern?: string;
+    replacetext?: string;
+    subprocessid?: string;
+    type?: string;
+    interval?: number;
+    weeks?: NodeDataArray.AsObject;
+  };
 
-  export enum NameCase { 
+  export enum NameCase {
     _NAME_NOT_SET = 0,
     NAME = 1,
   }
 
-  export enum ValueCase { 
+  export enum ValueCase {
     _VALUE_NOT_SET = 0,
     VALUE = 2,
   }
 
-  export enum ExpressionCase { 
+  export enum ExpressionCase {
     _EXPRESSION_NOT_SET = 0,
     EXPRESSION = 3,
   }
 
-  export enum IterationCase { 
+  export enum IterationCase {
     _ITERATION_NOT_SET = 0,
     ITERATION = 4,
   }
 
-  export enum ListvarCase { 
+  export enum ListvarCase {
     _LISTVAR_NOT_SET = 0,
     LISTVAR = 5,
   }
 
-  export enum LimitCase { 
+  export enum LimitCase {
     _LIMIT_NOT_SET = 0,
     LIMIT = 6,
   }
 
-  export enum UrlCase { 
+  export enum UrlCase {
     _URL_NOT_SET = 0,
     URL = 7,
   }
 
-  export enum MethodCase { 
+  export enum MethodCase {
     _METHOD_NOT_SET = 0,
     METHOD = 8,
   }
 
-  export enum HeadersCase { 
+  export enum HeadersCase {
     _HEADERS_NOT_SET = 0,
     HEADERS = 9,
   }
 
-  export enum PayloadCase { 
+  export enum PayloadCase {
     _PAYLOAD_NOT_SET = 0,
     PAYLOAD = 10,
   }
 
-  export enum VariableCase { 
+  export enum VariableCase {
     _VARIABLE_NOT_SET = 0,
     VARIABLE = 11,
   }
 
-  export enum MessageCase { 
+  export enum MessageCase {
     _MESSAGE_NOT_SET = 0,
     MESSAGE = 12,
   }
 
-  export enum ListCase { 
+  export enum ListCase {
     _LIST_NOT_SET = 0,
     LIST = 13,
   }
 
-  export enum ListvariableCase { 
+  export enum ListvariableCase {
     _LISTVARIABLE_NOT_SET = 0,
     LISTVARIABLE = 14,
   }
 
-  export enum TemplateCase { 
+  export enum TemplateCase {
     _TEMPLATE_NOT_SET = 0,
     TEMPLATE = 15,
   }
 
-  export enum TextCase { 
+  export enum TextCase {
     _TEXT_NOT_SET = 0,
     TEXT = 16,
   }
 
-  export enum PatternCase { 
+  export enum PatternCase {
     _PATTERN_NOT_SET = 0,
     PATTERN = 17,
   }
 
-  export enum ReplacetextCase { 
+  export enum ReplacetextCase {
     _REPLACETEXT_NOT_SET = 0,
     REPLACETEXT = 18,
   }
 
-  export enum SubprocessidCase { 
+  export enum SubprocessidCase {
     _SUBPROCESSID_NOT_SET = 0,
     SUBPROCESSID = 19,
   }
 
-  export enum TypeCase { 
+  export enum TypeCase {
     _TYPE_NOT_SET = 0,
     TYPE = 20,
   }
 
-  export enum IntervalCase { 
+  export enum IntervalCase {
     _INTERVAL_NOT_SET = 0,
     INTERVAL = 21,
   }
 
-  export enum WeeksCase { 
+  export enum WeeksCase {
     _WEEKS_NOT_SET = 0,
     WEEKS = 22,
   }
@@ -791,12 +791,12 @@ export class NodeDataArray extends jspb.Message {
 
 export namespace NodeDataArray {
   export type AsObject = {
-    type: ArrayDataType,
-    keyvalueitemsList: Array<KeyValue.AsObject>,
-    stringitemsList: Array<string>,
-    intitemsList: Array<number>,
-    boolitemsList: Array<boolean>,
-  }
+    type: ArrayDataType;
+    keyvalueitemsList: Array<KeyValue.AsObject>;
+    stringitemsList: Array<string>;
+    intitemsList: Array<number>;
+    boolitemsList: Array<boolean>;
+  };
 }
 
 export class NodeIcon extends jspb.Message {
@@ -816,9 +816,9 @@ export class NodeIcon extends jspb.Message {
 
 export namespace NodeIcon {
   export type AsObject = {
-    name: string,
-    color: string,
-  }
+    name: string;
+    color: string;
+  };
 }
 
 export class NodeDimensions extends jspb.Message {
@@ -838,9 +838,9 @@ export class NodeDimensions extends jspb.Message {
 
 export namespace NodeDimensions {
   export type AsObject = {
-    width: number,
-    height: number,
-  }
+    width: number;
+    height: number;
+  };
 }
 
 export class NodePosition extends jspb.Message {
@@ -865,12 +865,12 @@ export class NodePosition extends jspb.Message {
 
 export namespace NodePosition {
   export type AsObject = {
-    x: number,
-    y: number,
-    z?: number,
-  }
+    x: number;
+    y: number;
+    z?: number;
+  };
 
-  export enum ZCase { 
+  export enum ZCase {
     _Z_NOT_SET = 0,
     Z = 3,
   }
@@ -893,9 +893,9 @@ export class KeyValue extends jspb.Message {
 
 export namespace KeyValue {
   export type AsObject = {
-    key: string,
-    value: string,
-  }
+    key: string;
+    value: string;
+  };
 }
 
 export class NodeHandleBounds extends jspb.Message {
@@ -919,9 +919,9 @@ export class NodeHandleBounds extends jspb.Message {
 
 export namespace NodeHandleBounds {
   export type AsObject = {
-    sourceList: Array<Handle.AsObject>,
-    targetList: Array<Handle.AsObject>,
-  }
+    sourceList: Array<Handle.AsObject>;
+    targetList: Array<Handle.AsObject>;
+  };
 }
 
 export class Handle extends jspb.Message {
@@ -959,24 +959,24 @@ export class Handle extends jspb.Message {
 
 export namespace Handle {
   export type AsObject = {
-    x: number,
-    y: number,
-    id: string,
-    type: string,
-    width: number,
-    height: number,
-    nodeid: string,
-    position: string,
-  }
+    x: number;
+    y: number;
+    id: string;
+    type: string;
+    width: number;
+    height: number;
+    nodeid: string;
+    position: string;
+  };
 }
 
-export enum ArrayDataType { 
+export enum ArrayDataType {
   STRING = 0,
   INT = 1,
   BOOL = 2,
   KEYVALUE = 3,
 }
-export enum NodeStatus { 
+export enum NodeStatus {
   RUNNING = 0,
   COMPLETED = 1,
   FAILED = 2,

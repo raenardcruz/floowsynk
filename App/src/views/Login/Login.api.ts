@@ -14,7 +14,5 @@ export const LoginRequestUserPass = async (username: string, password: string): 
     const request = new Credential();
     request.setUsername(username);
     request.setPassword(password);
-    return await client.login(request, {
-        'authorization': `${localStorage.getItem('token')}`
-    });
+    return await client.login(request, {});
 }

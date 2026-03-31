@@ -1,9 +1,15 @@
 package main
 
+import db "github.com/raenardcruz/floowsynk/Database"
+
 type NodeList []Node
 type EdgeList []Edge
 
 var jwtKey = []byte("secret_key")
+
+func initJWTKey() {
+	jwtKey = []byte(db.AppConfig.JWT_Secret)
+}
 
 type ValidateResults struct {
 	id       string

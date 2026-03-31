@@ -1,3 +1,4 @@
+import { ref } from 'vue'
 import { useWorkflowCanvasHooks, useWorkflowCanvasStore } from '../Workflow.Canvas.hooks'
 import { WorkflowCanvasProps } from '../Workflow.Canvas.types'
 import { initWorkflows } from '@/views/Workflow/Process'
@@ -24,8 +25,11 @@ export const useWorkflowCanvasControlButtonActions = (props: WorkflowCanvasProps
     isRunning,
   } = useWorkflowCanvasStore(props.id)
   const { tab } = useWorkflowCanvasHooks(props.id)
+  const isSaving = ref(false)
   // Method: Save
   const saveProcess = async () => {
+    if (isSaving.value) return
+    isSaving.value = true
     try {
       if (tab.value.isnew) {
         await createProcess(tab.value)
@@ -39,6 +43,8 @@ export const useWorkflowCanvasControlButtonActions = (props: WorkflowCanvasProps
     }
     catch (error) {
       toast.add({severity:'error', summary: 'Error', detail: 'Failed to save workflow' + error, life: 3000});
+    } finally {
+      isSaving.value = false
     }
   }
   // Method: Delete

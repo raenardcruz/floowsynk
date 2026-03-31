@@ -5,7 +5,8 @@ import {
     SESSION_TOKEN_KEY,
     SESSION_EXPIRY_KEY,
     ERROR_SESSION_EXTENSION,
-    ERROR_USER_PASS } from './Login.constants';
+    ERROR_USER_PASS
+} from './Login.constants';
 import { LoginRequest, LoginRequestUserPass } from './Login.api'
 import { Token } from 'proto/login/login_pb'
 import { useStorage } from '@vueuse/core';
