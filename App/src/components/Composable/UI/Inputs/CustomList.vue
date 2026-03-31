@@ -22,7 +22,9 @@ import TextInput from '@/components/Composable/UI/Inputs/TextInput.vue'
 import Fieldset from 'primevue/fieldset'
 import Panel from 'primevue/panel'
 import Select from 'primevue/select'
-import { iconList } from '@/views/Pages/Tools/Tools.constants'
+const iconList = [
+    'add', 'approve', 'connection', 'dashboard', 'default', 'event', 'facebook', 'floowsynk', 'google', 'logs', 'org', 'painting', 'puzzle', 'screen', 'settings', 'settings2', 'timer', 'user', 'webhook', 'workflow'
+]
 
 
 const props = defineProps<CustomListProps>()

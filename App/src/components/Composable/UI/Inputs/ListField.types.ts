@@ -5,8 +5,8 @@
 import type { BaseComponentProps } from '../types/base'
 import type { Component } from 'vue'
 
-// Re-export protocol buffer types for convenience
-export type { NodeDataArray, ArrayDataType, KeyValue } from 'proto/workflow/workflow_pb'
+// Re-export standard types for convenience
+export type { NodeDataArray, ArrayDataType, KeyValue } from '@/utils/types'
 
 export interface ListFieldItem {
   id: string | number
@@ -25,7 +25,7 @@ export interface ListFieldOption {
 
 export interface ListFieldWrapperProps extends BaseComponentProps {
   /** The list data model */
-  modelValue: any // NodeDataArray.AsObject or simplified array
+  modelValue: any // NodeDataArray or simplified array
   /** Label for the component */
   label?: string
   /** Whether the component is disabled */

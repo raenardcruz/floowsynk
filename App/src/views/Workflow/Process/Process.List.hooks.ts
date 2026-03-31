@@ -1,10 +1,10 @@
 import { ref, computed } from 'vue'
-import { Workflow, WorkflowHistory } from 'proto/workflow/workflow_pb'
+import { Workflow, WorkflowHistory } from '@/utils/types'
 import { createGlobalState } from '@vueuse/core'
 
 export const useProcessListStore = createGlobalState(() => {
-    const processes = ref<Workflow.AsObject[]>([])
-    const history = ref<WorkflowHistory.AsObject[]>([])
+    const processes = ref<Workflow[]>([])
+    const history = ref<WorkflowHistory[]>([])
     const search = ref<string>("")
 
     return {
@@ -16,7 +16,7 @@ export const useProcessListStore = createGlobalState(() => {
 
 export const useProcessListHooks = () => {
     const { processes, search } = useProcessListStore()
-    const filteredProcesses = computed<Workflow.AsObject[]>(() => {
+    const filteredProcesses = computed<Workflow[]>(() => {
         if (search.value === "") {
             return processes.value
         }

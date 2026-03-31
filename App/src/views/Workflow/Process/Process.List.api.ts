@@ -1,36 +1,17 @@
-import { WorkflowServicePromiseClient } from 'proto/workflow/workflow_grpc_web_pb'
-import {
-    PageRequest,
-    WorkflowList,
-    WorkflowHistoryList,
-    WorkflowHistoryRequest,
-    WorkflowHistoryResponse,
-    } from 'proto/workflow/workflow_pb'
-import { Empty } from 'google-protobuf/google/protobuf/empty_pb' 
-import { getApiUrl } from '@/components/Composable/constants'
+import api from '@/utils/api';
+import { WorkflowList } from '@/utils/types';
 
 export const getAllWorkflows = async (limit: number, offset: number): Promise<WorkflowList> => {
-    const client = new WorkflowServicePromiseClient(getApiUrl())
-    const request = new PageRequest()
-    request.setLimit(limit)
-    request.setOffset(offset)
-    return await client.listWorkflows(request, {
-        'Authorization': `${localStorage.getItem("sessionToken")}`
-    })
+    const response = await api.get<WorkflowList>(`/api/workflows?limit=${limit}&offset=${offset}`);
+    return response.data;
 }
 
-export const listWorkflowRunHistory = async (): Promise<WorkflowHistoryList> => {
-    const client = new WorkflowServicePromiseClient(getApiUrl())
-    return await client.listWorkflowHistory(new Empty(), {
-        'Authorization': `${localStorage.getItem("sessionToken")}`
-    })
+export const listWorkflowRunHistory = async (): Promise<any> => {
+    const response = await api.get('/api/workflow-history');
+    return response.data;
 }
 
-export const getWorkflowHistory = async (id: string): Promise<WorkflowHistoryResponse> => {
-    const client = new WorkflowServicePromiseClient(getApiUrl())
-    const req = new WorkflowHistoryRequest()
-    req.setId(id)
-    return await client.getWorkflowHistory(req, {
-        'Authorization': `${localStorage.getItem("sessionToken")}`
-    })
+export const getWorkflowHistory = async (id: string): Promise<any> => {
+    const response = await api.get(`/api/workflow-history/${id}`);
+    return response.data;
 }

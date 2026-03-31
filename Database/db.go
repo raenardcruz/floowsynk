@@ -40,6 +40,11 @@ type Config struct {
 	Redis_DB           int
 	App_Admin_Password string
 	App_Admin_Username string
+	Server_REST_Port   string
+	Kafka_Brokers      string
+	Job_Token          string
+	JWT_Secret         string
+	Crypto_Key         string
 }
 
 var AppConfig *Config
@@ -55,10 +60,15 @@ func init() {
 		DB_NAME:            getEnv("DB_NAME", "floowsynk"),
 		Redis_Host:         getEnv("REDIS_HOST", "localhost"),
 		Redis_Port:         getEnvAsInt("REDIS_PORT", 6379),
-		Redis_Password:     getEnv("REDIS_PASSWORD", "floowsynk"),
+		Redis_Password:     getEnv("REDIS_PASSWORD", ""),
 		Redis_DB:           getEnvAsInt("REDIS_DB", 0),
 		App_Admin_Password: getEnv("APP_ADMIN_PASSWORD", "floowsynk"),
 		App_Admin_Username: getEnv("APP_ADMIN_USERNAME", "admin"),
+		Server_REST_Port:   getEnv("SERVER_REST_PORT", "8091"),
+		Kafka_Brokers:      getEnv("KAFKA_BROKERS", "localhost:9092"),
+		Job_Token:          getEnv("JOB_TOKEN", "6c9e5318-6e7b-452d-9e22-9f35a755bcbd"),
+		JWT_Secret:         getEnv("JWT_SECRET", "secret_key"),
+		Crypto_Key:         getEnv("CRYPTO_KEY", "HGD86teHeCb3Gl7Q"),
 	}
 }
 
@@ -128,6 +138,11 @@ func (db *DatabaseConnection) MigrateAndSeedDatabase() error {
 			Role:     UserRoleAdmin,
 		})
 	}
+	log.Println("Seeding feature flags...")
+	if err := db.InitializeFeatureFlags(); err != nil {
+		log.Printf("Error initializing feature flags: %v", err)
+	}
+
 	log.Println("Database migration and seeding completed")
 
 	return nil

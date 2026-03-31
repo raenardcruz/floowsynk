@@ -9,8 +9,6 @@ floowsynk/
 ├── Database/               # Database models and connections
 ├── Broker/                 # Kafka message broker utilities
 ├── Helper/                 # Utility functions
-├── CodeGen/                # Generated Protocol Buffer code
-├── proto/                  # Protocol Buffer definitions
 ├── Makefile               # Build and development commands
 └── docker-compose.yml     # Docker services configuration
 ```
@@ -29,7 +27,6 @@ App/
 │   │   ├── Login/          # Authentication
 │   │   ├── Dashboard/      # Dashboard view
 │   │   ├── Workflow/       # Workflow builder and management
-│   │   ├── Pages/          # Page builder functionality
 │   │   └── [Other Views]/  # Additional feature views
 │   ├── router/             # Vue Router configuration
 │   └── main.ts             # Application entry point
@@ -40,7 +37,7 @@ App/
 ## Backend Structure (Server/)
 ```
 Server/
-├── main.go                # Server entry point and gRPC setup
+├── main.go                # Server entry point
 ├── API.go                 # REST API endpoints
 ├── API.Methods.go         # API method implementations
 ├── struct.go              # Data structures
@@ -69,16 +66,6 @@ Database/
 └── Feature.go             # Feature flag management
 ```
 
-## Code Generation (CodeGen/)
-```
-CodeGen/
-├── go/                    # Generated Go gRPC code
-│   ├── login/             # Login service definitions
-│   └── workflow/          # Workflow service definitions
-└── ui/                    # Generated TypeScript gRPC-Web code
-    ├── login/             # Login service client code
-    └── workflow/          # Workflow service client code
-```
 
 ## Naming Conventions
 
@@ -96,11 +83,6 @@ CodeGen/
 - **Structs**: PascalCase
 - **Constants**: PascalCase or UPPER_SNAKE_CASE
 
-### Protocol Buffers
-- **Services**: PascalCase with "Service" suffix
-- **Messages**: PascalCase
-- **Fields**: snake_case
-- **Enums**: PascalCase with UPPER_CASE values
 
 ## File Organization Patterns
 
@@ -120,4 +102,3 @@ ComponentName/
 - Each major feature has its own package
 - Database operations grouped by entity
 - Shared utilities in separate packages
-- Generated code isolated in CodeGen directory

@@ -1,36 +1,13 @@
-import { Workflow } from 'proto/workflow/workflow_pb'
-import { WorkflowServicePromiseClient } from 'proto/workflow/workflow_grpc_web_pb'
-import { getApiUrl } from '@/components/Composable/constants'
-import { workflowFromObject } from '@/components/Composable/protoTransformers'
+import api from '@/utils/api';
 
-export const updateProcess = async (process: Workflow.AsObject) => {
-   const client = new WorkflowServicePromiseClient(getApiUrl())
-   const workflow = workflowFromObject(process)
-    return client.updateWorkflow(workflow, {
-        'Authorization': `${localStorage.getItem('sessionToken')}`
-    })
+export const updateProcess = async (process: any) => {
+    return api.put(`/api/workflows/${process.id}`, process);
 }
 
-export const createProcess = async (process: Workflow.AsObject) => {
-    const client = new WorkflowServicePromiseClient(getApiUrl())
-    const workflow = workflowFromObject(process)
-    return client.createWorkflow(workflow, {
-        'Authorization': `${localStorage.getItem('sessionToken')}`
-    })
+export const createProcess = async (process: any) => {
+    return api.post('/api/workflows', process);
 }
 
-export const deleteProcess = async (process: Workflow.AsObject) => {
-    const client = new WorkflowServicePromiseClient(getApiUrl())
-    const workflow = workflowFromObject(process)
-    return client.deleteWorkflow(workflow, {
-        'Authorization': `${localStorage.getItem('sessionToken')}`
-    })
-}
-
-export const executeProcess = async (_: Workflow.AsObject) => {
-    const client = new WorkflowServicePromiseClient(getApiUrl())
-    const workflow = workflowFromObject(_)
-    return client.quickRun(workflow, {
-        'Authorization': `${localStorage.getItem('sessionToken')}`,
-    })
+export const deleteProcess = async (process: any) => {
+    return api.delete(`/api/workflows/${process.id}`);
 }

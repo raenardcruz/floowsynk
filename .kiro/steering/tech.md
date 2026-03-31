@@ -10,17 +10,16 @@
 - **Editor**: Monaco Editor for code editing
 - **Flow Diagrams**: Vue Flow for workflow visualization
 - **HTTP Client**: Axios
-- **gRPC**: grpc-web for browser-server communication
+- **Communication**: REST and WebSockets for real-time updates
 
 ## Backend Stack
 - **Language**: Go 1.23+
-- **Framework**: Standard library with gRPC
+- **Framework**: Standard library with REST API
 - **Database**: PostgreSQL with GORM ORM
 - **Cache**: Redis
 - **Message Queue**: Apache Kafka (Sarama client)
 - **Authentication**: JWT tokens
-- **Protocol**: gRPC with Protocol Buffers
-- **Web Server**: grpc-web wrapper for HTTP/gRPC bridge
+- **Communication**: REST and WebSockets
 
 ## Infrastructure
 - **Containerization**: Docker & Docker Compose
@@ -33,7 +32,6 @@
 ### Setup & Dependencies
 ```bash
 make setup          # Install all dependencies and setup environment
-make proto          # Generate Protocol Buffer files for Go and TypeScript
 ```
 
 ### Development
@@ -57,9 +55,7 @@ make build          # Build both frontend and backend for production
 
 ## Development Ports
 - Frontend: http://localhost:3000
-- Backend gRPC-Web: http://localhost:8080
 - Backend REST API: http://localhost:8081
-- Plain gRPC: localhost:50051
 - PostgreSQL: localhost:5432
 - Redis: localhost:6379
 - Kafka: localhost:9092
