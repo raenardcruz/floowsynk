@@ -64,7 +64,7 @@ func (db *DatabaseConnection) CreateWorkflow(workflow *pb.Workflow) (string, err
 		UpdatedAt:   time.Now().UTC().Unix(),
 	}
 
-	if err := db.conn.Create(&wf).Error; err != nil {
+	if err := db.conn.Save(&wf).Error; err != nil {
 		return "", err
 	}
 	return wf.ID, nil

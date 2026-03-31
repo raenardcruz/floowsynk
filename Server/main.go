@@ -14,6 +14,7 @@ import (
 	lg "github.com/raenardcruz/floowsynk/CodeGen/go/login"
 	wf "github.com/raenardcruz/floowsynk/CodeGen/go/workflow"
 	db "github.com/raenardcruz/floowsynk/Database"
+	"github.com/raenardcruz/floowsynk/Server/crypto"
 	"github.com/raenardcruz/floowsynk/Server/workflow"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -28,8 +29,6 @@ type LoginServer struct {
 type WorkflowServer struct {
 	wf.UnimplementedWorkflowServiceServer
 }
-
-const JobToken = "6c9e5318-6e7b-452d-9e22-9f35a755bcbd"
 
 var DBCon *db.DatabaseConnection
 var producer *sarama.SyncProducer
@@ -61,7 +60,7 @@ func main() {
 	startRESTServer()
 	setupPlainGRPCServer()
 
-	grpcPort := ":8080"
+	grpcPort := ":" + db.AppConfig.Server_GRPC_Port
 	log.Println("gRPC Web server started at", grpcPort)
 	listener, err := net.Listen("tcp", grpcPort)
 	if err != nil {
@@ -77,6 +76,8 @@ func initializeDatabase() (err error) {
 	if DBCon, err = db.ConnectToDatabase(); err != nil {
 		return err
 	}
+	initJWTKey()
+	crypto.SetKey(db.AppConfig.Crypto_Key)
 	DBCon.MigrateAndSeedDatabase()
 	return nil
 }
@@ -99,7 +100,7 @@ func setupHTTPServer(grpcServer *grpc.Server) *http.ServeMux {
 }
 
 func startRESTServer() {
-	restAPIPort := ":8081"
+	restAPIPort := db.AppConfig.Server_REST_Port
 	restServer := http.NewServeMux()
 
 	// Define the route for the webhook handler
@@ -107,7 +108,7 @@ func startRESTServer() {
 
 	go func() {
 		log.Println("REST API server started at", restAPIPort)
-		listener, err := net.Listen("tcp", restAPIPort)
+		listener, err := net.Listen("tcp", ":" + restAPIPort)
 		if err != nil {
 			log.Fatalf("Failed to start REST API server: %v", err)
 		}
@@ -118,7 +119,7 @@ func startRESTServer() {
 }
 
 func setupPlainGRPCServer() {
-	plainGRPCPort := ":50051"
+	plainGRPCPort := ":" + db.AppConfig.Server_Plain_Port
 	plainGRPCServer := grpc.NewServer()
 	lg.RegisterLoginServiceServer(plainGRPCServer, &LoginServer{})
 	wf.RegisterWorkflowServiceServer(plainGRPCServer, &WorkflowServer{})
@@ -191,6 +192,7 @@ func corsMiddleware(h http.Handler) http.Handler {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, x-user-agent, x-grpc-web")
+		w.Header().Set("Access-Control-Expose-Headers", "grpc-status, grpc-message")
 		if r.Method == "OPTIONS" {
 			w.WriteHeader(http.StatusOK)
 			return

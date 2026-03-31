@@ -22,19 +22,16 @@ var FeatureFlags = []Feature{
 	},
 }
 
-func (db *DatabaseConnection) InitializeFeature(featureName string, description string) error {
+func (db *DatabaseConnection) InitializeFeatureFlags() error {
+	log.Println("Initializing feature flags...")
 	for _, feature := range FeatureFlags {
 		var existingFeature Feature
 		result := db.conn.Where("name = ?", feature.Name).First(&existingFeature)
 		if result.Error != nil {
-			if result.RowsAffected == 0 {
-				if err := db.conn.Create(&feature).Error; err != nil {
-					log.Printf("Failed to initialize feature %s: %v", feature.Name, err)
-					return err
-				}
-			} else {
-				log.Printf("Error querying feature %s: %v", feature.Name, result.Error)
-				return result.Error
+			log.Printf("Feature %s not found, creating...", feature.Name)
+			if err := db.conn.Create(&feature).Error; err != nil {
+				log.Printf("Failed to initialize feature %s: %v", feature.Name, err)
+				return err
 			}
 		}
 	}
@@ -43,8 +40,9 @@ func (db *DatabaseConnection) InitializeFeature(featureName string, description 
 
 func (db *DatabaseConnection) IsFeatureEnabled(featureName string) bool {
 	var feature Feature
-	result := db.conn.Where("name = ?", featureName).First(&feature)
-	if result.Error != nil {
+	// Use Find instead of First to avoid ErrRecordNotFound logging
+	result := db.conn.Where("name = ?", featureName).Limit(1).Find(&feature)
+	if result.Error != nil || result.RowsAffected == 0 {
 		return false
 	}
 	return feature.Enabled
