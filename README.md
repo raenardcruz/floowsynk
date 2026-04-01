@@ -9,20 +9,40 @@ Floowsynk is a high-performance **Workflow Automation & Orchestration Platform**
 Floowsynk is built with a modern, scalable stack focusing on performance and developer experience:
 
 ### **Frontend**
-- **Framework**: [Vue.js 3](https://vuejs.org/) (Composition API)
-- **Build Tool**: [Vite](https://vitejs.dev/)
-- **UI Library**: [PrimeVue](https://primevue.org/)
-- **Orchestration Canvas**: [Vue Flow](https://vueflow.dev/)
-- **Styling**: Vanilla CSS & PrimeVue Themes
-- **Language**: [TypeScript](https://www.typescriptlang.org/)
+- **Framework**: [Vue.js 3](https://vuejs.org/) (Composition API) — Provides a reactive, component-based UI for the workflow builder.
+- **Build Tool**: [Vite](https://vitejs.dev/) — Fast development server and optimized production builds.
+- **UI Library**: [PrimeVue](https://primevue.org/) — Comprehensive suite of UI components for dashboard and settings.
+- **Orchestration Canvas**: [Vue Flow](https://vueflow.dev/) — Interactive graph engine for designing workflow nodes and edges.
+- **Styling**: Vanilla CSS & PrimeVue Themes — Tailored, premium design system.
+- **Language**: [TypeScript](https://www.typescriptlang.org/) — Type-safe frontend logic.
 
 ### **Backend**
-- **Language**: [Go (Golang) 1.23+](https://go.dev/)
-- **Primary API**: [gRPC](https://grpc.io/) & [gRPC-Web](https://github.com/improbable-eng/grpc-web)
-- **REST Gateway**: [net/http](https://pkg.go.dev/net/http) (Webhook support)
-- **Database (ORM)**: [GORM](https://gorm.io/) with **PostgreSQL 15**
-- **Caching**: [Redis](https://redis.io/)
-- **Event Streaming**: [Apache Kafka](https://kafka.apache.org/)
+- **Language**: [Go (Golang) 1.23+](https://go.dev/) — High-concurrency engine for executing workflow steps and managing state.
+- **API (Primary)**: [gRPC](https://grpc.io/) & [gRPC-Web](https://github.com/improbable-eng/grpc-web) — Type-safe, high-performance communication between the dashboard (UI) and the backend.
+- **REST Gateway**: [net/http](https://pkg.go.dev/net/http) — Specialized REST endpoints for **Webhooks**, allowing external systems to trigger workflows via standard HTTP POST.
+- **Database (ORM)**: [GORM](https://gorm.io/) with **PostgreSQL 15** — Persistent storage for:
+    - **Users**: Account profiles and authentication details.
+    - **Workflows**: JSON-serialized workflow definitions, steps, and versions.
+    - **Replay Data**: Comprehensive historical records of every workflow execution (Run History).
+    - **Features**: Application-wide feature flags and configurations.
+- **Caching**: [Redis](https://redis.io/) — Low-latency storage for temporary workflow states, performance caching, and session management.
+- **Event Streaming**: [Apache Kafka](https://kafka.apache.org/) — Message broker used to queue workflow jobs; enables decoupled, scalable processing via the `Jobs/` workers.
+
+---
+
+## 🛠 Protobuf & gRPC Requirements
+
+To modify and regenerate the API layer, you must have the **Protocol Buffer Compiler (`protoc`)** installed along with the following specific plugins:
+
+| Requirement | Purpose |
+| :--- | :--- |
+| **`protoc` (v3+)** | The core protobuf compiler. |
+| **`protoc-gen-go`** | Generates Go message structures from `.proto` files. |
+| **`protoc-gen-go-grpc`** | Generates Go gRPC service interfaces and clients. |
+| **`protoc-gen-grpc-web`** | Generates gRPC-Web client code for the TypeScript frontend. |
+
+> [!NOTE]
+> These are automatically configured when running `make setup` on macOS (via Homebrew) or Linux (via apt-get).
 
 ### **Infrastructure & DevOps**
 - **Containerization**: [Docker](https://www.docker.com/) & [Docker Compose](https://docs.docker.com/compose/)
