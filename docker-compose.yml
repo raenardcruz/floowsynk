@@ -16,7 +16,7 @@ services:
       - ./Server/.env
     environment:
       - DB_HOST=db
-      - KAFKA_BROKERS=kafka:9092
+      - KAFKA_BROKERS=kafka:29092
       - REDIS_HOST=redis
       - REDIS_PORT=6379
     depends_on:

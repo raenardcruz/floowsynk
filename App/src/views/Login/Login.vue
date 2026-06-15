@@ -16,6 +16,7 @@
                             <button>Register</button>
                             <button type="submit">Login</button>
                         </div>
+                        <button type="button" @click="handleGuestLogin" class="guest-btn">Use as Guest</button>
                         <Divider />
                         <div class="forgot-password">
                             <a href="#">Forgot password?</a>
@@ -40,6 +41,7 @@
 import Logo from "@/components/Composable/Logo/Logo.vue";
 import {
     login,
+    loginAsGuest,
 } from './Login.helpers'
 import {
     useLoginStore
@@ -56,6 +58,10 @@ const {
 
 const handleLogin = async (_: Event) => {
     await login();
+};
+
+const handleGuestLogin = () => {
+    loginAsGuest();
 };
 </script>
 

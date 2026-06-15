@@ -76,6 +76,9 @@ func (s *WorkflowServer) UpdateWorkflow(ctx context.Context, req *wf.Workflow) (
 	if validateResults.status != http.StatusOK {
 		return nil, fmt.Errorf(validateResults.message)
 	}
+	if validateResults.role == "guest" {
+		return nil, fmt.Errorf("saving or modifying workflows is disabled in Guest Mode")
+	}
 	req.UpdatedBy = validateResults.id
 
 	if wl, err = UpdateWorkflow(req); err != nil {
@@ -92,6 +95,9 @@ func (s *WorkflowServer) CreateWorkflow(ctx context.Context, req *wf.Workflow) (
 	validateResults := validateToken(token)
 	if validateResults.status != http.StatusOK {
 		return nil, fmt.Errorf(validateResults.message)
+	}
+	if validateResults.role == "guest" {
+		return nil, fmt.Errorf("saving or modifying workflows is disabled in Guest Mode")
 	}
 	req.CreatedBy = validateResults.id
 	req.UpdatedBy = validateResults.id
@@ -110,6 +116,9 @@ func (s *WorkflowServer) DeleteWorkflow(ctx context.Context, req *wf.Workflow) (
 	validateResults := validateToken(token)
 	if validateResults.status != http.StatusOK {
 		return nil, fmt.Errorf(validateResults.message)
+	}
+	if validateResults.role == "guest" {
+		return nil, fmt.Errorf("saving or modifying workflows is disabled in Guest Mode")
 	}
 	if err := DeleteWorkflow(req.Id); err != nil {
 		return nil, err

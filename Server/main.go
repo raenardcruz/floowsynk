@@ -40,19 +40,17 @@ func main() {
 		return
 	}
 	if producer, err = Broker.Init(); err != nil {
-		log.Fatalf("Failed to initialize broker: %v", err)
-		return
+		log.Printf("Warning: Failed to initialize broker: %v. Continuing without Kafka.", err)
+	} else if producer == nil {
+		log.Printf("Warning: Failed to create producer. Continuing without Kafka.")
+	} else {
+		defer func() {
+			if err := (*producer).Close(); err != nil {
+				log.Fatalf("Failed to close producer: %v", err)
+			}
+			log.Println("Cleaned up producer")
+		}()
 	}
-	if producer == nil {
-		log.Fatalf("Failed to create producer")
-		return
-	}
-	defer func() {
-		if err := (*producer).Close(); err != nil {
-			log.Fatalf("Failed to close producer: %v", err)
-		}
-		log.Println("Cleaned up producer")
-	}()
 
 	grpcServer := setupGRPCServer()
 	httpServer := setupHTTPServer(grpcServer)

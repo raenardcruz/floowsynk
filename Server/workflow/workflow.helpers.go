@@ -74,7 +74,11 @@ func (wp *WorkflowProcessor) UpdateStatus(node *proto.Node, status proto.NodeSta
 		fmt.Printf("Error marshaling RunWorkflowResponse: %v\n", err)
 		return
 	}
-	kafka.SendMessage(*wp.Producer, Broker.WORKFLOW_REPLAY_DATA, wp.ID, string(rdBytes))
+	if wp.Producer != nil && *wp.Producer != nil {
+		kafka.SendMessage(*wp.Producer, Broker.WORKFLOW_REPLAY_DATA, wp.ID, string(rdBytes))
+	} else {
+		fmt.Printf("Warning: Kafka producer is not initialized, skipping log sending for ProcessID %s, NodeID %s\n", wp.ID, res.NodeId)
+	}
 }
 
 func (wp *WorkflowProcessor) getVariableMapString() map[string]string {

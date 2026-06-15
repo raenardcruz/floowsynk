@@ -28,6 +28,10 @@ export const useWorkflowCanvasControlButtonActions = (props: WorkflowCanvasProps
   const isSaving = ref(false)
   // Method: Save
   const saveProcess = async () => {
+    if (localStorage.getItem('sessionToken') === 'guest') {
+      toast.add({severity:'warn', summary: 'Guest Mode', detail: 'Saving is disabled in Guest Mode. Please log in to save workflows.', life: 5000});
+      return
+    }
     if (isSaving.value) return
     isSaving.value = true
     try {
@@ -49,6 +53,10 @@ export const useWorkflowCanvasControlButtonActions = (props: WorkflowCanvasProps
   }
   // Method: Delete
   const removeProcess = async () => {
+    if (localStorage.getItem('sessionToken') === 'guest') {
+      toast.add({severity:'warn', summary: 'Guest Mode', detail: 'Deleting is disabled in Guest Mode.', life: 5000});
+      return
+    }
     try {
       await deleteProcess(tab.value)
       toast.add({severity:'success', summary: 'Success', detail: 'Workflow deleted successfully', life: 3000});

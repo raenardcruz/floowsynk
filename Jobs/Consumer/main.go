@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"strings"
 	"time"
 
 	"github.com/IBM/sarama"
@@ -14,7 +15,6 @@ import (
 )
 
 const (
-	brokerAddress = "localhost:9092"
 	topic         = Broker.WORKFLOW_REPLAY_DATA
 	groupID       = "floowsynk-job-group3"
 	bufferTime    = 3 * time.Second
@@ -51,7 +51,8 @@ func main() {
 	config.Consumer.Group.Rebalance.Strategy = sarama.NewBalanceStrategyRoundRobin()
 	config.Consumer.Offsets.Initial = sarama.OffsetOldest
 
-	consumerGroup, err := sarama.NewConsumerGroup([]string{brokerAddress}, groupID, config)
+	brokers := strings.Split(db.AppConfig.Kafka_Brokers, ",")
+	consumerGroup, err := sarama.NewConsumerGroup(brokers, groupID, config)
 	if err != nil {
 		log.Fatalf("Error creating consumer group client: %v", err)
 	}

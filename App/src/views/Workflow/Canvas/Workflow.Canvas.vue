@@ -3,6 +3,7 @@
         <div class="canvas__header">
             <div class="canvas_titlecontainer">
                 <input class="canvas__headerinput canvas__label" type="text" v-model="tab.name" placeholder="Enter Process Title">
+                <Tag v-if="isGuest" severity="warn" rounded style="margin-left: 10px; padding: 4px 10px; font-weight: bold; background-color: var(--orange-5); color: var(--white-1);">Guest Mode</Tag>
                 <div class="canvas_tags">
                     <Tag pt:root:class="canvas__tag" @click="addTag" rounded>
                         <span class="material-symbols-outlined">add</span>
@@ -74,6 +75,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+const isGuest = ref(localStorage.getItem('sessionToken') === 'guest')
 import { VueFlow, useVueFlow } from '@vue-flow/core'
 import { WorkflowCanvasProps } from './Workflow.Canvas.types'
 import { useWorkflowCanvasHooks, useWorkflowCanvasStore } from './Workflow.Canvas.hooks'

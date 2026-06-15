@@ -40,3 +40,13 @@ const loginHandler = async (usePass: boolean) => {
 
 export const login = async () => await loginHandler(true);
 export const extendSession = () => loginHandler(false);
+
+export const loginAsGuest = () => {
+    const { session } = App.store;
+    const expiryDate = new Date();
+    expiryDate.setDate(expiryDate.getDate() + 365); // 1 year expiry
+    session.value = 'guest';
+    sessionToken.value = 'guest';
+    sessionExpiry.value = expiryDate.toISOString();
+    router.push({ path: '/' });
+}

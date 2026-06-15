@@ -44,6 +44,14 @@ func getTokenFromContext(ctx context.Context) (token string, err error) {
 }
 
 func validateToken(tokenString string) *ValidateResults {
+	if tokenString == "guest" {
+		return &ValidateResults{
+			id:       "guest",
+			username: "guest",
+			role:     "guest",
+			status:   http.StatusOK,
+		}
+	}
 	if tokenString == DB.AppConfig.Job_Token {
 		return &ValidateResults{
 			id:       "",
@@ -72,6 +80,9 @@ func validateToken(tokenString string) *ValidateResults {
 }
 
 func ExtendToken(token string) (string, error) {
+	if token == "guest" {
+		return "guest", nil
+	}
 	results := validateToken(token)
 	if results.status != http.StatusOK {
 		return "", fmt.Errorf("Unauthorized")

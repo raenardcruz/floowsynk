@@ -39,6 +39,9 @@ func (db *DatabaseConnection) InitializeFeatureFlags() error {
 }
 
 func (db *DatabaseConnection) IsFeatureEnabled(featureName string) bool {
+	if !db.conn.Migrator().HasTable(&Feature{}) {
+		return false
+	}
 	var feature Feature
 	// Use Find instead of First to avoid ErrRecordNotFound logging
 	result := db.conn.Where("name = ?", featureName).Limit(1).Find(&feature)

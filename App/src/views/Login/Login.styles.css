@@ -92,3 +92,14 @@
     margin-top: 10px;
     font-size: 0.9em;
 }
+.guest-btn {
+    width: 100%;
+    margin-top: 12px;
+    background-color: var(--grey-5);
+    color: var(--grey-1);
+    border: 1px solid var(--grey-4);
+    font-weight: 500;
+}
+.guest-btn:hover {
+    background-color: var(--grey-4);
+}
