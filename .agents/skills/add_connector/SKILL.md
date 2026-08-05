@@ -7,6 +7,13 @@ description: Guide on how to add a new 3rd party connector based on GitHub conne
 
 This guide outlines the step-by-step process of adding a new third-party connector to the FloowSynk system, modeled after the implementation of the GitHub connector.
 
+> **IMPORTANT**: When creating or updating a connector, always consult its corresponding document in the `Integrations/` folder (e.g. `Integrations/<ConnectorName>.md`):
+> 1. **Section 2 (Required Authentication Parameters)**: Derive all configuration input parameters and specify them in the `fields` array in the JSON template.
+> 2. **Section 4 (Base Endpoints & Key Resources)**: Implement every endpoint listed as an entry in the `actions` array in the JSON template.
+> 3. **Section 5 (Header / Request Format)**: Configure exact headers (`Content-Type`, `Accept`, API version headers, custom tokens) in `headers` per action.
+4. **Multi-Authentication Support**: Specify all supported authentication methods in `authType` (e.g. `"oauth2, apikey"` or `"oauth2, pat"`) so the UI displays distinct pills and tabs for OAuth2 and API Key/Token authentication choices.
+5. **Action Required Parameters / Fields**: Specify required fields per action either explicitly in a `"fields"` array on the action object or via `{{variable_name}}` placeholders in `path`, `queryParams`, or `payloadTemplate`. The Workflow UI node popup menu automatically parses and presents these fields as dedicated input controls for workflow builders.
+
 ## Step 1: Create the Connector Template Configuration File
 
 Create a new JSON template in the template directory:
@@ -20,7 +27,30 @@ Create a new JSON template in the template directory:
   "description": "Access GitHub repositories, create issues, manage pull requests and trigger workflows.",
   "icon": "/src/components/Icons/github.svg",
   "baseUrl": "https://api.github.com",
-  "authType": "oauth2",
+  "authType": "oauth2, pat",
+  "fields": [
+    {
+      "key": "client_id",
+      "label": "Client ID",
+      "type": "text",
+      "required": false,
+      "placeholder": "Enter GitHub OAuth App Client ID"
+    },
+    {
+      "key": "client_secret",
+      "label": "Client Secret",
+      "type": "password",
+      "required": false,
+      "placeholder": "Enter GitHub OAuth App Client Secret"
+    },
+    {
+      "key": "access_token",
+      "label": "Personal Access Token (PAT)",
+      "type": "password",
+      "required": false,
+      "placeholder": "ghp_... or github_pat_..."
+    }
+  ],
   "oauthConfig": {
     "authorizeUrl": "https://github.com/login/oauth/authorize",
     "tokenUrl": "https://github.com/login/oauth/access_token",
@@ -39,7 +69,13 @@ Create a new JSON template in the template directory:
         "Content-Type": "application/json"
       },
       "queryParams": [],
-      "payloadTemplate": "{\"title\": \"{{title}}\", \"body\": \"{{body}}\"}"
+      "payloadTemplate": "{\"title\": \"{{title}}\", \"body\": \"{{body}}\"}",
+      "fields": [
+        { "key": "owner", "label": "Repository Owner", "required": true, "placeholder": "e.g. octocat" },
+        { "key": "repo", "label": "Repository Name", "required": true, "placeholder": "e.g. hello-world" },
+        { "key": "title", "label": "Issue Title", "required": true, "placeholder": "Enter issue title" },
+        { "key": "body", "label": "Issue Body", "required": false, "placeholder": "Enter issue description" }
+      ]
     }
   ]
 }
@@ -47,20 +83,44 @@ Create a new JSON template in the template directory:
 
 ---
 
-## Step 2: Implement the Response Transformer (Optional)
+## Step 2: Implement Connection Verification & Response Transformer (Optional)
 
-Create a Go file for custom response formatting:
+Create a Go file for custom response formatting and credential checking:
 `Server/workflow/<connector_id>_connector.go`
 
-Implement `Transform<ConnectorName>Response` to format/clean raw JSON responses before sending them back to the client.
+1. **Credential Check Function**: Implement `Check<ConnectorName>Connection(creds map[string]string) bool` to verify that stored access credentials are valid.
+2. **Response Transformer**: Implement `Transform<ConnectorName>Response(actionID string, rawResponse interface{}) interface{}` to format/clean raw JSON responses before returning them.
 
-### Transformer Example (`Server/workflow/github_connector.go`)
+### Example (`Server/workflow/github_connector.go`)
 ```go
 package workflow
 
 import (
 	"encoding/json"
+	"fmt"
+	"net/http"
 )
+
+// CheckGitHubConnection verifies the stored access token against the GitHub API.
+func CheckGitHubConnection(creds map[string]string) bool {
+	token := creds["access_token"]
+	if token == "" {
+		return false
+	}
+	req, err := http.NewRequest("GET", "https://api.github.com/user", nil)
+	if err != nil {
+		return false
+	}
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
+	req.Header.Set("Accept", "application/vnd.github+json")
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return false
+	}
+	defer resp.Body.Close()
+	return resp.StatusCode == http.StatusOK
+}
 
 // TransformGitHubResponse transforms raw GitHub API response into a simplified structure
 func TransformGitHubResponse(actionID string, rawResponse interface{}) interface{} {
@@ -102,12 +162,13 @@ func TransformGitHubResponse(actionID string, rawResponse interface{}) interface
 
 ---
 
-## Step 3: Register the Connector Transformer
+## Step 3: Register the Connector Handlers
 
-Register your new connector in the main router file:
+Register your new connector handlers in the main router file:
 [connectors.go](file:///Users/raenard/Documents/floowsynk/Server/workflow/connectors.go)
 
-Modify `TransformConnectorResponse` to route matching connector IDs to your custom response transformer.
+1. Register `Transform<ConnectorName>Response` in `TransformConnectorResponse`.
+2. Register `Check<ConnectorName>Connection` in `CheckConnectorConnection`.
 
 ```go
 func TransformConnectorResponse(connectorID string, actionID string, rawResponse interface{}) interface{} {
@@ -122,6 +183,17 @@ func TransformConnectorResponse(connectorID string, actionID string, rawResponse
 		return Transform<ConnectorName>Response(actionID, rawResponse)
 	default:
 		return rawResponse
+	}
+}
+
+func CheckConnectorConnection(connectorID string, creds map[string]string) bool {
+	switch connectorID {
+	case "github":
+		return CheckGitHubConnection(creds)
+	case "<connector_id>":
+		return Check<ConnectorName>Connection(creds)
+	default:
+		return false
 	}
 }
 ```

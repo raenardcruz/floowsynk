@@ -1,0 +1,37 @@
+{
+  "id": "sendgrid",
+  "name": "SendGrid",
+  "description": "Send transactional emails and manage email templates via Twilio SendGrid.",
+  "icon": "/src/components/Icons/sendgrid.svg",
+  "baseUrl": "https://api.sendgrid.com/v3",
+  "authType": "api_key",
+  "fields": [
+    {
+      "key": "api_key",
+      "label": "SendGrid API Key",
+      "type": "password",
+      "required": true,
+      "placeholder": "SG.xxxxxxxx"
+    }
+  ],
+  "actions": [
+    {
+      "id": "send_email",
+      "name": "Send Email",
+      "description": "Send a transactional email message",
+      "path": "/mail/send",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "queryParams": [],
+      "payloadTemplate": "{\"personalizations\": [{\"to\": [{\"email\": \"{{to_email}}\"}]}], \"from\": {\"email\": \"{{from_email}}\"}, \"subject\": \"{{subject}}\", \"content\": [{\"type\": \"text/plain\", \"value\": \"{{content}}\"}]}",
+      "fields": [
+        { "key": "to_email", "label": "Recipient Email", "required": true, "placeholder": "recipient@example.com" },
+        { "key": "from_email", "label": "Sender Email", "required": true, "placeholder": "sender@example.com" },
+        { "key": "subject", "label": "Subject", "required": true, "placeholder": "Email Subject" },
+        { "key": "content", "label": "Email Body", "required": true, "placeholder": "Email text content" }
+      ]
+    }
+  ]
+}

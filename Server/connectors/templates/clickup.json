@@ -1,0 +1,84 @@
+{
+  "id": "clickup",
+  "name": "ClickUp",
+  "description": "Manage tasks, spaces, and teams in ClickUp.",
+  "icon": "/src/components/Icons/clickup.svg",
+  "baseUrl": "https://api.clickup.com/api/v2",
+  "authType": "custom",
+  "fields": [
+    {
+      "key": "api_token",
+      "label": "Personal API Token",
+      "type": "password",
+      "required": true,
+      "placeholder": "pk_..."
+    }
+  ],
+  "actions": [
+    {
+      "id": "create_task",
+      "name": "Create Task",
+      "description": "Create a new task in a specified list",
+      "path": "/list/{{list_id}}/task",
+      "method": "POST",
+      "headers": {
+        "Authorization": "{{api_token}}",
+        "Content-Type": "application/json"
+      },
+      "queryParams": [],
+      "payloadTemplate": "{\"name\": \"{{name}}\", \"description\": \"{{description}}\", \"status\": \"{{status}}\"}",
+      "fields": [
+        { "key": "list_id", "label": "List ID", "required": true, "placeholder": "Enter ClickUp List ID" },
+        { "key": "name", "label": "Task Name", "required": true, "placeholder": "New Task Name" },
+        { "key": "description", "label": "Description", "required": false, "placeholder": "Task details" },
+        { "key": "status", "label": "Task Status", "required": false, "placeholder": "open" }
+      ]
+    },
+    {
+      "id": "get_tasks",
+      "name": "Get Tasks",
+      "description": "Retrieve tasks from a list",
+      "path": "/list/{{list_id}}/task",
+      "method": "GET",
+      "headers": {
+        "Authorization": "{{api_token}}"
+      },
+      "queryParams": [],
+      "payloadTemplate": "",
+      "fields": [
+        { "key": "list_id", "label": "List ID", "required": true, "placeholder": "Enter ClickUp List ID" }
+      ]
+    },
+    {
+      "id": "update_task",
+      "name": "Update Task",
+      "description": "Update an existing task in ClickUp",
+      "path": "/task/{{task_id}}",
+      "method": "PUT",
+      "headers": {
+        "Authorization": "{{api_token}}",
+        "Content-Type": "application/json"
+      },
+      "queryParams": [],
+      "payloadTemplate": "{\"name\": \"{{name}}\", \"description\": \"{{description}}\", \"status\": \"{{status}}\"}",
+      "fields": [
+        { "key": "task_id", "label": "Task ID", "required": true, "placeholder": "Enter ClickUp Task ID" },
+        { "key": "name", "label": "Task Name", "required": false, "placeholder": "Updated Task Name" },
+        { "key": "description", "label": "Description", "required": false, "placeholder": "Updated details" },
+        { "key": "status", "label": "Status", "required": false, "placeholder": "complete" }
+      ]
+    },
+    {
+      "id": "get_teams",
+      "name": "Get Teams",
+      "description": "Get authorised workspace teams",
+      "path": "/team",
+      "method": "GET",
+      "headers": {
+        "Authorization": "{{api_token}}"
+      },
+      "queryParams": [],
+      "payloadTemplate": ""
+    }
+  ]
+}

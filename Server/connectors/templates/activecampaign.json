@@ -1,0 +1,99 @@
+{
+  "id": "activecampaign",
+  "name": "ActiveCampaign",
+  "description": "Manage contacts, automated marketing campaigns, and sales deals in ActiveCampaign.",
+  "icon": "/src/components/Icons/activecampaign.svg",
+  "baseUrl": "{{api_url}}/api/3",
+  "authType": "api_key",
+  "fields": [
+    {
+      "key": "api_url",
+      "label": "API URL",
+      "type": "text",
+      "required": true,
+      "placeholder": "https://youraccount.api-us1.com"
+    },
+    {
+      "key": "api_token",
+      "label": "API Token",
+      "type": "password",
+      "required": true,
+      "placeholder": "Enter ActiveCampaign API Token"
+    }
+  ],
+  "actions": [
+    {
+      "id": "list_contacts",
+      "name": "List Contacts",
+      "description": "Get all contacts from ActiveCampaign",
+      "path": "/contacts",
+      "method": "GET",
+      "headers": {
+        "Api-Token": "{{api_token}}",
+        "Accept": "application/json"
+      },
+      "queryParams": [],
+      "payloadTemplate": ""
+    },
+    {
+      "id": "create_contact",
+      "name": "Create Contact",
+      "description": "Create a new contact",
+      "path": "/contacts",
+      "method": "POST",
+      "headers": {
+        "Api-Token": "{{api_token}}",
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      "queryParams": [],
+      "payloadTemplate": "{\"contact\": {\"email\": \"{{email}}\", \"firstName\": \"{{first_name}}\", \"lastName\": \"{{last_name}}\", \"phone\": \"{{phone}}\"}}",
+      "fields": [
+        { "key": "email", "label": "Email Address", "required": true, "placeholder": "user@example.com" },
+        { "key": "first_name", "label": "First Name", "required": false, "placeholder": "John" },
+        { "key": "last_name", "label": "Last Name", "required": false, "placeholder": "Doe" },
+        { "key": "phone", "label": "Phone Number", "required": false, "placeholder": "+1234567890" }
+      ]
+    },
+    {
+      "id": "add_contact_to_list",
+      "name": "Add Contact to List",
+      "description": "Subscribe a contact to a specific list",
+      "path": "/contactLists",
+      "method": "POST",
+      "headers": {
+        "Api-Token": "{{api_token}}",
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      "queryParams": [],
+      "payloadTemplate": "{\"contactList\": {\"list\": \"{{list_id}}\", \"contact\": \"{{contact_id}}\", \"status\": 1}}",
+      "fields": [
+        { "key": "list_id", "label": "List ID", "required": true, "placeholder": "Enter List ID" },
+        { "key": "contact_id", "label": "Contact ID", "required": true, "placeholder": "Enter Contact ID" }
+      ]
+    },
+    {
+      "id": "create_deal",
+      "name": "Create Deal",
+      "description": "Create a new sales deal in ActiveCampaign",
+      "path": "/deals",
+      "method": "POST",
+      "headers": {
+        "Api-Token": "{{api_token}}",
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      "queryParams": [],
+      "payloadTemplate": "{\"deal\": {\"title\": \"{{title}}\", \"value\": {{value}}, \"currency\": \"{{currency}}\", \"pipeline\": \"{{pipeline_id}}\", \"stage\": \"{{stage_id}}\", \"contact\": \"{{contact_id}}\"}}",
+      "fields": [
+        { "key": "title", "label": "Deal Title", "required": true, "placeholder": "New Sales Deal" },
+        { "key": "value", "label": "Deal Value", "required": true, "placeholder": "1000" },
+        { "key": "currency", "label": "Currency", "required": true, "placeholder": "usd" },
+        { "key": "pipeline_id", "label": "Pipeline ID", "required": true, "placeholder": "Enter Pipeline ID" },
+        { "key": "stage_id", "label": "Stage ID", "required": true, "placeholder": "Enter Stage ID" },
+        { "key": "contact_id", "label": "Contact ID", "required": true, "placeholder": "Enter Contact ID" }
+      ]
+    }
+  ]
+}

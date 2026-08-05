@@ -1,0 +1,116 @@
+{
+  "id": "asana",
+  "name": "Asana",
+  "description": "Manage tasks, projects, and team workflows in Asana.",
+  "icon": "/src/components/Icons/asana.svg",
+  "baseUrl": "https://app.asana.com/api/1.0",
+  "authType": "oauth2, pat",
+  "fields": [
+    {
+      "key": "access_token",
+      "label": "Personal Access Token (PAT)",
+      "type": "password",
+      "required": false,
+      "placeholder": "1/ or 2/..."
+    },
+    {
+      "key": "client_id",
+      "label": "Client ID",
+      "type": "text",
+      "required": false,
+      "placeholder": "Enter OAuth Client ID"
+    },
+    {
+      "key": "client_secret",
+      "label": "Client Secret",
+      "type": "password",
+      "required": false,
+      "placeholder": "Enter OAuth Client Secret"
+    }
+  ],
+  "oauthConfig": {
+    "authorizeUrl": "https://app.asana.com/-/oauth_authorize",
+    "tokenUrl": "https://app.asana.com/-/oauth_token",
+    "defaultScopes": ["default"]
+  },
+  "actions": [
+    {
+      "id": "create_task",
+      "name": "Create Task",
+      "description": "Create a new task in an Asana workspace or project",
+      "path": "/tasks",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "queryParams": [],
+      "payloadTemplate": "{\"data\": {\"name\": \"{{name}}\", \"notes\": \"{{notes}}\", \"projects\": [\"{{project_gid}}\"]}}",
+      "fields": [
+        { "key": "name", "label": "Task Name", "required": true, "placeholder": "New Task Name" },
+        { "key": "project_gid", "label": "Project GID", "required": true, "placeholder": "Enter Asana Project GID" },
+        { "key": "notes", "label": "Task Notes / Description", "required": false, "placeholder": "Enter task details" }
+      ]
+    },
+    {
+      "id": "get_project_tasks",
+      "name": "Get Tasks in Project",
+      "description": "Retrieve tasks belonging to a specific project",
+      "path": "/projects/{{project_gid}}/tasks",
+      "method": "GET",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "queryParams": ["opt_fields"],
+      "fields": [
+        { "key": "project_gid", "label": "Project GID", "required": true, "placeholder": "Enter Asana Project GID" }
+      ]
+    },
+    {
+      "id": "get_task",
+      "name": "Get Task Details",
+      "description": "Retrieve detailed information for a specific task",
+      "path": "/tasks/{{task_gid}}",
+      "method": "GET",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "queryParams": ["opt_fields"],
+      "fields": [
+        { "key": "task_gid", "label": "Task GID", "required": true, "placeholder": "Enter Asana Task GID" }
+      ]
+    },
+    {
+      "id": "update_task",
+      "name": "Update Task",
+      "description": "Update task details in Asana",
+      "path": "/tasks/{{task_gid}}",
+      "method": "PUT",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "queryParams": [],
+      "payloadTemplate": "{\"data\": {\"name\": \"{{name}}\", \"notes\": \"{{notes}}\", \"completed\": {{completed}} }}",
+      "fields": [
+        { "key": "task_gid", "label": "Task GID", "required": true, "placeholder": "Enter Asana Task GID" },
+        { "key": "name", "label": "Task Name", "required": false, "placeholder": "Updated Task Name" },
+        { "key": "notes", "label": "Notes", "required": false, "placeholder": "Updated notes" }
+      ]
+    },
+    {
+      "id": "create_project",
+      "name": "Create Project",
+      "description": "Create a new project in Asana",
+      "path": "/projects",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "queryParams": [],
+      "payloadTemplate": "{\"data\": {\"name\": \"{{name}}\", \"workspace\": \"{{workspace_gid}}\"}}",
+      "fields": [
+        { "key": "name", "label": "Project Name", "required": true, "placeholder": "New Project Title" },
+        { "key": "workspace_gid", "label": "Workspace GID", "required": true, "placeholder": "Enter Workspace GID" }
+      ]
+    }
+  ]
+}

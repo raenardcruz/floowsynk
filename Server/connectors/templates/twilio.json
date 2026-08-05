@@ -1,0 +1,71 @@
+{
+  "id": "twilio",
+  "name": "Twilio",
+  "description": "Send SMS messages, make voice calls, and handle communications via Twilio API.",
+  "icon": "/src/components/Icons/twilio.svg",
+  "baseUrl": "https://api.twilio.com/2010-04-01",
+  "authType": "basic",
+  "fields": [
+    {
+      "key": "account_sid",
+      "label": "Account SID",
+      "type": "text",
+      "required": true,
+      "placeholder": "ACXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+    },
+    {
+      "key": "auth_token",
+      "label": "Auth Token",
+      "type": "password",
+      "required": true,
+      "placeholder": "Enter Twilio Auth Token"
+    }
+  ],
+  "actions": [
+    {
+      "id": "send_sms",
+      "name": "Send SMS",
+      "description": "Send an SMS text message to a recipient phone number",
+      "path": "/Accounts/{{account_sid}}/Messages.json",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "queryParams": [],
+      "payloadTemplate": "To={{to}}&From={{from}}&Body={{body}}",
+      "fields": [
+        { "key": "to", "label": "Recipient Phone Number (E.164)", "required": true, "placeholder": "+1234567890" },
+        { "key": "from", "label": "Sender Phone Number", "required": true, "placeholder": "+10987654321" },
+        { "key": "body", "label": "SMS Text Body", "required": true, "placeholder": "Enter SMS text" }
+      ]
+    },
+    {
+      "id": "make_call",
+      "name": "Make Call",
+      "description": "Initiate an outbound phone call via Twilio",
+      "path": "/Accounts/{{account_sid}}/Calls.json",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "queryParams": [],
+      "payloadTemplate": "To={{to}}&From={{from}}&Url={{url}}",
+      "fields": [
+        { "key": "to", "label": "Recipient Phone Number (E.164)", "required": true, "placeholder": "+1234567890" },
+        { "key": "from", "label": "Sender Phone Number", "required": true, "placeholder": "+10987654321" },
+        { "key": "url", "label": "TwiML URL", "required": true, "placeholder": "https://demo.twilio.com/welcome/voice/" }
+      ]
+    },
+    {
+      "id": "list_messages",
+      "name": "List Messages",
+      "description": "Retrieve message logs from Twilio account",
+      "path": "/Accounts/{{account_sid}}/Messages.json",
+      "method": "GET",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "queryParams": ["To", "From", "DateSent"]
+    }
+  ]
+}

@@ -34,19 +34,42 @@ export const checkConnectionStatus = async (id: string): Promise<{ valid: boolea
     return res.json()
 }
 
-export const updateConnection = async (
-    id: string,
+export const createConnection = async (
+    connectorId: string,
     name: string,
-    clientId: string,
-    clientSecret: string,
-    accessToken: string
-): Promise<{ success: boolean }> => {
-    const res = await fetch(`${getRestUrl()}/api/connectors/rename`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, name, clientId, clientSecret, accessToken })
+    authType: string,
+    fields: Record<string, string>
+): Promise<{ success: boolean; id: string }> => {
+    const res = await fetch(`${getRestUrl()}/api/connectors/create`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `${localStorage.getItem("sessionToken") || ''}`
+        },
+        body: JSON.stringify({ connectorId, name, authType, fields })
     })
     if (!res.ok) throw new Error(await res.text())
     return res.json()
 }
+
+export const updateConnection = async (
+    id: string,
+    name: string,
+    clientId?: string,
+    clientSecret?: string,
+    accessToken?: string,
+    fields?: Record<string, string>
+): Promise<{ success: boolean }> => {
+    const res = await fetch(`${getRestUrl()}/api/connectors/rename`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `${localStorage.getItem("sessionToken") || ''}`
+        },
+        body: JSON.stringify({ id, name, clientId, clientSecret, accessToken, fields })
+    })
+    if (!res.ok) throw new Error(await res.text())
+    return res.json()
+}
+
 

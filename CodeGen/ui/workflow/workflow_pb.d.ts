@@ -994,6 +994,74 @@ export namespace ConnectorTemplateList {
   };
 }
 
+export class ConnectorFieldProto extends jspb.Message {
+  getKey(): string;
+  setKey(value: string): ConnectorFieldProto;
+
+  getLabel(): string;
+  setLabel(value: string): ConnectorFieldProto;
+
+  getType(): string;
+  setType(value: string): ConnectorFieldProto;
+
+  getRequired(): boolean;
+  setRequired(value: boolean): ConnectorFieldProto;
+
+  getPlaceholder(): string;
+  setPlaceholder(value: string): ConnectorFieldProto;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ConnectorFieldProto.AsObject;
+  static toObject(includeInstance: boolean, msg: ConnectorFieldProto): ConnectorFieldProto.AsObject;
+  static serializeBinaryToWriter(message: ConnectorFieldProto, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ConnectorFieldProto;
+  static deserializeBinaryFromReader(message: ConnectorFieldProto, reader: jspb.BinaryReader): ConnectorFieldProto;
+}
+
+export namespace ConnectorFieldProto {
+  export type AsObject = {
+    key: string;
+    label: string;
+    type: string;
+    required: boolean;
+    placeholder: string;
+  };
+}
+
+export class ConnectorActionProto extends jspb.Message {
+  getId(): string;
+  setId(value: string): ConnectorActionProto;
+
+  getName(): string;
+  setName(value: string): ConnectorActionProto;
+
+  getDescription(): string;
+  setDescription(value: string): ConnectorActionProto;
+
+  getMethod(): string;
+  setMethod(value: string): ConnectorActionProto;
+
+  getPath(): string;
+  setPath(value: string): ConnectorActionProto;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ConnectorActionProto.AsObject;
+  static toObject(includeInstance: boolean, msg: ConnectorActionProto): ConnectorActionProto.AsObject;
+  static serializeBinaryToWriter(message: ConnectorActionProto, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ConnectorActionProto;
+  static deserializeBinaryFromReader(message: ConnectorActionProto, reader: jspb.BinaryReader): ConnectorActionProto;
+}
+
+export namespace ConnectorActionProto {
+  export type AsObject = {
+    id: string;
+    name: string;
+    description: string;
+    method: string;
+    path: string;
+  };
+}
+
 export class ConnectorProtoTemplate extends jspb.Message {
   getId(): string;
   setId(value: string): ConnectorProtoTemplate;
@@ -1013,6 +1081,16 @@ export class ConnectorProtoTemplate extends jspb.Message {
   getAuthtype(): string;
   setAuthtype(value: string): ConnectorProtoTemplate;
 
+  getFieldsList(): Array<ConnectorFieldProto>;
+  setFieldsList(value: Array<ConnectorFieldProto>): ConnectorProtoTemplate;
+  clearFieldsList(): ConnectorProtoTemplate;
+  addFields(value?: ConnectorFieldProto, index?: number): ConnectorFieldProto;
+
+  getActionsList(): Array<ConnectorActionProto>;
+  setActionsList(value: Array<ConnectorActionProto>): ConnectorProtoTemplate;
+  clearActionsList(): ConnectorProtoTemplate;
+  addActions(value?: ConnectorActionProto, index?: number): ConnectorActionProto;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): ConnectorProtoTemplate.AsObject;
   static toObject(includeInstance: boolean, msg: ConnectorProtoTemplate): ConnectorProtoTemplate.AsObject;
@@ -1029,6 +1107,8 @@ export namespace ConnectorProtoTemplate {
     icon: string;
     baseurl: string;
     authtype: string;
+    fieldsList: Array<ConnectorFieldProto.AsObject>;
+    actionsList: Array<ConnectorActionProto.AsObject>;
   };
 }
 

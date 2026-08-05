@@ -23,6 +23,30 @@
                 v-model="modelValue['type']"
                 placeholder="Select an Action" />
         </div>
+        <!-- Required Fields for Selected Action -->
+        <div v-if="actionRequiredFields.length > 0" class="action-required-fields" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 10px; display: flex; flex-direction: column; gap: 10px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <span style="font-weight: 600; font-size: 0.8rem; color: #ffca28; display: flex; align-items: center; gap: 6px;">
+                    <i class="pi pi-exclamation-circle"></i> Required Action Parameters
+                </span>
+                <span class="badge" style="font-size: 0.7rem; background: rgba(255, 202, 40, 0.2); color: #ffca28; padding: 2px 6px; border-radius: 4px; font-weight: 600;">
+                    {{ actionRequiredFields.length }} required
+                </span>
+            </div>
+            <div v-for="field in actionRequiredFields" :key="field.key" class="form-group" style="display: flex; flex-direction: column; gap: 4px;">
+                <label :for="'field-' + field.key" style="font-size: 0.8rem; color: var(--text-color); font-weight: 500;">
+                    {{ field.label }} <span style="color: #ff5252;">*</span>
+                </label>
+                <TextInput
+                    :id="'field-' + field.key"
+                    :placeholder="field.placeholder"
+                    :disabled="disabled"
+                    :modelValue="actionFieldValues[field.key] || ''"
+                    @update:modelValue="(val: any) => updateActionFieldValue(field.key, String(val))"
+                    class="w-full"
+                />
+            </div>
+        </div>
         <div>
             <label style="font-weight: 600; font-size: 0.85rem; color: var(--text-color); display: block; margin-bottom: 4px;">Input Payload (JSON)</label>
             <TextCodeInput
@@ -120,7 +144,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted } from 'vue'
+import { computed, ref, reactive, watch, onMounted } from 'vue'
 import WorkflowNodeSidebarFields from './Workflow.Sidebar.Node.Fields.vue'
 import { SidebarNodeProps } from '../Workflow.Sidebar.Node.types'
 import { useSidebarNodeHooks } from '../Workflow.Sidebar.Node.hooks'
@@ -175,6 +199,107 @@ const actionOptions = computed(() => {
         value: a.id
     }))
 })
+
+const selectedActionObj = computed(() => {
+    const val = modelValue.value
+    if (!val || !val['listvar'] || !val['type']) return null
+    const selectedConn = connectionsList.value.find(c => c.id === val['listvar'])
+    if (!selectedConn) return null
+    const connectorId = selectedConn.connectorid || selectedConn.connectorId
+    const selectedTemp = templatesList.value.find(t => t.id === connectorId)
+    if (!selectedTemp || !selectedTemp.actions) return null
+    return selectedTemp.actions.find((a: any) => a.id === val['type']) || null
+})
+
+interface ActionFieldInfo {
+    key: string
+    label: string
+    required: boolean
+    placeholder?: string
+}
+
+const actionRequiredFields = computed<ActionFieldInfo[]>(() => {
+    const action = selectedActionObj.value
+    if (!action) return []
+
+    const fieldsMap = new Map<string, ActionFieldInfo>()
+
+    // 1. Explicit fields array on action
+    if (Array.isArray(action.fields)) {
+        for (const f of action.fields) {
+            if (f.key) {
+                fieldsMap.set(f.key, {
+                    key: f.key,
+                    label: f.label || toSentenceCase(f.key),
+                    required: f.required !== false,
+                    placeholder: f.placeholder || `Enter ${toSentenceCase(f.key)}`
+                })
+            }
+        }
+    }
+
+    // 2. Extract placeholders {{var}} from path, queryParams, and payloadTemplate
+    const extractVars = (str?: string) => {
+        if (!str) return
+        const matches = str.matchAll(/\{\{([a-zA-Z0-9_]+)\}\}/g)
+        for (const m of matches) {
+            const key = m[1]
+            if (!fieldsMap.has(key)) {
+                fieldsMap.set(key, {
+                    key,
+                    label: toSentenceCase(key),
+                    required: true,
+                    placeholder: `Enter ${toSentenceCase(key)}`
+                })
+            }
+        }
+    }
+
+    extractVars(action.path)
+    if (Array.isArray(action.queryParams)) {
+        action.queryParams.forEach((q: string) => extractVars(q))
+    }
+    extractVars(action.payloadTemplate)
+
+    return Array.from(fieldsMap.values())
+})
+
+const actionFieldValues = reactive<Record<string, string>>({})
+
+const syncActionFieldValuesFromPayload = () => {
+    if (modelValue.value && modelValue.value['payload']) {
+        try {
+            const parsed = JSON.parse(modelValue.value['payload'])
+            if (typeof parsed === 'object' && parsed !== null) {
+                Object.keys(parsed).forEach(k => {
+                    actionFieldValues[k] = String(parsed[k])
+                })
+            }
+        } catch {
+            // ignore non-JSON payload
+        }
+    }
+}
+
+watch(selectedActionObj, () => {
+    syncActionFieldValuesFromPayload()
+}, { immediate: true })
+
+const updateActionFieldValue = (key: string, val: string) => {
+    actionFieldValues[key] = val
+    let currentPayload: Record<string, any> = {}
+    if (modelValue.value && modelValue.value['payload']) {
+        try {
+            currentPayload = JSON.parse(modelValue.value['payload'])
+        } catch {
+            currentPayload = {}
+        }
+    }
+    currentPayload[key] = val
+    if (modelValue.value) {
+        modelValue.value['payload'] = JSON.stringify(currentPayload, null, 2)
+    }
+}
 
 const generateRandomSecret = () => {
     return Array.from(crypto.getRandomValues(new Uint8Array(16)))

@@ -114,6 +114,7 @@ func startRESTServer() {
 	restServer.HandleFunc("/api/connectors/callback", oauthCallbackHandler)
 	restServer.HandleFunc("/api/connectors/templates", listConnectorTemplatesHandler)
 	restServer.HandleFunc("/api/connectors/check", checkConnectionHandler)
+	restServer.HandleFunc("/api/connectors/create", createConnectionHandler)
 	restServer.HandleFunc("/api/connectors/rename", updateConnectionHandler)
 
 	go func() {
@@ -260,7 +261,7 @@ func startOAuthHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if template.AuthType != "oauth2" || template.OAuthConfig == nil {
+	if !strings.Contains(template.AuthType, "oauth2") || template.OAuthConfig == nil {
 		http.Error(w, "connector does not support oauth2", http.StatusBadRequest)
 		return
 	}
@@ -386,6 +387,73 @@ func checkConnectionHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]interface{}{"valid": valid})
 }
 
+// createConnectionHandler creates a non-OAuth (API Key, PAT, Token) connection record directly.
+func createConnectionHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	var body struct {
+		ConnectorID string            `json:"connectorId"`
+		Name        string            `json:"name"`
+		AuthType    string            `json:"authType"`
+		Fields      map[string]string `json:"fields"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil || body.ConnectorID == "" || body.Name == "" {
+		http.Error(w, "connectorId and name are required", http.StatusBadRequest)
+		return
+	}
+
+	authType := body.AuthType
+	if authType == "" {
+		authType = "apikey"
+	}
+
+	credsMap := map[string]interface{}{}
+	for k, v := range body.Fields {
+		if v != "" {
+			credsMap[k] = v
+		}
+	}
+	credsMap["created_at"] = time.Now().Unix()
+
+	credsBytes, _ := json.Marshal(credsMap)
+	encryptedCreds, err := crypto.Encrypt(string(credsBytes))
+	if err != nil {
+		http.Error(w, "failed to encrypt credentials: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	userID := "b5bd8424-fb52-4454-8102-488959a41ca8" // default admin user fallback
+	tokenHeader := r.Header.Get("Authorization")
+	if tokenHeader != "" {
+		validation := validateToken(tokenHeader)
+		if validation.status == http.StatusOK && validation.id != "" && validation.id != "guest" {
+			userID = validation.id
+		}
+	}
+
+	connectionID := uuid.NewString()
+	newConn := db.Connection{
+		ID:          connectionID,
+		Name:        body.Name,
+		ConnectorID: body.ConnectorID,
+		AuthType:    authType,
+		Credentials: encryptedCreds,
+		UserID:      userID,
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
+	}
+	if err := DBCon.AddConnection(newConn); err != nil {
+		http.Error(w, "failed to create connection: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]interface{}{"success": true, "id": connectionID})
+}
+
 // updateConnectionHandler updates name and/or credentials of an existing connection.
 // It decrypts the current credential blob, merges in the supplied fields, then re-encrypts,
 // so any stored tokens that the user didn't change are preserved.
@@ -395,11 +463,12 @@ func updateConnectionHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var body struct {
-		ID          string `json:"id"`
-		Name        string `json:"name"`
-		ClientID    string `json:"clientId"`
-		ClientSecret string `json:"clientSecret"`
-		AccessToken  string `json:"accessToken"`
+		ID           string                 `json:"id"`
+		Name         string                 `json:"name"`
+		ClientID     string                 `json:"clientId"`
+		ClientSecret string                 `json:"clientSecret"`
+		AccessToken  string                 `json:"accessToken"`
+		Fields       map[string]interface{} `json:"fields"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil || body.ID == "" || body.Name == "" {
 		http.Error(w, "id and name are required", http.StatusBadRequest)
@@ -430,6 +499,13 @@ func updateConnectionHandler(w http.ResponseWriter, r *http.Request) {
 	if body.AccessToken != "" {
 		existing["access_token"] = body.AccessToken
 		existing["created_at"] = time.Now().Unix()
+	}
+	if body.Fields != nil {
+		for k, v := range body.Fields {
+			if strVal, ok := v.(string); ok && strVal != "" {
+				existing[k] = strVal
+			}
+		}
 	}
 
 	var encryptedCreds string

@@ -68,6 +68,36 @@ func TransformSlackResponse(actionID string, rawResponse interface{}) interface{
 			}
 			return result
 		}
+	case "list_channels":
+		var listRes struct {
+			OK       bool `json:"ok"`
+			Channels []struct {
+				ID   string `json:"id"`
+				Name string `json:"name"`
+			} `json:"channels"`
+		}
+		if err := json.Unmarshal(data, &listRes); err == nil {
+			listBytes, err := json.Marshal(listRes.Channels)
+			if err == nil {
+				return string(listBytes)
+			}
+			return listRes.Channels
+		}
+	case "get_user_info":
+		var userRes struct {
+			OK   bool `json:"ok"`
+			User struct {
+				ID   string `json:"id"`
+				Name string `json:"name"`
+			} `json:"user"`
+		}
+		if err := json.Unmarshal(data, &userRes); err == nil {
+			userBytes, err := json.Marshal(userRes.User)
+			if err == nil {
+				return string(userBytes)
+			}
+			return userRes.User
+		}
 	}
 
 	return rawResponse

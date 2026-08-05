@@ -1,0 +1,108 @@
+{
+  "id": "hubspot",
+  "name": "HubSpot",
+  "description": "Manage CRM contacts, deals, and marketing automation in HubSpot.",
+  "icon": "/src/components/Icons/hubspot.svg",
+  "baseUrl": "https://api.hubapi.com",
+  "authType": "oauth2, apikey",
+  "fields": [
+    {
+      "key": "access_token",
+      "label": "Private App Access Token",
+      "type": "password",
+      "required": false,
+      "placeholder": "pat-na1-... or pat-eu1-..."
+    },
+    {
+      "key": "client_id",
+      "label": "Client ID",
+      "type": "text",
+      "required": false,
+      "placeholder": "Enter HubSpot OAuth Client ID"
+    },
+    {
+      "key": "client_secret",
+      "label": "Client Secret",
+      "type": "password",
+      "required": false,
+      "placeholder": "Enter HubSpot OAuth Client Secret"
+    }
+  ],
+  "oauthConfig": {
+    "authorizeUrl": "https://app.hubspot.com/oauth/authorize",
+    "tokenUrl": "https://api.hubapi.com/oauth/v1/token",
+    "defaultScopes": ["crm.objects.contacts.write", "crm.objects.deals.write"]
+  },
+  "actions": [
+    {
+      "id": "list_contacts",
+      "name": "List Contacts",
+      "description": "Retrieve contacts list from HubSpot CRM",
+      "path": "/crm/v3/objects/contacts",
+      "method": "GET",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "queryParams": ["limit", "properties"]
+    },
+    {
+      "id": "create_contact",
+      "name": "Create Contact",
+      "description": "Create a new contact in HubSpot CRM",
+      "path": "/crm/v3/objects/contacts",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "queryParams": [],
+      "payloadTemplate": "{\"properties\": {\"email\": \"{{email}}\", \"firstname\": \"{{first_name}}\", \"lastname\": \"{{last_name}}\"}}",
+      "fields": [
+        { "key": "email", "label": "Email Address", "required": true, "placeholder": "contact@example.com" },
+        { "key": "first_name", "label": "First Name", "required": false, "placeholder": "Jane" },
+        { "key": "last_name", "label": "Last Name", "required": false, "placeholder": "Smith" }
+      ]
+    },
+    {
+      "id": "search_contacts",
+      "name": "Search Contacts",
+      "description": "Search contacts using filter groups in HubSpot CRM",
+      "path": "/crm/v3/objects/contacts/search",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "queryParams": [],
+      "payloadTemplate": "{\"filterGroups\": {{filter_groups}}, \"query\": \"{{query}}\"}",
+      "fields": [
+        { "key": "query", "label": "Search Query", "required": true, "placeholder": "Search term" }
+      ]
+    },
+    {
+      "id": "list_deals",
+      "name": "List Deals",
+      "description": "Retrieve sales deals list from HubSpot CRM",
+      "path": "/crm/v3/objects/deals",
+      "method": "GET",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "queryParams": ["limit", "properties"]
+    },
+    {
+      "id": "create_deal",
+      "name": "Create Deal",
+      "description": "Create a new sales deal in HubSpot CRM",
+      "path": "/crm/v3/objects/deals",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "queryParams": [],
+      "payloadTemplate": "{\"properties\": {\"dealname\": \"{{deal_name}}\", \"amount\": \"{{amount}}\", \"pipeline\": \"default\", \"dealstage\": \"appointmentscheduled\"}}",
+      "fields": [
+        { "key": "deal_name", "label": "Deal Name", "required": true, "placeholder": "Enterprise License Deal" },
+        { "key": "amount", "label": "Deal Amount", "required": true, "placeholder": "5000" }
+      ]
+    }
+  ]
+}

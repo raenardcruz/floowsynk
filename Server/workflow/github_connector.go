@@ -88,6 +88,21 @@ func TransformGitHubResponse(actionID string, rawResponse interface{}) interface
 			}
 			return clean
 		}
+	case "get_user_profile":
+		var profile struct {
+			ID        int64  `json:"id"`
+			Login     string `json:"login"`
+			Name      string `json:"name"`
+			HTMLURL   string `json:"html_url"`
+			AvatarURL string `json:"avatar_url"`
+		}
+		if err := json.Unmarshal(data, &profile); err == nil {
+			profileBytes, err := json.Marshal(profile)
+			if err == nil {
+				return string(profileBytes)
+			}
+			return profile
+		}
 	}
 
 	return rawResponse

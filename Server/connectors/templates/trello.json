@@ -1,0 +1,94 @@
+{
+  "id": "trello",
+  "name": "Trello",
+  "description": "Create cards, manage boards, update lists, and track project tasks in Trello.",
+  "icon": "/src/components/Icons/trello.svg",
+  "baseUrl": "https://api.trello.com/1",
+  "authType": "oauth2",
+  "fields": [
+    {
+      "key": "api_key",
+      "label": "API Key",
+      "type": "text",
+      "required": true,
+      "placeholder": "Enter 32-character Trello API Key"
+    },
+    {
+      "key": "access_token",
+      "label": "User API Token",
+      "type": "password",
+      "required": true,
+      "placeholder": "Enter Trello User Token"
+    }
+  ],
+  "oauthConfig": {
+    "authorizeUrl": "https://trello.com/1/authorize",
+    "tokenUrl": "https://trello.com/1/token",
+    "defaultScopes": ["read", "write"]
+  },
+  "actions": [
+    {
+      "id": "create_card",
+      "name": "Create Card",
+      "description": "Create a new card on a Trello list",
+      "path": "/cards",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "queryParams": [],
+      "payloadTemplate": "{\"idList\": \"{{idList}}\", \"name\": \"{{name}}\", \"desc\": \"{{desc}}\"}",
+      "fields": [
+        { "key": "idList", "label": "List ID", "required": true, "placeholder": "Enter Trello List ID" },
+        { "key": "name", "label": "Card Name", "required": true, "placeholder": "Card title" },
+        { "key": "desc", "label": "Description", "required": false, "placeholder": "Card description" }
+      ]
+    },
+    {
+      "id": "get_board_cards",
+      "name": "Get Cards on Board",
+      "description": "Get all cards on a Trello board",
+      "path": "/boards/{{board_id}}/cards",
+      "method": "GET",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "queryParams": [],
+      "fields": [
+        { "key": "board_id", "label": "Board ID", "required": true, "placeholder": "Enter Trello Board ID" }
+      ]
+    },
+    {
+      "id": "update_card",
+      "name": "Update Card",
+      "description": "Update card attributes or list placement on Trello",
+      "path": "/cards/{{card_id}}",
+      "method": "PUT",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "queryParams": [],
+      "payloadTemplate": "{\"name\": \"{{name}}\", \"desc\": \"{{desc}}\", \"idList\": \"{{idList}}\"}",
+      "fields": [
+        { "key": "card_id", "label": "Card ID", "required": true, "placeholder": "Enter Trello Card ID" },
+        { "key": "name", "label": "Card Name", "required": false, "placeholder": "Updated title" },
+        { "key": "desc", "label": "Description", "required": false, "placeholder": "Updated description" },
+        { "key": "idList", "label": "Target List ID", "required": false, "placeholder": "New List ID" }
+      ]
+    },
+    {
+      "id": "get_board_lists",
+      "name": "Get Lists on Board",
+      "description": "Retrieve all lists for a specific Trello board",
+      "path": "/boards/{{board_id}}/lists",
+      "method": "GET",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "queryParams": [],
+      "fields": [
+        { "key": "board_id", "label": "Board ID", "required": true, "placeholder": "Enter Trello Board ID" }
+      ]
+    }
+  ]
+}

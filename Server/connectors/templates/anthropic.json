@@ -1,0 +1,38 @@
+{
+  "id": "anthropic",
+  "name": "Anthropic",
+  "description": "Generate completions and analyze content using Claude models.",
+  "icon": "/src/components/Icons/anthropic.svg",
+  "baseUrl": "https://api.anthropic.com/v1",
+  "authType": "api_key",
+  "fields": [
+    {
+      "key": "api_key",
+      "label": "API Key",
+      "type": "password",
+      "required": true,
+      "placeholder": "sk-ant-api03-..."
+    }
+  ],
+  "actions": [
+    {
+      "id": "create_message",
+      "name": "Create Message",
+      "description": "Send a prompt message to Claude model",
+      "path": "/messages",
+      "method": "POST",
+      "headers": {
+        "x-api-key": "{{api_key}}",
+        "anthropic-version": "2023-06-01",
+        "Content-Type": "application/json"
+      },
+      "queryParams": [],
+      "payloadTemplate": "{\"model\": \"{{model}}\", \"max_tokens\": {{max_tokens}}, \"messages\": [{\"role\": \"user\", \"content\": \"{{prompt}}\"}]}",
+      "fields": [
+        { "key": "prompt", "label": "Prompt Content", "required": true, "placeholder": "Enter prompt or question for Claude" },
+        { "key": "model", "label": "Claude Model", "required": false, "placeholder": "claude-3-5-sonnet-20241022" },
+        { "key": "max_tokens", "label": "Max Tokens", "required": false, "placeholder": "1000" }
+      ]
+    }
+  ]
+}

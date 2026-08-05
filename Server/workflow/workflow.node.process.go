@@ -528,12 +528,18 @@ func (wp *WorkflowProcessor) ConnectorNodeProcess(node *proto.Node) (string, err
 		})
 	}
 
-	// Add auth header
-	if conn.AuthType == "oauth2" {
-		accessToken, _ := creds["access_token"].(string)
+	// Add auth header if credentials contain token/key
+	tokenVal := ""
+	for _, key := range []string{"access_token", "api_key", "pat", "api_token", "token", "auth_token", "bot_token"} {
+		if val, ok := creds[key].(string); ok && val != "" {
+			tokenVal = val
+			break
+		}
+	}
+	if tokenVal != "" {
 		headers = append(headers, &proto.KeyValue{
 			Key:   "Authorization",
-			Value: "Bearer " + accessToken,
+			Value: "Bearer " + tokenVal,
 		})
 	}
 

@@ -24,15 +24,24 @@ type ActionTemplate struct {
 	PayloadTemplate string            `json:"payloadTemplate"`
 }
 
+type AuthField struct {
+	Key         string `json:"key"`
+	Label       string `json:"label"`
+	Type        string `json:"type"` // "text", "password"
+	Required    bool   `json:"required"`
+	Placeholder string `json:"placeholder"`
+}
+
 type ConnectorTemplate struct {
-	ID          string            `json:"id"`
-	Name        string            `json:"name"`
-	Description string            `json:"description"`
-	Icon        string            `json:"icon"`
-	BaseURL     string            `json:"baseUrl"`
-	AuthType    string            `json:"authType"` // "oauth2", "api_key", "basic"
-	OAuthConfig *OAuthConfig      `json:"oauthConfig,omitempty"`
-	Actions     []ActionTemplate  `json:"actions"`
+	ID          string           `json:"id"`
+	Name        string           `json:"name"`
+	Description string           `json:"description"`
+	Icon        string           `json:"icon"`
+	BaseURL     string           `json:"baseUrl"`
+	AuthType    string           `json:"authType"` // "oauth2", "api_key", "basic"
+	Fields      []AuthField      `json:"fields"`
+	OAuthConfig *OAuthConfig     `json:"oauthConfig,omitempty"`
+	Actions     []ActionTemplate `json:"actions"`
 }
 
 var templatesMap = make(map[string]ConnectorTemplate)

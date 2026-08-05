@@ -5,10 +5,33 @@
   "icon": "/src/components/Icons/slack.svg",
   "baseUrl": "https://slack.com/api",
   "authType": "oauth2",
+  "fields": [
+    {
+      "key": "client_id",
+      "label": "Client ID",
+      "type": "text",
+      "required": false,
+      "placeholder": "Enter Slack App Client ID"
+    },
+    {
+      "key": "client_secret",
+      "label": "Client Secret",
+      "type": "password",
+      "required": false,
+      "placeholder": "Enter Slack App Client Secret"
+    },
+    {
+      "key": "access_token",
+      "label": "Bot User OAuth Token",
+      "type": "password",
+      "required": false,
+      "placeholder": "xoxb-..."
+    }
+  ],
   "oauthConfig": {
     "authorizeUrl": "https://slack.com/oauth/v2/authorize",
     "tokenUrl": "https://slack.com/api/oauth.v2.access",
-    "defaultScopes": ["chat:write", "chat:write.public"]
+    "defaultScopes": ["chat:write", "chat:write.public", "channels:read", "users:read"]
   },
   "actions": [
     {
@@ -18,10 +41,39 @@
       "path": "/chat.postMessage",
       "method": "POST",
       "headers": {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json; charset=utf-8"
       },
       "queryParams": [],
-      "payloadTemplate": "{\"channel\": \"{{channel}}\", \"text\": \"{{message}}\"}"
+      "payloadTemplate": "{\"channel\": \"{{channel}}\", \"text\": \"{{message}}\"}",
+      "fields": [
+        { "key": "channel", "label": "Channel ID / Name", "required": true, "placeholder": "#general or C123456" },
+        { "key": "message", "label": "Message Text", "required": true, "placeholder": "Hello from FloowSynk!" }
+      ]
+    },
+    {
+      "id": "list_channels",
+      "name": "List Channels",
+      "description": "Retrieve list of channels in the Slack workspace",
+      "path": "/conversations.list",
+      "method": "GET",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "queryParams": ["types"]
+    },
+    {
+      "id": "get_user_info",
+      "name": "Get User Info",
+      "description": "Retrieve profile information for a Slack user",
+      "path": "/users.info",
+      "method": "GET",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "queryParams": ["user"],
+      "fields": [
+        { "key": "user", "label": "User ID", "required": true, "placeholder": "U12345678" }
+      ]
     }
   ]
 }

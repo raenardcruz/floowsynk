@@ -193,6 +193,22 @@ message ConnectorTemplateList {
     repeated ConnectorProtoTemplate templates = 1;
 }
 
+message ConnectorFieldProto {
+    string key = 1;
+    string label = 2;
+    string type = 3;
+    bool required = 4;
+    string placeholder = 5;
+}
+
+message ConnectorActionProto {
+    string id = 1;
+    string name = 2;
+    string description = 3;
+    string method = 4;
+    string path = 5;
+}
+
 message ConnectorProtoTemplate {
     string id = 1;
     string name = 2;
@@ -200,6 +216,8 @@ message ConnectorProtoTemplate {
     string icon = 4;
     string baseUrl = 5;
     string authType = 6;
+    repeated ConnectorFieldProto fields = 7;
+    repeated ConnectorActionProto actions = 8;
 }
 
 message ConnectionList {

@@ -1,0 +1,86 @@
+{
+  "id": "discord",
+  "name": "Discord",
+  "description": "Send channel messages and webhooks, manage Discord server notifications.",
+  "icon": "/src/components/Icons/discord.svg",
+  "baseUrl": "https://discord.com/api/v10",
+  "authType": "oauth2",
+  "fields": [
+    {
+      "key": "bot_token",
+      "label": "Bot Token",
+      "type": "password",
+      "required": false,
+      "placeholder": "Enter Discord Bot Secret Token"
+    },
+    {
+      "key": "client_id",
+      "label": "Client ID",
+      "type": "text",
+      "required": false,
+      "placeholder": "Enter Discord Application Client ID"
+    },
+    {
+      "key": "client_secret",
+      "label": "Client Secret",
+      "type": "password",
+      "required": false,
+      "placeholder": "Enter Discord Application Client Secret"
+    }
+  ],
+  "oauthConfig": {
+    "authorizeUrl": "https://discord.com/api/oauth2/authorize",
+    "tokenUrl": "https://discord.com/api/oauth2/token",
+    "defaultScopes": ["bot", "messages.read", "webhook.incoming"]
+  },
+  "actions": [
+    {
+      "id": "create_message",
+      "name": "Create Message",
+      "description": "Send a message to a Discord channel",
+      "path": "/channels/{{channel_id}}/messages",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "queryParams": [],
+      "payloadTemplate": "{\"content\": \"{{content}}\"}",
+      "fields": [
+        { "key": "channel_id", "label": "Channel ID", "required": true, "placeholder": "Enter Discord Channel ID" },
+        { "key": "content", "label": "Message Content", "required": true, "placeholder": "Enter message to send" }
+      ]
+    },
+    {
+      "id": "execute_webhook",
+      "name": "Execute Webhook",
+      "description": "Send a message via Discord Webhook URL",
+      "path": "/webhooks/{{webhook_id}}/{{webhook_token}}",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "queryParams": [],
+      "payloadTemplate": "{\"content\": \"{{content}}\", \"username\": \"{{username}}\"}",
+      "fields": [
+        { "key": "webhook_id", "label": "Webhook ID", "required": true, "placeholder": "Enter Webhook ID" },
+        { "key": "webhook_token", "label": "Webhook Token", "required": true, "placeholder": "Enter Webhook Token" },
+        { "key": "content", "label": "Message Content", "required": true, "placeholder": "Enter message text" },
+        { "key": "username", "label": "Bot Username Override", "required": false, "placeholder": "FloowSynk Bot" }
+      ]
+    },
+    {
+      "id": "list_messages",
+      "name": "List Messages",
+      "description": "Retrieve recent messages from a Discord channel",
+      "path": "/channels/{{channel_id}}/messages",
+      "method": "GET",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "queryParams": ["limit"],
+      "fields": [
+        { "key": "channel_id", "label": "Channel ID", "required": true, "placeholder": "Enter Discord Channel ID" }
+      ]
+    }
+  ]
+}

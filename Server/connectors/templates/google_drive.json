@@ -1,0 +1,99 @@
+{
+  "id": "google_drive",
+  "name": "Google Drive",
+  "description": "Upload files, manage folders, and share documents on Google Drive.",
+  "icon": "/src/components/Icons/google_drive.svg",
+  "baseUrl": "https://www.googleapis.com/drive/v3",
+  "authType": "oauth2",
+  "fields": [
+    {
+      "key": "client_id",
+      "label": "Client ID",
+      "type": "text",
+      "required": true,
+      "placeholder": "Enter Google Cloud OAuth Client ID"
+    },
+    {
+      "key": "client_secret",
+      "label": "Client Secret",
+      "type": "password",
+      "required": true,
+      "placeholder": "Enter Google Cloud OAuth Client Secret"
+    }
+  ],
+  "oauthConfig": {
+    "authorizeUrl": "https://accounts.google.com/o/oauth2/auth",
+    "tokenUrl": "https://oauth2.googleapis.com/token",
+    "defaultScopes": ["https://www.googleapis.com/auth/drive.file"]
+  },
+  "actions": [
+    {
+      "id": "upload_file",
+      "name": "Upload File",
+      "description": "Create a file metadata entry in Google Drive",
+      "path": "/files",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "queryParams": [],
+      "payloadTemplate": "{\"name\": \"{{name}}\", \"mimeType\": \"{{mime_type}}\"}",
+      "fields": [
+        { "key": "name", "label": "File Name", "required": true, "placeholder": "my-file.txt" },
+        { "key": "mime_type", "label": "MIME Type", "required": false, "placeholder": "text/plain" }
+      ]
+    },
+    {
+      "id": "create_folder",
+      "name": "Create Folder",
+      "description": "Create a new folder in Google Drive",
+      "path": "/files",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "queryParams": [],
+      "payloadTemplate": "{\"name\": \"{{name}}\", \"mimeType\": \"application/vnd.google-apps.folder\"}",
+      "fields": [
+        { "key": "name", "label": "Folder Name", "required": true, "placeholder": "New Folder" }
+      ]
+    },
+    {
+      "id": "download_file",
+      "name": "Download File",
+      "description": "Download file content from Google Drive",
+      "path": "/files/{{file_id}}",
+      "method": "GET",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "queryParams": ["alt"],
+      "fields": [
+        { "key": "file_id", "label": "File ID", "required": true, "placeholder": "Enter Google Drive File ID" }
+      ]
+    },
+    {
+      "id": "list_files",
+      "name": "List Files",
+      "description": "List non-trashed files in Google Drive",
+      "path": "/files",
+      "method": "GET",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "queryParams": ["q"]
+    },
+    {
+      "id": "delete_file",
+      "name": "Delete File",
+      "description": "Permanently delete a file from Google Drive",
+      "path": "/files/{{file_id}}",
+      "method": "DELETE",
+      "headers": {},
+      "queryParams": [],
+      "fields": [
+        { "key": "file_id", "label": "File ID", "required": true, "placeholder": "Enter Google Drive File ID" }
+      ]
+    }
+  ]
+}

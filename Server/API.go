@@ -217,6 +217,26 @@ func (s *WorkflowServer) ListConnectorTemplates(ctx context.Context, _ *emptypb.
 	templates := workflow.ListConnectorTemplates()
 	pbTemplates := make([]*wf.ConnectorProtoTemplate, 0, len(templates))
 	for _, t := range templates {
+		pbFields := make([]*wf.ConnectorFieldProto, 0, len(t.Fields))
+		for _, f := range t.Fields {
+			pbFields = append(pbFields, &wf.ConnectorFieldProto{
+				Key:         f.Key,
+				Label:       f.Label,
+				Type:        f.Type,
+				Required:    f.Required,
+				Placeholder: f.Placeholder,
+			})
+		}
+		pbActions := make([]*wf.ConnectorActionProto, 0, len(t.Actions))
+		for _, a := range t.Actions {
+			pbActions = append(pbActions, &wf.ConnectorActionProto{
+				Id:          a.ID,
+				Name:        a.Name,
+				Description: a.Description,
+				Method:      a.Method,
+				Path:        a.Path,
+			})
+		}
 		pbTemplates = append(pbTemplates, &wf.ConnectorProtoTemplate{
 			Id:          t.ID,
 			Name:        t.Name,
@@ -224,6 +244,8 @@ func (s *WorkflowServer) ListConnectorTemplates(ctx context.Context, _ *emptypb.
 			Icon:        t.Icon,
 			BaseUrl:     t.BaseURL,
 			AuthType:    t.AuthType,
+			Fields:      pbFields,
+			Actions:     pbActions,
 		})
 	}
 	return &wf.ConnectorTemplateList{Templates: pbTemplates}, nil

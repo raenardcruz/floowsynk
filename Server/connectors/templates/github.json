@@ -4,7 +4,30 @@
   "description": "Access GitHub repositories, create issues, manage pull requests and trigger workflows.",
   "icon": "/src/components/Icons/github.svg",
   "baseUrl": "https://api.github.com",
-  "authType": "oauth2",
+  "authType": "oauth2, pat",
+  "fields": [
+    {
+      "key": "client_id",
+      "label": "Client ID",
+      "type": "text",
+      "required": false,
+      "placeholder": "Enter GitHub OAuth App Client ID"
+    },
+    {
+      "key": "client_secret",
+      "label": "Client Secret",
+      "type": "password",
+      "required": false,
+      "placeholder": "Enter GitHub OAuth App Client Secret"
+    },
+    {
+      "key": "access_token",
+      "label": "Personal Access Token (PAT)",
+      "type": "password",
+      "required": false,
+      "placeholder": "ghp_... or github_pat_..."
+    }
+  ],
   "oauthConfig": {
     "authorizeUrl": "https://github.com/login/oauth/authorize",
     "tokenUrl": "https://github.com/login/oauth/access_token",
@@ -23,7 +46,13 @@
         "Content-Type": "application/json"
       },
       "queryParams": [],
-      "payloadTemplate": "{\"title\": \"{{title}}\", \"body\": \"{{body}}\"}"
+      "payloadTemplate": "{\"title\": \"{{title}}\", \"body\": \"{{body}}\"}",
+      "fields": [
+        { "key": "owner", "label": "Repository Owner", "required": true, "placeholder": "e.g. octocat" },
+        { "key": "repo", "label": "Repository Name", "required": true, "placeholder": "e.g. hello-world" },
+        { "key": "title", "label": "Issue Title", "required": true, "placeholder": "Bug in user login" },
+        { "key": "body", "label": "Issue Description", "required": false, "placeholder": "Details about the issue" }
+      ]
     },
     {
       "id": "trigger_workflow",
@@ -37,13 +66,31 @@
         "Content-Type": "application/json"
       },
       "queryParams": [],
-      "payloadTemplate": "{\"ref\": \"{{ref}}\", \"inputs\": {{inputs}}}"
+      "payloadTemplate": "{\"ref\": \"{{ref}}\", \"inputs\": {{inputs}}}",
+      "fields": [
+        { "key": "owner", "label": "Repository Owner", "required": true, "placeholder": "e.g. octocat" },
+        { "key": "repo", "label": "Repository Name", "required": true, "placeholder": "e.g. hello-world" },
+        { "key": "workflow_id", "label": "Workflow ID or File Name", "required": true, "placeholder": "main.yml" },
+        { "key": "ref", "label": "Git Ref / Branch", "required": true, "placeholder": "main" }
+      ]
     },
     {
       "id": "list_repos",
       "name": "List Repositories",
       "description": "List repositories for the authenticated user",
       "path": "/user/repos",
+      "method": "GET",
+      "headers": {
+        "Accept": "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28"
+      },
+      "queryParams": []
+    },
+    {
+      "id": "get_user_profile",
+      "name": "Get User Profile",
+      "description": "Retrieve profile information for the authenticated GitHub user",
+      "path": "/user",
       "method": "GET",
       "headers": {
         "Accept": "application/vnd.github+json",

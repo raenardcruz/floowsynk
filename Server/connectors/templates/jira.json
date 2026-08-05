@@ -1,0 +1,104 @@
+{
+  "id": "jira",
+  "name": "Jira",
+  "description": "Create Jira issues, update issue statuses, search projects, and track software bugs.",
+  "icon": "/src/components/Icons/jira.svg",
+  "baseUrl": "https://api.atlassian.com/ex/jira/{{cloud_id}}/rest/api/3",
+  "authType": "oauth2",
+  "fields": [
+    {
+      "key": "client_id",
+      "label": "Client ID",
+      "type": "text",
+      "required": false,
+      "placeholder": "Enter Atlassian OAuth Client ID"
+    },
+    {
+      "key": "client_secret",
+      "label": "Client Secret",
+      "type": "password",
+      "required": false,
+      "placeholder": "Enter Atlassian OAuth Client Secret"
+    },
+    {
+      "key": "access_token",
+      "label": "API Token",
+      "type": "password",
+      "required": false,
+      "placeholder": "Enter Atlassian API Token"
+    }
+  ],
+  "oauthConfig": {
+    "authorizeUrl": "https://auth.atlassian.com/authorize",
+    "tokenUrl": "https://auth.atlassian.com/oauth/token",
+    "defaultScopes": ["read:jira-work", "write:jira-work"]
+  },
+  "actions": [
+    {
+      "id": "search_issues",
+      "name": "Search Issues (JQL)",
+      "description": "Search issues using Jira Query Language (JQL)",
+      "path": "/search",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      "queryParams": [],
+      "payloadTemplate": "{\"jql\": \"{{jql}}\"}",
+      "fields": [
+        { "key": "jql", "label": "JQL Query", "required": true, "placeholder": "project = PROJ AND status = Open" }
+      ]
+    },
+    {
+      "id": "create_issue",
+      "name": "Create Issue",
+      "description": "Create a new issue in a Jira project",
+      "path": "/issue",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      "queryParams": [],
+      "payloadTemplate": "{\"fields\": {\"project\": {\"key\": \"{{project_key}}\"}, \"summary\": \"{{summary}}\", \"description\": \"{{description}}\", \"issuetype\": {\"name\": \"{{issue_type}}\"}}}",
+      "fields": [
+        { "key": "project_key", "label": "Project Key", "required": true, "placeholder": "e.g. PROJ" },
+        { "key": "summary", "label": "Issue Summary", "required": true, "placeholder": "Enter issue summary" },
+        { "key": "description", "label": "Description", "required": false, "placeholder": "Issue description" },
+        { "key": "issue_type", "label": "Issue Type", "required": false, "placeholder": "Task" }
+      ]
+    },
+    {
+      "id": "get_issue",
+      "name": "Get Issue Details",
+      "description": "Retrieve detailed information for a specific Jira issue",
+      "path": "/issue/{{issue_key}}",
+      "method": "GET",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "queryParams": [],
+      "fields": [
+        { "key": "issue_key", "label": "Issue Key", "required": true, "placeholder": "PROJ-123" }
+      ]
+    },
+    {
+      "id": "update_issue",
+      "name": "Update Issue",
+      "description": "Update details or fields of a Jira issue",
+      "path": "/issue/{{issue_key}}",
+      "method": "PUT",
+      "headers": {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      "queryParams": [],
+      "payloadTemplate": "{\"fields\": {{fields}} }",
+      "fields": [
+        { "key": "issue_key", "label": "Issue Key", "required": true, "placeholder": "PROJ-123" },
+        { "key": "fields", "label": "Fields (JSON)", "required": true, "placeholder": "{\"summary\": \"Updated summary\"}" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,92 @@
+{
+  "id": "airtable",
+  "name": "Airtable",
+  "description": "Read, create, and update records in Airtable bases.",
+  "icon": "/src/components/Icons/airtable.svg",
+  "baseUrl": "https://api.airtable.com/v0",
+  "authType": "bearer",
+  "fields": [
+    {
+      "key": "access_token",
+      "label": "Personal Access Token",
+      "type": "password",
+      "required": true,
+      "placeholder": "pat..."
+    },
+    {
+      "key": "base_id",
+      "label": "Base ID",
+      "type": "text",
+      "required": true,
+      "placeholder": "appXXXXXXXXXXXXXX"
+    }
+  ],
+  "actions": [
+    {
+      "id": "list_records",
+      "name": "List Records",
+      "description": "List records in a table",
+      "path": "/{{base_id}}/{{table_name}}",
+      "method": "GET",
+      "headers": {
+        "Authorization": "Bearer {{access_token}}"
+      },
+      "queryParams": [],
+      "payloadTemplate": "",
+      "fields": [
+        { "key": "table_name", "label": "Table Name", "required": true, "placeholder": "e.g. Contacts or Tasks" }
+      ]
+    },
+    {
+      "id": "create_record",
+      "name": "Create Record",
+      "description": "Create a record in a table",
+      "path": "/{{base_id}}/{{table_name}}",
+      "method": "POST",
+      "headers": {
+        "Authorization": "Bearer {{access_token}}",
+        "Content-Type": "application/json"
+      },
+      "queryParams": [],
+      "payloadTemplate": "{\"fields\": {{fields_json}}}",
+      "fields": [
+        { "key": "table_name", "label": "Table Name", "required": true, "placeholder": "e.g. Contacts or Tasks" },
+        { "key": "fields_json", "label": "Record Fields (JSON)", "required": true, "placeholder": "{\"Name\": \"Jane Doe\", \"Status\": \"Active\"}" }
+      ]
+    },
+    {
+      "id": "update_record",
+      "name": "Update Record",
+      "description": "Update fields of an existing record",
+      "path": "/{{base_id}}/{{table_name}}/{{record_id}}",
+      "method": "PATCH",
+      "headers": {
+        "Authorization": "Bearer {{access_token}}",
+        "Content-Type": "application/json"
+      },
+      "queryParams": [],
+      "payloadTemplate": "{\"fields\": {{fields_json}}}",
+      "fields": [
+        { "key": "table_name", "label": "Table Name", "required": true, "placeholder": "e.g. Contacts or Tasks" },
+        { "key": "record_id", "label": "Record ID", "required": true, "placeholder": "recXXXXXXXXXXXXXX" },
+        { "key": "fields_json", "label": "Fields to Update (JSON)", "required": true, "placeholder": "{\"Status\": \"Completed\"}" }
+      ]
+    },
+    {
+      "id": "delete_record",
+      "name": "Delete Record",
+      "description": "Delete a record from a table",
+      "path": "/{{base_id}}/{{table_name}}/{{record_id}}",
+      "method": "DELETE",
+      "headers": {
+        "Authorization": "Bearer {{access_token}}"
+      },
+      "queryParams": [],
+      "payloadTemplate": "",
+      "fields": [
+        { "key": "table_name", "label": "Table Name", "required": true, "placeholder": "e.g. Contacts or Tasks" },
+        { "key": "record_id", "label": "Record ID", "required": true, "placeholder": "recXXXXXXXXXXXXXX" }
+      ]
+    }
+  ]
+}
