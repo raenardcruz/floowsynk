@@ -29,6 +29,7 @@ const (
 	replaceType     = "replace"
 	findAllType     = "findAll"
 	subprocessType  = "subprocess"
+	responseType    = "response"
 )
 
 const (
@@ -80,6 +81,7 @@ func (wp *WorkflowProcessor) Process(nodeId string) (err error) {
 		replaceType:     wp.ReplaceNodeProcess,
 		findAllType:     wp.FindAllNodeProcess,
 		subprocessType:  wp.SubProcessNodeProcess,
+		responseType:    wp.ResponseNodeProcess,
 	}
 
 	processFunc, ok := nodeProcessors[node.Nodetype]

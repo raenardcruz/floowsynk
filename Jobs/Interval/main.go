@@ -21,16 +21,18 @@ type IntervalJob struct{}
 var DBCon *db.DatabaseConnection
 
 func (job *IntervalJob) ProcessIntervalWorkflows() {
+	ticker := time.NewTicker(5 * time.Second)
+	defer ticker.Stop()
 	for {
 		workflows, err := DBCon.GetIntervalWorkflows()
 		if err != nil {
 			log.Printf("Error fetching workflows from database: %v", err)
-			continue
+		} else if workflows != nil {
+			for _, workflow := range workflows.Workflows {
+				go job.processNode(workflow)
+			}
 		}
-
-		for _, workflow := range workflows.Workflows {
-			go job.processNode(workflow)
-		}
+		<-ticker.C
 	}
 }
 
@@ -62,19 +64,13 @@ func (job *IntervalJob) processNode(workflow *wf.Workflow) {
 	}
 
 	cacheKey := "workflow:interval:" + workflow.Id
-	exists, err := db.CacheExists(ctx, cacheKey)
+	set, err := db.SetCacheNX(ctx, cacheKey, "running", duration)
 	if err != nil {
-		log.Printf("Error checking Redis cache for node %v: %v", node.Id, err)
+		log.Printf("Error setting Redis cache lock for workflow %v: %v", workflow.Id, err)
 		return
 	}
 
-	if exists {
-		return
-	}
-
-	err = db.SetCache(ctx, cacheKey, "running", duration)
-	if err != nil {
-		log.Printf("Error setting Redis cache for workflow %v: %v", workflow.Id, err)
+	if !set {
 		return
 	}
 

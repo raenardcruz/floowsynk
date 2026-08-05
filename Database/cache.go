@@ -88,6 +88,21 @@ func ClearCache(ctx context.Context) error {
 	return nil
 }
 
+func SetCacheNX(ctx context.Context, key string, data interface{}, expiration time.Duration) (bool, error) {
+	if !UseCache {
+		return true, nil
+	}
+	jsonData, err := json.Marshal(data)
+	if err != nil {
+		return false, fmt.Errorf("failed to marshal data to JSON: %w", err)
+	}
+	set, err := RedisClient.SetNX(ctx, key, jsonData, expiration).Result()
+	if err != nil {
+		return false, fmt.Errorf("failed to setnx cache key %s: %w", key, err)
+	}
+	return set, nil
+}
+
 func CacheExists(ctx context.Context, key string) (bool, error) {
 	if !UseCache {
 		return false, nil

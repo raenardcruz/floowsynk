@@ -98,6 +98,34 @@ func getEnvAsInt(name string, defaultVal int) int {
 
 func ConnectToDatabase() (*DatabaseConnection, error) {
 	log.Println("Connecting to database...")
+
+	// Ensure the database exists by connecting to the default 'postgres' database first
+	defaultConnStr := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=postgres sslmode=disable",
+		AppConfig.DB_HOST,
+		AppConfig.DB_PORT,
+		AppConfig.DB_USER,
+		AppConfig.DB_PASSWORD)
+
+	tempDb, err := gorm.Open(postgres.Open(defaultConnStr), &gorm.Config{})
+	if err == nil {
+		var exists bool
+		err = tempDb.Raw("SELECT EXISTS(SELECT 1 FROM pg_database WHERE datname = ?)", AppConfig.DB_NAME).Scan(&exists).Error
+		if err == nil && !exists {
+			log.Printf("Database %s does not exist, creating it...", AppConfig.DB_NAME)
+			createDbSQL := fmt.Sprintf("CREATE DATABASE %s", AppConfig.DB_NAME)
+			if err := tempDb.Exec(createDbSQL).Error; err != nil {
+				log.Printf("Warning: Failed to create database %s: %v", AppConfig.DB_NAME, err)
+			} else {
+				log.Printf("Database %s created successfully", AppConfig.DB_NAME)
+			}
+		}
+		if sqlDb, err := tempDb.DB(); err == nil {
+			sqlDb.Close()
+		}
+	} else {
+		log.Printf("Warning: Failed to connect to default database to check/create %s: %v", AppConfig.DB_NAME, err)
+	}
+
 	connStr := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		AppConfig.DB_HOST,
 		AppConfig.DB_PORT,

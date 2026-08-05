@@ -341,9 +341,12 @@ func (wp *WorkflowProcessor) FindAllNodeProcess(node *proto.Node) (string, error
 
 func (wp *WorkflowProcessor) SubProcessNodeProcess(node *proto.Node) (string, error) {
 	subProcessId := node.Data.SubProcessId
-	defer func() {
-		wp.UpdateStatus(node, proto.NodeStatus_COMPLETED, nil, fmt.Sprintf("SubProcess %s completed successfully", *subProcessId), true)
-	}()
+	if wp.Depth > 10 {
+		err := fmt.Errorf("subprocess execution depth limit exceeded (max 10)")
+		wp.UpdateStatus(node, proto.NodeStatus_FAILED, nil, err.Error(), true)
+		return "", err
+	}
+
 	workflow, err := wp.DBcon.GetWorkflow(*subProcessId)
 	if err != nil {
 		wp.UpdateStatus(node, proto.NodeStatus_FAILED, nil, fmt.Sprintf("Error retrieving SubProcess %s: %v", *subProcessId, err), true)
@@ -354,11 +357,39 @@ func (wp *WorkflowProcessor) SubProcessNodeProcess(node *proto.Node) (string, er
 		Workflow:         workflow,
 		ProcessVariables: wp.ProcessVariables,
 		DBcon:            wp.DBcon,
+		Depth:            wp.Depth + 1,
 	}
-	wp.UpdateStatus(node, proto.NodeStatus_INFO, nil, fmt.Sprintf("SubProcess %s is running", *subProcessId), true)
-	subProcessor.Process("0")
+	wp.UpdateStatus(node, proto.NodeStatus_INFO, nil, fmt.Sprintf("SubProcess %s is running (depth %d)", *subProcessId, subProcessor.Depth), true)
+	
+	if err := subProcessor.Process("0"); err != nil {
+		wp.UpdateStatus(node, proto.NodeStatus_FAILED, nil, fmt.Sprintf("SubProcess %s failed: %v", *subProcessId, err), true)
+		return "", err
+	}
+
 	for key, value := range subProcessor.ProcessVariables {
 		wp.ProcessVariables[key] = value
 	}
+	wp.UpdateStatus(node, proto.NodeStatus_COMPLETED, nil, fmt.Sprintf("SubProcess %s completed successfully", *subProcessId), true)
 	return "", nil
 }
+
+func (wp *WorkflowProcessor) ResponseNodeProcess(node *proto.Node) (string, error) {
+	text := ""
+	if node.Data != nil && node.Data.Message != nil {
+		text = wp.populateTemplate(*node.Data.Message, nil)
+	}
+	defer func() {
+		replayNode := CopyNode(node)
+		replayNode.Data.Message = &text
+		wp.UpdateStatus(&replayNode, proto.NodeStatus_COMPLETED, text, "Response sent: "+text, true)
+	}()
+	if wp.ResponseChan != nil {
+		select {
+		case wp.ResponseChan <- text:
+		default:
+			// avoid blocking if channel is already full or closed
+		}
+	}
+	return "", nil
+}
+

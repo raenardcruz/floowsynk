@@ -105,12 +105,7 @@ func Login(userName string, password string) (string, error) {
 		return "", fmt.Errorf("login not allowed for service users")
 	}
 
-	ePassword, err := crypto.EncryptPassword(password)
-	if err != nil {
-		return "", fmt.Errorf("error encrypting password")
-	}
-
-	if dbUser.Password == ePassword {
+	if crypto.VerifyPassword(dbUser.Password, password) {
 		token := generateToken(dbUser.ID, userName, dbUser.Role, time.Now().Add(time.Minute*60).UTC().Unix())
 		return token, nil
 	}

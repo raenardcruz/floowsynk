@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/signal"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/IBM/sarama"
@@ -21,6 +22,7 @@ const (
 )
 
 var replayData []db.ReplayData
+var replayMutex sync.Mutex
 var DBCon *db.DatabaseConnection
 
 type ConsumerGroupHandler struct{}
@@ -38,7 +40,9 @@ func (ConsumerGroupHandler) ConsumeClaim(session sarama.ConsumerGroupSession, cl
 			log.Printf("Error unmarshalling message: %v", err)
 			continue
 		}
+		replayMutex.Lock()
 		replayData = append(replayData, rd)
+		replayMutex.Unlock()
 		session.MarkMessage(message, "")
 	}
 	return nil
@@ -76,10 +80,17 @@ func main() {
 	go func() {
 		for {
 			<-timer.C
+			replayMutex.Lock()
+			var batch []db.ReplayData
 			if len(replayData) > 0 {
-				log.Printf("Flushing %d replay data to the database", len(replayData))
-				DBCon.CreateBatchReplayData(replayData)
-				replayData = []db.ReplayData{}
+				batch = replayData
+				replayData = nil
+			}
+			replayMutex.Unlock()
+
+			if len(batch) > 0 {
+				log.Printf("Flushing %d replay data to the database", len(batch))
+				DBCon.CreateBatchReplayData(batch)
 			}
 			timer.Reset(bufferTime)
 		}

@@ -24,6 +24,8 @@ type WorkflowProcessor struct {
 	DBcon            db.DatabaseConnection
 	Producer         *sarama.SyncProducer
 	Step             int32
+	Depth            int32
+	ResponseChan     chan string
 }
 
 type WorkflowHistory struct {

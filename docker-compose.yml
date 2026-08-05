@@ -1,8 +1,3 @@
-include:
-  - path: docker/postgres.yml
-  - path: docker/redis.yml
-  - path: docker/kafka.yml
-
 services:
   server:
     build:
@@ -14,15 +9,6 @@ services:
       - "${SERVER_PLAIN_GRPC_PORT:-50051}:${SERVER_PLAIN_GRPC_PORT:-50051}"
     env_file:
       - ./Server/.env
-    environment:
-      - DB_HOST=db
-      - KAFKA_BROKERS=kafka:29092
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-    depends_on:
-      - redis
-      - db
-      - kafka
 
   app:
     build:

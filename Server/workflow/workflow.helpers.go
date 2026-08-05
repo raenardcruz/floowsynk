@@ -198,13 +198,14 @@ func (wp *WorkflowProcessor) makeRequest(url string, method string, headers []*p
 	}
 
 	resp, err := client.Do(req)
-	wp.setVariable("api.status", resp.StatusCode)
-	wp.setVariable("api.headers", resp.Header)
-	wp.setVariable("api.length", resp.ContentLength)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
+
+	wp.setVariable("api.status", resp.StatusCode)
+	wp.setVariable("api.headers", resp.Header)
+	wp.setVariable("api.length", resp.ContentLength)
 
 	err = json.NewDecoder(resp.Body).Decode(&body)
 	if err != nil {

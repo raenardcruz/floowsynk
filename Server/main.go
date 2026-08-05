@@ -160,6 +160,27 @@ func runWebhookHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Validate webhook secret if configured in the webhook trigger node
+	var webhookNode *wf.Node
+	for _, node := range workflowObj.Nodes {
+		if node.Nodetype == "webhook" {
+			webhookNode = node
+			break
+		}
+	}
+	if webhookNode != nil && webhookNode.Data != nil && webhookNode.Data.Value != nil && *webhookNode.Data.Value != "" {
+		expectedSecret := *webhookNode.Data.Value
+		clientSecret := r.Header.Get("X-Webhook-Secret")
+		if clientSecret == "" {
+			clientSecret = r.URL.Query().Get("secret")
+		}
+		if clientSecret != expectedSecret {
+			http.Error(w, "Unauthorized: Invalid or missing Webhook Secret", http.StatusUnauthorized)
+			return
+		}
+	}
+
+	responseChan := make(chan string, 1)
 	wp := workflow.WorkflowProcessor{
 		ID:               uuid.NewString(),
 		DBcon:            *DBCon,
@@ -167,21 +188,35 @@ func runWebhookHandler(w http.ResponseWriter, r *http.Request) {
 		Stream:           nil,
 		ProcessVariables: make(map[string]interface{}),
 		Producer:         producer,
+		ResponseChan:     responseChan,
 	}
 
-	if err := wp.StartWorkflow(); err != nil {
-		http.Error(w, "Failed to start workflow: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
+	doneChan := make(chan error, 1)
+	go func() {
+		err := wp.StartWorkflow()
+		doneChan <- err
+	}()
 
-	response := map[string]interface{}{
-		"message":   "Workflow started successfully",
-		"variables": wp.ProcessVariables,
-	}
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	if err := json.NewEncoder(w).Encode(response); err != nil {
-		http.Error(w, "Failed to encode response as JSON", http.StatusInternalServerError)
+	select {
+	case responseText := <-responseChan:
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(responseText))
+	case err := <-doneChan:
+		if err != nil {
+			http.Error(w, "Failed to start workflow: "+err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		response := map[string]interface{}{
+			"message":   "Workflow completed successfully",
+			"variables": wp.ProcessVariables,
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		if err := json.NewEncoder(w).Encode(response); err != nil {
+			http.Error(w, "Failed to encode response as JSON", http.StatusInternalServerError)
+		}
 	}
 }
 
