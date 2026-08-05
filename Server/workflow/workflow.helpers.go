@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"html"
 	"html/template"
+	"io/ioutil"
 	"net/http"
 	"regexp"
 	"strings"
@@ -197,6 +198,10 @@ func (wp *WorkflowProcessor) makeRequest(url string, method string, headers []*p
 		req.Header.Add(header.Key, header.Value)
 	}
 
+	if req.Header.Get("User-Agent") == "" {
+		req.Header.Set("User-Agent", "Floowsynk-App")
+	}
+
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
@@ -207,13 +212,20 @@ func (wp *WorkflowProcessor) makeRequest(url string, method string, headers []*p
 	wp.setVariable("api.headers", resp.Header)
 	wp.setVariable("api.length", resp.ContentLength)
 
-	err = json.NewDecoder(resp.Body).Decode(&body)
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
-	wp.setVariable("api.body", body)
 
-	return body, nil
+	var jsonBody interface{}
+	if err := json.Unmarshal(bodyBytes, &jsonBody); err == nil {
+		wp.setVariable("api.body", jsonBody)
+		return jsonBody, nil
+	}
+
+	strBody := string(bodyBytes)
+	wp.setVariable("api.body", strBody)
+	return strBody, nil
 }
 
 func RegexReplaceAll(text, pattern, replaceText string) string {

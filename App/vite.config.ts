@@ -6,6 +6,17 @@ import vue from '@vitejs/plugin-vue'
 export default defineConfig({
   plugins: [
     vue(),
+    {
+      name: 'ignore-monaco-sourcemaps',
+      transform(code, id) {
+        if (id.includes('monaco-editor')) {
+          return {
+            code: code.replace(/\/\/# sourceMappingURL=.*/g, ''),
+            map: null
+          }
+        }
+      }
+    }
   ],
   // esbuild specific optimizations
   esbuild: {

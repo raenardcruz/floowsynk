@@ -974,6 +974,136 @@ export namespace Handle {
   };
 }
 
+export class ConnectorTemplateList extends jspb.Message {
+  getTemplatesList(): Array<ConnectorProtoTemplate>;
+  setTemplatesList(value: Array<ConnectorProtoTemplate>): ConnectorTemplateList;
+  clearTemplatesList(): ConnectorTemplateList;
+  addTemplates(value?: ConnectorProtoTemplate, index?: number): ConnectorProtoTemplate;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ConnectorTemplateList.AsObject;
+  static toObject(includeInstance: boolean, msg: ConnectorTemplateList): ConnectorTemplateList.AsObject;
+  static serializeBinaryToWriter(message: ConnectorTemplateList, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ConnectorTemplateList;
+  static deserializeBinaryFromReader(message: ConnectorTemplateList, reader: jspb.BinaryReader): ConnectorTemplateList;
+}
+
+export namespace ConnectorTemplateList {
+  export type AsObject = {
+    templatesList: Array<ConnectorProtoTemplate.AsObject>;
+  };
+}
+
+export class ConnectorProtoTemplate extends jspb.Message {
+  getId(): string;
+  setId(value: string): ConnectorProtoTemplate;
+
+  getName(): string;
+  setName(value: string): ConnectorProtoTemplate;
+
+  getDescription(): string;
+  setDescription(value: string): ConnectorProtoTemplate;
+
+  getIcon(): string;
+  setIcon(value: string): ConnectorProtoTemplate;
+
+  getBaseurl(): string;
+  setBaseurl(value: string): ConnectorProtoTemplate;
+
+  getAuthtype(): string;
+  setAuthtype(value: string): ConnectorProtoTemplate;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ConnectorProtoTemplate.AsObject;
+  static toObject(includeInstance: boolean, msg: ConnectorProtoTemplate): ConnectorProtoTemplate.AsObject;
+  static serializeBinaryToWriter(message: ConnectorProtoTemplate, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ConnectorProtoTemplate;
+  static deserializeBinaryFromReader(message: ConnectorProtoTemplate, reader: jspb.BinaryReader): ConnectorProtoTemplate;
+}
+
+export namespace ConnectorProtoTemplate {
+  export type AsObject = {
+    id: string;
+    name: string;
+    description: string;
+    icon: string;
+    baseurl: string;
+    authtype: string;
+  };
+}
+
+export class ConnectionList extends jspb.Message {
+  getConnectionsList(): Array<ConnectionProto>;
+  setConnectionsList(value: Array<ConnectionProto>): ConnectionList;
+  clearConnectionsList(): ConnectionList;
+  addConnections(value?: ConnectionProto, index?: number): ConnectionProto;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ConnectionList.AsObject;
+  static toObject(includeInstance: boolean, msg: ConnectionList): ConnectionList.AsObject;
+  static serializeBinaryToWriter(message: ConnectionList, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ConnectionList;
+  static deserializeBinaryFromReader(message: ConnectionList, reader: jspb.BinaryReader): ConnectionList;
+}
+
+export namespace ConnectionList {
+  export type AsObject = {
+    connectionsList: Array<ConnectionProto.AsObject>;
+  };
+}
+
+export class ConnectionProto extends jspb.Message {
+  getId(): string;
+  setId(value: string): ConnectionProto;
+
+  getName(): string;
+  setName(value: string): ConnectionProto;
+
+  getConnectorid(): string;
+  setConnectorid(value: string): ConnectionProto;
+
+  getAuthtype(): string;
+  setAuthtype(value: string): ConnectionProto;
+
+  getCreatedat(): string;
+  setCreatedat(value: string): ConnectionProto;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ConnectionProto.AsObject;
+  static toObject(includeInstance: boolean, msg: ConnectionProto): ConnectionProto.AsObject;
+  static serializeBinaryToWriter(message: ConnectionProto, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ConnectionProto;
+  static deserializeBinaryFromReader(message: ConnectionProto, reader: jspb.BinaryReader): ConnectionProto;
+}
+
+export namespace ConnectionProto {
+  export type AsObject = {
+    id: string;
+    name: string;
+    connectorid: string;
+    authtype: string;
+    createdat: string;
+  };
+}
+
+export class DeleteConnectionRequest extends jspb.Message {
+  getId(): string;
+  setId(value: string): DeleteConnectionRequest;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): DeleteConnectionRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: DeleteConnectionRequest): DeleteConnectionRequest.AsObject;
+  static serializeBinaryToWriter(message: DeleteConnectionRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): DeleteConnectionRequest;
+  static deserializeBinaryFromReader(message: DeleteConnectionRequest, reader: jspb.BinaryReader): DeleteConnectionRequest;
+}
+
+export namespace DeleteConnectionRequest {
+  export type AsObject = {
+    id: string;
+  };
+}
+
 export enum ArrayDataType {
   STRING = 0,
   INT = 1,

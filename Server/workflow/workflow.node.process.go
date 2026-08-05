@@ -4,9 +4,16 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
+	"net/http"
+	"net/url"
+	"os"
 	"regexp"
+	"strings"
+	"time"
 
 	proto "github.com/raenardcruz/floowsynk/CodeGen/go/workflow"
+	"github.com/raenardcruz/floowsynk/Server/crypto"
 	m "github.com/raenardcruz/floowsynk/Server/matheval"
 )
 
@@ -392,4 +399,187 @@ func (wp *WorkflowProcessor) ResponseNodeProcess(node *proto.Node) (string, erro
 	}
 	return "", nil
 }
+
+func (wp *WorkflowProcessor) ConnectorNodeProcess(node *proto.Node) (string, error) {
+	if node.Data == nil || node.Data.Listvar == nil || node.Data.Type == nil || node.Data.Variable == nil {
+		return "", errors.New("connector node missing required parameters (connectionId, actionId, output variable)")
+	}
+
+	connectionID := *node.Data.Listvar
+	actionID := *node.Data.Type
+	outputVar := *node.Data.Variable
+	payloadInputStr := ""
+	if node.Data.Payload != nil {
+		payloadInputStr = wp.populateTemplate(*node.Data.Payload, nil)
+	}
+
+	// 1. Fetch connection
+	conn, err := wp.DBcon.GetConnection(connectionID)
+	if err != nil {
+		return "", fmt.Errorf("connection %s not found: %v", connectionID, err)
+	}
+
+	// 2. Fetch template
+	template, ok := GetConnectorTemplate(conn.ConnectorID)
+	if !ok {
+		return "", fmt.Errorf("connector template %s not found", conn.ConnectorID)
+	}
+
+	// Find the action template
+	var action ActionTemplate
+	found := false
+	for _, a := range template.Actions {
+		if a.ID == actionID {
+			action = a
+			found = true
+			break
+		}
+	}
+	if !found {
+		return "", fmt.Errorf("action %s not found in connector %s", actionID, conn.ConnectorID)
+	}
+
+	// 3. Decrypt credentials
+	var creds map[string]interface{}
+	decryptedCreds, err := crypto.Decrypt(conn.Credentials)
+	if err != nil {
+		return "", fmt.Errorf("failed to decrypt connection credentials: %v", err)
+	}
+	if err := json.Unmarshal([]byte(decryptedCreds), &creds); err != nil {
+		return "", fmt.Errorf("failed to parse connection credentials: %v", err)
+	}
+
+	// OAuth2 validation and token refresh logic
+	if conn.AuthType == "oauth2" {
+		createdAtVal, _ := creds["created_at"].(float64)
+		expiresInVal, _ := creds["expires_in"].(float64)
+		if createdAtVal > 0 && expiresInVal > 0 {
+			expiryTime := time.Unix(int64(createdAtVal)+int64(expiresInVal), 0)
+			if time.Now().After(expiryTime) {
+				refreshToken, _ := creds["refresh_token"].(string)
+				if refreshToken != "" {
+					clientID, clientSecret := getConnectorCredentials(conn.ConnectorID)
+					data := url.Values{}
+					data.Set("client_id", clientID)
+					data.Set("client_secret", clientSecret)
+					data.Set("refresh_token", refreshToken)
+					data.Set("grant_type", "refresh_token")
+
+					resp, err := http.PostForm(template.OAuthConfig.TokenURL, data)
+					if err == nil && resp.StatusCode == http.StatusOK {
+						defer resp.Body.Close()
+						bodyBytes, _ := ioutil.ReadAll(resp.Body)
+						var parsed map[string]interface{}
+						if json.Unmarshal(bodyBytes, &parsed) == nil {
+							parsed["created_at"] = time.Now().Unix()
+							if _, ok := parsed["refresh_token"]; !ok {
+								parsed["refresh_token"] = refreshToken
+							}
+							creds = parsed
+							bytes, _ := json.Marshal(creds)
+							encrypted, _ := crypto.Encrypt(string(bytes))
+							conn.Credentials = encrypted
+							conn.UpdatedAt = time.Now()
+							wp.DBcon.SaveConnection(&conn)
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// 4. Resolve template variables in payload/path
+	var inputs map[string]interface{}
+	if payloadInputStr != "" {
+		json.Unmarshal([]byte(payloadInputStr), &inputs)
+	}
+
+	path := action.Path
+	payloadStr := action.PayloadTemplate
+
+	for k, v := range inputs {
+		var valStr string
+		switch val := v.(type) {
+		case string:
+			valStr = val
+		case map[string]interface{}, []interface{}, []map[string]interface{}:
+			bytes, err := json.Marshal(val)
+			if err == nil {
+				valStr = string(bytes)
+			} else {
+				valStr = fmt.Sprintf("%v", v)
+			}
+		default:
+			valStr = fmt.Sprintf("%v", v)
+		}
+		path = strings.ReplaceAll(path, "{{"+k+"}}", valStr)
+		payloadStr = strings.ReplaceAll(payloadStr, "{{"+k+"}}", valStr)
+	}
+
+	urlStr := template.BaseURL + path
+	method := action.Method
+
+	// Prepare request headers
+	headers := make([]*proto.KeyValue, 0)
+	for k, v := range action.Headers {
+		headers = append(headers, &proto.KeyValue{
+			Key:   k,
+			Value: v,
+		})
+	}
+
+	// Add auth header
+	if conn.AuthType == "oauth2" {
+		accessToken, _ := creds["access_token"].(string)
+		headers = append(headers, &proto.KeyValue{
+			Key:   "Authorization",
+			Value: "Bearer " + accessToken,
+		})
+	}
+
+	var payloadObj interface{}
+	if payloadStr != "" {
+		json.Unmarshal([]byte(payloadStr), &payloadObj)
+	}
+
+	response, err := wp.makeRequest(urlStr, method, headers, payloadObj)
+	replayNode := CopyNode(node)
+	replayNode.Data.Url = &urlStr
+	replayNode.Data.Payload = &payloadStr
+
+	if err != nil {
+		wp.UpdateStatus(&replayNode, proto.NodeStatus_FAILED, nil, fmt.Sprintf("Error processing Connector %s: %v", urlStr, err), true)
+		return "", err
+	}
+
+	transformedResponse := TransformConnectorResponse(conn.ConnectorID, actionID, response)
+
+	var finalResponse interface{} = transformedResponse
+	switch r := transformedResponse.(type) {
+	case map[string]interface{}, []interface{}, []map[string]interface{}:
+		if bytes, err := json.Marshal(r); err == nil {
+			finalResponse = string(bytes)
+		}
+	}
+
+	defer func() {
+		wp.UpdateStatus(&replayNode, proto.NodeStatus_COMPLETED, finalResponse, fmt.Sprintf("Connector action %s executed successfully", actionID), true)
+	}()
+	wp.setVariable(outputVar, finalResponse)
+	return "", nil
+}
+
+func getConnectorCredentials(connectorID string) (string, string) {
+	prefix := strings.ToUpper(connectorID)
+	clientID := os.Getenv(prefix + "_CLIENT_ID")
+	clientSecret := os.Getenv(prefix + "_CLIENT_SECRET")
+	if clientID == "" {
+		clientID = "mock_client_id"
+	}
+	if clientSecret == "" {
+		clientSecret = "mock_client_secret"
+	}
+	return clientID, clientSecret
+}
+
 

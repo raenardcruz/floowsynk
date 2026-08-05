@@ -189,6 +189,35 @@ message Handle {
     string position = 8;
 }
 
+message ConnectorTemplateList {
+    repeated ConnectorProtoTemplate templates = 1;
+}
+
+message ConnectorProtoTemplate {
+    string id = 1;
+    string name = 2;
+    string description = 3;
+    string icon = 4;
+    string baseUrl = 5;
+    string authType = 6;
+}
+
+message ConnectionList {
+    repeated ConnectionProto connections = 1;
+}
+
+message ConnectionProto {
+    string id = 1;
+    string name = 2;
+    string connectorId = 3;
+    string authType = 4;
+    string createdAt = 5;
+}
+
+message DeleteConnectionRequest {
+    string id = 1;
+}
+
 service WorkflowService {
     rpc GetWorkflow(GetWorkflowRequest) returns (Workflow);
     rpc ListWorkflows(PageRequest) returns (WorkflowList);
@@ -199,4 +228,7 @@ service WorkflowService {
     rpc RunWorkflowId(RunWorkflowIdRequest) returns (stream ReplayData);
     rpc ListWorkflowHistory(google.protobuf.Empty) returns (WorkflowHistoryList);
     rpc GetWorkflowHistory(WorkflowHistoryRequest) returns (WorkflowHistoryResponse);
+    rpc ListConnectorTemplates(google.protobuf.Empty) returns (ConnectorTemplateList);
+    rpc ListConnections(google.protobuf.Empty) returns (ConnectionList);
+    rpc DeleteConnection(DeleteConnectionRequest) returns (google.protobuf.Empty);
 }

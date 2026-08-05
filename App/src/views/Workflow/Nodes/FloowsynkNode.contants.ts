@@ -161,7 +161,7 @@ export const nodes: Node.AsObject[] = [
         groupList: [4],
         icon: {
             name: "reply",
-            color: "linear-gradient(135deg, var(--brown-1), var(--brown-8))"
+            color: "linear-gradient(135deg, var(--orange-3), var(--orange-7))" // orange
         },
         data: {
             message: ""
@@ -310,6 +310,22 @@ export const nodes: Node.AsObject[] = [
         },
         data: {
             subprocessid: ""
+        },
+        inputsList: ["input"],
+        outputsList: ["output"]
+    },
+    {
+        id: '', nodetype: 'connector', label: '3rd Party Connector', position: { x: 0, y: 0 },
+        groupList: [4],
+        icon: {
+            name: "cable",
+            color: "linear-gradient(135deg, var(--violet-3), var(--violet-7))" // violet
+        },
+        data: {
+            listvar: "",
+            type: "",
+            payload: "{}",
+            variable: "response"
         },
         inputsList: ["input"],
         outputsList: ["output"]

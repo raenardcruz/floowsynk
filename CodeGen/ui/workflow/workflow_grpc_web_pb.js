@@ -615,5 +615,188 @@ proto.proto.WorkflowServicePromiseClient.prototype.getWorkflowHistory =
 };
 
 
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.google.protobuf.Empty,
+ *   !proto.proto.ConnectorTemplateList>}
+ */
+const methodDescriptor_WorkflowService_ListConnectorTemplates = new grpc.web.MethodDescriptor(
+  '/proto.WorkflowService/ListConnectorTemplates',
+  grpc.web.MethodType.UNARY,
+  google_protobuf_empty_pb.Empty,
+  proto.proto.ConnectorTemplateList,
+  /**
+   * @param {!proto.google.protobuf.Empty} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.proto.ConnectorTemplateList.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.google.protobuf.Empty} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.RpcError, ?proto.proto.ConnectorTemplateList)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.proto.ConnectorTemplateList>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.proto.WorkflowServiceClient.prototype.listConnectorTemplates =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/proto.WorkflowService/ListConnectorTemplates',
+      request,
+      metadata || {},
+      methodDescriptor_WorkflowService_ListConnectorTemplates,
+      callback);
+};
+
+
+/**
+ * @param {!proto.google.protobuf.Empty} request The
+ *     request proto
+ * @param {?Object<string, string>=} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.proto.ConnectorTemplateList>}
+ *     Promise that resolves to the response
+ */
+proto.proto.WorkflowServicePromiseClient.prototype.listConnectorTemplates =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/proto.WorkflowService/ListConnectorTemplates',
+      request,
+      metadata || {},
+      methodDescriptor_WorkflowService_ListConnectorTemplates);
+};
+
+
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.google.protobuf.Empty,
+ *   !proto.proto.ConnectionList>}
+ */
+const methodDescriptor_WorkflowService_ListConnections = new grpc.web.MethodDescriptor(
+  '/proto.WorkflowService/ListConnections',
+  grpc.web.MethodType.UNARY,
+  google_protobuf_empty_pb.Empty,
+  proto.proto.ConnectionList,
+  /**
+   * @param {!proto.google.protobuf.Empty} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.proto.ConnectionList.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.google.protobuf.Empty} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.RpcError, ?proto.proto.ConnectionList)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.proto.ConnectionList>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.proto.WorkflowServiceClient.prototype.listConnections =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/proto.WorkflowService/ListConnections',
+      request,
+      metadata || {},
+      methodDescriptor_WorkflowService_ListConnections,
+      callback);
+};
+
+
+/**
+ * @param {!proto.google.protobuf.Empty} request The
+ *     request proto
+ * @param {?Object<string, string>=} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.proto.ConnectionList>}
+ *     Promise that resolves to the response
+ */
+proto.proto.WorkflowServicePromiseClient.prototype.listConnections =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/proto.WorkflowService/ListConnections',
+      request,
+      metadata || {},
+      methodDescriptor_WorkflowService_ListConnections);
+};
+
+
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.proto.DeleteConnectionRequest,
+ *   !proto.google.protobuf.Empty>}
+ */
+const methodDescriptor_WorkflowService_DeleteConnection = new grpc.web.MethodDescriptor(
+  '/proto.WorkflowService/DeleteConnection',
+  grpc.web.MethodType.UNARY,
+  proto.proto.DeleteConnectionRequest,
+  google_protobuf_empty_pb.Empty,
+  /**
+   * @param {!proto.proto.DeleteConnectionRequest} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  google_protobuf_empty_pb.Empty.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.proto.DeleteConnectionRequest} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.RpcError, ?proto.google.protobuf.Empty)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.google.protobuf.Empty>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.proto.WorkflowServiceClient.prototype.deleteConnection =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/proto.WorkflowService/DeleteConnection',
+      request,
+      metadata || {},
+      methodDescriptor_WorkflowService_DeleteConnection,
+      callback);
+};
+
+
+/**
+ * @param {!proto.proto.DeleteConnectionRequest} request The
+ *     request proto
+ * @param {?Object<string, string>=} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.google.protobuf.Empty>}
+ *     Promise that resolves to the response
+ */
+proto.proto.WorkflowServicePromiseClient.prototype.deleteConnection =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/proto.WorkflowService/DeleteConnection',
+      request,
+      metadata || {},
+      methodDescriptor_WorkflowService_DeleteConnection);
+};
+
+
 module.exports = proto.proto;
 

@@ -208,3 +208,58 @@ func (s *WorkflowServer) GetWorkflowHistory(ctx context.Context, req *wf.Workflo
 
 	return res, nil
 }
+
+func (s *WorkflowServer) ListConnectorTemplates(ctx context.Context, _ *emptypb.Empty) (*wf.ConnectorTemplateList, error) {
+	_, err := getTokenFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	templates := workflow.ListConnectorTemplates()
+	pbTemplates := make([]*wf.ConnectorProtoTemplate, 0, len(templates))
+	for _, t := range templates {
+		pbTemplates = append(pbTemplates, &wf.ConnectorProtoTemplate{
+			Id:          t.ID,
+			Name:        t.Name,
+			Description: t.Description,
+			Icon:        t.Icon,
+			BaseUrl:     t.BaseURL,
+			AuthType:    t.AuthType,
+		})
+	}
+	return &wf.ConnectorTemplateList{Templates: pbTemplates}, nil
+}
+
+func (s *WorkflowServer) ListConnections(ctx context.Context, _ *emptypb.Empty) (*wf.ConnectionList, error) {
+	_, err := getTokenFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	conns, err := DBCon.ListConnections()
+	if err != nil {
+		return nil, err
+	}
+	pbConns := make([]*wf.ConnectionProto, 0, len(conns))
+	for _, c := range conns {
+		pbConns = append(pbConns, &wf.ConnectionProto{
+			Id:          c.ID,
+			Name:        c.Name,
+			ConnectorId: c.ConnectorID,
+			AuthType:    c.AuthType,
+			CreatedAt:   c.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
+		})
+	}
+	return &wf.ConnectionList{Connections: pbConns}, nil
+}
+
+func (s *WorkflowServer) DeleteConnection(ctx context.Context, req *wf.DeleteConnectionRequest) (*emptypb.Empty, error) {
+	_, err := getTokenFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	err = DBCon.DeleteConnection(req.Id)
+	if err != nil {
+		return nil, err
+	}
+	return &emptypb.Empty{}, nil
+}
+

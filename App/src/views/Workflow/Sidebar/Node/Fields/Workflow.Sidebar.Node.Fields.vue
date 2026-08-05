@@ -6,6 +6,39 @@
             label="Subprocess"
             v-model="modelValue" />
     </div>
+    <div v-else-if="props.nodeType === 'connector' && modelValue" class="connector-config" style="display: flex; flex-direction: column; gap: 12px; padding: 4px;">
+        <div>
+            <label style="font-weight: 600; font-size: 0.85rem; color: var(--text-color); display: block; margin-bottom: 4px;">Connection</label>
+            <SelectInput
+                :options="connectionOptions"
+                :disabled="disabled"
+                v-model="modelValue['listvar']"
+                placeholder="Select a Connection" />
+        </div>
+        <div>
+            <label style="font-weight: 600; font-size: 0.85rem; color: var(--text-color); display: block; margin-bottom: 4px;">Action</label>
+            <SelectInput
+                :options="actionOptions"
+                :disabled="disabled"
+                v-model="modelValue['type']"
+                placeholder="Select an Action" />
+        </div>
+        <div>
+            <label style="font-weight: 600; font-size: 0.85rem; color: var(--text-color); display: block; margin-bottom: 4px;">Input Payload (JSON)</label>
+            <TextCodeInput
+                v-model="modelValue['payload']"
+                label="Payload"
+                :disabled="disabled"
+                :editorConfig="{ variables: variables, target: 'body' }" />
+        </div>
+        <div>
+            <label style="font-weight: 600; font-size: 0.85rem; color: var(--text-color); display: block; margin-bottom: 4px;">Output Variable</label>
+            <TextInput
+                v-model="modelValue['variable']"
+                placeholder="e.g. response"
+                :disabled="disabled" />
+        </div>
+    </div>
     <div v-else-if="props.nodeType === 'webhook' && modelValue" class="webhook-config" style="display: flex; flex-direction: column; gap: 12px; padding: 4px;">
         <div>
             <label style="font-weight: 600; font-size: 0.85rem; color: var(--text-color); display: block; margin-bottom: 4px;">Webhook Secret Token</label>
@@ -87,7 +120,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import WorkflowNodeSidebarFields from './Workflow.Sidebar.Node.Fields.vue'
 import { SidebarNodeProps } from '../Workflow.Sidebar.Node.types'
 import { useSidebarNodeHooks } from '../Workflow.Sidebar.Node.hooks'
@@ -95,10 +128,53 @@ import { toSentenceCase } from '@/components/Composable/Utilities'
 import { MONACO_EDITOR_DATA_PROPERTIES } from './Workflow.Sidebar.Node.Fields.constants'
 import { Checkbox as CheckboxInput, TextCodeInput, Select as SelectInput, ListField as ListInput, TextInput } from '@/components/Composable/UI/Inputs'
 import { useTab } from '@/views/Workflow'
+import { getConnections } from '@/views/Connectors/Connectors.api'
 
 const props = defineProps<SidebarNodeProps>()
 const modelValue = defineModel<Record<string, any>>()
 const { tab } = useTab(props.tabid)
+
+const connectionsList = ref<any[]>([])
+const templatesList = ref<any[]>([])
+
+const fetchConnectorData = async () => {
+    try {
+        const connRes = await getConnections()
+        connectionsList.value = connRes.toObject().connectionsList || []
+
+        const tempRes = await fetch('http://localhost:8083/api/connectors/templates')
+        if (tempRes.ok) {
+            templatesList.value = await tempRes.json()
+        }
+    } catch (err) {
+        console.error("Failed to load connector data in sidebar:", err)
+    }
+}
+
+onMounted(() => {
+    fetchConnectorData()
+})
+
+const connectionOptions = computed(() => {
+    return connectionsList.value.map(c => ({
+        label: `${c.name} (${c.connectorid || c.connectorId})`,
+        value: c.id
+    }))
+})
+
+const actionOptions = computed(() => {
+    const val = modelValue.value
+    if (!val || !val['listvar']) return []
+    const selectedConn = connectionsList.value.find(c => c.id === val['listvar'])
+    if (!selectedConn) return []
+    const connectorId = selectedConn.connectorid || selectedConn.connectorId
+    const selectedTemp = templatesList.value.find(t => t.id === connectorId)
+    if (!selectedTemp || !selectedTemp.actions) return []
+    return selectedTemp.actions.map((a: any) => ({
+        label: a.name,
+        value: a.id
+    }))
+})
 
 const generateRandomSecret = () => {
     return Array.from(crypto.getRandomValues(new Uint8Array(16)))
@@ -161,7 +237,8 @@ const getComponent = (key: string, value: any) => {
                         label,
                         disabled: props.disabled,
                         editorConfig: enableEditor ? {
-                            variables: variables.value
+                            variables: variables.value,
+                            target: 'body'
                         } : null
                     }
                 }

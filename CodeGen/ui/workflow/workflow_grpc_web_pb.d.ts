@@ -68,6 +68,27 @@ export class WorkflowServiceClient {
                response: workflow_pb.WorkflowHistoryResponse) => void
   ): grpcWeb.ClientReadableStream<workflow_pb.WorkflowHistoryResponse>;
 
+  listConnectorTemplates(
+    request: google_protobuf_empty_pb.Empty,
+    metadata: grpcWeb.Metadata | undefined,
+    callback: (err: grpcWeb.RpcError,
+               response: workflow_pb.ConnectorTemplateList) => void
+  ): grpcWeb.ClientReadableStream<workflow_pb.ConnectorTemplateList>;
+
+  listConnections(
+    request: google_protobuf_empty_pb.Empty,
+    metadata: grpcWeb.Metadata | undefined,
+    callback: (err: grpcWeb.RpcError,
+               response: workflow_pb.ConnectionList) => void
+  ): grpcWeb.ClientReadableStream<workflow_pb.ConnectionList>;
+
+  deleteConnection(
+    request: workflow_pb.DeleteConnectionRequest,
+    metadata: grpcWeb.Metadata | undefined,
+    callback: (err: grpcWeb.RpcError,
+               response: google_protobuf_empty_pb.Empty) => void
+  ): grpcWeb.ClientReadableStream<google_protobuf_empty_pb.Empty>;
+
 }
 
 export class WorkflowServicePromiseClient {
@@ -119,6 +140,21 @@ export class WorkflowServicePromiseClient {
     request: workflow_pb.WorkflowHistoryRequest,
     metadata?: grpcWeb.Metadata
   ): Promise<workflow_pb.WorkflowHistoryResponse>;
+
+  listConnectorTemplates(
+    request: google_protobuf_empty_pb.Empty,
+    metadata?: grpcWeb.Metadata
+  ): Promise<workflow_pb.ConnectorTemplateList>;
+
+  listConnections(
+    request: google_protobuf_empty_pb.Empty,
+    metadata?: grpcWeb.Metadata
+  ): Promise<workflow_pb.ConnectionList>;
+
+  deleteConnection(
+    request: workflow_pb.DeleteConnectionRequest,
+    metadata?: grpcWeb.Metadata
+  ): Promise<google_protobuf_empty_pb.Empty>;
 
 }
 

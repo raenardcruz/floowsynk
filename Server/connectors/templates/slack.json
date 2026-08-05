@@ -1,0 +1,27 @@
+{
+  "id": "slack",
+  "name": "Slack",
+  "description": "Send notifications and interact with Slack channels.",
+  "icon": "/src/components/Icons/slack.svg",
+  "baseUrl": "https://slack.com/api",
+  "authType": "oauth2",
+  "oauthConfig": {
+    "authorizeUrl": "https://slack.com/oauth/v2/authorize",
+    "tokenUrl": "https://slack.com/api/oauth.v2.access",
+    "defaultScopes": ["chat:write", "chat:write.public"]
+  },
+  "actions": [
+    {
+      "id": "post_message",
+      "name": "Post Message",
+      "description": "Send a message to a Slack channel",
+      "path": "/chat.postMessage",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "queryParams": [],
+      "payloadTemplate": "{\"channel\": \"{{channel}}\", \"text\": \"{{message}}\"}"
+    }
+  ]
+}

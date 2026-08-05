@@ -1710,6 +1710,298 @@ func (x *Handle) GetPosition() string {
 	return ""
 }
 
+type ConnectorTemplateList struct {
+	state         protoimpl.MessageState    `protogen:"open.v1"`
+	Templates     []*ConnectorProtoTemplate `protobuf:"bytes,1,rep,name=templates,proto3" json:"templates,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ConnectorTemplateList) Reset() {
+	*x = ConnectorTemplateList{}
+	mi := &file_workflow_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ConnectorTemplateList) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ConnectorTemplateList) ProtoMessage() {}
+
+func (x *ConnectorTemplateList) ProtoReflect() protoreflect.Message {
+	mi := &file_workflow_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ConnectorTemplateList.ProtoReflect.Descriptor instead.
+func (*ConnectorTemplateList) Descriptor() ([]byte, []int) {
+	return file_workflow_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *ConnectorTemplateList) GetTemplates() []*ConnectorProtoTemplate {
+	if x != nil {
+		return x.Templates
+	}
+	return nil
+}
+
+type ConnectorProtoTemplate struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	Icon          string                 `protobuf:"bytes,4,opt,name=icon,proto3" json:"icon,omitempty"`
+	BaseUrl       string                 `protobuf:"bytes,5,opt,name=baseUrl,proto3" json:"baseUrl,omitempty"`
+	AuthType      string                 `protobuf:"bytes,6,opt,name=authType,proto3" json:"authType,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ConnectorProtoTemplate) Reset() {
+	*x = ConnectorProtoTemplate{}
+	mi := &file_workflow_proto_msgTypes[21]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ConnectorProtoTemplate) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ConnectorProtoTemplate) ProtoMessage() {}
+
+func (x *ConnectorProtoTemplate) ProtoReflect() protoreflect.Message {
+	mi := &file_workflow_proto_msgTypes[21]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ConnectorProtoTemplate.ProtoReflect.Descriptor instead.
+func (*ConnectorProtoTemplate) Descriptor() ([]byte, []int) {
+	return file_workflow_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *ConnectorProtoTemplate) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *ConnectorProtoTemplate) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *ConnectorProtoTemplate) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *ConnectorProtoTemplate) GetIcon() string {
+	if x != nil {
+		return x.Icon
+	}
+	return ""
+}
+
+func (x *ConnectorProtoTemplate) GetBaseUrl() string {
+	if x != nil {
+		return x.BaseUrl
+	}
+	return ""
+}
+
+func (x *ConnectorProtoTemplate) GetAuthType() string {
+	if x != nil {
+		return x.AuthType
+	}
+	return ""
+}
+
+type ConnectionList struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Connections   []*ConnectionProto     `protobuf:"bytes,1,rep,name=connections,proto3" json:"connections,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ConnectionList) Reset() {
+	*x = ConnectionList{}
+	mi := &file_workflow_proto_msgTypes[22]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ConnectionList) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ConnectionList) ProtoMessage() {}
+
+func (x *ConnectionList) ProtoReflect() protoreflect.Message {
+	mi := &file_workflow_proto_msgTypes[22]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ConnectionList.ProtoReflect.Descriptor instead.
+func (*ConnectionList) Descriptor() ([]byte, []int) {
+	return file_workflow_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *ConnectionList) GetConnections() []*ConnectionProto {
+	if x != nil {
+		return x.Connections
+	}
+	return nil
+}
+
+type ConnectionProto struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	ConnectorId   string                 `protobuf:"bytes,3,opt,name=connectorId,proto3" json:"connectorId,omitempty"`
+	AuthType      string                 `protobuf:"bytes,4,opt,name=authType,proto3" json:"authType,omitempty"`
+	CreatedAt     string                 `protobuf:"bytes,5,opt,name=createdAt,proto3" json:"createdAt,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ConnectionProto) Reset() {
+	*x = ConnectionProto{}
+	mi := &file_workflow_proto_msgTypes[23]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ConnectionProto) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ConnectionProto) ProtoMessage() {}
+
+func (x *ConnectionProto) ProtoReflect() protoreflect.Message {
+	mi := &file_workflow_proto_msgTypes[23]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ConnectionProto.ProtoReflect.Descriptor instead.
+func (*ConnectionProto) Descriptor() ([]byte, []int) {
+	return file_workflow_proto_rawDescGZIP(), []int{23}
+}
+
+func (x *ConnectionProto) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *ConnectionProto) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *ConnectionProto) GetConnectorId() string {
+	if x != nil {
+		return x.ConnectorId
+	}
+	return ""
+}
+
+func (x *ConnectionProto) GetAuthType() string {
+	if x != nil {
+		return x.AuthType
+	}
+	return ""
+}
+
+func (x *ConnectionProto) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
+type DeleteConnectionRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteConnectionRequest) Reset() {
+	*x = DeleteConnectionRequest{}
+	mi := &file_workflow_proto_msgTypes[24]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteConnectionRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteConnectionRequest) ProtoMessage() {}
+
+func (x *DeleteConnectionRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_workflow_proto_msgTypes[24]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteConnectionRequest.ProtoReflect.Descriptor instead.
+func (*DeleteConnectionRequest) Descriptor() ([]byte, []int) {
+	return file_workflow_proto_rawDescGZIP(), []int{24}
+}
+
+func (x *DeleteConnectionRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
 var File_workflow_proto protoreflect.FileDescriptor
 
 const file_workflow_proto_rawDesc = "" +
@@ -1902,7 +2194,26 @@ const file_workflow_proto_rawDesc = "" +
 	"\x05width\x18\x05 \x01(\x02R\x05width\x12\x16\n" +
 	"\x06height\x18\x06 \x01(\x02R\x06height\x12\x16\n" +
 	"\x06nodeId\x18\a \x01(\tR\x06nodeId\x12\x1a\n" +
-	"\bposition\x18\b \x01(\tR\bposition*<\n" +
+	"\bposition\x18\b \x01(\tR\bposition\"T\n" +
+	"\x15ConnectorTemplateList\x12;\n" +
+	"\ttemplates\x18\x01 \x03(\v2\x1d.proto.ConnectorProtoTemplateR\ttemplates\"\xa8\x01\n" +
+	"\x16ConnectorProtoTemplate\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
+	"\vdescription\x18\x03 \x01(\tR\vdescription\x12\x12\n" +
+	"\x04icon\x18\x04 \x01(\tR\x04icon\x12\x18\n" +
+	"\abaseUrl\x18\x05 \x01(\tR\abaseUrl\x12\x1a\n" +
+	"\bauthType\x18\x06 \x01(\tR\bauthType\"J\n" +
+	"\x0eConnectionList\x128\n" +
+	"\vconnections\x18\x01 \x03(\v2\x16.proto.ConnectionProtoR\vconnections\"\x91\x01\n" +
+	"\x0fConnectionProto\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
+	"\vconnectorId\x18\x03 \x01(\tR\vconnectorId\x12\x1a\n" +
+	"\bauthType\x18\x04 \x01(\tR\bauthType\x12\x1c\n" +
+	"\tcreatedAt\x18\x05 \x01(\tR\tcreatedAt\")\n" +
+	"\x17DeleteConnectionRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id*<\n" +
 	"\rArrayDataType\x12\n" +
 	"\n" +
 	"\x06STRING\x10\x00\x12\a\n" +
@@ -1915,7 +2226,7 @@ const file_workflow_proto_rawDesc = "" +
 	"\tCOMPLETED\x10\x01\x12\n" +
 	"\n" +
 	"\x06FAILED\x10\x02\x12\b\n" +
-	"\x04INFO\x10\x032\xbe\x04\n" +
+	"\x04INFO\x10\x032\x9c\x06\n" +
 	"\x0fWorkflowService\x129\n" +
 	"\vGetWorkflow\x12\x19.proto.GetWorkflowRequest\x1a\x0f.proto.Workflow\x128\n" +
 	"\rListWorkflows\x12\x12.proto.PageRequest\x1a\x13.proto.WorkflowList\x122\n" +
@@ -1925,7 +2236,10 @@ const file_workflow_proto_rawDesc = "" +
 	"\bQuickRun\x12\x0f.proto.Workflow\x1a\x11.proto.ReplayData0\x01\x12A\n" +
 	"\rRunWorkflowId\x12\x1b.proto.RunWorkflowIdRequest\x1a\x11.proto.ReplayData0\x01\x12I\n" +
 	"\x13ListWorkflowHistory\x12\x16.google.protobuf.Empty\x1a\x1a.proto.WorkflowHistoryList\x12S\n" +
-	"\x12GetWorkflowHistory\x12\x1d.proto.WorkflowHistoryRequest\x1a\x1e.proto.WorkflowHistoryResponseB\tZ\a./protob\x06proto3"
+	"\x12GetWorkflowHistory\x12\x1d.proto.WorkflowHistoryRequest\x1a\x1e.proto.WorkflowHistoryResponse\x12N\n" +
+	"\x16ListConnectorTemplates\x12\x16.google.protobuf.Empty\x1a\x1c.proto.ConnectorTemplateList\x12@\n" +
+	"\x0fListConnections\x12\x16.google.protobuf.Empty\x1a\x15.proto.ConnectionList\x12J\n" +
+	"\x10DeleteConnection\x12\x1e.proto.DeleteConnectionRequest\x1a\x16.google.protobuf.EmptyB\tZ\a./protob\x06proto3"
 
 var (
 	file_workflow_proto_rawDescOnce sync.Once
@@ -1940,7 +2254,7 @@ func file_workflow_proto_rawDescGZIP() []byte {
 }
 
 var file_workflow_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_workflow_proto_msgTypes = make([]protoimpl.MessageInfo, 21)
+var file_workflow_proto_msgTypes = make([]protoimpl.MessageInfo, 26)
 var file_workflow_proto_goTypes = []any{
 	(ArrayDataType)(0),              // 0: proto.ArrayDataType
 	(NodeStatus)(0),                 // 1: proto.NodeStatus
@@ -1964,15 +2278,20 @@ var file_workflow_proto_goTypes = []any{
 	(*KeyValue)(nil),                // 19: proto.KeyValue
 	(*NodeHandleBounds)(nil),        // 20: proto.NodeHandleBounds
 	(*Handle)(nil),                  // 21: proto.Handle
-	nil,                             // 22: proto.ReplayData.VariablesEntry
-	(*emptypb.Empty)(nil),           // 23: google.protobuf.Empty
+	(*ConnectorTemplateList)(nil),   // 22: proto.ConnectorTemplateList
+	(*ConnectorProtoTemplate)(nil),  // 23: proto.ConnectorProtoTemplate
+	(*ConnectionList)(nil),          // 24: proto.ConnectionList
+	(*ConnectionProto)(nil),         // 25: proto.ConnectionProto
+	(*DeleteConnectionRequest)(nil), // 26: proto.DeleteConnectionRequest
+	nil,                             // 27: proto.ReplayData.VariablesEntry
+	(*emptypb.Empty)(nil),           // 28: google.protobuf.Empty
 }
 var file_workflow_proto_depIdxs = []int32{
 	4,  // 0: proto.WorkflowHistoryList.history:type_name -> proto.WorkflowHistory
 	1,  // 1: proto.WorkflowHistory.Status:type_name -> proto.NodeStatus
 	7,  // 2: proto.WorkflowHistoryResponse.data:type_name -> proto.ReplayData
 	14, // 3: proto.ReplayData.data:type_name -> proto.NodeData
-	22, // 4: proto.ReplayData.variables:type_name -> proto.ReplayData.VariablesEntry
+	27, // 4: proto.ReplayData.variables:type_name -> proto.ReplayData.VariablesEntry
 	1,  // 5: proto.ReplayData.status:type_name -> proto.NodeStatus
 	11, // 6: proto.WorkflowList.workflows:type_name -> proto.Workflow
 	13, // 7: proto.Workflow.nodes:type_name -> proto.Node
@@ -1992,29 +2311,37 @@ var file_workflow_proto_depIdxs = []int32{
 	19, // 21: proto.NodeDataArray.keyValueItems:type_name -> proto.KeyValue
 	21, // 22: proto.NodeHandleBounds.source:type_name -> proto.Handle
 	21, // 23: proto.NodeHandleBounds.target:type_name -> proto.Handle
-	9,  // 24: proto.WorkflowService.GetWorkflow:input_type -> proto.GetWorkflowRequest
-	8,  // 25: proto.WorkflowService.ListWorkflows:input_type -> proto.PageRequest
-	11, // 26: proto.WorkflowService.UpdateWorkflow:input_type -> proto.Workflow
-	11, // 27: proto.WorkflowService.CreateWorkflow:input_type -> proto.Workflow
-	11, // 28: proto.WorkflowService.DeleteWorkflow:input_type -> proto.Workflow
-	11, // 29: proto.WorkflowService.QuickRun:input_type -> proto.Workflow
-	2,  // 30: proto.WorkflowService.RunWorkflowId:input_type -> proto.RunWorkflowIdRequest
-	23, // 31: proto.WorkflowService.ListWorkflowHistory:input_type -> google.protobuf.Empty
-	5,  // 32: proto.WorkflowService.GetWorkflowHistory:input_type -> proto.WorkflowHistoryRequest
-	11, // 33: proto.WorkflowService.GetWorkflow:output_type -> proto.Workflow
-	10, // 34: proto.WorkflowService.ListWorkflows:output_type -> proto.WorkflowList
-	11, // 35: proto.WorkflowService.UpdateWorkflow:output_type -> proto.Workflow
-	11, // 36: proto.WorkflowService.CreateWorkflow:output_type -> proto.Workflow
-	23, // 37: proto.WorkflowService.DeleteWorkflow:output_type -> google.protobuf.Empty
-	7,  // 38: proto.WorkflowService.QuickRun:output_type -> proto.ReplayData
-	7,  // 39: proto.WorkflowService.RunWorkflowId:output_type -> proto.ReplayData
-	3,  // 40: proto.WorkflowService.ListWorkflowHistory:output_type -> proto.WorkflowHistoryList
-	6,  // 41: proto.WorkflowService.GetWorkflowHistory:output_type -> proto.WorkflowHistoryResponse
-	33, // [33:42] is the sub-list for method output_type
-	24, // [24:33] is the sub-list for method input_type
-	24, // [24:24] is the sub-list for extension type_name
-	24, // [24:24] is the sub-list for extension extendee
-	0,  // [0:24] is the sub-list for field type_name
+	23, // 24: proto.ConnectorTemplateList.templates:type_name -> proto.ConnectorProtoTemplate
+	25, // 25: proto.ConnectionList.connections:type_name -> proto.ConnectionProto
+	9,  // 26: proto.WorkflowService.GetWorkflow:input_type -> proto.GetWorkflowRequest
+	8,  // 27: proto.WorkflowService.ListWorkflows:input_type -> proto.PageRequest
+	11, // 28: proto.WorkflowService.UpdateWorkflow:input_type -> proto.Workflow
+	11, // 29: proto.WorkflowService.CreateWorkflow:input_type -> proto.Workflow
+	11, // 30: proto.WorkflowService.DeleteWorkflow:input_type -> proto.Workflow
+	11, // 31: proto.WorkflowService.QuickRun:input_type -> proto.Workflow
+	2,  // 32: proto.WorkflowService.RunWorkflowId:input_type -> proto.RunWorkflowIdRequest
+	28, // 33: proto.WorkflowService.ListWorkflowHistory:input_type -> google.protobuf.Empty
+	5,  // 34: proto.WorkflowService.GetWorkflowHistory:input_type -> proto.WorkflowHistoryRequest
+	28, // 35: proto.WorkflowService.ListConnectorTemplates:input_type -> google.protobuf.Empty
+	28, // 36: proto.WorkflowService.ListConnections:input_type -> google.protobuf.Empty
+	26, // 37: proto.WorkflowService.DeleteConnection:input_type -> proto.DeleteConnectionRequest
+	11, // 38: proto.WorkflowService.GetWorkflow:output_type -> proto.Workflow
+	10, // 39: proto.WorkflowService.ListWorkflows:output_type -> proto.WorkflowList
+	11, // 40: proto.WorkflowService.UpdateWorkflow:output_type -> proto.Workflow
+	11, // 41: proto.WorkflowService.CreateWorkflow:output_type -> proto.Workflow
+	28, // 42: proto.WorkflowService.DeleteWorkflow:output_type -> google.protobuf.Empty
+	7,  // 43: proto.WorkflowService.QuickRun:output_type -> proto.ReplayData
+	7,  // 44: proto.WorkflowService.RunWorkflowId:output_type -> proto.ReplayData
+	3,  // 45: proto.WorkflowService.ListWorkflowHistory:output_type -> proto.WorkflowHistoryList
+	6,  // 46: proto.WorkflowService.GetWorkflowHistory:output_type -> proto.WorkflowHistoryResponse
+	22, // 47: proto.WorkflowService.ListConnectorTemplates:output_type -> proto.ConnectorTemplateList
+	24, // 48: proto.WorkflowService.ListConnections:output_type -> proto.ConnectionList
+	28, // 49: proto.WorkflowService.DeleteConnection:output_type -> google.protobuf.Empty
+	38, // [38:50] is the sub-list for method output_type
+	26, // [26:38] is the sub-list for method input_type
+	26, // [26:26] is the sub-list for extension type_name
+	26, // [26:26] is the sub-list for extension extendee
+	0,  // [0:26] is the sub-list for field type_name
 }
 
 func init() { file_workflow_proto_init() }
@@ -2032,7 +2359,7 @@ func file_workflow_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_workflow_proto_rawDesc), len(file_workflow_proto_rawDesc)),
 			NumEnums:      2,
-			NumMessages:   21,
+			NumMessages:   26,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

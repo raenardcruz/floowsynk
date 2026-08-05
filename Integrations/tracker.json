@@ -1,0 +1,292 @@
+{
+  "project": "Floowsynk Third-Party Connectors Integration",
+  "version": "1.0.0",
+  "last_updated": "2026-08-05T09:50:00Z",
+  "summary": {
+    "total_connectors": 40,
+    "implemented_count": 1,
+    "pending_count": 39
+  },
+  "connectors": [
+    {
+      "id": "AWS_S3",
+      "name": "AWS S3",
+      "status": "pending",
+      "implemented_at": null,
+      "docs_file": "Integrations/AWS_S3.md.docx"
+    },
+    {
+      "id": "ActiveCampaign",
+      "name": "ActiveCampaign",
+      "status": "pending",
+      "implemented_at": null,
+      "docs_file": "Integrations/ActiveCampaign.md.docx"
+    },
+    {
+      "id": "Airtable",
+      "name": "Airtable",
+      "status": "pending",
+      "implemented_at": null,
+      "docs_file": "Integrations/Airtable.md.docx"
+    },
+    {
+      "id": "Anthropic",
+      "name": "Anthropic",
+      "status": "pending",
+      "implemented_at": null,
+      "docs_file": "Integrations/Anthropic.md.docx"
+    },
+    {
+      "id": "Asana",
+      "name": "Asana",
+      "status": "pending",
+      "implemented_at": null,
+      "docs_file": "Integrations/Asana.md.docx"
+    },
+    {
+      "id": "ClickUp",
+      "name": "ClickUp",
+      "status": "pending",
+      "implemented_at": null,
+      "docs_file": "Integrations/ClickUp.md.docx"
+    },
+    {
+      "id": "ConvertKit",
+      "name": "ConvertKit",
+      "status": "pending",
+      "implemented_at": null,
+      "docs_file": "Integrations/ConvertKit.md.docx"
+    },
+    {
+      "id": "Discord",
+      "name": "Discord",
+      "status": "pending",
+      "implemented_at": null,
+      "docs_file": "Integrations/Discord.md.docx"
+    },
+    {
+      "id": "Dropbox",
+      "name": "Dropbox",
+      "status": "pending",
+      "implemented_at": null,
+      "docs_file": "Integrations/Dropbox.md.docx"
+    },
+    {
+      "id": "GitHub",
+      "name": "GitHub",
+      "status": "completed",
+      "implemented_at": "2026-08-05T09:52:33Z",
+      "docs_file": "Integrations/GitHub.md.docx"
+    },
+    {
+      "id": "GitLab",
+      "name": "GitLab",
+      "status": "pending",
+      "implemented_at": null,
+      "docs_file": "Integrations/GitLab.md.docx"
+    },
+    {
+      "id": "Gmail",
+      "name": "Gmail",
+      "status": "pending",
+      "implemented_at": null,
+      "docs_file": "Integrations/Gmail.md.docx"
+    },
+    {
+      "id": "Google_Calendar",
+      "name": "Google Calendar",
+      "status": "pending",
+      "implemented_at": null,
+      "docs_file": "Integrations/Google_Calendar.md.docx"
+    },
+    {
+      "id": "Google_Drive",
+      "name": "Google Drive",
+      "status": "pending",
+      "implemented_at": null,
+      "docs_file": "Integrations/Google_Drive.md.docx"
+    },
+    {
+      "id": "Google_Gemini",
+      "name": "Google Gemini",
+      "status": "pending",
+      "implemented_at": null,
+      "docs_file": "Integrations/Google_Gemini.md.docx"
+    },
+    {
+      "id": "Google_Sheets",
+      "name": "Google Sheets",
+      "status": "pending",
+      "implemented_at": null,
+      "docs_file": "Integrations/Google_Sheets.md.docx"
+    },
+    {
+      "id": "HubSpot",
+      "name": "HubSpot",
+      "status": "pending",
+      "implemented_at": null,
+      "docs_file": "Integrations/HubSpot.md.docx"
+    },
+    {
+      "id": "Intercom",
+      "name": "Intercom",
+      "status": "pending",
+      "implemented_at": null,
+      "docs_file": "Integrations/Intercom.md.docx"
+    },
+    {
+      "id": "Jira",
+      "name": "Jira",
+      "status": "pending",
+      "implemented_at": null,
+      "docs_file": "Integrations/Jira.md.docx"
+    },
+    {
+      "id": "Mailchimp",
+      "name": "Mailchimp",
+      "status": "pending",
+      "implemented_at": null,
+      "docs_file": "Integrations/Mailchimp.md.docx"
+    },
+    {
+      "id": "Microsoft_Teams",
+      "name": "Microsoft Teams",
+      "status": "pending",
+      "implemented_at": null,
+      "docs_file": "Integrations/Microsoft_Teams.md.docx"
+    },
+    {
+      "id": "MongoDB",
+      "name": "MongoDB",
+      "status": "pending",
+      "implemented_at": null,
+      "docs_file": "Integrations/MongoDB.md.docx"
+    },
+    {
+      "id": "Notion",
+      "name": "Notion",
+      "status": "pending",
+      "implemented_at": null,
+      "docs_file": "Integrations/Notion.md.docx"
+    },
+    {
+      "id": "OpenAI",
+      "name": "OpenAI",
+      "status": "pending",
+      "implemented_at": null,
+      "docs_file": "Integrations/OpenAI.md.docx"
+    },
+    {
+      "id": "Outlook",
+      "name": "Outlook",
+      "status": "pending",
+      "implemented_at": null,
+      "docs_file": "Integrations/Outlook.md.docx"
+    },
+    {
+      "id": "Pipedrive",
+      "name": "Pipedrive",
+      "status": "pending",
+      "implemented_at": null,
+      "docs_file": "Integrations/Pipedrive.md.docx"
+    },
+    {
+      "id": "PostgreSQL",
+      "name": "PostgreSQL",
+      "status": "pending",
+      "implemented_at": null,
+      "docs_file": "Integrations/PostgreSQL.md.docx"
+    },
+    {
+      "id": "QuickBooks",
+      "name": "QuickBooks",
+      "status": "pending",
+      "implemented_at": null,
+      "docs_file": "Integrations/QuickBooks.md.docx"
+    },
+    {
+      "id": "Reddit",
+      "name": "Reddit",
+      "status": "pending",
+      "implemented_at": null,
+      "docs_file": "Integrations/Reddit.md.docx"
+    },
+    {
+      "id": "Salesforce",
+      "name": "Salesforce",
+      "status": "pending",
+      "implemented_at": null,
+      "docs_file": "Integrations/Salesforce.md.docx"
+    },
+    {
+      "id": "Shopify",
+      "name": "Shopify",
+      "status": "pending",
+      "implemented_at": null,
+      "docs_file": "Integrations/Shopify.md.docx"
+    },
+    {
+      "id": "Slack",
+      "name": "Slack",
+      "status": "pending",
+      "implemented_at": null,
+      "docs_file": "Integrations/Slack.md.docx"
+    },
+    {
+      "id": "Stripe",
+      "name": "Stripe",
+      "status": "pending",
+      "implemented_at": null,
+      "docs_file": "Integrations/Stripe.md.docx"
+    },
+    {
+      "id": "Telegram",
+      "name": "Telegram",
+      "status": "pending",
+      "implemented_at": null,
+      "docs_file": "Integrations/Telegram.md.docx"
+    },
+    {
+      "id": "Trello",
+      "name": "Trello",
+      "status": "pending",
+      "implemented_at": null,
+      "docs_file": "Integrations/Trello.md.docx"
+    },
+    {
+      "id": "Twilio",
+      "name": "Twilio",
+      "status": "pending",
+      "implemented_at": null,
+      "docs_file": "Integrations/Twilio.md.docx"
+    },
+    {
+      "id": "WordPress",
+      "name": "WordPress",
+      "status": "pending",
+      "implemented_at": null,
+      "docs_file": "Integrations/WordPress.md.docx"
+    },
+    {
+      "id": "X_Twitter",
+      "name": "X/Twitter",
+      "status": "pending",
+      "implemented_at": null,
+      "docs_file": "Integrations/X_Twitter.md.docx"
+    },
+    {
+      "id": "Zendesk",
+      "name": "Zendesk",
+      "status": "pending",
+      "implemented_at": null,
+      "docs_file": "Integrations/Zendesk.md.docx"
+    },
+    {
+      "id": "Zoom",
+      "name": "Zoom",
+      "status": "pending",
+      "implemented_at": null,
+      "docs_file": "Integrations/Zoom.md.docx"
+    }
+  ]
+}

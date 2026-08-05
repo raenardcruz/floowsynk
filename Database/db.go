@@ -151,6 +151,7 @@ func (db *DatabaseConnection) MigrateAndSeedDatabase() error {
 		&Workflow{},
 		&ReplayData{},
 		&Feature{},
+		&Connection{},
 	}
 
 	for _, model := range models {
