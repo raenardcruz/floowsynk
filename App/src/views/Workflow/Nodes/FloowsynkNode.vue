@@ -62,7 +62,9 @@ const showModal = ref(false)
 const { isRunning, hadOpenModalSidebar } = useWorkflowCanvasStore(props.tabid)
 const { nodestatus, isReplayNodeSelected } = useFloowsynkNodeWatchers(props.tabid, node, showSidebar)
 const clickHandler = (event: any) => {
-    op.value.toggle(event)
+    if (node.id !== '0') {
+        op.value.toggle(event)
+    }
     clickhandler(node, showSidebar, showModal)
 }
 let { icon, nodetype, label, outputsList, inputsList, nodestyle } = node as unknown as Node.AsObject

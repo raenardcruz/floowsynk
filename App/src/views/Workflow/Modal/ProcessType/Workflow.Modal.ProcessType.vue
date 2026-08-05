@@ -21,54 +21,19 @@
                 </div>
             </div>
             <div class="field-content">
-                <div v-if="isSelected('defaultnode') || isSelected('default')">
-                    No additional fields required.
-                </div>
-                <div v-if="isSelected('events')" class="fields">
-                    <label for="name">Name: </label>
-                    <input
-                    type="text" 
-                    class="input" 
-                    id="name" 
-                    placeholder="Event Name"
-                    v-model="tab.nodesList[0].data.name"
-                    v-if="tab.nodesList && tab.nodesList[0] && tab.nodesList[0].data" />
-                </div>
-                <div v-else-if="isSelected('webhook')" class="fields">
-                    <label
-                        for="url">
-                        Webhook Url:
-                    </label>
-                    <span style="display: flex; align-items: center; position: relative; overflow: none;">
-                        <input type="text" class="input" id="url" :value="webhookUrl" readonly />
-                        <span class="material-symbols-outlined copy-btn" @click="copyToClipboard(id)">content_copy</span>
-                        <span class="tooltip" v-if="showTooltip">URL copied!</span>
-                    </span>
-                </div>
-                <div v-else-if="isSelected('interval')" class="fields">
-                    <label for="name">Type: </label>
-                    <select
-                    class="input"
-                    v-model="tab.nodesList[0].data.type"
-                    v-if="tab.nodesList[0].data">
-                        <option value="seconds">Seconds</option>
-                        <option value="minutes">Minutes</option>
-                        <option value="hours">Hours</option>
-                        <option value="days">Days</option>
-                    </select>
-                    <label for="interval">Interval: </label>
-                    <input type="number" class="input" id="interval" placeholder="Interval in seconds"
-                        v-model="tab.nodesList[0].data.interval" v-if="tab.nodesList[0].data" />
-                    <label>Days of the week:</label>
-                    <div class="week">
-                        <div class="weekdays">
-                            <label v-for="(day, index) in ['S', 'M', 'T', 'W', 'T', 'F', 'S']" :key="day"
-                                class="day-box">
-                                <input type="checkbox" :value="day" v-model="tab.nodesList[0].data.weeks.boolitemsList[index]"
-                                    v-if="tab.nodesList && tab.nodesList[0].data && tab.nodesList[0].data.weeks" />
-                                <span class="day-label">{{ day }}</span>
-                            </label>
-                        </div>
+                <div class="node-configuration">
+                    <div class="node-configuration__label">
+                        <span class="material-symbols-outlined node-configuration__labelicon">settings</span>
+                        <span>Node configuration ({{ toSentenceCase(tab.nodesList?.[0]?.nodetype || tab.type) }})</span>
+                    </div>
+                    <Divider />
+                    <WorkflowNodeSidebarFields
+                        v-if="tab.nodesList?.[0]?.data"
+                        :nodeType="tab.nodesList[0].nodetype"
+                        v-model="tab.nodesList[0].data"
+                        :tabid="props.id" />
+                    <div v-else class="node-configuration__empty">
+                        No additional fields required.
                     </div>
                 </div>
             </div>
@@ -78,15 +43,17 @@
 
 <script setup lang="ts">
 import WorkflowIcon from '@/views/Workflow/Workflow.Icon.vue'
+import Divider from 'primevue/divider'
 import { ProcessTypeProps } from './Workflow.Modal.ProcessType.types'
 import { useTab } from '@/views/Workflow'
-import { useProcessTypeHooks, useProcessTypeStore } from './Workflow.Modal.ProcessTab.hooks'
-import { useProcessTypeHelpers, copyToClipboard } from './Workflow.Modal.ProcessType.helper'
+import { useProcessTypeHooks } from './Workflow.Modal.ProcessTab.hooks'
+import { useProcessTypeHelpers } from './Workflow.Modal.ProcessType.helper'
+import { SidebarCanvasFields as WorkflowNodeSidebarFields } from '@/views/Workflow/Sidebar'
+import { toSentenceCase } from '@/components/Composable/Utilities'
 
 const props = defineProps<ProcessTypeProps>()
 const { tab } = useTab(props.id)
-const { webhookUrl, isSelected } = useProcessTypeHooks(props.id)
-const { showTooltip } = useProcessTypeStore()
+const { isSelected } = useProcessTypeHooks(props.id)
 const { selectNode } = useProcessTypeHelpers(props.id)
 </script>
 
