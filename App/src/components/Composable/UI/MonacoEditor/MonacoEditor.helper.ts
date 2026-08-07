@@ -25,12 +25,33 @@ export const registerCustomLanguage = (props: MonacoEditorProps) => {
     return registerCompletionProvider(props)
 }
 
+export const formatAndDetectLanguage = (val: string) => {
+    if (!val || typeof val !== 'string') return { value: val || '', language: LANGUAGE }
+    const trimmed = val.trim()
+    if ((trimmed.startsWith('{') && trimmed.endsWith('}')) || (trimmed.startsWith('[') && trimmed.endsWith(']'))) {
+        try {
+            const parsed = JSON.parse(trimmed)
+            if (typeof parsed === 'object' && parsed !== null) {
+                return {
+                    value: JSON.stringify(parsed, null, 2),
+                    language: 'json'
+                }
+            }
+        } catch {
+            // Not valid JSON
+        }
+    }
+    return { value: val, language: LANGUAGE }
+}
+
 export const initMonacoEditor = (editorContainer: Ref<HTMLDivElement | null>, props: MonacoEditorProps, emit: (event: "update:modelValue", ...args: any[]) => void) => {
     let editorInstance: monaco.editor.IStandaloneCodeEditor | null = null
     if (editorContainer.value) {
+        const { value, language } = formatAndDetectLanguage(props.modelValue || '')
+
         editorInstance = monaco.editor.create(editorContainer.value, {
-            value: props.modelValue,
-            language: LANGUAGE,
+            value: value,
+            language: language,
             automaticLayout: true,
             theme: TEMPLATE,
             wordWrap: 'on',
@@ -42,8 +63,8 @@ export const initMonacoEditor = (editorContainer: Ref<HTMLDivElement | null>, pr
         })
 
         editorInstance.onDidChangeModelContent(() => {
-            const value = editorInstance?.getValue() || ''
-            emit(EMIT_MODAL, value)
+            const val = editorInstance?.getValue() || ''
+            emit(EMIT_MODAL, val)
         })
     }
     if (editorInstance) {

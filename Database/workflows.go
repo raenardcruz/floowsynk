@@ -2,6 +2,7 @@ package DB
 
 import (
 	"context"
+	"database/sql/driver"
 	"encoding/json"
 	"errors"
 	"log"
@@ -27,17 +28,28 @@ type Workflow struct {
 	UpdatedAt   int64
 }
 
+func (j JSONB) Value() (driver.Value, error) {
+	if len(j) == 0 {
+		return nil, nil
+	}
+	return string(j), nil
+}
+
 func (j *JSONB) Scan(value interface{}) error {
 	if value == nil {
 		*j = nil
 		return nil
 	}
-	s, ok := value.([]byte)
-	if !ok {
+	switch v := value.(type) {
+	case []byte:
+		*j = append((*j)[0:0], v...)
+		return nil
+	case string:
+		*j = append((*j)[0:0], []byte(v)...)
+		return nil
+	default:
 		return errors.New("invalid scan source for JSONB")
 	}
-	*j = append((*j)[0:0], s...)
-	return nil
 }
 
 func (db *DatabaseConnection) CreateWorkflow(workflow *pb.Workflow) (string, error) {

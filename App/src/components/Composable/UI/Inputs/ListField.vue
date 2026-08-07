@@ -17,7 +17,8 @@
       <div v-for="(_, index) in displayItems" :key="`item-${index}`" class="listfield-wrapper__item">
         <div style="width: 100%; min-width: 200px; margin: 0;">
           <component :is="getComponentForType(currentDataType).component" v-model="displayItems[index]"
-            v-bind="getComponentPropsForIndex(index)" :disabled="disabled" :invalid="invalid" />
+            v-bind="getComponentPropsForIndex(index)" :disabled="disabled" :invalid="invalid"
+            :editorConfig="disabled ? { variables: [], target: 'body' } : null" />
         </div>
         <Button size="small" text :disabled="disabled" @click="removeItem(index)" style="width: 24px; border-radius: 50px;">
           <img :src="TrashSvg" alt="Remove" style="width: 16px; height: 16px;" />

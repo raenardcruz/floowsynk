@@ -26,7 +26,7 @@
             </div>
             <div class="node-variables__caption">{{ node.id }}</div>
             <Divider />
-            <WorkflowNodeSidebarFields :nodeType="nodetype" v-model="node.data" :tabid="props.tabid" />
+            <WorkflowNodeSidebarFields :nodeType="nodetype" v-model="node.data" :tabid="props.tabid" :disabled="isRunning" />
         </div>
     </Popover>
     <Teleport :to="`#${canvasId}`">

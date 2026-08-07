@@ -49,36 +49,37 @@ func (wp *WorkflowProcessor) UpdateStatus(node *proto.Node, status proto.NodeSta
 		wp.Stream.SendMsg(res)
 	}
 
-	// DB Record format
-	data, err := json.Marshal(res.Data)
-	if err != nil {
-		fmt.Printf("Error marshaling RunWorkflowResponse: %v\n", err)
-		return
-	}
-	variables, err := json.Marshal(res.Variables)
-	if err != nil {
-		fmt.Printf("Error marshaling RunWorkflowResponse: %v\n", err)
-		return
-	}
-	dbRD := DB.ReplayData{
-		ProcessID:       wp.ID,
-		WorkflowID:      wp.Workflow.Id,
-		NodeID:          res.NodeId,
-		Data:            data,
-		Variables:       variables,
-		Status:          int32(res.Status),
-		Message:         res.Message,
-		ProcessSequence: int(wp.Step),
-	}
-	rdBytes, err := json.Marshal(dbRD)
-	if err != nil {
-		fmt.Printf("Error marshaling RunWorkflowResponse: %v\n", err)
-		return
-	}
-	if wp.Producer != nil && *wp.Producer != nil {
-		kafka.SendMessage(*wp.Producer, Broker.WORKFLOW_REPLAY_DATA, wp.ID, string(rdBytes))
-	} else {
-		fmt.Printf("Warning: Kafka producer is not initialized, skipping log sending for ProcessID %s, NodeID %s\n", wp.ID, res.NodeId)
+	// DB Record format - save step to DB if it has replay data / message or is completed/failed/info
+	if includeReplayData || message != "" || status != proto.NodeStatus_RUNNING {
+		data, err := json.Marshal(res.Data)
+		if err != nil {
+			fmt.Printf("Error marshaling RunWorkflowResponse: %v\n", err)
+			return
+		}
+		variables, err := json.Marshal(res.Variables)
+		if err != nil {
+			fmt.Printf("Error marshaling RunWorkflowResponse: %v\n", err)
+			return
+		}
+		dbRD := DB.ReplayData{
+			ProcessID:       wp.ID,
+			WorkflowID:      wp.Workflow.Id,
+			NodeID:          res.NodeId,
+			Data:            data,
+			Variables:       variables,
+			Status:          int32(res.Status),
+			Message:         res.Message,
+			ProcessSequence: int(wp.Step),
+		}
+		rdBytes, err := json.Marshal(dbRD)
+		if err == nil {
+			if wp.Producer != nil && *wp.Producer != nil {
+				kafka.SendMessage(*wp.Producer, Broker.WORKFLOW_REPLAY_DATA, wp.ID, string(rdBytes))
+			}
+			if _, err := wp.DBcon.CreateReplayData(&dbRD); err != nil {
+				fmt.Printf("Error saving replay data to DB: %v\n", err)
+			}
+		}
 	}
 }
 

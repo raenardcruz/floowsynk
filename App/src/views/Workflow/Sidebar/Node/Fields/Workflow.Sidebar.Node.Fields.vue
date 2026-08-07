@@ -37,10 +37,11 @@
                 <label :for="'field-' + field.key" style="font-size: 0.8rem; color: var(--text-color); font-weight: 500;">
                     {{ field.label }} <span style="color: #ff5252;">*</span>
                 </label>
-                <TextInput
+                <TextCodeInput
                     :id="'field-' + field.key"
                     :placeholder="field.placeholder"
                     :disabled="disabled"
+                    :editorConfig="disabled || MONACO_EDITOR_DATA_PROPERTIES.includes(field.key) ? { variables: variables, target: 'body' } : null"
                     :modelValue="actionFieldValues[field.key] || ''"
                     @update:modelValue="(val: any) => updateActionFieldValue(field.key, String(val))"
                     class="w-full"
@@ -57,17 +58,18 @@
         </div>
         <div>
             <label style="font-weight: 600; font-size: 0.85rem; color: var(--text-color); display: block; margin-bottom: 4px;">Output Variable</label>
-            <TextInput
+            <TextCodeInput
                 v-model="modelValue['variable']"
                 placeholder="e.g. response"
-                :disabled="disabled" />
+                :disabled="disabled"
+                :editorConfig="disabled ? { variables: variables, target: 'body' } : null" />
         </div>
     </div>
     <div v-else-if="props.nodeType === 'webhook' && modelValue" class="webhook-config" style="display: flex; flex-direction: column; gap: 12px; padding: 4px;">
         <div>
             <label style="font-weight: 600; font-size: 0.85rem; color: var(--text-color); display: block; margin-bottom: 4px;">Webhook Secret Token</label>
             <div style="display: flex; gap: 8px;">
-                <TextInput placeholder="Secret key (optional)" v-model="modelValue['value']" style="flex: 1;" :disabled="disabled" />
+                <TextCodeInput placeholder="Secret key (optional)" v-model="modelValue['value']" style="flex: 1;" :disabled="disabled" :editorConfig="disabled || MONACO_EDITOR_DATA_PROPERTIES.includes('value') ? { variables: variables, target: 'body' } : null" />
                 <button type="button" @click="modelValue['value'] = generateRandomSecret()" :disabled="disabled" style="background: var(--primary-color); color: white; border: none; border-radius: 4px; padding: 0 12px; cursor: pointer; font-size: 0.8rem; font-weight: 500;">Generate</button>
             </div>
             <small style="color: var(--text-color-secondary); font-size: 0.75rem; margin-top: 4px; display: block;">If set, requests must include the <code>X-Webhook-Secret</code> header.</small>
@@ -92,7 +94,7 @@
     <div v-else-if="props.nodeType === 'interval' && modelValue" class="interval-config" style="display: flex; flex-direction: column; gap: 12px; padding: 4px;">
         <div>
             <label style="font-weight: 600; font-size: 0.85rem; color: var(--text-color); display: block; margin-bottom: 4px;">Interval Value</label>
-            <TextInput v-model="modelValue['interval']" :disabled="disabled" />
+            <TextCodeInput v-model="modelValue['interval']" :disabled="disabled" :editorConfig="disabled ? { variables: variables, target: 'body' } : null" />
         </div>
         <div>
             <label style="font-weight: 600; font-size: 0.85rem; color: var(--text-color); display: block; margin-bottom: 4px;">Interval Unit</label>
@@ -141,6 +143,14 @@
             <component :is="getComponent(key, value)?.component" v-bind="getComponent(key, value)?.props" v-model="modelValue[key]" />
         </div>
     </template>
+    <div v-else-if="modelValue != null" style="margin-top: 8px;">
+        <TextCodeInput
+            :modelValue="String(modelValue)"
+            :disabled="disabled"
+            :editorConfig="disabled ? { variables: variables, target: 'body' } : null"
+            @update:modelValue="modelValue = $event"
+        />
+    </div>
 </template>
 
 <script setup lang="ts">
@@ -150,12 +160,13 @@ import { SidebarNodeProps } from '../Workflow.Sidebar.Node.types'
 import { useSidebarNodeHooks } from '../Workflow.Sidebar.Node.hooks'
 import { toSentenceCase } from '@/components/Composable/Utilities'
 import { MONACO_EDITOR_DATA_PROPERTIES } from './Workflow.Sidebar.Node.Fields.constants'
-import { Checkbox as CheckboxInput, TextCodeInput, Select as SelectInput, ListField as ListInput, TextInput } from '@/components/Composable/UI/Inputs'
+import { Checkbox as CheckboxInput, TextCodeInput, Select as SelectInput, ListField as ListInput } from '@/components/Composable/UI/Inputs'
 import { useTab } from '@/views/Workflow'
 import { getConnections } from '@/views/Connectors/Connectors.api'
 
 const props = defineProps<SidebarNodeProps>()
-const modelValue = defineModel<Record<string, any>>()
+const disabled = computed(() => props.disabled)
+const modelValue = defineModel<any>()
 const { tab } = useTab(props.tabid)
 
 const connectionsList = ref<any[]>([])
@@ -331,9 +342,10 @@ const isNodeArray = (obj: any): boolean => {
     }
 }
 
-const getComponent = (key: string, value: any) => {
-    const label = toSentenceCase(key)
-    if (value.constructor === Object) {
+const getComponent = (key: string | number, value: any) => {
+    const keyStr = String(key)
+    const label = toSentenceCase(keyStr)
+    if (value != null && typeof value === 'object' && value.constructor === Object) {
         if (isNodeArray(value)) {
             return {
                 component: ListInput,
@@ -353,9 +365,10 @@ const getComponent = (key: string, value: any) => {
             }
         }
     } else {
-        switch (value.constructor) {
+        const ctor = value != null ? value.constructor : String
+        switch (ctor) {
             case String:
-                const enableEditor = MONACO_EDITOR_DATA_PROPERTIES.includes(key)
+                const enableEditor = MONACO_EDITOR_DATA_PROPERTIES.includes(keyStr) || Boolean(props.disabled)
                 return {
                     component: TextCodeInput,
                     props: {
@@ -373,7 +386,11 @@ const getComponent = (key: string, value: any) => {
                     props: {
                         label,
                         type: 'number',
-                        disabled: props.disabled
+                        disabled: props.disabled,
+                        editorConfig: props.disabled ? {
+                            variables: variables.value,
+                            target: 'body'
+                        } : null
                     }
                 }
             case Boolean:
@@ -385,7 +402,17 @@ const getComponent = (key: string, value: any) => {
                     }
                 }
             default:
-                return null
+                return {
+                    component: TextCodeInput,
+                    props: {
+                        label,
+                        disabled: props.disabled,
+                        editorConfig: props.disabled ? {
+                            variables: variables.value,
+                            target: 'body'
+                        } : null
+                    }
+                }
         }
     }
 }

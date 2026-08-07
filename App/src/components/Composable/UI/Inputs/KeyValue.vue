@@ -11,25 +11,23 @@
       {{ label }}
     </div>
 
-    <FloatLabel variant="on" style="margin-top: 8px;">
-      <InputText ref="keyInputRef" :id="keyInputId" v-model="keyValue" :placeholder="keyPlaceholder || 'Key'"
-        :disabled="disabled" :invalid="invalid" :class="[
-          keyValueVariantClasses[variant || 'outlined'],
-          keyValueSizeClasses[size || 'medium'],
-          'keyvalue-wrapper__key-input'
-        ]" @focus="handleKeyFocus" @blur="handleKeyBlur" />
-      <label :for="keyInputId">Key</label>
-    </FloatLabel>
+    <TextCodeInput ref="keyInputRef" :id="keyInputId" v-model="keyValue" :placeholder="keyPlaceholder || 'Key'"
+      label="Key" :disabled="disabled" :invalid="invalid"
+      :editorConfig="disabled ? { variables: [], target: 'body' } : null"
+      :class="[
+        keyValueVariantClasses[variant || 'outlined'],
+        keyValueSizeClasses[size || 'medium'],
+        'keyvalue-wrapper__key-input'
+      ]" @focus="handleKeyFocus" @blur="handleKeyBlur" />
 
-    <FloatLabel variant="on" style="margin-top: 8px;">
-      <InputText ref="valueInputRef" :id="valueInputId" v-model="valueValue" :placeholder="valuePlaceholder || 'Value'"
-        :disabled="disabled" :invalid="invalid" :class="[
-          keyValueVariantClasses[variant || 'outlined'],
-          keyValueSizeClasses[size || 'medium'],
-          'keyvalue-wrapper__value-input'
-        ]" @focus="handleValueFocus" @blur="handleValueBlur" />
-      <label :for="valueInputId">Value</label>
-    </FloatLabel>
+    <TextCodeInput ref="valueInputRef" :id="valueInputId" v-model="valueValue" :placeholder="valuePlaceholder || 'Value'"
+      label="Value" :disabled="disabled" :invalid="invalid"
+      :editorConfig="disabled ? { variables: [], target: 'body' } : null"
+      :class="[
+        keyValueVariantClasses[variant || 'outlined'],
+        keyValueSizeClasses[size || 'medium'],
+        'keyvalue-wrapper__value-input'
+      ]" @focus="handleValueFocus" @blur="handleValueBlur" />
 
     <div class="divider"></div>
   </div>
@@ -38,8 +36,7 @@
 <script setup lang="ts">
 import { ref, computed, nextTick } from 'vue'
 import { generateId } from '../utils/component'
-import FloatLabel from 'primevue/floatlabel'
-import InputText from 'primevue/inputtext'
+import TextCodeInput from './TextCodeInput.vue'
 
 import type {
   KeyValueWrapperProps,

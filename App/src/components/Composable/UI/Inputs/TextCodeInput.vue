@@ -24,6 +24,18 @@
     </label>
   </FloatLabel>
 
+  <IconField v-else-if="editorConfig">
+    <InputText ref="primevueRef" :id="inputId" v-model="internalValue" :type="inputType" :placeholder="placeholder"
+      :disabled="disabled" :invalid="invalid" :class="[
+        textCodeInputVariantClasses[variant ?? 'outlined'],
+        textCodeInputSizeClasses[size ?? 'medium'],
+        'textcodeinput-wrapper__input'
+      ]" @focus="handleFocus" @blur="handleBlur" @keydown="handleKeydown" @keyup="handleKeyup" />
+    <InputIcon pt:root:class="icon-position" @click="openEditor" v-tooltip.bottom="'Code Editor'">
+      <img class="code-icon" :src="MapEmbedSVG" alt="Map Embed Icon" />
+    </InputIcon>
+  </IconField>
+
   <InputText v-else ref="primevueRef" :id="inputId" v-model="internalValue" :type="inputType" :placeholder="placeholder"
     :disabled="disabled" :invalid="invalid" :class="[
       textCodeInputVariantClasses[variant ?? 'outlined'],
@@ -234,7 +246,8 @@ defineExpose<TextCodeInputWrapperExposed>({
 
 :deep(.icon-position) {
   transform: translateY(-50%);
-  cursor: pointer;
+  cursor: pointer !important;
+  pointer-events: auto !important;
   padding: 4px;
   border-radius: 50px;
   transition: all 0.15s ease-in-out;

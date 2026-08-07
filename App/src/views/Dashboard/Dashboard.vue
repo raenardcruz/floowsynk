@@ -186,7 +186,7 @@
 
           <Column header="Action" class="text-right" style="width: 80px;">
             <template #body="slotProps">
-              <button class="icon-btn" @click="viewRunDetails(slotProps.data.id)" title="View Run Log">
+              <button class="icon-btn" @click="viewRunDetails(slotProps.data)" title="View Run Log">
                 <i class="pi pi-search"></i>
               </button>
             </template>
@@ -358,7 +358,7 @@ const fetchData = async () => {
       workflowName: h.getWorkflowname(),
       runDate: h.getRundate(),
       status: h.getStatus()
-    }));
+    })).sort((a, b) => new Date(b.runDate).getTime() - new Date(a.runDate).getTime());
     
     workflowsList.value = workflows.getWorkflowsList().map(w => ({
       id: w.getId(),
@@ -373,8 +373,14 @@ const fetchData = async () => {
   }
 };
 
-const viewRunDetails = (processId: string) => {
-  console.log('Viewing details for:', processId);
+import { useRouter } from 'vue-router';
+import { historyClicked } from '@/views/Workflow/Process/Process.List.helper';
+
+const router = useRouter();
+
+const viewRunDetails = async (runItem: any) => {
+  await router.push('/workflow');
+  historyClicked({ id: runItem.id, workflowid: runItem.workflowId } as any);
 };
 
 onMounted(() => {

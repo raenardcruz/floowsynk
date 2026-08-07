@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net"
@@ -116,6 +117,7 @@ func startRESTServer() {
 	restServer.HandleFunc("/api/connectors/check", checkConnectionHandler)
 	restServer.HandleFunc("/api/connectors/create", createConnectionHandler)
 	restServer.HandleFunc("/api/connectors/rename", updateConnectionHandler)
+	restServer.HandleFunc("/api/history/clear", clearHistoryHandler)
 
 	go func() {
 		log.Println("REST API server started at", restAPIPort)
@@ -666,5 +668,19 @@ func listConnectorTemplatesHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(templates)
+}
+
+func clearHistoryHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost && r.Method != http.MethodDelete {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	if err := DBCon.ClearAllReplayData(); err != nil {
+		http.Error(w, fmt.Sprintf("Failed to clear history: %v", err), http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(`{"success": true, "message": "Run history cleared"}`))
 }
 

@@ -179,14 +179,19 @@ func GetWorkflowHistoryImpl(Id string) (*wf.WorkflowHistoryResponse, error) {
 	var data []*wf.ReplayData
 	for _, rd := range replayDataList {
 		var nodeData wf.NodeData
-		if err := json.Unmarshal([]byte(rd.Data), &nodeData); err != nil {
-			log.Printf("Error unmarshalling data: %v", err)
-			return nil, err
+		if len(rd.Data) > 0 && string(rd.Data) != "null" {
+			if err := json.Unmarshal([]byte(rd.Data), &nodeData); err != nil {
+				log.Printf("Warning unmarshalling replay data for node %s: %v", rd.NodeID, err)
+			}
 		}
 		var variables map[string]string
-		if err := json.Unmarshal([]byte(rd.Variables), &variables); err != nil {
-			log.Printf("Error unmarshalling variables: %v", err)
-			return nil, err
+		if len(rd.Variables) > 0 && string(rd.Variables) != "null" {
+			if err := json.Unmarshal([]byte(rd.Variables), &variables); err != nil {
+				log.Printf("Warning unmarshalling replay variables for node %s: %v", rd.NodeID, err)
+			}
+		}
+		if variables == nil {
+			variables = make(map[string]string)
 		}
 
 		data = append(data, &wf.ReplayData{

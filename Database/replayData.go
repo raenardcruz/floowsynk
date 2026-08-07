@@ -104,7 +104,7 @@ func (db *DatabaseConnection) GetWorkflowHistory() ([]ReplayData, error) {
 		}
 	}
 
-	result := db.conn.Select("process_id, workflow_id, min(created_at) as created_at, MAX(CASE WHEN status = 2 THEN 2 WHEN status = 1 THEN 1 ELSE 0 END) as status").Group("process_id, workflow_id").Find(&replayData)
+	result := db.conn.Select("process_id, workflow_id, min(created_at) as created_at, MAX(CASE WHEN status = 2 THEN 2 WHEN status = 1 THEN 1 ELSE 0 END) as status").Group("process_id, workflow_id").Order("created_at DESC").Find(&replayData)
 
 	if result.Error != nil {
 		return nil, result.Error
@@ -153,5 +153,19 @@ func (db *DatabaseConnection) Cleanup(retention int) error {
 	}
 	log.Printf("SQL: %v, Rows Affected: %d", result.Statement.SQL.String(), result.RowsAffected)
 	log.Printf("Cleaned up Replay Data older than %d days", retention)
+	return nil
+}
+
+func (db *DatabaseConnection) ClearAllReplayData() error {
+	result := db.conn.Exec("TRUNCATE TABLE replay_data;")
+	if err := result.Error; err != nil {
+		return err
+	}
+	ctx := context.Background()
+	DeleteCache(ctx, "replayHistoryList")
+	if RedisClient != nil {
+		ClearCache(ctx)
+	}
+	log.Printf("All Replay Data cleared from DB and Redis Cache.")
 	return nil
 }

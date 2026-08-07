@@ -69,7 +69,7 @@ func DeleteCache(ctx context.Context, key string) error {
 }
 
 func ClearCache(ctx context.Context) error {
-	if !UseCache {
+	if !UseCache || RedisClient == nil {
 		return nil
 	}
 	keys, err := RedisClient.Keys(ctx, "*").Result()
