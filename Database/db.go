@@ -48,13 +48,24 @@ type Config struct {
 	Job_Token          string
 	JWT_Secret         string
 	Crypto_Key         string
+	// Environment: "staging" or "production"
+	App_Environment    string
+	// Production target for publish-from-staging (leave blank for same-DB mode)
+	Prod_Server_URL    string
+	Prod_API_Token     string
 }
 
 var AppConfig *Config
 var UseCache = true
 
 func init() {
-	godotenv.Load()
+	// Support ENV_FILE=path/to/.env.production to run multiple environments locally
+	envFile := os.Getenv("ENV_FILE")
+	if envFile == "" {
+		envFile = ".env"
+	}
+	godotenv.Load(envFile)
+
 	AppConfig = &Config{
 		DB_HOST:            getEnv("DB_HOST", "localhost"),
 		DB_PORT:            getEnvAsInt("DB_PORT", 5432),
@@ -75,6 +86,9 @@ func init() {
 		Job_Token:          getEnv("JOB_TOKEN", "6c9e5318-6e7b-452d-9e22-9f35a755bcbd"),
 		JWT_Secret:         getEnv("JWT_SECRET", "secret_key"),
 		Crypto_Key:         getEnv("CRYPTO_KEY", "HGD86teHeCb3Gl7Q"),
+		App_Environment:    getEnv("APP_ENVIRONMENT", "staging"),
+		Prod_Server_URL:    getEnv("PROD_SERVER_URL", ""),
+		Prod_API_Token:     getEnv("PROD_API_TOKEN", ""),
 	}
 }
 
@@ -149,6 +163,7 @@ func (db *DatabaseConnection) MigrateAndSeedDatabase() error {
 	models := []interface{}{
 		&Users{},
 		&Workflow{},
+		&WorkflowVersion{},
 		&ReplayData{},
 		&Feature{},
 		&Connection{},

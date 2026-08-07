@@ -16,11 +16,15 @@ RUN npm install
 ARG VITE_SERVER
 ENV VITE_SERVER=$VITE_SERVER
 
+ARG VITE_APP_ENVIRONMENT=staging
+ENV VITE_APP_ENVIRONMENT=$VITE_APP_ENVIRONMENT
+
 # Copy source code
 COPY App/ .
 
 # Build the app (assuming production build)
 RUN npm run build
+
 
 # Final stage - serve with Nginx
 FROM nginx:alpine

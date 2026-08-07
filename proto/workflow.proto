@@ -81,6 +81,36 @@ message Workflow {
     optional bool isNew = 12;
 }
 
+// WorkflowVersion is a point-in-time snapshot of a workflow (staging only).
+message WorkflowVersion {
+    string id = 1;
+    string workflowId = 2;
+    int32  versionNum = 3;
+    string label = 4;       // user-defined label, e.g. "v3 - fixed loop"
+    repeated Node nodes = 5;
+    repeated Edge edges = 6;
+    string savedBy = 7;
+    string savedAt = 8;     // formatted timestamp
+}
+
+message WorkflowVersionList {
+    repeated WorkflowVersion versions = 1;
+}
+
+message GetWorkflowVersionsRequest {
+    string workflowId = 1;
+}
+
+message PublishWorkflowRequest {
+    string workflowId = 1;
+    string versionId = 2;   // empty = publish current live staging workflow
+}
+
+message PublishWorkflowResponse {
+    bool   success = 1;
+    string message = 2;
+}
+
 message Edge {
     string id = 1;
     string type = 2;
@@ -249,4 +279,8 @@ service WorkflowService {
     rpc ListConnectorTemplates(google.protobuf.Empty) returns (ConnectorTemplateList);
     rpc ListConnections(google.protobuf.Empty) returns (ConnectionList);
     rpc DeleteConnection(DeleteConnectionRequest) returns (google.protobuf.Empty);
+    // Versioning (staging environment only)
+    rpc ListWorkflowVersions(GetWorkflowVersionsRequest) returns (WorkflowVersionList);
+    rpc RestoreWorkflowVersion(WorkflowVersion) returns (Workflow);
+    rpc PublishWorkflow(PublishWorkflowRequest) returns (PublishWorkflowResponse);
 }

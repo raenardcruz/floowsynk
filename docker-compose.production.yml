@@ -1,0 +1,83 @@
+services:
+  # ─────────────────────────────────────────────
+  # Backend server (production)
+  # ─────────────────────────────────────────────
+  server-production:
+    build:
+      context: .
+      dockerfile: Server/Dockerfile
+    container_name: floowsynk-server-production
+    ports:
+      - "8084:8084"   # gRPC-Web
+      - "8085:8085"   # REST API
+      - "50052:50052" # Plain gRPC
+    env_file:
+      - ./Server/.env.production
+    environment:
+      - DB_HOST=${DB_HOST:-host.docker.internal}
+      - REDIS_HOST=${REDIS_HOST:-host.docker.internal}
+      - KAFKA_BROKERS=${KAFKA_BROKERS:-host.docker.internal:9092}
+      - APP_ENVIRONMENT=production
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+
+  # ─────────────────────────────────────────────
+  # Kafka consumer job (production)
+  # ─────────────────────────────────────────────
+  consumer-production:
+    build:
+      context: .
+      dockerfile: Jobs/Consumer/Dockerfile
+    container_name: floowsynk-consumer-production
+    env_file:
+      - ./Server/.env.production
+    environment:
+      - DB_HOST=${DB_HOST:-host.docker.internal}
+      - REDIS_HOST=${REDIS_HOST:-host.docker.internal}
+      - KAFKA_BROKERS=${KAFKA_BROKERS:-host.docker.internal:9092}
+      - APP_ENVIRONMENT=production
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - server-production
+    restart: unless-stopped
+
+  # ─────────────────────────────────────────────
+  # Interval trigger job (production)
+  # ─────────────────────────────────────────────
+  interval-production:
+    build:
+      context: .
+      dockerfile: Jobs/Interval/Dockerfile
+    container_name: floowsynk-interval-production
+    env_file:
+      - ./Server/.env.production
+    environment:
+      - DB_HOST=${DB_HOST:-host.docker.internal}
+      - REDIS_HOST=${REDIS_HOST:-host.docker.internal}
+      - KAFKA_BROKERS=${KAFKA_BROKERS:-host.docker.internal:9092}
+      - SERVER_GRPC_HOST=server-production
+      - APP_ENVIRONMENT=production
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - server-production
+    restart: unless-stopped
+
+  # ─────────────────────────────────────────────
+  # Frontend app (production)
+  # ─────────────────────────────────────────────
+  app-production:
+    build:
+      context: .
+      dockerfile: App/Dockerfile
+      args:
+        - VITE_SERVER=${VITE_SERVER_PRODUCTION:-http://localhost:8084}
+        - VITE_APP_ENVIRONMENT=production
+    container_name: floowsynk-app-production
+    ports:
+      - "3001:80"   # http://localhost:3001
+    depends_on:
+      - server-production
+    restart: unless-stopped

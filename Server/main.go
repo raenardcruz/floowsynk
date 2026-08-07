@@ -85,6 +85,7 @@ func initializeDatabase() (err error) {
 	if err := workflow.LoadConnectorTemplates("connectors/templates"); err != nil {
 		log.Printf("Warning: Failed to load connector templates: %v", err)
 	}
+	log.Printf("🌍 Running in environment: %s", db.AppConfig.App_Environment)
 	return nil
 }
 
@@ -118,6 +119,8 @@ func startRESTServer() {
 	restServer.HandleFunc("/api/connectors/create", createConnectionHandler)
 	restServer.HandleFunc("/api/connectors/rename", updateConnectionHandler)
 	restServer.HandleFunc("/api/history/clear", clearHistoryHandler)
+	// Publish endpoint: receives workflow pushes from a staging server (production mode only)
+	restServer.HandleFunc("/api/publish/workflow", publishWorkflowHandler)
 
 	go func() {
 		log.Println("REST API server started at", restAPIPort)
@@ -683,4 +686,44 @@ func clearHistoryHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(`{"success": true, "message": "Run history cleared"}`))
 }
+
+// publishWorkflowHandler receives a workflow published from a staging server.
+// The production server must have APP_ENVIRONMENT=production and PROD_API_TOKEN set identically.
+func publishWorkflowHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Only POST method is allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Validate the API token
+	token := r.Header.Get("Authorization")
+	if token == "" || token != db.AppConfig.Prod_API_Token {
+		http.Error(w, "Unauthorized: Invalid or missing API token", http.StatusUnauthorized)
+		return
+	}
+
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "Failed to read request body", http.StatusBadRequest)
+		return
+	}
+	defer r.Body.Close()
+
+	var workflow wf.Workflow
+	if err := json.Unmarshal(body, &workflow); err != nil {
+		http.Error(w, "Invalid workflow payload: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	// Upsert workflow into production environment
+	if err := DBCon.PublishWorkflowVersion(workflow.Id, ""); err != nil {
+		http.Error(w, "Failed to save workflow to production: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(`{"success": true, "message": "Workflow published to production"}`))
+}
+
 

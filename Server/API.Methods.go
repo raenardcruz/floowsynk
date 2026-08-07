@@ -207,3 +207,125 @@ func GetWorkflowHistoryImpl(Id string) (*wf.WorkflowHistoryResponse, error) {
 		Data: data,
 	}, nil
 }
+
+// ListWorkflowVersionsImpl returns all version snapshots for a workflow.
+// Only meaningful in staging environments.
+func ListWorkflowVersionsImpl(workflowID string) (*wf.WorkflowVersionList, error) {
+	versions, err := DBCon.ListWorkflowVersions(workflowID)
+	if err != nil {
+		return nil, err
+	}
+	return &wf.WorkflowVersionList{Versions: versions}, nil
+}
+
+// RestoreWorkflowVersionImpl restores the live staging workflow to a previous version's snapshot.
+func RestoreWorkflowVersionImpl(version *wf.WorkflowVersion, userID string) (*wf.Workflow, error) {
+	if DB.AppConfig.App_Environment != "staging" {
+		return nil, fmt.Errorf("version restore is only available in the staging environment")
+	}
+	// Fetch the current workflow to preserve metadata
+	existing, err := DBCon.GetWorkflow(version.WorkflowId)
+	if err != nil {
+		return nil, fmt.Errorf("workflow %s not found: %w", version.WorkflowId, err)
+	}
+	// Apply the version's nodes and edges onto the live workflow
+	existing.Nodes = version.Nodes
+	existing.Edges = version.Edges
+	existing.UpdatedBy = userID
+	if err := DBCon.UpdateWorkflow(existing); err != nil {
+		return nil, fmt.Errorf("failed to restore workflow version: %w", err)
+	}
+	return existing, nil
+}
+
+// PublishWorkflowImpl pushes a workflow version to production.
+// If PROD_SERVER_URL is set, it pushes via HTTP to the remote server.
+// Otherwise, it upserts the workflow in the same DB with environment="production".
+func PublishWorkflowImpl(req *wf.PublishWorkflowRequest) (*wf.PublishWorkflowResponse, error) {
+	if DB.AppConfig.App_Environment != "staging" {
+		return &wf.PublishWorkflowResponse{
+			Success: false,
+			Message: "Publishing is only available from the staging environment",
+		}, nil
+	}
+
+	// Remote server publish mode
+	if DB.AppConfig.Prod_Server_URL != "" {
+		resp, err := publishToRemoteServer(req)
+		if err != nil {
+			return &wf.PublishWorkflowResponse{Success: false, Message: err.Error()}, nil
+		}
+		return resp, nil
+	}
+
+	// Same-DB publish mode: upsert with environment="production"
+	if err := DBCon.PublishWorkflowVersion(req.WorkflowId, req.VersionId); err != nil {
+		return &wf.PublishWorkflowResponse{
+			Success: false,
+			Message: fmt.Sprintf("Failed to publish workflow: %v", err),
+		}, nil
+	}
+	return &wf.PublishWorkflowResponse{
+		Success: true,
+		Message: fmt.Sprintf("Workflow %s published to production successfully", req.WorkflowId),
+	}, nil
+}
+
+// publishToRemoteServer sends a publish request to a separate production server via HTTP.
+func publishToRemoteServer(req *wf.PublishWorkflowRequest) (*wf.PublishWorkflowResponse, error) {
+	// Fetch the workflow version data to send
+	workflow, err := DBCon.GetWorkflow(req.WorkflowId)
+	if err != nil {
+		return nil, fmt.Errorf("workflow not found: %w", err)
+	}
+
+	// If a specific version is requested, load it
+	if req.VersionId != "" {
+		version, err := DBCon.GetWorkflowVersion(req.VersionId)
+		if err != nil {
+			return nil, fmt.Errorf("version not found: %w", err)
+		}
+		var nodes []*wf.Node
+		var edges []*wf.Edge
+		if err := json.Unmarshal(version.Nodes, &nodes); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal version nodes: %w", err)
+		}
+		if err := json.Unmarshal(version.Edges, &edges); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal version edges: %w", err)
+		}
+		workflow.Nodes = nodes
+		workflow.Edges = edges
+	}
+
+	payload, err := json.Marshal(workflow)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal workflow: %w", err)
+	}
+
+	targetURL := DB.AppConfig.Prod_Server_URL + "/api/publish/workflow"
+	httpReq, err := http.NewRequest(http.MethodPost, targetURL, strings.NewReader(string(payload)))
+	if err != nil {
+		return nil, fmt.Errorf("failed to create HTTP request: %w", err)
+	}
+	httpReq.Header.Set("Content-Type", "application/json")
+	httpReq.Header.Set("Authorization", DB.AppConfig.Prod_API_Token)
+
+	client := &http.Client{Timeout: 30 * time.Second}
+	resp, err := client.Do(httpReq)
+	if err != nil {
+		return nil, fmt.Errorf("failed to reach production server: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return &wf.PublishWorkflowResponse{
+			Success: false,
+			Message: fmt.Sprintf("Production server returned status %d", resp.StatusCode),
+		}, nil
+	}
+	return &wf.PublishWorkflowResponse{
+		Success: true,
+		Message: fmt.Sprintf("Workflow %s published to remote production server successfully", req.WorkflowId),
+	}, nil
+}
+

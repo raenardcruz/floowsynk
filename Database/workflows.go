@@ -26,6 +26,8 @@ type Workflow struct {
 	Tags        pq.StringArray `gorm:"type:text[]"`
 	CreatedAt   int64
 	UpdatedAt   int64
+	// Environment: "staging" or "production"
+	Environment string `gorm:"default:'staging'"`
 }
 
 func (j JSONB) Value() (driver.Value, error) {
@@ -74,6 +76,7 @@ func (db *DatabaseConnection) CreateWorkflow(workflow *pb.Workflow) (string, err
 		Tags:        pq.StringArray(workflow.Tags),
 		CreatedAt:   time.Now().UTC().Unix(),
 		UpdatedAt:   time.Now().UTC().Unix(),
+		Environment: AppConfig.App_Environment,
 	}
 
 	if err := db.conn.Save(&wf).Error; err != nil {
@@ -84,7 +87,7 @@ func (db *DatabaseConnection) CreateWorkflow(workflow *pb.Workflow) (string, err
 
 func (db *DatabaseConnection) GetWorkflows(limit, offset int) (*pb.WorkflowList, error) {
 	var workflows []Workflow
-	if err := db.conn.Limit(limit).Offset(offset).Find(&workflows).Error; err != nil {
+	if err := db.conn.Where("environment = ?", AppConfig.App_Environment).Limit(limit).Offset(offset).Find(&workflows).Error; err != nil {
 		log.Printf("Error querying workflows: %v", err)
 		return nil, err
 	}
@@ -175,6 +178,7 @@ func (db *DatabaseConnection) GetWebhookWorkflow(id string) (*pb.Workflow, error
 	}
 
 	var wf Workflow
+	// Webhook workflows check both staging and production (webhooks are always live)
 	if err := db.conn.First(&wf, "id = ? and type = ?", id, "webhook").Error; err != nil {
 		log.Printf("Error querying workflow: %v", err)
 		return nil, err
@@ -219,7 +223,8 @@ func (db *DatabaseConnection) GetIntervalWorkflows() (*pb.WorkflowList, error) {
 	}
 
 	var workflows []Workflow
-	if err := db.conn.Where("type = ?", "interval").Find(&workflows).Error; err != nil {
+	// Interval workflows always run from production if available, else staging
+	if err := db.conn.Where("type = ? AND environment = ?", "interval", AppConfig.App_Environment).Find(&workflows).Error; err != nil {
 		log.Printf("Error querying interval workflows: %v", err)
 		return nil, err
 	}
@@ -281,8 +286,15 @@ func (db *DatabaseConnection) UpdateWorkflow(workflow *pb.Workflow) error {
 		Tags:        pq.StringArray(workflow.Tags),
 	}
 
-	if err := db.conn.Model(&Workflow{}).Where("id = ?", wf.ID).Updates(&wf).Error; err != nil {
+	if err := db.conn.Model(&Workflow{}).Where("id = ? AND environment = ?", wf.ID, AppConfig.App_Environment).Updates(&wf).Error; err != nil {
 		return err
+	}
+
+	// Create or update version snapshot (staging only)
+	if AppConfig.App_Environment == "staging" {
+		if err := db.CreateOrUpdateWorkflowVersion(workflow.Id, nodes, edges, workflow.UpdatedBy); err != nil {
+			log.Printf("Warning: Failed to create workflow version for %s: %v", workflow.Id, err)
+		}
 	}
 
 	if err := SetCache(ctx, cacheKey, workflow, workflowCacheExpiration); err != nil {

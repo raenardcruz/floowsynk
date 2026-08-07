@@ -288,6 +288,138 @@ export namespace Workflow {
   }
 }
 
+export class WorkflowVersion extends jspb.Message {
+  getId(): string;
+  setId(value: string): WorkflowVersion;
+
+  getWorkflowid(): string;
+  setWorkflowid(value: string): WorkflowVersion;
+
+  getVersionnum(): number;
+  setVersionnum(value: number): WorkflowVersion;
+
+  getLabel(): string;
+  setLabel(value: string): WorkflowVersion;
+
+  getNodesList(): Array<Node>;
+  setNodesList(value: Array<Node>): WorkflowVersion;
+  clearNodesList(): WorkflowVersion;
+  addNodes(value?: Node, index?: number): Node;
+
+  getEdgesList(): Array<Edge>;
+  setEdgesList(value: Array<Edge>): WorkflowVersion;
+  clearEdgesList(): WorkflowVersion;
+  addEdges(value?: Edge, index?: number): Edge;
+
+  getSavedby(): string;
+  setSavedby(value: string): WorkflowVersion;
+
+  getSavedat(): string;
+  setSavedat(value: string): WorkflowVersion;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): WorkflowVersion.AsObject;
+  static toObject(includeInstance: boolean, msg: WorkflowVersion): WorkflowVersion.AsObject;
+  static serializeBinaryToWriter(message: WorkflowVersion, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): WorkflowVersion;
+  static deserializeBinaryFromReader(message: WorkflowVersion, reader: jspb.BinaryReader): WorkflowVersion;
+}
+
+export namespace WorkflowVersion {
+  export type AsObject = {
+    id: string;
+    workflowid: string;
+    versionnum: number;
+    label: string;
+    nodesList: Array<Node.AsObject>;
+    edgesList: Array<Edge.AsObject>;
+    savedby: string;
+    savedat: string;
+  };
+}
+
+export class WorkflowVersionList extends jspb.Message {
+  getVersionsList(): Array<WorkflowVersion>;
+  setVersionsList(value: Array<WorkflowVersion>): WorkflowVersionList;
+  clearVersionsList(): WorkflowVersionList;
+  addVersions(value?: WorkflowVersion, index?: number): WorkflowVersion;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): WorkflowVersionList.AsObject;
+  static toObject(includeInstance: boolean, msg: WorkflowVersionList): WorkflowVersionList.AsObject;
+  static serializeBinaryToWriter(message: WorkflowVersionList, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): WorkflowVersionList;
+  static deserializeBinaryFromReader(message: WorkflowVersionList, reader: jspb.BinaryReader): WorkflowVersionList;
+}
+
+export namespace WorkflowVersionList {
+  export type AsObject = {
+    versionsList: Array<WorkflowVersion.AsObject>;
+  };
+}
+
+export class GetWorkflowVersionsRequest extends jspb.Message {
+  getWorkflowid(): string;
+  setWorkflowid(value: string): GetWorkflowVersionsRequest;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): GetWorkflowVersionsRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: GetWorkflowVersionsRequest): GetWorkflowVersionsRequest.AsObject;
+  static serializeBinaryToWriter(message: GetWorkflowVersionsRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): GetWorkflowVersionsRequest;
+  static deserializeBinaryFromReader(message: GetWorkflowVersionsRequest, reader: jspb.BinaryReader): GetWorkflowVersionsRequest;
+}
+
+export namespace GetWorkflowVersionsRequest {
+  export type AsObject = {
+    workflowid: string;
+  };
+}
+
+export class PublishWorkflowRequest extends jspb.Message {
+  getWorkflowid(): string;
+  setWorkflowid(value: string): PublishWorkflowRequest;
+
+  getVersionid(): string;
+  setVersionid(value: string): PublishWorkflowRequest;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): PublishWorkflowRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: PublishWorkflowRequest): PublishWorkflowRequest.AsObject;
+  static serializeBinaryToWriter(message: PublishWorkflowRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): PublishWorkflowRequest;
+  static deserializeBinaryFromReader(message: PublishWorkflowRequest, reader: jspb.BinaryReader): PublishWorkflowRequest;
+}
+
+export namespace PublishWorkflowRequest {
+  export type AsObject = {
+    workflowid: string;
+    versionid: string;
+  };
+}
+
+export class PublishWorkflowResponse extends jspb.Message {
+  getSuccess(): boolean;
+  setSuccess(value: boolean): PublishWorkflowResponse;
+
+  getMessage(): string;
+  setMessage(value: string): PublishWorkflowResponse;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): PublishWorkflowResponse.AsObject;
+  static toObject(includeInstance: boolean, msg: PublishWorkflowResponse): PublishWorkflowResponse.AsObject;
+  static serializeBinaryToWriter(message: PublishWorkflowResponse, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): PublishWorkflowResponse;
+  static deserializeBinaryFromReader(message: PublishWorkflowResponse, reader: jspb.BinaryReader): PublishWorkflowResponse;
+}
+
+export namespace PublishWorkflowResponse {
+  export type AsObject = {
+    success: boolean;
+    message: string;
+  };
+}
+
 export class Edge extends jspb.Message {
   getId(): string;
   setId(value: string): Edge;

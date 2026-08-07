@@ -89,6 +89,27 @@ export class WorkflowServiceClient {
                response: google_protobuf_empty_pb.Empty) => void
   ): grpcWeb.ClientReadableStream<google_protobuf_empty_pb.Empty>;
 
+  listWorkflowVersions(
+    request: workflow_pb.GetWorkflowVersionsRequest,
+    metadata: grpcWeb.Metadata | undefined,
+    callback: (err: grpcWeb.RpcError,
+               response: workflow_pb.WorkflowVersionList) => void
+  ): grpcWeb.ClientReadableStream<workflow_pb.WorkflowVersionList>;
+
+  restoreWorkflowVersion(
+    request: workflow_pb.WorkflowVersion,
+    metadata: grpcWeb.Metadata | undefined,
+    callback: (err: grpcWeb.RpcError,
+               response: workflow_pb.Workflow) => void
+  ): grpcWeb.ClientReadableStream<workflow_pb.Workflow>;
+
+  publishWorkflow(
+    request: workflow_pb.PublishWorkflowRequest,
+    metadata: grpcWeb.Metadata | undefined,
+    callback: (err: grpcWeb.RpcError,
+               response: workflow_pb.PublishWorkflowResponse) => void
+  ): grpcWeb.ClientReadableStream<workflow_pb.PublishWorkflowResponse>;
+
 }
 
 export class WorkflowServicePromiseClient {
@@ -155,6 +176,21 @@ export class WorkflowServicePromiseClient {
     request: workflow_pb.DeleteConnectionRequest,
     metadata?: grpcWeb.Metadata
   ): Promise<google_protobuf_empty_pb.Empty>;
+
+  listWorkflowVersions(
+    request: workflow_pb.GetWorkflowVersionsRequest,
+    metadata?: grpcWeb.Metadata
+  ): Promise<workflow_pb.WorkflowVersionList>;
+
+  restoreWorkflowVersion(
+    request: workflow_pb.WorkflowVersion,
+    metadata?: grpcWeb.Metadata
+  ): Promise<workflow_pb.Workflow>;
+
+  publishWorkflow(
+    request: workflow_pb.PublishWorkflowRequest,
+    metadata?: grpcWeb.Metadata
+  ): Promise<workflow_pb.PublishWorkflowResponse>;
 
 }
 

@@ -798,5 +798,188 @@ proto.proto.WorkflowServicePromiseClient.prototype.deleteConnection =
 };
 
 
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.proto.GetWorkflowVersionsRequest,
+ *   !proto.proto.WorkflowVersionList>}
+ */
+const methodDescriptor_WorkflowService_ListWorkflowVersions = new grpc.web.MethodDescriptor(
+  '/proto.WorkflowService/ListWorkflowVersions',
+  grpc.web.MethodType.UNARY,
+  proto.proto.GetWorkflowVersionsRequest,
+  proto.proto.WorkflowVersionList,
+  /**
+   * @param {!proto.proto.GetWorkflowVersionsRequest} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.proto.WorkflowVersionList.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.proto.GetWorkflowVersionsRequest} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.RpcError, ?proto.proto.WorkflowVersionList)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.proto.WorkflowVersionList>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.proto.WorkflowServiceClient.prototype.listWorkflowVersions =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/proto.WorkflowService/ListWorkflowVersions',
+      request,
+      metadata || {},
+      methodDescriptor_WorkflowService_ListWorkflowVersions,
+      callback);
+};
+
+
+/**
+ * @param {!proto.proto.GetWorkflowVersionsRequest} request The
+ *     request proto
+ * @param {?Object<string, string>=} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.proto.WorkflowVersionList>}
+ *     Promise that resolves to the response
+ */
+proto.proto.WorkflowServicePromiseClient.prototype.listWorkflowVersions =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/proto.WorkflowService/ListWorkflowVersions',
+      request,
+      metadata || {},
+      methodDescriptor_WorkflowService_ListWorkflowVersions);
+};
+
+
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.proto.WorkflowVersion,
+ *   !proto.proto.Workflow>}
+ */
+const methodDescriptor_WorkflowService_RestoreWorkflowVersion = new grpc.web.MethodDescriptor(
+  '/proto.WorkflowService/RestoreWorkflowVersion',
+  grpc.web.MethodType.UNARY,
+  proto.proto.WorkflowVersion,
+  proto.proto.Workflow,
+  /**
+   * @param {!proto.proto.WorkflowVersion} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.proto.Workflow.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.proto.WorkflowVersion} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.RpcError, ?proto.proto.Workflow)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.proto.Workflow>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.proto.WorkflowServiceClient.prototype.restoreWorkflowVersion =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/proto.WorkflowService/RestoreWorkflowVersion',
+      request,
+      metadata || {},
+      methodDescriptor_WorkflowService_RestoreWorkflowVersion,
+      callback);
+};
+
+
+/**
+ * @param {!proto.proto.WorkflowVersion} request The
+ *     request proto
+ * @param {?Object<string, string>=} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.proto.Workflow>}
+ *     Promise that resolves to the response
+ */
+proto.proto.WorkflowServicePromiseClient.prototype.restoreWorkflowVersion =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/proto.WorkflowService/RestoreWorkflowVersion',
+      request,
+      metadata || {},
+      methodDescriptor_WorkflowService_RestoreWorkflowVersion);
+};
+
+
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.proto.PublishWorkflowRequest,
+ *   !proto.proto.PublishWorkflowResponse>}
+ */
+const methodDescriptor_WorkflowService_PublishWorkflow = new grpc.web.MethodDescriptor(
+  '/proto.WorkflowService/PublishWorkflow',
+  grpc.web.MethodType.UNARY,
+  proto.proto.PublishWorkflowRequest,
+  proto.proto.PublishWorkflowResponse,
+  /**
+   * @param {!proto.proto.PublishWorkflowRequest} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.proto.PublishWorkflowResponse.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.proto.PublishWorkflowRequest} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.RpcError, ?proto.proto.PublishWorkflowResponse)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.proto.PublishWorkflowResponse>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.proto.WorkflowServiceClient.prototype.publishWorkflow =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/proto.WorkflowService/PublishWorkflow',
+      request,
+      metadata || {},
+      methodDescriptor_WorkflowService_PublishWorkflow,
+      callback);
+};
+
+
+/**
+ * @param {!proto.proto.PublishWorkflowRequest} request The
+ *     request proto
+ * @param {?Object<string, string>=} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.proto.PublishWorkflowResponse>}
+ *     Promise that resolves to the response
+ */
+proto.proto.WorkflowServicePromiseClient.prototype.publishWorkflow =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/proto.WorkflowService/PublishWorkflow',
+      request,
+      metadata || {},
+      methodDescriptor_WorkflowService_PublishWorkflow);
+};
+
+
 module.exports = proto.proto;
 

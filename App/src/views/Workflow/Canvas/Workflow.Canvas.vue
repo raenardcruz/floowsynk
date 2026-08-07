@@ -4,6 +4,13 @@
             <div class="canvas_titlecontainer">
                 <input class="canvas__headerinput canvas__label" type="text" v-model="tab.name" placeholder="Enter Process Title">
                 <Tag v-if="isGuest" severity="warn" rounded style="margin-left: 10px; padding: 4px 10px; font-weight: bold; background-color: var(--orange-5); color: var(--white-1);">Guest Mode</Tag>
+                <!-- Environment badges -->
+                <span v-if="isProduction" class="env-badge env-badge--live" title="Production — live data, no versioning">
+                    <span class="material-symbols-outlined">circle</span> LIVE
+                </span>
+                <span v-else class="env-badge env-badge--staging" title="Staging — versioning enabled">
+                    <span class="material-symbols-outlined">layers</span> STAGING
+                </span>
                 <div class="canvas_tags">
                     <Tag pt:root:class="canvas__tag" @click="addTag" rounded>
                         <span class="material-symbols-outlined">add</span>
@@ -49,6 +56,10 @@
                         <ControlButton title="Save" v-if="!isRunning">
                             <span class="material-symbols-outlined" @click="saveProcess()">save</span>
                         </ControlButton>
+                        <!-- Version History button (staging only) -->
+                        <ControlButton title="Version History" v-if="!isRunning && !isProduction" @click="showVersionHistory = true">
+                            <span class="material-symbols-outlined">history</span>
+                        </ControlButton>
                         <ControlButton title="Run" style="background: var(--green-2); color: var(--white-1);"
                             v-if="!isRunning">
                             <span class="material-symbols-outlined" @click="runProcess()">play_arrow</span>
@@ -70,12 +81,23 @@
                 </div>
             </div>
         </div>
+        <!-- Version History modal (staging only) -->
+        <VersionHistoryModal
+            v-if="!isProduction"
+            :visible="showVersionHistory"
+            :workflowId="tab.id"
+            :workflowName="tab.name"
+            @close="showVersionHistory = false"
+            @restored="onVersionRestored"
+        />
     </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
 const isGuest = ref(localStorage.getItem('sessionToken') === 'guest')
+const isProduction = ref(import.meta.env.VITE_APP_ENVIRONMENT === 'production')
+const showVersionHistory = ref(false)
 import { VueFlow, useVueFlow } from '@vue-flow/core'
 import { WorkflowCanvasProps } from './Workflow.Canvas.types'
 import { useWorkflowCanvasHooks, useWorkflowCanvasStore } from './Workflow.Canvas.hooks'
@@ -83,7 +105,7 @@ import { useWorkflowCanvasVueFlowEvents } from './VueFlowEvents/Workflow.Canvas.
 import { useWorkflowCanvasControlButtonActions } from './ButtonActions/Workflow.Canvas.ButtonActions'
 import { SidebarCanvas } from '@/views/Workflow/Sidebar'
 import { Modal } from '@/components/Composable/UI/Modal'
-import { ProcessTypeModal } from '@/views/Workflow/Modal'
+import { ProcessTypeModal, VersionHistoryModal } from '@/views/Workflow/Modal'
 import { MiniMap } from '@vue-flow/minimap'
 import { Background } from '@vue-flow/background'
 import { ControlButton, Controls } from '@vue-flow/controls'
@@ -109,6 +131,43 @@ const {
     showReplayData,
     isRunning,
 } = useWorkflowCanvasStore(props.id)
+
+const onVersionRestored = () => {
+    // Reload the workflow from the server after a version restore
+    window.location.reload()
+}
 </script>
 
 <style scoped src="./Workflow.Canvas.styles.css"></style>
+
+<style scoped>
+/* Environment badges */
+.env-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    margin-left: 8px;
+    flex-shrink: 0;
+}
+.env-badge .material-symbols-outlined { font-size: 10px; }
+.env-badge--live {
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    animation: pulse-live 2s infinite;
+}
+@keyframes pulse-live {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+.env-badge--staging {
+    background: rgba(124, 140, 248, 0.12);
+    color: #a5b4fc;
+    border: 1px solid rgba(124, 140, 248, 0.25);
+}
+</style>

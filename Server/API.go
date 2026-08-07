@@ -285,3 +285,58 @@ func (s *WorkflowServer) DeleteConnection(ctx context.Context, req *wf.DeleteCon
 	return &emptypb.Empty{}, nil
 }
 
+func (s *WorkflowServer) ListWorkflowVersions(ctx context.Context, req *wf.GetWorkflowVersionsRequest) (*wf.WorkflowVersionList, error) {
+	token, err := getTokenFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	validateResults := validateToken(token)
+	if validateResults.status != http.StatusOK {
+		return nil, fmt.Errorf(validateResults.message)
+	}
+	versions, err := ListWorkflowVersionsImpl(req.WorkflowId)
+	if err != nil {
+		return nil, err
+	}
+	return versions, nil
+}
+
+func (s *WorkflowServer) RestoreWorkflowVersion(ctx context.Context, req *wf.WorkflowVersion) (*wf.Workflow, error) {
+	token, err := getTokenFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	validateResults := validateToken(token)
+	if validateResults.status != http.StatusOK {
+		return nil, fmt.Errorf(validateResults.message)
+	}
+	if validateResults.role == "guest" {
+		return nil, fmt.Errorf("restoring workflow versions is disabled in Guest Mode")
+	}
+	workflow, err := RestoreWorkflowVersionImpl(req, validateResults.id)
+	if err != nil {
+		return nil, err
+	}
+	return workflow, nil
+}
+
+func (s *WorkflowServer) PublishWorkflow(ctx context.Context, req *wf.PublishWorkflowRequest) (*wf.PublishWorkflowResponse, error) {
+	token, err := getTokenFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	validateResults := validateToken(token)
+	if validateResults.status != http.StatusOK {
+		return nil, fmt.Errorf(validateResults.message)
+	}
+	if validateResults.role == "guest" {
+		return nil, fmt.Errorf("publishing workflows is disabled in Guest Mode")
+	}
+	resp, err := PublishWorkflowImpl(req)
+	if err != nil {
+		return nil, err
+	}
+	return resp, nil
+}
+
+

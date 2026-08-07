@@ -22,6 +22,12 @@
                     <span>Connectors</span>
                 </router-link>
             </div>
+
+            <!-- Environment indicator -->
+            <div :class="['nav-env-badge', isProduction ? 'nav-env-badge--prod' : 'nav-env-badge--staging']">
+                <span class="nav-env-dot"></span>
+                <span>{{ isProduction ? 'PRODUCTION' : 'STAGING' }}</span>
+            </div>
         </template>
         
         <template #end>
@@ -54,9 +60,55 @@ import Logo from "@/components/Composable/Logo/Logo.vue"
 import AppDrawer from "./AppDrawer"
 import { openAppDrawer, logout, pageInit } from './Home.helper'
 import { useRoute } from 'vue-router'
+import { ref } from 'vue'
 
 const route = useRoute()
+const isProduction = ref(import.meta.env.VITE_APP_ENVIRONMENT === 'production')
 pageInit();
 </script>
 
 <style scoped src="./Home.style.css"></style>
+
+<style scoped>
+/* Environment badge in the navbar */
+.nav-env-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+    margin-left: 8px;
+    flex-shrink: 0;
+    user-select: none;
+}
+.nav-env-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+.nav-env-badge--staging {
+    background: rgba(124, 140, 248, 0.12);
+    color: #a5b4fc;
+    border: 1px solid rgba(124, 140, 248, 0.25);
+}
+.nav-env-badge--staging .nav-env-dot {
+    background: #7c8cf8;
+}
+.nav-env-badge--prod {
+    background: rgba(239, 68, 68, 0.12);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+.nav-env-badge--prod .nav-env-dot {
+    background: #ef4444;
+    animation: pulse-dot 1.5s infinite;
+}
+@keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.7); }
+}
+</style>
