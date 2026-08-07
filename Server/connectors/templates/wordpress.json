@@ -1,0 +1,198 @@
+{
+  "id": "wordpress",
+  "name": "WordPress",
+  "description": "Manage WordPress posts, pages, media, and categories via REST API.",
+  "icon": "/src/components/Icons/wordpress.svg",
+  "baseUrl": "{{site_url}}/wp-json/wp/v2",
+  "authType": "basic, apikey",
+  "fields": [
+    {
+      "key": "site_url",
+      "label": "Site Base URL",
+      "type": "text",
+      "required": true,
+      "placeholder": "https://yourblog.com"
+    },
+    {
+      "key": "username",
+      "label": "Username",
+      "type": "text",
+      "required": true,
+      "placeholder": "Enter WordPress Username"
+    },
+    {
+      "key": "application_password",
+      "label": "Application Password",
+      "type": "password",
+      "required": true,
+      "placeholder": "abcd efgh ijkl mnop"
+    }
+  ],
+  "actions": [
+    {
+      "id": "list_posts",
+      "name": "List Posts",
+      "description": "Retrieve a list of WordPress posts",
+      "path": "/posts",
+      "method": "GET",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "queryParams": [
+        { "key": "per_page", "value": "{{per_page}}" },
+        { "key": "status", "value": "{{status}}" }
+      ],
+      "fields": [
+        { "key": "per_page", "label": "Per Page", "required": false, "placeholder": "10" },
+        { "key": "status", "label": "Post Status", "required": false, "placeholder": "publish" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "per_page": { "type": "string", "description": "Number of items to return", "example": "10" },
+          "status": { "type": "string", "description": "Limit response to posts with a specific status", "example": "publish" }
+        }
+      },
+      "outputSchema": [
+        {
+          "id": 1,
+          "date": "2026-08-05T12:00:00",
+          "slug": "hello-world",
+          "status": "publish",
+          "type": "post",
+          "link": "https://yourblog.com/hello-world",
+          "title": { "rendered": "Hello world!" },
+          "content": { "rendered": "<p>Welcome to WordPress.</p>" }
+        }
+      ]
+    },
+    {
+      "id": "create_post",
+      "name": "Create Post",
+      "description": "Create a new post in WordPress",
+      "path": "/posts",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "payloadTemplate": "{\"title\": \"{{title}}\", \"content\": \"{{content}}\", \"status\": \"{{status}}\", \"excerpt\": \"{{excerpt}}\"}",
+      "fields": [
+        { "key": "title", "label": "Title", "required": true, "placeholder": "Enter post title" },
+        { "key": "content", "label": "Content", "required": true, "placeholder": "Enter post content (HTML/Text)" },
+        { "key": "status", "label": "Status", "required": false, "placeholder": "draft or publish" },
+        { "key": "excerpt", "label": "Excerpt", "required": false, "placeholder": "Short summary of post" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string", "description": "Post title", "example": "New Blog Announcement" },
+          "content": { "type": "string", "description": "Post body content", "example": "We are thrilled to launch..." },
+          "status": { "type": "string", "description": "Post status (publish/draft)", "example": "publish" },
+          "excerpt": { "type": "string", "description": "Post summary", "example": "Summary..." }
+        },
+        "required": ["title", "content"]
+      },
+      "outputSchema": {
+        "id": 101,
+        "date": "2026-08-07T12:00:00",
+        "slug": "new-blog-announcement",
+        "status": "publish",
+        "link": "https://yourblog.com/new-blog-announcement",
+        "title": { "rendered": "New Blog Announcement" }
+      }
+    },
+    {
+      "id": "update_post",
+      "name": "Update Post",
+      "description": "Update an existing WordPress post by ID",
+      "path": "/posts/{{id}}",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "payloadTemplate": "{\"title\": \"{{title}}\", \"content\": \"{{content}}\", \"status\": \"{{status}}\"}",
+      "fields": [
+        { "key": "id", "label": "Post ID", "required": true, "placeholder": "e.g. 101" },
+        { "key": "title", "label": "Updated Title", "required": false, "placeholder": "Updated title" },
+        { "key": "content", "label": "Updated Content", "required": false, "placeholder": "Updated body content" },
+        { "key": "status", "label": "Status", "required": false, "placeholder": "publish" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "description": "Post ID", "example": "101" },
+          "title": { "type": "string", "description": "Updated title", "example": "Updated Blog Title" },
+          "content": { "type": "string", "description": "Updated content", "example": "Updated text..." },
+          "status": { "type": "string", "description": "Post status", "example": "publish" }
+        },
+        "required": ["id"]
+      },
+      "outputSchema": {
+        "id": 101,
+        "status": "publish",
+        "link": "https://yourblog.com/updated-blog-title",
+        "title": { "rendered": "Updated Blog Title" }
+      }
+    },
+    {
+      "id": "upload_media",
+      "name": "Upload Media",
+      "description": "Upload a media item to WordPress media library",
+      "path": "/media",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "payloadTemplate": "{\"title\": \"{{title}}\", \"source_url\": \"{{source_url}}\"}",
+      "fields": [
+        { "key": "title", "label": "Media Title", "required": true, "placeholder": "e.g. Hero Image" },
+        { "key": "source_url", "label": "Source Image URL", "required": true, "placeholder": "https://example.com/image.jpg" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string", "description": "Media item title", "example": "Logo" },
+          "source_url": { "type": "string", "description": "Public URL of media file", "example": "https://example.com/logo.png" }
+        },
+        "required": ["title", "source_url"]
+      },
+      "outputSchema": {
+        "id": 202,
+        "date": "2026-08-07T12:00:00",
+        "source_url": "https://yourblog.com/wp-content/uploads/2026/08/logo.png",
+        "mime_type": "image/png"
+      }
+    },
+    {
+      "id": "get_categories",
+      "name": "Get Categories",
+      "description": "List post categories in WordPress",
+      "path": "/categories",
+      "method": "GET",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "queryParams": [
+        { "key": "per_page", "value": "{{per_page}}" }
+      ],
+      "fields": [
+        { "key": "per_page", "label": "Per Page", "required": false, "placeholder": "100" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "per_page": { "type": "string", "description": "Number of categories to return", "example": "100" }
+        }
+      },
+      "outputSchema": [
+        {
+          "id": 1,
+          "count": 5,
+          "description": "News & Announcements",
+          "name": "News",
+          "slug": "news"
+        }
+      ]
+    }
+  ]
+}

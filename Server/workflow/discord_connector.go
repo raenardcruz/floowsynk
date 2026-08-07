@@ -7,13 +7,13 @@ import (
 )
 
 // CheckDiscordConnection verifies the stored bot or user access token against Discord API.
-func CheckDiscordConnection(creds map[string]string) bool {
+func CheckDiscordConnection(creds map[string]string) (bool, string) {
 	token := creds["access_token"]
 	if token == "" {
 		token = creds["bot_token"]
 	}
 	if token == "" {
-		return false
+		return false, "Missing access token or bot token"
 	}
 
 	authHeader := fmt.Sprintf("Bearer %s", token)
@@ -23,16 +23,19 @@ func CheckDiscordConnection(creds map[string]string) bool {
 
 	req, err := http.NewRequest("GET", "https://discord.com/api/v10/users/@me", nil)
 	if err != nil {
-		return false
+		return false, fmt.Sprintf("Failed to create request: %v", err)
 	}
 	req.Header.Set("Authorization", authHeader)
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return false
+		return false, fmt.Sprintf("Connection request failed: %v", err)
 	}
 	defer resp.Body.Close()
-	return resp.StatusCode == http.StatusOK
+	if resp.StatusCode != http.StatusOK {
+		return false, fmt.Sprintf("HTTP %d: %s", resp.StatusCode, resp.Status)
+	}
+	return true, ""
 }
 
 // TransformDiscordResponse formats raw Discord API responses.

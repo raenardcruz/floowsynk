@@ -7,24 +7,27 @@ import (
 )
 
 // CheckGitHubConnection verifies the stored access token against the GitHub API.
-func CheckGitHubConnection(creds map[string]string) bool {
+func CheckGitHubConnection(creds map[string]string) (bool, string) {
 	token := creds["access_token"]
 	if token == "" {
-		return false
+		return false, "Missing access token"
 	}
 	req, err := http.NewRequest("GET", "https://api.github.com/user", nil)
 	if err != nil {
-		return false
+		return false, fmt.Sprintf("Failed to create request: %v", err)
 	}
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
 	req.Header.Set("Accept", "application/vnd.github+json")
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return false
+		return false, fmt.Sprintf("Connection request failed: %v", err)
 	}
 	defer resp.Body.Close()
-	return resp.StatusCode == http.StatusOK
+	if resp.StatusCode != http.StatusOK {
+		return false, fmt.Sprintf("HTTP %d: %s", resp.StatusCode, resp.Status)
+	}
+	return true, ""
 }
 
 

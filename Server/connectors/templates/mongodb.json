@@ -1,0 +1,157 @@
+{
+  "id": "mongodb",
+  "name": "MongoDB",
+  "description": "Execute queries, document insertions, updates, and deletions in MongoDB collections.",
+  "icon": "/src/components/Icons/mongodb.svg",
+  "baseUrl": "https://api.mongodb.com",
+  "authType": "connection_string",
+  "fields": [
+    {
+      "key": "connection_string",
+      "label": "Connection String (SRV URI)",
+      "type": "password",
+      "required": true,
+      "placeholder": "mongodb+srv://user:pass@cluster.mongodb.net/dbname"
+    },
+    {
+      "key": "database_name",
+      "label": "Database Name",
+      "type": "text",
+      "required": true,
+      "placeholder": "my_database"
+    },
+    {
+      "key": "collection_name",
+      "label": "Collection Name",
+      "type": "text",
+      "required": true,
+      "placeholder": "users"
+    }
+  ],
+  "actions": [
+    {
+      "id": "find_documents",
+      "name": "Find Documents",
+      "description": "Query documents from a MongoDB collection matching filter criteria",
+      "path": "/action/find",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "payloadTemplate": "{\"database\": \"{{database_name}}\", \"collection\": \"{{collection_name}}\", \"filter\": {{filter}}}",
+      "fields": [
+        { "key": "database_name", "label": "Database Name", "required": true, "placeholder": "my_database" },
+        { "key": "collection_name", "label": "Collection Name", "required": true, "placeholder": "users" },
+        { "key": "filter", "label": "Filter Criteria (JSON)", "required": true, "placeholder": "{\"status\": \"active\"}" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "database_name": { "type": "string", "description": "Target database name" },
+          "collection_name": { "type": "string", "description": "Target collection name" },
+          "filter": { "type": "object", "description": "JSON filter query" }
+        },
+        "required": ["database_name", "collection_name", "filter"]
+      },
+      "outputSchema": {
+        "documents": [
+          {
+            "_id": "60d5ec49f1b2c82b8c8e4f1a",
+            "status": "active",
+            "name": "Alice"
+          }
+        ]
+      }
+    },
+    {
+      "id": "insert_document",
+      "name": "Insert Document",
+      "description": "Insert a new document into a collection",
+      "path": "/action/insertOne",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "payloadTemplate": "{\"database\": \"{{database_name}}\", \"collection\": \"{{collection_name}}\", \"document\": {{document}}}",
+      "fields": [
+        { "key": "database_name", "label": "Database Name", "required": true, "placeholder": "my_database" },
+        { "key": "collection_name", "label": "Collection Name", "required": true, "placeholder": "users" },
+        { "key": "document", "label": "Document Payload (JSON)", "required": true, "placeholder": "{\"name\": \"Bob\", \"email\": \"bob@example.com\"}" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "database_name": { "type": "string", "description": "Target database" },
+          "collection_name": { "type": "string", "description": "Target collection" },
+          "document": { "type": "object", "description": "Document to insert" }
+        },
+        "required": ["database_name", "collection_name", "document"]
+      },
+      "outputSchema": {
+        "insertedId": "60d5ec49f1b2c82b8c8e4f1b",
+        "acknowledged": true
+      }
+    },
+    {
+      "id": "update_documents",
+      "name": "Update Documents",
+      "description": "Update existing documents in a collection matching a query filter",
+      "path": "/action/updateMany",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "payloadTemplate": "{\"database\": \"{{database_name}}\", \"collection\": \"{{collection_name}}\", \"filter\": {{filter}}, \"update\": {{update}}}",
+      "fields": [
+        { "key": "database_name", "label": "Database Name", "required": true, "placeholder": "my_database" },
+        { "key": "collection_name", "label": "Collection Name", "required": true, "placeholder": "users" },
+        { "key": "filter", "label": "Filter Query (JSON)", "required": true, "placeholder": "{\"status\": \"pending\"}" },
+        { "key": "update", "label": "Update Operator (JSON)", "required": true, "placeholder": "{\"$set\": {\"status\": \"active\"}}" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "database_name": { "type": "string", "description": "Database name" },
+          "collection_name": { "type": "string", "description": "Collection name" },
+          "filter": { "type": "object", "description": "Filter criteria" },
+          "update": { "type": "object", "description": "Update operator ($set, etc.)" }
+        },
+        "required": ["database_name", "collection_name", "filter", "update"]
+      },
+      "outputSchema": {
+        "matchedCount": 5,
+        "modifiedCount": 5,
+        "acknowledged": true
+      }
+    },
+    {
+      "id": "delete_documents",
+      "name": "Delete Documents",
+      "description": "Delete matching documents from a collection",
+      "path": "/action/deleteMany",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "payloadTemplate": "{\"database\": \"{{database_name}}\", \"collection\": \"{{collection_name}}\", \"filter\": {{filter}}}",
+      "fields": [
+        { "key": "database_name", "label": "Database Name", "required": true, "placeholder": "my_database" },
+        { "key": "collection_name", "label": "Collection Name", "required": true, "placeholder": "users" },
+        { "key": "filter", "label": "Filter Query (JSON)", "required": true, "placeholder": "{\"status\": \"expired\"}" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "database_name": { "type": "string", "description": "Database name" },
+          "collection_name": { "type": "string", "description": "Collection name" },
+          "filter": { "type": "object", "description": "Filter criteria" }
+        },
+        "required": ["database_name", "collection_name", "filter"]
+      },
+      "outputSchema": {
+        "deletedCount": 2,
+        "acknowledged": true
+      }
+    }
+  ]
+}

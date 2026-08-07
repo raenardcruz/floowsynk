@@ -31,7 +31,10 @@
   "oauthConfig": {
     "authorizeUrl": "https://gitlab.com/oauth/authorize",
     "tokenUrl": "https://gitlab.com/oauth/token",
-    "defaultScopes": ["api", "read_user"]
+    "defaultScopes": [
+      "api",
+      "read_user"
+    ]
   },
   "actions": [
     {
@@ -43,7 +46,24 @@
       "headers": {
         "Accept": "application/json"
       },
-      "queryParams": []
+      "queryParams": [],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "membership": {
+            "type": "boolean",
+            "description": "Limit to projects the user is a member of",
+            "default": true
+          }
+        }
+      },
+      "outputSchema": [
+        {
+          "id": 123456,
+          "name": "Project One",
+          "path_with_namespace": "group/project-one"
+        }
+      ]
     },
     {
       "id": "get_issues",
@@ -56,7 +76,33 @@
       },
       "queryParams": [],
       "fields": [
-        { "key": "project_id", "label": "Project ID", "required": true, "placeholder": "Enter GitLab Project ID" }
+        {
+          "key": "project_id",
+          "label": "Project ID",
+          "required": true,
+          "placeholder": "Enter GitLab Project ID"
+        }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "project_id": {
+            "type": "string",
+            "description": "Project ID",
+            "example": "123456"
+          }
+        },
+        "required": [
+          "project_id"
+        ]
+      },
+      "outputSchema": [
+        {
+          "id": 76,
+          "iid": 6,
+          "title": "Fix CI build script failure",
+          "state": "opened"
+        }
       ]
     },
     {
@@ -71,10 +117,57 @@
       "queryParams": [],
       "payloadTemplate": "{\"title\": \"{{title}}\", \"description\": \"{{description}}\"}",
       "fields": [
-        { "key": "project_id", "label": "Project ID", "required": true, "placeholder": "Enter GitLab Project ID" },
-        { "key": "title", "label": "Issue Title", "required": true, "placeholder": "Issue summary" },
-        { "key": "description", "label": "Description", "required": false, "placeholder": "Issue body" }
-      ]
+        {
+          "key": "project_id",
+          "label": "Project ID",
+          "required": true,
+          "placeholder": "Enter GitLab Project ID"
+        },
+        {
+          "key": "title",
+          "label": "Issue Title",
+          "required": true,
+          "placeholder": "Issue summary"
+        },
+        {
+          "key": "description",
+          "label": "Description",
+          "required": false,
+          "placeholder": "Issue body"
+        }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "project_id": {
+            "type": "string",
+            "description": "GitLab Project ID or URL-encoded path",
+            "example": "123456"
+          },
+          "title": {
+            "type": "string",
+            "description": "Issue title",
+            "example": "Fix CI build script failure"
+          },
+          "description": {
+            "type": "string",
+            "description": "Detailed description",
+            "example": "Script fails on step 3."
+          }
+        },
+        "required": [
+          "project_id",
+          "title"
+        ]
+      },
+      "outputSchema": {
+        "id": 76,
+        "iid": 6,
+        "project_id": 123456,
+        "title": "Fix CI build script failure",
+        "description": "Script fails on step 3.",
+        "state": "opened"
+      }
     },
     {
       "id": "create_merge_request",
@@ -88,11 +181,71 @@
       "queryParams": [],
       "payloadTemplate": "{\"source_branch\": \"{{source_branch}}\", \"target_branch\": \"{{target_branch}}\", \"title\": \"{{title}}\"}",
       "fields": [
-        { "key": "project_id", "label": "Project ID", "required": true, "placeholder": "Enter GitLab Project ID" },
-        { "key": "title", "label": "Merge Request Title", "required": true, "placeholder": "MR title" },
-        { "key": "source_branch", "label": "Source Branch", "required": true, "placeholder": "feature-branch" },
-        { "key": "target_branch", "label": "Target Branch", "required": true, "placeholder": "main" }
-      ]
+        {
+          "key": "project_id",
+          "label": "Project ID",
+          "required": true,
+          "placeholder": "Enter GitLab Project ID"
+        },
+        {
+          "key": "title",
+          "label": "Merge Request Title",
+          "required": true,
+          "placeholder": "MR title"
+        },
+        {
+          "key": "source_branch",
+          "label": "Source Branch",
+          "required": true,
+          "placeholder": "feature-branch"
+        },
+        {
+          "key": "target_branch",
+          "label": "Target Branch",
+          "required": true,
+          "placeholder": "main"
+        }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "project_id": {
+            "type": "string",
+            "description": "Project ID",
+            "example": "123456"
+          },
+          "source_branch": {
+            "type": "string",
+            "description": "Source branch",
+            "example": "feature-branch"
+          },
+          "target_branch": {
+            "type": "string",
+            "description": "Target branch",
+            "example": "main"
+          },
+          "title": {
+            "type": "string",
+            "description": "Merge request title",
+            "example": "Merge feature branch"
+          }
+        },
+        "required": [
+          "project_id",
+          "source_branch",
+          "target_branch",
+          "title"
+        ]
+      },
+      "outputSchema": {
+        "id": 991,
+        "iid": 12,
+        "project_id": 123456,
+        "title": "Merge feature branch",
+        "source_branch": "feature-branch",
+        "target_branch": "main",
+        "state": "opened"
+      }
     },
     {
       "id": "trigger_pipeline",
@@ -106,10 +259,51 @@
       "queryParams": [],
       "payloadTemplate": "{\"token\": \"{{token}}\", \"ref\": \"{{ref}}\"}",
       "fields": [
-        { "key": "project_id", "label": "Project ID", "required": true, "placeholder": "Enter GitLab Project ID" },
-        { "key": "token", "label": "Trigger Token", "required": true, "placeholder": "Pipeline trigger token" },
-        { "key": "ref", "label": "Git Ref / Branch", "required": true, "placeholder": "main" }
-      ]
+        {
+          "key": "project_id",
+          "label": "Project ID",
+          "required": true,
+          "placeholder": "Enter GitLab Project ID"
+        },
+        {
+          "key": "token",
+          "label": "Trigger Token",
+          "required": true,
+          "placeholder": "Pipeline trigger token"
+        },
+        {
+          "key": "ref",
+          "label": "Git Ref / Branch",
+          "required": true,
+          "placeholder": "main"
+        }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "project_id": {
+            "type": "string",
+            "description": "GitLab Project ID",
+            "example": "123456"
+          },
+          "ref": {
+            "type": "string",
+            "description": "Branch or tag name",
+            "example": "main"
+          }
+        },
+        "required": [
+          "project_id",
+          "ref"
+        ]
+      },
+      "outputSchema": {
+        "id": 9988,
+        "project_id": 123456,
+        "sha": "ecf67890",
+        "ref": "main",
+        "status": "created"
+      }
     }
   ]
 }

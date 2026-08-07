@@ -7,19 +7,22 @@ import (
 )
 
 // CheckTrelloConnection verifies Trello OAuth token / key credentials.
-func CheckTrelloConnection(creds map[string]string) bool {
+func CheckTrelloConnection(creds map[string]string) (bool, string) {
 	key := creds["api_key"]
 	token := creds["access_token"]
 	if key == "" || token == "" {
-		return false
+		return false, "Missing API key or access token"
 	}
 	url := fmt.Sprintf("https://api.trello.com/1/members/me?key=%s&token=%s", key, token)
 	resp, err := http.Get(url)
 	if err != nil {
-		return false
+		return false, fmt.Sprintf("Connection request failed: %v", err)
 	}
 	defer resp.Body.Close()
-	return resp.StatusCode == http.StatusOK
+	if resp.StatusCode != http.StatusOK {
+		return false, fmt.Sprintf("HTTP %d: %s", resp.StatusCode, resp.Status)
+	}
+	return true, ""
 }
 
 // TransformTrelloResponse formats raw Trello API responses.

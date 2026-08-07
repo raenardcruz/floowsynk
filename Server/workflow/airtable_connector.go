@@ -7,27 +7,30 @@ import (
 )
 
 // CheckAirtableConnection verifies Personal Access Token against Airtable API.
-func CheckAirtableConnection(creds map[string]string) bool {
+func CheckAirtableConnection(creds map[string]string) (bool, string) {
 	token := creds["access_token"]
 	baseID := creds["base_id"]
 	if token == "" || baseID == "" {
-		return false
+		return false, "Missing access token or base ID"
 	}
 
 	req, err := http.NewRequest("GET", fmt.Sprintf("https://api.airtable.com/v0/meta/bases/%s/tables", baseID), nil)
 	if err != nil {
-		return false
+		return false, fmt.Sprintf("Failed to create request: %v", err)
 	}
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return false
+		return false, fmt.Sprintf("Connection request failed: %v", err)
 	}
 	defer resp.Body.Close()
 
-	return resp.StatusCode == http.StatusOK
+	if resp.StatusCode != http.StatusOK {
+		return false, fmt.Sprintf("HTTP %d: %s", resp.StatusCode, resp.Status)
+	}
+	return true, ""
 }
 
 // TransformAirtableResponse formats Airtable API responses.

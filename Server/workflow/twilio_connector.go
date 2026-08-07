@@ -2,29 +2,33 @@ package workflow
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 )
 
 // CheckTwilioConnection checks Twilio credentials validity.
-func CheckTwilioConnection(creds map[string]string) bool {
+func CheckTwilioConnection(creds map[string]string) (bool, string) {
 	accountSid := creds["account_sid"]
 	authToken := creds["auth_token"]
 	if accountSid == "" || authToken == "" {
-		return false
+		return false, "Missing Account SID or Auth Token"
 	}
 	url := "https://api.twilio.com/2010-04-01/Accounts/" + accountSid + ".json"
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return false
+		return false, fmt.Sprintf("Failed to create request: %v", err)
 	}
 	req.SetBasicAuth(accountSid, authToken)
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return false
+		return false, fmt.Sprintf("Connection request failed: %v", err)
 	}
 	defer resp.Body.Close()
-	return resp.StatusCode == http.StatusOK
+	if resp.StatusCode != http.StatusOK {
+		return false, fmt.Sprintf("HTTP %d: %s", resp.StatusCode, resp.Status)
+	}
+	return true, ""
 }
 
 // TransformTwilioResponse formats raw Twilio API responses.

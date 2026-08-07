@@ -29,10 +29,66 @@
       "queryParams": [],
       "payloadTemplate": "{\"model\": \"{{model}}\", \"max_tokens\": {{max_tokens}}, \"messages\": [{\"role\": \"user\", \"content\": \"{{prompt}}\"}]}",
       "fields": [
-        { "key": "prompt", "label": "Prompt Content", "required": true, "placeholder": "Enter prompt or question for Claude" },
-        { "key": "model", "label": "Claude Model", "required": false, "placeholder": "claude-3-5-sonnet-20241022" },
-        { "key": "max_tokens", "label": "Max Tokens", "required": false, "placeholder": "1000" }
-      ]
+        {
+          "key": "prompt",
+          "label": "Prompt Content",
+          "required": true,
+          "placeholder": "Enter prompt or question for Claude"
+        },
+        {
+          "key": "model",
+          "label": "Claude Model",
+          "required": false,
+          "placeholder": "claude-3-5-sonnet-20241022"
+        },
+        {
+          "key": "max_tokens",
+          "label": "Max Tokens",
+          "required": false,
+          "placeholder": "1000"
+        }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "model": {
+            "type": "string",
+            "description": "Claude model name",
+            "example": "claude-3-5-sonnet-20240620"
+          },
+          "prompt": {
+            "type": "string",
+            "description": "User prompt message text",
+            "example": "Summarize the key benefits of workflow automation."
+          },
+          "max_tokens": {
+            "type": "integer",
+            "description": "Maximum tokens in response",
+            "default": 1024
+          }
+        },
+        "required": [
+          "model",
+          "prompt"
+        ]
+      },
+      "outputSchema": {
+        "id": "msg_013Zva2CMHLvVMneVFQQJKvC",
+        "type": "message",
+        "role": "assistant",
+        "content": [
+          {
+            "type": "text",
+            "text": "Workflow automation increases efficiency, eliminates human error, and saves time..."
+          }
+        ],
+        "model": "claude-3-5-sonnet-20240620",
+        "stop_reason": "end_turn",
+        "usage": {
+          "input_tokens": 25,
+          "output_tokens": 150
+        }
+      }
     }
   ]
 }

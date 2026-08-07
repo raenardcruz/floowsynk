@@ -1,0 +1,122 @@
+{
+  "id": "mailchimp",
+  "name": "Mailchimp",
+  "description": "Manage marketing audiences, subscribers, and email campaigns in Mailchimp.",
+  "icon": "/src/components/Icons/mailchimp.svg",
+  "baseUrl": "https://{{server_prefix}}.api.mailchimp.com/3.0",
+  "authType": "apikey, oauth2",
+  "fields": [
+    {
+      "key": "api_key",
+      "label": "API Key",
+      "type": "password",
+      "required": true,
+      "placeholder": "YOUR_API_KEY-usXX"
+    },
+    {
+      "key": "server_prefix",
+      "label": "Server Prefix / Datacenter",
+      "type": "text",
+      "required": true,
+      "placeholder": "us21"
+    }
+  ],
+  "oauthConfig": {
+    "authorizeUrl": "https://login.mailchimp.com/oauth2/authorize",
+    "tokenUrl": "https://login.mailchimp.com/oauth2/token",
+    "defaultScopes": []
+  },
+  "actions": [
+    {
+      "id": "list_audiences",
+      "name": "List Audiences",
+      "description": "Get all lists/audiences in Mailchimp account",
+      "path": "/lists",
+      "method": "GET",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "fields": [],
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "outputSchema": {
+        "lists": [
+          {
+            "id": "a1b2c3d4e5",
+            "name": "Newsletter Subscribers",
+            "stats": {
+              "member_count": 1500
+            }
+          }
+        ],
+        "total_items": 1
+      }
+    },
+    {
+      "id": "add_or_update_member",
+      "name": "Add or Update Member",
+      "description": "Add or update a subscriber in a Mailchimp list",
+      "path": "/lists/{{list_id}}/members/{{subscriber_hash}}",
+      "method": "PUT",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "payloadTemplate": "{\"email_address\": \"{{email_address}}\", \"status_if_new\": \"{{status}}\", \"status\": \"{{status}}\"}",
+      "fields": [
+        { "key": "list_id", "label": "Audience/List ID", "required": true, "placeholder": "a1b2c3d4e5" },
+        { "key": "subscriber_hash", "label": "Subscriber MD5 Hash", "required": true, "placeholder": "md5(lowercase_email)" },
+        { "key": "email_address", "label": "Email Address", "required": true, "placeholder": "user@example.com" },
+        { "key": "status", "label": "Status", "required": true, "placeholder": "subscribed or pending" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "list_id": { "type": "string", "description": "Target list ID" },
+          "subscriber_hash": { "type": "string", "description": "MD5 hash of email" },
+          "email_address": { "type": "string", "description": "Email address" },
+          "status": { "type": "string", "description": "Subscription status", "example": "subscribed" }
+        },
+        "required": ["list_id", "subscriber_hash", "email_address", "status"]
+      },
+      "outputSchema": {
+        "id": "md5hash12345",
+        "email_address": "user@example.com",
+        "status": "subscribed",
+        "list_id": "a1b2c3d4e5"
+      }
+    },
+    {
+      "id": "create_campaign",
+      "name": "Create Campaign",
+      "description": "Create a new email campaign in Mailchimp",
+      "path": "/campaigns",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "payloadTemplate": "{\"type\": \"regular\", \"recipients\": {\"list_id\": \"{{list_id}}\"}, \"settings\": {\"subject_line\": \"{{subject_line}}\", \"title\": \"{{title}}\"}}",
+      "fields": [
+        { "key": "list_id", "label": "Audience/List ID", "required": true, "placeholder": "a1b2c3d4e5" },
+        { "key": "subject_line", "label": "Subject Line", "required": true, "placeholder": "Weekly Newsletter #42" },
+        { "key": "title", "label": "Campaign Title", "required": true, "placeholder": "Internal Campaign Title" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "list_id": { "type": "string", "description": "Target audience list ID" },
+          "subject_line": { "type": "string", "description": "Email subject line" },
+          "title": { "type": "string", "description": "Campaign title" }
+        },
+        "required": ["list_id", "subject_line", "title"]
+      },
+      "outputSchema": {
+        "id": "campaign_12345",
+        "type": "regular",
+        "status": "save",
+        "archive_url": "http://eepurl.com/..."
+      }
+    }
+  ]
+}

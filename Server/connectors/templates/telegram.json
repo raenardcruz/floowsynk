@@ -1,0 +1,157 @@
+{
+  "id": "telegram",
+  "name": "Telegram",
+  "description": "Send text messages, photos, documents, and manage webhooks using the Telegram Bot API.",
+  "icon": "/src/components/Icons/telegram.svg",
+  "baseUrl": "https://api.telegram.org/bot{{access_token}}",
+  "authType": "apikey",
+  "fields": [
+    {
+      "key": "access_token",
+      "label": "Bot API Access Token",
+      "type": "password",
+      "required": true,
+      "placeholder": "123456789:ABCdefGhIJKlmNoPQRsTUVwxyZ..."
+    },
+    {
+      "key": "chat_id",
+      "label": "Chat ID",
+      "type": "text",
+      "required": false,
+      "placeholder": "Numeric identifier for chat/group/channel"
+    }
+  ],
+  "actions": [
+    {
+      "id": "send_message",
+      "name": "Send Message",
+      "description": "Send a text message to a Telegram chat, group, or channel",
+      "path": "/sendMessage",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "queryParams": [],
+      "payloadTemplate": "{\"chat_id\": \"{{chat_id}}\", \"text\": \"{{text}}\"}",
+      "fields": [
+        { "key": "chat_id", "label": "Chat ID", "required": true, "placeholder": "e.g. 12345678 or -100123456789" },
+        { "key": "text", "label": "Message Text", "required": true, "placeholder": "Enter text message" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "chat_id": { "type": "string", "description": "Telegram Chat ID", "example": "12345678" },
+          "text": { "type": "string", "description": "Message content", "example": "Hello from FloowSynk!" }
+        },
+        "required": ["chat_id", "text"]
+      },
+      "outputSchema": {
+        "ok": true,
+        "result": {
+          "message_id": 42,
+          "chat": {
+            "id": 12345678,
+            "type": "private"
+          },
+          "date": 1600000000,
+          "text": "Hello from FloowSynk!"
+        }
+      }
+    },
+    {
+      "id": "send_photo",
+      "name": "Send Photo",
+      "description": "Send a photo URL to a Telegram chat",
+      "path": "/sendPhoto",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "queryParams": [],
+      "payloadTemplate": "{\"chat_id\": \"{{chat_id}}\", \"photo\": \"{{photo}}\", \"caption\": \"{{caption}}\"}",
+      "fields": [
+        { "key": "chat_id", "label": "Chat ID", "required": true, "placeholder": "e.g. 12345678" },
+        { "key": "photo", "label": "Photo URL", "required": true, "placeholder": "https://example.com/image.jpg" },
+        { "key": "caption", "label": "Caption", "required": false, "placeholder": "Photo caption" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "chat_id": { "type": "string", "description": "Telegram Chat ID", "example": "12345678" },
+          "photo": { "type": "string", "description": "Image URL", "example": "https://example.com/image.jpg" },
+          "caption": { "type": "string", "description": "Image caption", "example": "Sample Image" }
+        },
+        "required": ["chat_id", "photo"]
+      },
+      "outputSchema": {
+        "ok": true,
+        "result": {
+          "message_id": 43,
+          "chat": { "id": 12345678 },
+          "photo": []
+        }
+      }
+    },
+    {
+      "id": "send_document",
+      "name": "Send Document",
+      "description": "Send a document URL to a Telegram chat",
+      "path": "/sendDocument",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "queryParams": [],
+      "payloadTemplate": "{\"chat_id\": \"{{chat_id}}\", \"document\": \"{{document}}\", \"caption\": \"{{caption}}\"}",
+      "fields": [
+        { "key": "chat_id", "label": "Chat ID", "required": true, "placeholder": "e.g. 12345678" },
+        { "key": "document", "label": "Document URL", "required": true, "placeholder": "https://example.com/file.pdf" },
+        { "key": "caption", "label": "Caption", "required": false, "placeholder": "Document description" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "chat_id": { "type": "string", "description": "Telegram Chat ID", "example": "12345678" },
+          "document": { "type": "string", "description": "Document file URL", "example": "https://example.com/file.pdf" },
+          "caption": { "type": "string", "description": "Document caption", "example": "Report PDF" }
+        },
+        "required": ["chat_id", "document"]
+      },
+      "outputSchema": {
+        "ok": true,
+        "result": {
+          "message_id": 44,
+          "chat": { "id": 12345678 },
+          "document": {}
+        }
+      }
+    },
+    {
+      "id": "set_webhook",
+      "name": "Set Webhook",
+      "description": "Specify a URL and receive incoming updates via an outgoing webhook",
+      "path": "/setWebhook",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "queryParams": [],
+      "payloadTemplate": "{\"url\": \"{{url}}\"}",
+      "fields": [
+        { "key": "url", "label": "Webhook URL", "required": true, "placeholder": "https://yourdomain.com/webhook/telegram" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "url": { "type": "string", "description": "HTTPS webhook URL", "example": "https://yourdomain.com/webhook/telegram" }
+        },
+        "required": ["url"]
+      },
+      "outputSchema": {
+        "ok": true,
+        "result": true,
+        "description": "Webhook was set"
+      }
+    }
+  ]
+}

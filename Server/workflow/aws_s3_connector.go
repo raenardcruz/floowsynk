@@ -7,31 +7,33 @@ import (
 )
 
 // CheckAWS_S3Connection checks credentials by querying object listing or basic S3 check.
-func CheckAWS_S3Connection(creds map[string]string) bool {
+func CheckAWS_S3Connection(creds map[string]string) (bool, string) {
 	accessKey := creds["access_key_id"]
 	secretKey := creds["secret_access_key"]
 	bucket := creds["bucket_name"]
 	region := creds["region"]
 
 	if accessKey == "" || secretKey == "" || bucket == "" || region == "" {
-		return false
+		return false, "Missing AWS credentials, bucket name, or region"
 	}
 
 	url := fmt.Sprintf("https://%s.s3.%s.amazonaws.com/?list-type=2", bucket, region)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return false
+		return false, fmt.Sprintf("Failed to create request: %v", err)
 	}
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return false
+		return false, fmt.Sprintf("Connection request failed: %v", err)
 	}
 	defer resp.Body.Close()
 
-	// S3 returns 200 on successful auth/list or 403 on invalid sig/creds
-	return resp.StatusCode == http.StatusOK
+	if resp.StatusCode != http.StatusOK {
+		return false, fmt.Sprintf("HTTP %d: %s", resp.StatusCode, resp.Status)
+	}
+	return true, ""
 }
 
 // TransformAWS_S3Response formats raw S3 response data.

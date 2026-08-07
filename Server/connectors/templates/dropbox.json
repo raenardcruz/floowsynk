@@ -1,0 +1,124 @@
+{
+  "id": "dropbox",
+  "name": "Dropbox",
+  "description": "Store, access, and manage files in Dropbox.",
+  "icon": "/src/components/Icons/dropbox.svg",
+  "baseUrl": "https://api.dropboxapi.com/2",
+  "authType": "oauth2",
+  "fields": [
+    {
+      "key": "client_id",
+      "label": "App Key (Client ID)",
+      "type": "text",
+      "required": true,
+      "placeholder": "Enter Dropbox App Key"
+    },
+    {
+      "key": "client_secret",
+      "label": "App Secret (Client Secret)",
+      "type": "password",
+      "required": true,
+      "placeholder": "Enter Dropbox App Secret"
+    },
+    {
+      "key": "access_token",
+      "label": "Access Token",
+      "type": "password",
+      "required": false,
+      "placeholder": "sl.B..."
+    }
+  ],
+  "oauthConfig": {
+    "authorizeUrl": "https://www.dropbox.com/oauth2/authorize",
+    "tokenUrl": "https://api.dropboxapi.com/oauth2/token",
+    "defaultScopes": ["files.content.read", "files.content.write", "files.metadata.read"]
+  },
+  "actions": [
+    {
+      "id": "list_folder",
+      "name": "List Folder",
+      "description": "Returns the contents of a folder",
+      "path": "/files/list_folder",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "payloadTemplate": "{\"path\": \"{{path}}\"}",
+      "fields": [
+        { "key": "path", "label": "Folder Path", "required": true, "placeholder": "e.g. /folder or empty string for root" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": { "type": "string", "description": "Folder path", "example": "/documents" }
+        },
+        "required": ["path"]
+      },
+      "outputSchema": {
+        "entries": [
+          {
+            ".tag": "file",
+            "name": "document.pdf",
+            "id": "id:a4ba3790-2c2f-4562-829e-2c9ff892b34d",
+            "path_lower": "/documents/document.pdf",
+            "size": 1024
+          }
+        ],
+        "has_more": false
+      }
+    },
+    {
+      "id": "upload_file",
+      "name": "Upload File",
+      "description": "Upload file content to Dropbox",
+      "path": "https://content.dropboxapi.com/2/files/upload",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/octet-stream",
+        "Dropbox-API-Arg": "{\"path\": \"{{path}}\", \"mode\": \"add\", \"autorename\": true, \"mute\": false}"
+      },
+      "payloadTemplate": "{{content}}",
+      "fields": [
+        { "key": "path", "label": "File Path", "required": true, "placeholder": "/folder/file.txt" },
+        { "key": "content", "label": "File Content", "required": true, "placeholder": "File string content" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": { "type": "string", "description": "Destination file path", "example": "/documents/sample.txt" },
+          "content": { "type": "string", "description": "Content string", "example": "Hello world" }
+        },
+        "required": ["path", "content"]
+      },
+      "outputSchema": {
+        "name": "sample.txt",
+        "id": "id:a4ba3790-2c2f-4562-829e-2c9ff892b34e",
+        "path_lower": "/documents/sample.txt",
+        "size": 11
+      }
+    },
+    {
+      "id": "download_file",
+      "name": "Download File",
+      "description": "Download a file from Dropbox",
+      "path": "https://content.dropboxapi.com/2/files/download",
+      "method": "POST",
+      "headers": {
+        "Dropbox-API-Arg": "{\"path\": \"{{path}}\"}"
+      },
+      "fields": [
+        { "key": "path", "label": "File Path", "required": true, "placeholder": "/folder/file.txt" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "path": { "type": "string", "description": "Target file path", "example": "/documents/sample.txt" }
+        },
+        "required": ["path"]
+      },
+      "outputSchema": {
+        "result": "File binary or string data"
+      }
+    }
+  ]
+}

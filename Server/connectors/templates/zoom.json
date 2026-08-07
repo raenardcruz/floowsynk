@@ -1,0 +1,145 @@
+{
+  "id": "zoom",
+  "name": "Zoom",
+  "description": "Create and manage Zoom meetings, retrieve cloud recordings, and manage users.",
+  "icon": "/src/components/Icons/zoom.svg",
+  "baseUrl": "https://api.zoom.us/v2",
+  "authType": "oauth2",
+  "fields": [
+    {
+      "key": "account_id",
+      "label": "Account ID",
+      "type": "text",
+      "required": true,
+      "placeholder": "Enter Zoom Server-to-Server Account ID"
+    },
+    {
+      "key": "client_id",
+      "label": "Client ID",
+      "type": "text",
+      "required": true,
+      "placeholder": "Enter OAuth Client ID"
+    },
+    {
+      "key": "client_secret",
+      "label": "Client Secret",
+      "type": "password",
+      "required": true,
+      "placeholder": "Enter OAuth Client Secret"
+    },
+    {
+      "key": "access_token",
+      "label": "Access Token",
+      "type": "password",
+      "required": false,
+      "placeholder": "Enter Bearer Access Token"
+    }
+  ],
+  "oauthConfig": {
+    "authorizeUrl": "https://zoom.us/oauth/authorize",
+    "tokenUrl": "https://zoom.us/oauth/token",
+    "defaultScopes": ["meeting:write:admin", "meeting:read:admin", "recording:read:admin"]
+  },
+  "actions": [
+    {
+      "id": "create_meeting",
+      "name": "Create Meeting",
+      "description": "Create a new meeting for a user",
+      "path": "/users/{{userId}}/meetings",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "payloadTemplate": "{\"topic\": \"{{topic}}\", \"type\": {{type}}, \"start_time\": \"{{start_time}}\", \"duration\": {{duration}}}",
+      "fields": [
+        { "key": "userId", "label": "User ID or Email", "required": true, "placeholder": "me or user@company.com" },
+        { "key": "topic", "label": "Meeting Topic", "required": true, "placeholder": "Project Sync" },
+        { "key": "type", "label": "Meeting Type", "required": false, "placeholder": "2 (Scheduled)" },
+        { "key": "start_time", "label": "Start Time (ISO 8601)", "required": false, "placeholder": "2026-08-10T10:00:00Z" },
+        { "key": "duration", "label": "Duration (minutes)", "required": false, "placeholder": "45" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "userId": { "type": "string", "description": "User ID or email (use 'me' for current user)", "example": "me" },
+          "topic": { "type": "string", "description": "Topic of the meeting", "example": "Weekly Sync" },
+          "type": { "type": "number", "description": "Meeting type (1=Instant, 2=Scheduled)", "example": 2 },
+          "start_time": { "type": "string", "description": "Meeting start time in UTC ISO 8601", "example": "2026-08-10T10:00:00Z" },
+          "duration": { "type": "number", "description": "Meeting duration in minutes", "example": 30 }
+        },
+        "required": ["userId", "topic"]
+      },
+      "outputSchema": {
+        "id": 1234567890,
+        "join_url": "https://zoom.us/j/1234567890",
+        "start_url": "https://zoom.us/s/1234567890",
+        "topic": "Weekly Sync",
+        "start_time": "2026-08-10T10:00:00Z"
+      }
+    },
+    {
+      "id": "list_meetings",
+      "name": "List Meetings",
+      "description": "List meetings scheduled for a user",
+      "path": "/users/{{userId}}/meetings",
+      "method": "GET",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "queryParams": [],
+      "fields": [
+        { "key": "userId", "label": "User ID or Email", "required": true, "placeholder": "me or user@company.com" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "userId": { "type": "string", "description": "User ID or email ('me')", "example": "me" }
+        },
+        "required": ["userId"]
+      },
+      "outputSchema": {
+        "meetings": [
+          {
+            "id": 1234567890,
+            "topic": "Weekly Sync",
+            "start_time": "2026-08-10T10:00:00Z",
+            "duration": 30,
+            "join_url": "https://zoom.us/j/1234567890"
+          }
+        ]
+      }
+    },
+    {
+      "id": "get_recording",
+      "name": "Get Recording",
+      "description": "Retrieve cloud recordings for a meeting by meeting ID",
+      "path": "/meetings/{{meetingId}}/recordings",
+      "method": "GET",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "queryParams": [],
+      "fields": [
+        { "key": "meetingId", "label": "Meeting ID", "required": true, "placeholder": "1234567890" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "meetingId": { "type": "string", "description": "Meeting ID", "example": "1234567890" }
+        },
+        "required": ["meetingId"]
+      },
+      "outputSchema": {
+        "id": 1234567890,
+        "recording_count": 2,
+        "recording_files": [
+          {
+            "id": "rec123",
+            "file_type": "MP4",
+            "download_url": "https://zoom.us/rec/download/123"
+          }
+        ]
+      }
+    }
+  ]
+}

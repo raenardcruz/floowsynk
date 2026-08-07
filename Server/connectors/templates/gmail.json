@@ -1,0 +1,150 @@
+{
+  "id": "gmail",
+  "name": "Gmail",
+  "description": "Send emails, manage drafts, and read messages using Gmail API.",
+  "icon": "/src/components/Icons/gmail.svg",
+  "baseUrl": "https://gmail.googleapis.com/gmail/v1/users/me",
+  "authType": "oauth2",
+  "fields": [
+    {
+      "key": "client_id",
+      "label": "Client ID",
+      "type": "text",
+      "required": true,
+      "placeholder": "Enter Google OAuth Client ID"
+    },
+    {
+      "key": "client_secret",
+      "label": "Client Secret",
+      "type": "password",
+      "required": true,
+      "placeholder": "Enter Google OAuth Client Secret"
+    },
+    {
+      "key": "access_token",
+      "label": "Access Token",
+      "type": "password",
+      "required": false,
+      "placeholder": "ya29..."
+    }
+  ],
+  "oauthConfig": {
+    "authorizeUrl": "https://accounts.google.com/o/oauth2/v2/auth",
+    "tokenUrl": "https://oauth2.googleapis.com/token",
+    "defaultScopes": [
+      "https://mail.google.com/",
+      "https://www.googleapis.com/auth/gmail.send",
+      "https://www.googleapis.com/auth/gmail.readonly"
+    ]
+  },
+  "actions": [
+    {
+      "id": "send_message",
+      "name": "Send Email",
+      "description": "Send an email message",
+      "path": "/messages/send",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "payloadTemplate": "{\"raw\": \"{{raw}}\"}",
+      "fields": [
+        { "key": "raw", "label": "Base64URL Encoded Message", "required": true, "placeholder": "RFC 2822 base64url encoded string" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "raw": { "type": "string", "description": "Base64URL encoded RFC 2822 email content" }
+        },
+        "required": ["raw"]
+      },
+      "outputSchema": {
+        "id": "1893ab871c9",
+        "threadId": "1893ab871c9",
+        "labelIds": ["SENT"]
+      }
+    },
+    {
+      "id": "list_messages",
+      "name": "List Messages",
+      "description": "List email messages in mailbox",
+      "path": "/messages",
+      "method": "GET",
+      "queryParams": [
+        { "key": "q", "value": "{{q}}" },
+        { "key": "maxResults", "value": "{{maxResults}}" }
+      ],
+      "fields": [
+        { "key": "q", "label": "Search Query", "required": false, "placeholder": "is:unread or from:user@example.com" },
+        { "key": "maxResults", "label": "Max Results", "required": false, "placeholder": "10" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "q": { "type": "string", "description": "Query filter string", "example": "is:unread" },
+          "maxResults": { "type": "string", "description": "Maximum messages to return", "example": "10" }
+        }
+      },
+      "outputSchema": {
+        "messages": [
+          {
+            "id": "1893ab871c9",
+            "threadId": "1893ab871c9"
+          }
+        ],
+        "resultSizeEstimate": 1
+      }
+    },
+    {
+      "id": "get_message",
+      "name": "Get Message Details",
+      "description": "Retrieve message details by ID",
+      "path": "/messages/{{id}}",
+      "method": "GET",
+      "fields": [
+        { "key": "id", "label": "Message ID", "required": true, "placeholder": "Message ID string" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "description": "Gmail message ID", "example": "1893ab871c9" }
+        },
+        "required": ["id"]
+      },
+      "outputSchema": {
+        "id": "1893ab871c9",
+        "threadId": "1893ab871c9",
+        "snippet": "Email body snippet text...",
+        "internalDate": "1700000000000"
+      }
+    },
+    {
+      "id": "create_draft",
+      "name": "Create Draft",
+      "description": "Create an email draft",
+      "path": "/drafts",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "payloadTemplate": "{\"message\": {\"raw\": \"{{raw}}\"}}",
+      "fields": [
+        { "key": "raw", "label": "Base64URL Encoded Message", "required": true, "placeholder": "RFC 2822 base64url encoded string" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "raw": { "type": "string", "description": "Base64URL encoded RFC 2822 email content" }
+        },
+        "required": ["raw"]
+      },
+      "outputSchema": {
+        "id": "r-100200300",
+        "message": {
+          "id": "1893ab871ca",
+          "threadId": "1893ab871ca"
+        }
+      }
+    }
+  ]
+}

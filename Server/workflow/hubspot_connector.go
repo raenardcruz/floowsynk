@@ -2,11 +2,12 @@ package workflow
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 )
 
 // CheckHubSpotConnection checks HubSpot access token / API key validity.
-func CheckHubSpotConnection(creds map[string]string) bool {
+func CheckHubSpotConnection(creds map[string]string) (bool, string) {
 	token := creds["access_token"]
 	if token == "" {
 		token = creds["api_key"]
@@ -15,20 +16,23 @@ func CheckHubSpotConnection(creds map[string]string) bool {
 		token = creds["pat"]
 	}
 	if token == "" {
-		return false
+		return false, "Missing access token, API key, or PAT"
 	}
 	req, err := http.NewRequest("GET", "https://api.hubapi.com/crm/v3/objects/contacts?limit=1", nil)
 	if err != nil {
-		return false
+		return false, fmt.Sprintf("Failed to create request: %v", err)
 	}
 	req.Header.Set("Authorization", "Bearer "+token)
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return false
+		return false, fmt.Sprintf("Connection request failed: %v", err)
 	}
 	defer resp.Body.Close()
-	return resp.StatusCode == http.StatusOK
+	if resp.StatusCode != http.StatusOK {
+		return false, fmt.Sprintf("HTTP %d: %s", resp.StatusCode, resp.Status)
+	}
+	return true, ""
 }
 
 // TransformHubSpotResponse formats raw HubSpot API responses.

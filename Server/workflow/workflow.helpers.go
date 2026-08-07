@@ -220,11 +220,17 @@ func (wp *WorkflowProcessor) makeRequest(url string, method string, headers []*p
 	var jsonBody interface{}
 	if err := json.Unmarshal(bodyBytes, &jsonBody); err == nil {
 		wp.setVariable("api.body", jsonBody)
+		if resp.StatusCode >= 400 {
+			return jsonBody, fmt.Errorf("HTTP request failed with status code %d", resp.StatusCode)
+		}
 		return jsonBody, nil
 	}
 
 	strBody := string(bodyBytes)
 	wp.setVariable("api.body", strBody)
+	if resp.StatusCode >= 400 {
+		return strBody, fmt.Errorf("HTTP request failed with status code %d: %s", resp.StatusCode, strBody)
+	}
 	return strBody, nil
 }
 

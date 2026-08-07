@@ -7,32 +7,33 @@ import (
 )
 
 // CheckSlackConnection verifies the stored access token using Slack's auth.test method.
-func CheckSlackConnection(creds map[string]string) bool {
+func CheckSlackConnection(creds map[string]string) (bool, string) {
 	token := creds["access_token"]
 	if token == "" {
-		return false
+		return false, "Missing access token"
 	}
 	req, err := http.NewRequest("GET", "https://slack.com/api/auth.test", nil)
 	if err != nil {
-		return false
+		return false, fmt.Sprintf("Failed to create request: %v", err)
 	}
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return false
+		return false, fmt.Sprintf("Connection request failed: %v", err)
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		return false
+		return false, fmt.Sprintf("HTTP %d: %s", resp.StatusCode, resp.Status)
 	}
 	var result struct {
-		OK bool `json:"ok"`
+		OK    bool   `json:"ok"`
+		Error string `json:"error"`
 	}
-	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
-		return false
+	if err := json.NewDecoder(resp.Body).Decode(&result); err == nil && !result.OK {
+		return false, fmt.Sprintf("Slack API error: %s", result.Error)
 	}
-	return result.OK
+	return true, ""
 }
 
 

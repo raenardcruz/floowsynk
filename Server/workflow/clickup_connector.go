@@ -2,30 +2,34 @@ package workflow
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 )
 
 // CheckClickUpConnection verifies Personal API Token with ClickUp.
-func CheckClickUpConnection(creds map[string]string) bool {
+func CheckClickUpConnection(creds map[string]string) (bool, string) {
 	token := creds["api_token"]
 	if token == "" {
-		return false
+		return false, "Missing API token"
 	}
 
 	req, err := http.NewRequest("GET", "https://api.clickup.com/api/v2/user", nil)
 	if err != nil {
-		return false
+		return false, fmt.Sprintf("Failed to create request: %v", err)
 	}
 	req.Header.Set("Authorization", token)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return false
+		return false, fmt.Sprintf("Connection request failed: %v", err)
 	}
 	defer resp.Body.Close()
 
-	return resp.StatusCode == http.StatusOK
+	if resp.StatusCode != http.StatusOK {
+		return false, fmt.Sprintf("HTTP %d: %s", resp.StatusCode, resp.Status)
+	}
+	return true, ""
 }
 
 // TransformClickUpResponse formats ClickUp API responses.

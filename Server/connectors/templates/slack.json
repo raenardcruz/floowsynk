@@ -31,7 +31,12 @@
   "oauthConfig": {
     "authorizeUrl": "https://slack.com/oauth/v2/authorize",
     "tokenUrl": "https://slack.com/api/oauth.v2.access",
-    "defaultScopes": ["chat:write", "chat:write.public", "channels:read", "users:read"]
+    "defaultScopes": [
+      "chat:write",
+      "chat:write.public",
+      "channels:read",
+      "users:read"
+    ]
   },
   "actions": [
     {
@@ -46,9 +51,43 @@
       "queryParams": [],
       "payloadTemplate": "{\"channel\": \"{{channel}}\", \"text\": \"{{message}}\"}",
       "fields": [
-        { "key": "channel", "label": "Channel ID / Name", "required": true, "placeholder": "#general or C123456" },
-        { "key": "message", "label": "Message Text", "required": true, "placeholder": "Hello from FloowSynk!" }
-      ]
+        {
+          "key": "channel",
+          "label": "Channel ID / Name",
+          "required": true,
+          "placeholder": "#general or C123456"
+        },
+        {
+          "key": "message",
+          "label": "Message Text",
+          "required": true,
+          "placeholder": "Hello from FloowSynk!"
+        }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "channel": {
+            "type": "string",
+            "description": "Slack Channel ID or Name",
+            "example": "#general or C12345678"
+          },
+          "message": {
+            "type": "string",
+            "description": "Message Text",
+            "example": "Hello team! Weekly sync starts in 10 minutes."
+          }
+        },
+        "required": [
+          "channel",
+          "message"
+        ]
+      },
+      "outputSchema": {
+        "ok": true,
+        "channel": "C12345678",
+        "ts": "1723026000.000200"
+      }
     },
     {
       "id": "list_channels",
@@ -59,7 +98,25 @@
       "headers": {
         "Accept": "application/json"
       },
-      "queryParams": ["types"]
+      "queryParams": [
+        "types"
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "types": {
+            "type": "string",
+            "description": "Channel types to list (public_channel, private_channel)",
+            "default": "public_channel"
+          }
+        }
+      },
+      "outputSchema": [
+        {
+          "id": "C12345678",
+          "name": "general"
+        }
+      ]
     },
     {
       "id": "get_user_info",
@@ -70,10 +127,34 @@
       "headers": {
         "Accept": "application/json"
       },
-      "queryParams": ["user"],
+      "queryParams": [
+        "user"
+      ],
       "fields": [
-        { "key": "user", "label": "User ID", "required": true, "placeholder": "U12345678" }
-      ]
+        {
+          "key": "user",
+          "label": "User ID",
+          "required": true,
+          "placeholder": "U12345678"
+        }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "user": {
+            "type": "string",
+            "description": "Slack User ID",
+            "example": "U12345678"
+          }
+        },
+        "required": [
+          "user"
+        ]
+      },
+      "outputSchema": {
+        "id": "U12345678",
+        "name": "janesmith"
+      }
     }
   ]
 }

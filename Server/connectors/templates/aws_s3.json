@@ -48,10 +48,56 @@
       "queryParams": [],
       "payloadTemplate": "{{content}}",
       "fields": [
-        { "key": "object_key", "label": "S3 Object Key / Path", "required": true, "placeholder": "path/to/file.txt" },
-        { "key": "content", "label": "File Content", "required": true, "placeholder": "Enter object file content" },
-        { "key": "content_type", "label": "Content Type", "required": false, "placeholder": "text/plain" }
-      ]
+        {
+          "key": "object_key",
+          "label": "S3 Object Key / Path",
+          "required": true,
+          "placeholder": "path/to/file.txt"
+        },
+        {
+          "key": "content",
+          "label": "File Content",
+          "required": true,
+          "placeholder": "Enter object file content"
+        },
+        {
+          "key": "content_type",
+          "label": "Content Type",
+          "required": false,
+          "placeholder": "text/plain"
+        }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "bucket": {
+            "type": "string",
+            "description": "Bucket Name",
+            "example": "my-app-bucket"
+          },
+          "key": {
+            "type": "string",
+            "description": "S3 Key Path",
+            "example": "files/document.pdf"
+          },
+          "body": {
+            "type": "string",
+            "description": "File content string",
+            "example": "file content"
+          }
+        },
+        "required": [
+          "bucket",
+          "key",
+          "body"
+        ]
+      },
+      "outputSchema": {
+        "ETag": "\"68934a3e9455fa72420237eb05902327\"",
+        "Location": "https://my-app-bucket.s3.amazonaws.com/files/document.pdf",
+        "Key": "files/document.pdf",
+        "Bucket": "my-app-bucket"
+      }
     },
     {
       "id": "download_file",
@@ -63,8 +109,37 @@
       "queryParams": [],
       "payloadTemplate": "",
       "fields": [
-        { "key": "object_key", "label": "S3 Object Key / Path", "required": true, "placeholder": "path/to/file.txt" }
-      ]
+        {
+          "key": "object_key",
+          "label": "S3 Object Key / Path",
+          "required": true,
+          "placeholder": "path/to/file.txt"
+        }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "bucket": {
+            "type": "string",
+            "description": "Bucket Name",
+            "example": "my-app-bucket"
+          },
+          "key": {
+            "type": "string",
+            "description": "S3 Key Path",
+            "example": "files/document.pdf"
+          }
+        },
+        "required": [
+          "bucket",
+          "key"
+        ]
+      },
+      "outputSchema": {
+        "ContentType": "application/pdf",
+        "ContentLength": 2048,
+        "Body": "[File Binary / String Content]"
+      }
     },
     {
       "id": "delete_file",
@@ -76,8 +151,36 @@
       "queryParams": [],
       "payloadTemplate": "",
       "fields": [
-        { "key": "object_key", "label": "S3 Object Key / Path", "required": true, "placeholder": "path/to/file.txt" }
-      ]
+        {
+          "key": "object_key",
+          "label": "S3 Object Key / Path",
+          "required": true,
+          "placeholder": "path/to/file.txt"
+        }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "bucket": {
+            "type": "string",
+            "description": "Bucket Name",
+            "example": "my-app-bucket"
+          },
+          "key": {
+            "type": "string",
+            "description": "S3 Key Path",
+            "example": "files/document.pdf"
+          }
+        },
+        "required": [
+          "bucket",
+          "key"
+        ]
+      },
+      "outputSchema": {
+        "DeleteMarker": true,
+        "VersionId": "def456"
+      }
     },
     {
       "id": "list_objects",
@@ -87,9 +190,41 @@
       "method": "GET",
       "headers": {},
       "queryParams": [
-        { "key": "list-type", "value": "2" }
+        {
+          "key": "list-type",
+          "value": "2"
+        }
       ],
-      "payloadTemplate": ""
+      "payloadTemplate": "",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "bucket": {
+            "type": "string",
+            "description": "S3 Bucket Name",
+            "example": "my-app-uploads"
+          },
+          "prefix": {
+            "type": "string",
+            "description": "Prefix filter for keys",
+            "example": "documents/"
+          }
+        },
+        "required": [
+          "bucket"
+        ]
+      },
+      "outputSchema": {
+        "Name": "my-app-uploads",
+        "Prefix": "documents/",
+        "Contents": [
+          {
+            "Key": "documents/report.pdf",
+            "LastModified": "2026-08-07T10:00:00.000Z",
+            "Size": 1024
+          }
+        ]
+      }
     }
   ]
 }

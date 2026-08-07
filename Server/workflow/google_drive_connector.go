@@ -7,23 +7,26 @@ import (
 )
 
 // CheckGoogleDriveConnection checks Google Drive OAuth token validity.
-func CheckGoogleDriveConnection(creds map[string]string) bool {
+func CheckGoogleDriveConnection(creds map[string]string) (bool, string) {
 	token := creds["access_token"]
 	if token == "" {
-		return false
+		return false, "Missing access token"
 	}
 	req, err := http.NewRequest("GET", "https://www.googleapis.com/drive/v3/about?fields=user", nil)
 	if err != nil {
-		return false
+		return false, fmt.Sprintf("Failed to create request: %v", err)
 	}
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return false
+		return false, fmt.Sprintf("Connection request failed: %v", err)
 	}
 	defer resp.Body.Close()
-	return resp.StatusCode == http.StatusOK
+	if resp.StatusCode != http.StatusOK {
+		return false, fmt.Sprintf("HTTP %d: %s", resp.StatusCode, resp.Status)
+	}
+	return true, ""
 }
 
 // TransformGoogleDriveResponse formats raw Google Drive API responses.

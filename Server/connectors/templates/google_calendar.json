@@ -1,0 +1,168 @@
+{
+  "id": "google_calendar",
+  "name": "Google Calendar",
+  "description": "Manage calendars, events, and scheduling via Google Calendar API.",
+  "icon": "/src/components/Icons/google_calendar.svg",
+  "baseUrl": "https://www.googleapis.com/calendar/v3",
+  "authType": "oauth2",
+  "fields": [
+    {
+      "key": "client_id",
+      "label": "Client ID",
+      "type": "text",
+      "required": true,
+      "placeholder": "Enter Google OAuth Client ID"
+    },
+    {
+      "key": "client_secret",
+      "label": "Client Secret",
+      "type": "password",
+      "required": true,
+      "placeholder": "Enter Google OAuth Client Secret"
+    },
+    {
+      "key": "access_token",
+      "label": "Access Token",
+      "type": "password",
+      "required": false,
+      "placeholder": "ya29..."
+    }
+  ],
+  "oauthConfig": {
+    "authorizeUrl": "https://accounts.google.com/o/oauth2/v2/auth",
+    "tokenUrl": "https://oauth2.googleapis.com/token",
+    "defaultScopes": [
+      "https://www.googleapis.com/auth/calendar",
+      "https://www.googleapis.com/auth/calendar.events"
+    ]
+  },
+  "actions": [
+    {
+      "id": "create_event",
+      "name": "Create Event",
+      "description": "Create a new event on a specified calendar",
+      "path": "/calendars/{{calendarId}}/events",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "payloadTemplate": "{\"summary\": \"{{summary}}\", \"description\": \"{{description}}\", \"start\": {\"dateTime\": \"{{start_time}}\"}, \"end\": {\"dateTime\": \"{{end_time}}\"}}",
+      "fields": [
+        { "key": "calendarId", "label": "Calendar ID", "required": true, "placeholder": "primary or calendar email" },
+        { "key": "summary", "label": "Event Title / Summary", "required": true, "placeholder": "Team Meeting" },
+        { "key": "description", "label": "Description", "required": false, "placeholder": "Agenda items..." },
+        { "key": "start_time", "label": "Start Time (ISO Format)", "required": true, "placeholder": "2026-08-07T10:00:00Z" },
+        { "key": "end_time", "label": "End Time (ISO Format)", "required": true, "placeholder": "2026-08-07T11:00:00Z" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "calendarId": { "type": "string", "description": "Calendar ID", "example": "primary" },
+          "summary": { "type": "string", "description": "Event summary", "example": "Team Sync" },
+          "description": { "type": "string", "description": "Event details", "example": "Weekly meeting" },
+          "start_time": { "type": "string", "description": "ISO start time", "example": "2026-08-07T10:00:00Z" },
+          "end_time": { "type": "string", "description": "ISO end time", "example": "2026-08-07T11:00:00Z" }
+        },
+        "required": ["calendarId", "summary", "start_time", "end_time"]
+      },
+      "outputSchema": {
+        "id": "event_id_12345",
+        "status": "confirmed",
+        "htmlLink": "https://www.google.com/calendar/event?eid=...",
+        "summary": "Team Sync"
+      }
+    },
+    {
+      "id": "list_events",
+      "name": "List Events",
+      "description": "List events from a calendar",
+      "path": "/calendars/{{calendarId}}/events",
+      "method": "GET",
+      "queryParams": [
+        { "key": "timeMin", "value": "{{timeMin}}" },
+        { "key": "timeMax", "value": "{{timeMax}}" }
+      ],
+      "fields": [
+        { "key": "calendarId", "label": "Calendar ID", "required": true, "placeholder": "primary" },
+        { "key": "timeMin", "label": "Min Time (ISO)", "required": false, "placeholder": "2026-08-01T00:00:00Z" },
+        { "key": "timeMax", "label": "Max Time (ISO)", "required": false, "placeholder": "2026-08-31T23:59:59Z" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "calendarId": { "type": "string", "description": "Calendar ID", "example": "primary" },
+          "timeMin": { "type": "string", "description": "Minimum RFC3339 timestamp" },
+          "timeMax": { "type": "string", "description": "Maximum RFC3339 timestamp" }
+        },
+        "required": ["calendarId"]
+      },
+      "outputSchema": {
+        "items": [
+          {
+            "id": "event_id_12345",
+            "summary": "Team Sync",
+            "start": { "dateTime": "2026-08-07T10:00:00Z" },
+            "end": { "dateTime": "2026-08-07T11:00:00Z" }
+          }
+        ]
+      }
+    },
+    {
+      "id": "update_event",
+      "name": "Update Event",
+      "description": "Update an existing event on a calendar",
+      "path": "/calendars/{{calendarId}}/events/{{eventId}}",
+      "method": "PUT",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "payloadTemplate": "{\"summary\": \"{{summary}}\", \"description\": \"{{description}}\", \"start\": {\"dateTime\": \"{{start_time}}\"}, \"end\": {\"dateTime\": \"{{end_time}}\"}}",
+      "fields": [
+        { "key": "calendarId", "label": "Calendar ID", "required": true, "placeholder": "primary" },
+        { "key": "eventId", "label": "Event ID", "required": true, "placeholder": "event_id_12345" },
+        { "key": "summary", "label": "Event Title / Summary", "required": true, "placeholder": "Updated Team Meeting" },
+        { "key": "description", "label": "Description", "required": false, "placeholder": "Updated description..." },
+        { "key": "start_time", "label": "Start Time (ISO Format)", "required": true, "placeholder": "2026-08-07T10:00:00Z" },
+        { "key": "end_time", "label": "End Time (ISO Format)", "required": true, "placeholder": "2026-08-07T11:00:00Z" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "calendarId": { "type": "string", "description": "Calendar ID", "example": "primary" },
+          "eventId": { "type": "string", "description": "Event ID", "example": "event_id_12345" },
+          "summary": { "type": "string", "description": "Updated event summary" },
+          "start_time": { "type": "string", "description": "ISO start time" },
+          "end_time": { "type": "string", "description": "ISO end time" }
+        },
+        "required": ["calendarId", "eventId", "summary", "start_time", "end_time"]
+      },
+      "outputSchema": {
+        "id": "event_id_12345",
+        "status": "confirmed",
+        "summary": "Updated Team Meeting"
+      }
+    },
+    {
+      "id": "delete_event",
+      "name": "Delete Event",
+      "description": "Delete an event from a calendar",
+      "path": "/calendars/{{calendarId}}/events/{{eventId}}",
+      "method": "DELETE",
+      "fields": [
+        { "key": "calendarId", "label": "Calendar ID", "required": true, "placeholder": "primary" },
+        { "key": "eventId", "label": "Event ID", "required": true, "placeholder": "event_id_12345" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "calendarId": { "type": "string", "description": "Calendar ID", "example": "primary" },
+          "eventId": { "type": "string", "description": "Event ID", "example": "event_id_12345" }
+        },
+        "required": ["calendarId", "eventId"]
+      },
+      "outputSchema": {
+        "success": true
+      }
+    }
+  ]
+}

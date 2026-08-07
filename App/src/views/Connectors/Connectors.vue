@@ -8,9 +8,30 @@
 
     <!-- Active Connections -->
     <div class="section-card">
-      <div class="section-header">
-        <h2 class="section-title">Active Connections</h2>
-        <span class="badge" v-if="connections.length > 0">{{ connections.length }} Connected</span>
+      <div class="section-header section-header-with-search">
+        <div class="section-title-group">
+          <h2 class="section-title">Active Connections</h2>
+          <span class="badge" v-if="connections.length > 0">
+            {{ filteredConnections.length }} / {{ connections.length }} Connected
+          </span>
+        </div>
+        <div class="search-box" v-if="connections.length > 0">
+          <i class="pi pi-search search-icon"></i>
+          <input
+            type="text"
+            v-model="connectionSearchQuery"
+            placeholder="Search connections..."
+            class="search-input"
+          />
+          <button
+            v-if="connectionSearchQuery"
+            class="clear-search-btn"
+            @click="connectionSearchQuery = ''"
+            title="Clear search"
+          >
+            <i class="pi pi-times"></i>
+          </button>
+        </div>
       </div>
 
       <div v-if="connections.length === 0" class="empty-state">
@@ -19,8 +40,14 @@
         <p>Pick a connector from the gallery below to set up your first integration.</p>
       </div>
 
+      <div v-else-if="filteredConnections.length === 0" class="empty-state">
+        <div class="empty-icon"><i class="pi pi-search"></i></div>
+        <h3>No matching connections</h3>
+        <p>No connections matched "{{ connectionSearchQuery }}". Try searching for another name or connector type.</p>
+      </div>
+
       <div v-else class="connections-grid">
-        <div v-for="conn in connections" :key="conn.id" class="connection-item">
+        <div v-for="conn in filteredConnections" :key="conn.id" class="connection-item">
           <div class="connection-meta">
             <span class="connector-icon-wrapper">
               <img v-if="getTemplateIcon(conn.connectorid) && (getTemplateIcon(conn.connectorid).startsWith('/') || getTemplateIcon(conn.connectorid).endsWith('.svg'))" :src="getTemplateIcon(conn.connectorid)" class="connector-img-icon" alt="icon" />
@@ -38,6 +65,7 @@
                     'status-invalid':  connectionStatuses[conn.id] === 'invalid',
                     'status-unknown':  !connectionStatuses[conn.id],
                   }"
+                  :title="connectionErrors[conn.id] || ''"
                 >
                   <span v-if="connectionStatuses[conn.id] === 'checking'" class="status-pulse"></span>
                   <i v-else-if="connectionStatuses[conn.id] === 'valid'" class="pi pi-check-circle"></i>
@@ -50,6 +78,9 @@
                 </span>
               </div>
               <span class="connector-type">{{ conn.connectorid }} · {{ conn.authtype }}</span>
+              <div v-if="connectionStatuses[conn.id] === 'invalid' && connectionErrors[conn.id]" class="connection-error-log">
+                <i class="pi pi-exclamation-circle"></i> <span>{{ connectionErrors[conn.id] }}</span>
+              </div>
             </div>
           </div>
           <div class="connection-actions">
@@ -66,13 +97,46 @@
 
     <!-- Connector Gallery -->
     <div class="section-card mt-6">
-      <div class="section-header">
-        <h2 class="section-title">Connector Gallery</h2>
-        <span class="badge" v-if="templates.length > 0">{{ templates.length }} Available</span>
+      <div class="section-header section-header-with-search">
+        <div class="section-title-group">
+          <h2 class="section-title">Connector Gallery</h2>
+          <span class="badge" v-if="templates.length > 0">
+            {{ filteredTemplates.length }} / {{ templates.length }} Available
+          </span>
+        </div>
+        <div class="search-box" v-if="templates.length > 0">
+          <i class="pi pi-search search-icon"></i>
+          <input
+            type="text"
+            v-model="gallerySearchQuery"
+            placeholder="Search connector gallery..."
+            class="search-input"
+          />
+          <button
+            v-if="gallerySearchQuery"
+            class="clear-search-btn"
+            @click="gallerySearchQuery = ''"
+            title="Clear search"
+          >
+            <i class="pi pi-times"></i>
+          </button>
+        </div>
       </div>
 
-      <div class="templates-grid">
-        <div v-for="temp in templates" :key="temp.id" class="template-card">
+      <div v-if="templates.length === 0" class="empty-state">
+        <div class="empty-icon"><i class="pi pi-box"></i></div>
+        <h3>No connector templates available</h3>
+        <p>Check back later or check your backend connection.</p>
+      </div>
+
+      <div v-else-if="filteredTemplates.length === 0" class="empty-state">
+        <div class="empty-icon"><i class="pi pi-search"></i></div>
+        <h3>No matching connectors</h3>
+        <p>No connectors matched "{{ gallerySearchQuery }}". Try searching for another service name, description, or auth type.</p>
+      </div>
+
+      <div v-else class="templates-grid">
+        <div v-for="temp in filteredTemplates" :key="temp.id" class="template-card">
           <div class="template-header">
             <span class="template-icon">
               <img v-if="temp.icon && (temp.icon.startsWith('/') || temp.icon.endsWith('.svg'))" :src="temp.icon" class="connector-img-icon" alt="icon" />
@@ -205,10 +269,17 @@
           <div class="supported-actions-section">
             <h3 class="modal-section-title"><i class="pi pi-bolt"></i> Supported Actions</h3>
             <div class="actions-list">
-              <div v-for="act in getConnectorActions(selectedTemplate.id)" :key="act.name" class="action-card">
+              <div
+                v-for="act in getConnectorActions(selectedTemplate.id)"
+                :key="act.name"
+                class="action-card action-card-clickable"
+                @click="openSchemaModal(act)"
+                title="Click to view Input and Output Schema"
+              >
                 <div class="action-header">
                   <i :class="act.icon" class="action-icon"></i>
                   <span class="action-name">{{ act.name }}</span>
+                  <span class="schema-pill-badge"><i class="pi pi-code"></i> Schema</span>
                 </div>
                 <p class="action-desc">{{ act.description }}</p>
               </div>
@@ -220,6 +291,53 @@
             <h4 class="instructions-title"><i class="pi pi-info-circle"></i> Setup Guide</h4>
             <ol class="instructions-list" v-html="parseMarkdownBody(getConnectorInstructions(selectedTemplate.id))"></ol>
           </div>
+        </div>
+      </div>
+    </Modal>
+
+    <!-- Action Schema Popup Modal -->
+    <Modal
+      :visible="isSchemaModalVisible"
+      :title="selectedAction ? `${selectedAction.name} — Schema` : 'Action Schema'"
+      :caption="selectedAction ? `${selectedAction.method || 'API'} ${selectedAction.path || ''}` : 'Action Input and Output Specifications'"
+      @update:visible="isSchemaModalVisible = $event"
+      saveLabel="Close"
+      @save="() => isSchemaModalVisible = false"
+      width="600px"
+      height="auto"
+    >
+      <div v-if="selectedAction" class="schema-modal-content">
+        <!-- Tab selector for Input vs Output -->
+        <div class="schema-tab-bar">
+          <button
+            type="button"
+            class="schema-tab-btn"
+            :class="{ active: activeSchemaTab === 'input' }"
+            @click="activeSchemaTab = 'input'"
+          >
+            <i class="pi pi-sign-in"></i> Input Schema
+          </button>
+          <button
+            type="button"
+            class="schema-tab-btn"
+            :class="{ active: activeSchemaTab === 'output' }"
+            @click="activeSchemaTab = 'output'"
+          >
+            <i class="pi pi-sign-out"></i> Output Schema
+          </button>
+        </div>
+
+        <div class="schema-code-wrapper">
+          <div class="schema-code-header">
+            <span class="schema-code-title">
+              {{ activeSchemaTab === 'input' ? 'JSON Schema / Request Body' : 'Sample JSON Response' }}
+            </span>
+            <button class="btn-copy-schema" @click="copySchemaContent">
+              <i :class="schemaCopied ? 'pi pi-check' : 'pi pi-copy'"></i>
+              {{ schemaCopied ? 'Copied!' : 'Copy JSON' }}
+            </button>
+          </div>
+          <pre class="schema-code-block"><code>{{ formattedSchemaJson }}</code></pre>
         </div>
       </div>
     </Modal>
@@ -254,6 +372,8 @@ interface ConnectorActionProto {
   description: string
   method: string
   path: string
+  inputSchema?: any
+  outputSchema?: any
 }
 
 interface ConnectorProtoTemplate {
@@ -263,6 +383,8 @@ interface ConnectorProtoTemplate {
   icon: string
   baseurl: string
   authtype: string
+  fields?: ConnectorFieldProto[]
+  actions?: ConnectorActionProto[]
   fieldsList?: ConnectorFieldProto[]
   actionsList?: ConnectorActionProto[]
 }
@@ -277,16 +399,53 @@ interface ConnectionProto {
 
 type ConnectionStatus = 'checking' | 'valid' | 'invalid' | 'unknown'
 
+// ─── Action Schema Modal State ───────────────────────────────
+const isSchemaModalVisible = ref(false)
+const selectedAction = ref<any>(null)
+const activeSchemaTab = ref<'input' | 'output'>('input')
+const schemaCopied = ref(false)
+
+const openSchemaModal = (action: any) => {
+  selectedAction.value = action
+  activeSchemaTab.value = 'input'
+  schemaCopied.value = false
+  isSchemaModalVisible.value = true
+}
+
+const formattedSchemaJson = computed(() => {
+  if (!selectedAction.value) return '{}'
+  const data = activeSchemaTab.value === 'input'
+    ? (selectedAction.value.inputSchema || { type: 'object', properties: {} })
+    : (selectedAction.value.outputSchema || { success: true })
+  return JSON.stringify(data, null, 2)
+})
+
+const copySchemaContent = async () => {
+  try {
+    await navigator.clipboard.writeText(formattedSchemaJson.value)
+    schemaCopied.value = true
+    setTimeout(() => {
+      schemaCopied.value = false
+    }, 2000)
+  } catch (err) {
+    console.error('Failed to copy schema:', err)
+  }
+}
+
 const getConnectorActions = (id: string) => {
   const match = templates.value.find(t => t.id === id)
-  if (match && match.actionsList && match.actionsList.length > 0) {
-    return match.actionsList.map((a: ConnectorActionProto) => ({
-      name: a.name,
-      description: a.description,
-      icon: a.method === 'POST' ? 'pi pi-plus-circle' : a.method === 'PUT' || a.method === 'PATCH' ? 'pi pi-pencil' : a.method === 'DELETE' ? 'pi pi-trash' : 'pi pi-list'
-    }))
-  }
-  return []
+  if (!match) return []
+  const actionsArr = match.actions || match.actionsList || []
+  return actionsArr.map((a: any) => ({
+    id: a.id,
+    name: a.name,
+    description: a.description,
+    method: a.method,
+    path: a.path,
+    inputSchema: a.inputSchema,
+    outputSchema: a.outputSchema,
+    icon: a.method === 'POST' ? 'pi pi-plus-circle' : a.method === 'PUT' || a.method === 'PATCH' ? 'pi pi-pencil' : a.method === 'DELETE' ? 'pi pi-trash' : 'pi pi-list'
+  }))
 }
 
 const getConnectorInstructions = (id: string): string => {
@@ -403,7 +562,10 @@ const parseMarkdownBody = (text: string) => {
 // ─── State ───────────────────────────────────────────────────────────────────
 const templates = ref<ConnectorProtoTemplate[]>([])
 const connections = ref<ConnectionProto[]>([])
+const connectionSearchQuery = ref('')
+const gallerySearchQuery = ref('')
 const connectionStatuses = reactive<Record<string, ConnectionStatus>>({})
+const connectionErrors = reactive<Record<string, string>>({})
 const isModalVisible = ref(false)
 const isEditMode = ref(false)
 const editingConnectionId = ref<string | null>(null)
@@ -414,6 +576,33 @@ const clientSecret = ref('')
 const accessToken = ref('')
 const dynamicFields = reactive<Record<string, string>>({})
 const activeAuthTab = ref<'oauth2' | 'apikey'>('oauth2')
+
+// Filter active connections by name, connector ID, or auth type
+const filteredConnections = computed(() => {
+  const q = connectionSearchQuery.value.trim().toLowerCase()
+  if (!q) return connections.value
+  return connections.value.filter(conn => {
+    return (
+      (conn.name && conn.name.toLowerCase().includes(q)) ||
+      (conn.connectorid && conn.connectorid.toLowerCase().includes(q)) ||
+      (conn.authtype && conn.authtype.toLowerCase().includes(q))
+    )
+  })
+})
+
+// Filter connector gallery templates by name, description, ID, or auth type
+const filteredTemplates = computed(() => {
+  const q = gallerySearchQuery.value.trim().toLowerCase()
+  if (!q) return templates.value
+  return templates.value.filter(temp => {
+    return (
+      (temp.name && temp.name.toLowerCase().includes(q)) ||
+      (temp.description && temp.description.toLowerCase().includes(q)) ||
+      (temp.id && temp.id.toLowerCase().includes(q)) ||
+      (temp.authtype && temp.authtype.toLowerCase().includes(q))
+    )
+  })
+})
 
 // ─── Helpers for Multi-Auth Pills & Tabs ─────────────────────────────────────
 const getAuthPills = (authtypeStr?: string) => {
@@ -447,18 +636,19 @@ const getAvailableAuthTabs = (authtypeStr?: string): Array<{ id: 'oauth2' | 'api
   return tabs
 }
 
+// Filter dynamic parameter fields based on selected auth tab
 const filteredFields = computed(() => {
-  if (!selectedTemplate.value || !selectedTemplate.value.fieldsList) return []
-  const fields = selectedTemplate.value.fieldsList
+  if (!selectedTemplate.value) return []
+  const fields = selectedTemplate.value.fields || selectedTemplate.value.fieldsList || []
   if (activeAuthTab.value === 'oauth2') {
     // Show fields relevant to OAuth2 (e.g. client_id, client_secret)
-    return fields.filter(f => {
+    return fields.filter((f: any) => {
       const key = f.key.toLowerCase()
       return key.includes('client') || key.includes('app_id') || key.includes('oauth')
     })
   } else {
     // Show fields relevant to API Key / PAT / Token (e.g. access_token, api_key, secret, token)
-    return fields.filter(f => {
+    return fields.filter((f: any) => {
       const key = f.key.toLowerCase()
       return key.includes('token') || key.includes('key') || key.includes('secret') || key.includes('pat') || key.includes('auth') || key.includes('sid')
     })
@@ -469,12 +659,23 @@ const filteredFields = computed(() => {
 const loadData = async () => {
   try {
     const templatesRes = await getConnectorTemplates()
-    const templatesListObj = templatesRes.toObject()
-    templates.value = (templatesListObj.templatesList as unknown as ConnectorProtoTemplate[]) || []
+    if (Array.isArray(templatesRes)) {
+      templates.value = templatesRes
+    } else {
+      const templatesListObj = (templatesRes as any).toObject()
+      templates.value = (templatesListObj.templatesList as unknown as ConnectorProtoTemplate[]) || []
+    }
 
     const connectionsRes = await getConnections()
     const connectionsListObj = connectionsRes.toObject()
-    connections.value = (connectionsListObj.connectionsList as unknown as ConnectionProto[]) || []
+    const rawConns = (connectionsListObj.connectionsList as unknown as any[]) || []
+    connections.value = rawConns.map(c => ({
+      id: c.id,
+      name: c.name,
+      connectorid: c.connectorid || c.connectorId || '',
+      authtype: c.authtype || c.authType || '',
+      createdat: c.createdat || c.createdAt || ''
+    }))
   } catch (err) {
     console.error('Failed to load data:', err)
   }
@@ -483,9 +684,16 @@ const loadData = async () => {
 const checkAllStatuses = async () => {
   for (const conn of connections.value) {
     connectionStatuses[conn.id] = 'checking'
+    connectionErrors[conn.id] = ''
     checkConnectionStatus(conn.id)
-      .then(res => { connectionStatuses[conn.id] = res.valid ? 'valid' : 'invalid' })
-      .catch(() => { connectionStatuses[conn.id] = 'invalid' })
+      .then(res => {
+        connectionStatuses[conn.id] = res.valid ? 'valid' : 'invalid'
+        connectionErrors[conn.id] = res.valid ? '' : (res.error || 'Connection verification failed')
+      })
+      .catch(err => {
+        connectionStatuses[conn.id] = 'invalid'
+        connectionErrors[conn.id] = err?.message || 'Connection check failed'
+      })
   }
 }
 
@@ -511,11 +719,10 @@ const openConnectModal = (template: ConnectorProtoTemplate) => {
   clientSecret.value = ''
   accessToken.value = ''
   Object.keys(dynamicFields).forEach(k => delete dynamicFields[k])
-  if (template.fieldsList) {
-    template.fieldsList.forEach(f => {
-      dynamicFields[f.key] = ''
-    })
-  }
+  const templateFields = template.fields || template.fieldsList || []
+  templateFields.forEach((f: any) => {
+    dynamicFields[f.key] = ''
+  })
   isModalVisible.value = true
 }
 
@@ -533,11 +740,10 @@ const openEditModal = (conn: ConnectionProto) => {
   clientSecret.value = ''
   accessToken.value = ''
   Object.keys(dynamicFields).forEach(k => delete dynamicFields[k])
-  if (template.fieldsList) {
-    template.fieldsList.forEach(f => {
-      dynamicFields[f.key] = ''
-    })
-  }
+  const editTemplateFields = template.fields || template.fieldsList || []
+  editTemplateFields.forEach((f: any) => {
+    dynamicFields[f.key] = ''
+  })
   isModalVisible.value = true
 }
 
@@ -565,9 +771,16 @@ const handleModalSave = async () => {
       await loadData()
       // Re-check status for this connection after saving
       connectionStatuses[editingConnectionId.value] = 'checking'
+      connectionErrors[editingConnectionId.value] = ''
       checkConnectionStatus(editingConnectionId.value)
-        .then(res => { connectionStatuses[editingConnectionId.value!] = res.valid ? 'valid' : 'invalid' })
-        .catch(() => { connectionStatuses[editingConnectionId.value!] = 'invalid' })
+        .then(res => {
+          connectionStatuses[editingConnectionId.value!] = res.valid ? 'valid' : 'invalid'
+          connectionErrors[editingConnectionId.value!] = res.valid ? '' : (res.error || 'Connection verification failed')
+        })
+        .catch(err => {
+          connectionStatuses[editingConnectionId.value!] = 'invalid'
+          connectionErrors[editingConnectionId.value!] = err?.message || 'Connection check failed'
+        })
     } catch (err) {
       console.error('Failed to update connection:', err)
       alert('Failed to save: ' + err)
@@ -590,9 +803,16 @@ const handleModalSave = async () => {
         await loadData()
         if (res.id) {
           connectionStatuses[res.id] = 'checking'
+          connectionErrors[res.id] = ''
           checkConnectionStatus(res.id)
-            .then(statusRes => { connectionStatuses[res.id] = statusRes.valid ? 'valid' : 'invalid' })
-            .catch(() => { connectionStatuses[res.id] = 'invalid' })
+            .then(statusRes => {
+              connectionStatuses[res.id] = statusRes.valid ? 'valid' : 'invalid'
+              connectionErrors[res.id] = statusRes.valid ? '' : (statusRes.error || 'Connection verification failed')
+            })
+            .catch(err => {
+              connectionStatuses[res.id] = 'invalid'
+              connectionErrors[res.id] = err?.message || 'Connection check failed'
+            })
         }
       } catch (err) {
         console.error('Failed to create connection:', err)

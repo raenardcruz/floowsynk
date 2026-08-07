@@ -28,11 +28,67 @@
       "queryParams": [],
       "payloadTemplate": "{\"name\": \"{{name}}\", \"description\": \"{{description}}\", \"status\": \"{{status}}\"}",
       "fields": [
-        { "key": "list_id", "label": "List ID", "required": true, "placeholder": "Enter ClickUp List ID" },
-        { "key": "name", "label": "Task Name", "required": true, "placeholder": "New Task Name" },
-        { "key": "description", "label": "Description", "required": false, "placeholder": "Task details" },
-        { "key": "status", "label": "Task Status", "required": false, "placeholder": "open" }
-      ]
+        {
+          "key": "list_id",
+          "label": "List ID",
+          "required": true,
+          "placeholder": "Enter ClickUp List ID"
+        },
+        {
+          "key": "name",
+          "label": "Task Name",
+          "required": true,
+          "placeholder": "New Task Name"
+        },
+        {
+          "key": "description",
+          "label": "Description",
+          "required": false,
+          "placeholder": "Task details"
+        },
+        {
+          "key": "status",
+          "label": "Task Status",
+          "required": false,
+          "placeholder": "open"
+        }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "list_id": {
+            "type": "string",
+            "description": "ClickUp List ID",
+            "example": "12345678"
+          },
+          "name": {
+            "type": "string",
+            "description": "Task Name",
+            "example": "Design landing page mockup"
+          },
+          "description": {
+            "type": "string",
+            "description": "Task Description",
+            "example": "Figma wireframe design for new feature."
+          }
+        },
+        "required": [
+          "list_id",
+          "name"
+        ]
+      },
+      "outputSchema": {
+        "id": "abc1234",
+        "name": "Design landing page mockup",
+        "status": {
+          "status": "to do",
+          "color": "#d3d3d3"
+        },
+        "creator": {
+          "id": 1234,
+          "username": "Jane Doe"
+        }
+      }
     },
     {
       "id": "get_tasks",
@@ -46,8 +102,37 @@
       "queryParams": [],
       "payloadTemplate": "",
       "fields": [
-        { "key": "list_id", "label": "List ID", "required": true, "placeholder": "Enter ClickUp List ID" }
-      ]
+        {
+          "key": "list_id",
+          "label": "List ID",
+          "required": true,
+          "placeholder": "Enter ClickUp List ID"
+        }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "list_id": {
+            "type": "string",
+            "description": "ClickUp List ID",
+            "example": "12345678"
+          }
+        },
+        "required": [
+          "list_id"
+        ]
+      },
+      "outputSchema": {
+        "tasks": [
+          {
+            "id": "abc1234",
+            "name": "Design Landing Page",
+            "status": {
+              "status": "to do"
+            }
+          }
+        ]
+      }
     },
     {
       "id": "update_task",
@@ -62,11 +147,61 @@
       "queryParams": [],
       "payloadTemplate": "{\"name\": \"{{name}}\", \"description\": \"{{description}}\", \"status\": \"{{status}}\"}",
       "fields": [
-        { "key": "task_id", "label": "Task ID", "required": true, "placeholder": "Enter ClickUp Task ID" },
-        { "key": "name", "label": "Task Name", "required": false, "placeholder": "Updated Task Name" },
-        { "key": "description", "label": "Description", "required": false, "placeholder": "Updated details" },
-        { "key": "status", "label": "Status", "required": false, "placeholder": "complete" }
-      ]
+        {
+          "key": "task_id",
+          "label": "Task ID",
+          "required": true,
+          "placeholder": "Enter ClickUp Task ID"
+        },
+        {
+          "key": "name",
+          "label": "Task Name",
+          "required": false,
+          "placeholder": "Updated Task Name"
+        },
+        {
+          "key": "description",
+          "label": "Description",
+          "required": false,
+          "placeholder": "Updated details"
+        },
+        {
+          "key": "status",
+          "label": "Status",
+          "required": false,
+          "placeholder": "complete"
+        }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "task_id": {
+            "type": "string",
+            "description": "Task ID",
+            "example": "abc1234"
+          },
+          "name": {
+            "type": "string",
+            "description": "Updated Name",
+            "example": "Design Landing Page v2"
+          },
+          "status": {
+            "type": "string",
+            "description": "Status name",
+            "example": "in progress"
+          }
+        },
+        "required": [
+          "task_id"
+        ]
+      },
+      "outputSchema": {
+        "id": "abc1234",
+        "name": "Design Landing Page v2",
+        "status": {
+          "status": "in progress"
+        }
+      }
     },
     {
       "id": "get_teams",
@@ -78,7 +213,27 @@
         "Authorization": "{{api_token}}"
       },
       "queryParams": [],
-      "payloadTemplate": ""
+      "payloadTemplate": "",
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "outputSchema": {
+        "teams": [
+          {
+            "id": "12345",
+            "name": "Engineering Team",
+            "members": [
+              {
+                "user": {
+                  "id": 101,
+                  "username": "Jane Doe"
+                }
+              }
+            ]
+          }
+        ]
+      }
     }
   ]
 }

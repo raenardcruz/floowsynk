@@ -7,23 +7,26 @@ import (
 )
 
 // CheckAsanaConnection checks Asana access token validity.
-func CheckAsanaConnection(creds map[string]string) bool {
+func CheckAsanaConnection(creds map[string]string) (bool, string) {
 	token := creds["access_token"]
 	if token == "" {
-		return false
+		return false, "Missing access token"
 	}
 	req, err := http.NewRequest("GET", "https://app.asana.com/api/1.0/users/me", nil)
 	if err != nil {
-		return false
+		return false, fmt.Sprintf("Failed to create request: %v", err)
 	}
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return false
+		return false, fmt.Sprintf("Connection request failed: %v", err)
 	}
 	defer resp.Body.Close()
-	return resp.StatusCode == http.StatusOK
+	if resp.StatusCode != http.StatusOK {
+		return false, fmt.Sprintf("HTTP %d: %s", resp.StatusCode, resp.Status)
+	}
+	return true, ""
 }
 
 // TransformAsanaResponse formats raw Asana API responses.

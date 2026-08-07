@@ -2,19 +2,20 @@ package workflow
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 )
 
 // CheckAnthropicConnection verifies API key with Anthropic API.
-func CheckAnthropicConnection(creds map[string]string) bool {
+func CheckAnthropicConnection(creds map[string]string) (bool, string) {
 	apiKey := creds["api_key"]
 	if apiKey == "" {
-		return false
+		return false, "Missing API key"
 	}
 
 	req, err := http.NewRequest("GET", "https://api.anthropic.com/v1/models", nil)
 	if err != nil {
-		return false
+		return false, fmt.Sprintf("Failed to create request: %v", err)
 	}
 	req.Header.Set("x-api-key", apiKey)
 	req.Header.Set("anthropic-version", "2023-06-01")
@@ -22,11 +23,14 @@ func CheckAnthropicConnection(creds map[string]string) bool {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return false
+		return false, fmt.Sprintf("Connection request failed: %v", err)
 	}
 	defer resp.Body.Close()
 
-	return resp.StatusCode == http.StatusOK
+	if resp.StatusCode != http.StatusOK {
+		return false, fmt.Sprintf("HTTP %d: %s", resp.StatusCode, resp.Status)
+	}
+	return true, ""
 }
 
 // TransformAnthropicResponse formats Anthropic API responses.

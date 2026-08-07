@@ -8,17 +8,17 @@ import (
 )
 
 // CheckActiveCampaignConnection verifies ActiveCampaign API credentials.
-func CheckActiveCampaignConnection(creds map[string]string) bool {
+func CheckActiveCampaignConnection(creds map[string]string) (bool, string) {
 	apiURL := strings.TrimRight(creds["api_url"], "/")
 	token := creds["api_token"]
 
 	if apiURL == "" || token == "" {
-		return false
+		return false, "Missing API URL or API token"
 	}
 
 	req, err := http.NewRequest("GET", fmt.Sprintf("%s/api/3/contacts?limit=1", apiURL), nil)
 	if err != nil {
-		return false
+		return false, fmt.Sprintf("Failed to create request: %v", err)
 	}
 	req.Header.Set("Api-Token", token)
 	req.Header.Set("Accept", "application/json")
@@ -26,11 +26,13 @@ func CheckActiveCampaignConnection(creds map[string]string) bool {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return false
+		return false, fmt.Sprintf("Connection request failed: %v", err)
 	}
 	defer resp.Body.Close()
-
-	return resp.StatusCode == http.StatusOK
+	if resp.StatusCode != http.StatusOK {
+		return false, fmt.Sprintf("HTTP %d: %s", resp.StatusCode, resp.Status)
+	}
+	return true, ""
 }
 
 // TransformActiveCampaignResponse formats raw ActiveCampaign responses.

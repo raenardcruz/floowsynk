@@ -7,23 +7,26 @@ import (
 )
 
 // CheckSendGridConnection checks SendGrid API key validity.
-func CheckSendGridConnection(creds map[string]string) bool {
+func CheckSendGridConnection(creds map[string]string) (bool, string) {
 	apiKey := creds["api_key"]
 	if apiKey == "" {
-		return false
+		return false, "Missing API key"
 	}
 	req, err := http.NewRequest("GET", "https://api.sendgrid.com/v3/scopes", nil)
 	if err != nil {
-		return false
+		return false, fmt.Sprintf("Failed to create request: %v", err)
 	}
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", apiKey))
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return false
+		return false, fmt.Sprintf("Connection request failed: %v", err)
 	}
 	defer resp.Body.Close()
-	return resp.StatusCode == http.StatusOK
+	if resp.StatusCode != http.StatusOK {
+		return false, fmt.Sprintf("HTTP %d: %s", resp.StatusCode, resp.Status)
+	}
+	return true, ""
 }
 
 // TransformSendGridResponse formats raw SendGrid API responses.

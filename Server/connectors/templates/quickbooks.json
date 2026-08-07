@@ -1,0 +1,154 @@
+{
+  "id": "quickbooks",
+  "name": "QuickBooks",
+  "description": "Manage accounting, invoices, customers, and financial reports in QuickBooks Online.",
+  "icon": "/src/components/Icons/quickbooks.svg",
+  "baseUrl": "https://quickbooks.api.intuit.com/v3/company/{{realm_id}}",
+  "authType": "oauth2",
+  "fields": [
+    {
+      "key": "client_id",
+      "label": "Client ID",
+      "type": "text",
+      "required": false,
+      "placeholder": "Intuit OAuth Client ID"
+    },
+    {
+      "key": "client_secret",
+      "label": "Client Secret",
+      "type": "password",
+      "required": false,
+      "placeholder": "Intuit OAuth Client Secret"
+    },
+    {
+      "key": "realm_id",
+      "label": "Company ID (Realm ID)",
+      "type": "text",
+      "required": true,
+      "placeholder": "Numeric Company ID"
+    },
+    {
+      "key": "environment",
+      "label": "Environment",
+      "type": "text",
+      "required": false,
+      "placeholder": "Sandbox or Production"
+    },
+    {
+      "key": "access_token",
+      "label": "Access Token",
+      "type": "password",
+      "required": false,
+      "placeholder": "OAuth2 Access Token"
+    }
+  ],
+  "oauthConfig": {
+    "authorizeUrl": "https://appcenter.intuit.com/connect/oauth2",
+    "tokenUrl": "https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer",
+    "defaultScopes": ["com.intuit.quickbooks.accounting"]
+  },
+  "actions": [
+    {
+      "id": "create_invoice",
+      "name": "Create Invoice",
+      "description": "Create a new sales invoice in QuickBooks Online",
+      "path": "/invoice",
+      "method": "POST",
+      "queryParams": [
+        { "key": "minorversion", "value": "65" }
+      ],
+      "headers": {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      "payloadTemplate": "{\"Line\": [{\"Amount\": {{amount}}, \"DetailType\": \"SalesItemLineDetail\", \"SalesItemLineDetail\": {\"ItemRef\": {\"value\": \"1\"}}}], \"CustomerRef\": {\"value\": \"{{customer_id}}\"}}",
+      "fields": [
+        { "key": "customer_id", "label": "Customer ID", "required": true, "placeholder": "Customer Ref ID (e.g. 1)" },
+        { "key": "amount", "label": "Invoice Amount", "required": true, "placeholder": "100.00" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "customer_id": { "type": "string", "description": "QuickBooks Customer ID", "example": "1" },
+          "amount": { "type": "number", "description": "Total invoice amount", "example": 100.0 }
+        },
+        "required": ["customer_id", "amount"]
+      },
+      "outputSchema": {
+        "Invoice": {
+          "Id": "130",
+          "SyncToken": "0",
+          "DocNumber": "1037",
+          "TxnDate": "2026-08-05",
+          "TotalAmt": 100.0,
+          "CustomerRef": { "value": "1", "name": "Amy's Bird Sanctuary" }
+        }
+      }
+    },
+    {
+      "id": "get_customer",
+      "name": "Get Customer",
+      "description": "Retrieve customer details by Customer ID",
+      "path": "/customer/{{customer_id}}",
+      "method": "GET",
+      "queryParams": [
+        { "key": "minorversion", "value": "65" }
+      ],
+      "headers": {
+        "Accept": "application/json"
+      },
+      "fields": [
+        { "key": "customer_id", "label": "Customer ID", "required": true, "placeholder": "Customer numeric ID" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "customer_id": { "type": "string", "description": "Customer ID", "example": "1" }
+        },
+        "required": ["customer_id"]
+      },
+      "outputSchema": {
+        "Customer": {
+          "Id": "1",
+          "GivenName": "Amy",
+          "FamilyName": "Lauterbach",
+          "CompanyName": "Amy's Bird Sanctuary",
+          "PrimaryEmailAddr": { "Address": "amy@example.com" }
+        }
+      }
+    },
+    {
+      "id": "execute_query",
+      "name": "Execute Query",
+      "description": "Run an SQL-like query against QuickBooks API",
+      "path": "/query",
+      "method": "GET",
+      "queryParams": [
+        { "key": "query", "value": "{{query}}" },
+        { "key": "minorversion", "value": "65" }
+      ],
+      "headers": {
+        "Accept": "application/json"
+      },
+      "fields": [
+        { "key": "query", "label": "Intuit Query", "required": true, "placeholder": "SELECT * FROM Invoice" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": { "type": "string", "description": "Intuit SQL query", "example": "SELECT * FROM Invoice" }
+        },
+        "required": ["query"]
+      },
+      "outputSchema": {
+        "QueryResponse": {
+          "Invoice": [
+            { "Id": "100", "TotalAmt": 250.0 }
+          ],
+          "startPosition": 1,
+          "maxResults": 1
+        }
+      }
+    }
+  ]
+}

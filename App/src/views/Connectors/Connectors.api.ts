@@ -1,6 +1,5 @@
 import { WorkflowServicePromiseClient } from 'proto/workflow/workflow_grpc_web_pb'
 import {
-    ConnectorTemplateList,
     ConnectionList,
     DeleteConnectionRequest
 } from 'proto/workflow/workflow_pb'
@@ -11,9 +10,10 @@ const getHeaders = () => ({
     'Authorization': `${localStorage.getItem("sessionToken") || ''}`
 })
 
-export const getConnectorTemplates = async (): Promise<ConnectorTemplateList> => {
-    const client = new WorkflowServicePromiseClient(getApiUrl())
-    return await client.listConnectorTemplates(new Empty(), getHeaders())
+export const getConnectorTemplates = async (): Promise<any[]> => {
+    const res = await fetch(`${getRestUrl()}/api/connectors/templates`)
+    if (!res.ok) throw new Error(await res.text())
+    return res.json()
 }
 
 export const getConnections = async (): Promise<ConnectionList> => {
@@ -28,9 +28,12 @@ export const deleteConnection = async (id: string): Promise<Empty> => {
     return await client.deleteConnection(req, getHeaders())
 }
 
-export const checkConnectionStatus = async (id: string): Promise<{ valid: boolean }> => {
+export const checkConnectionStatus = async (id: string): Promise<{ valid: boolean; error?: string }> => {
     const res = await fetch(`${getRestUrl()}/api/connectors/check?id=${encodeURIComponent(id)}`)
-    if (!res.ok) return { valid: false }
+    if (!res.ok) {
+        const text = await res.text()
+        return { valid: false, error: text || 'Connection check failed' }
+    }
     return res.json()
 }
 

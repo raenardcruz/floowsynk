@@ -1,0 +1,147 @@
+{
+  "id": "convertkit",
+  "name": "ConvertKit",
+  "description": "Connect to ConvertKit (Kit) to manage subscribers, forms, and tags.",
+  "icon": "/src/components/Icons/convertkit.svg",
+  "baseUrl": "https://api.convertkit.com/v3",
+  "authType": "apikey",
+  "fields": [
+    {
+      "key": "api_key",
+      "label": "API Key",
+      "type": "text",
+      "required": true,
+      "placeholder": "Enter public API Key"
+    },
+    {
+      "key": "api_secret",
+      "label": "API Secret",
+      "type": "password",
+      "required": false,
+      "placeholder": "Enter API Secret (required for subscriber management)"
+    }
+  ],
+  "actions": [
+    {
+      "id": "list_forms",
+      "name": "List Forms",
+      "description": "Get a list of forms in your ConvertKit account",
+      "path": "/forms",
+      "method": "GET",
+      "queryParams": [
+        { "key": "api_key", "value": "{{api_key}}" }
+      ],
+      "fields": [],
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "outputSchema": {
+        "forms": [
+          {
+            "id": 12345,
+            "name": "Newsletter Signup",
+            "created_at": "2026-01-01T00:00:00.000Z"
+          }
+        ]
+      }
+    },
+    {
+      "id": "subscribe_to_form",
+      "name": "Add Subscriber to Form",
+      "description": "Subscribe an email address to a specific form",
+      "path": "/forms/{{form_id}}/subscribe",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "payloadTemplate": "{\"api_key\": \"{{api_key}}\", \"email\": \"{{email}}\", \"first_name\": \"{{first_name}}\"}",
+      "fields": [
+        { "key": "form_id", "label": "Form ID", "required": true, "placeholder": "e.g. 12345" },
+        { "key": "email", "label": "Email Address", "required": true, "placeholder": "user@example.com" },
+        { "key": "first_name", "label": "First Name", "required": false, "placeholder": "Jane" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "form_id": { "type": "string", "description": "Form ID", "example": "12345" },
+          "email": { "type": "string", "description": "Subscriber email", "example": "user@example.com" },
+          "first_name": { "type": "string", "description": "Subscriber first name", "example": "Jane" }
+        },
+        "required": ["form_id", "email"]
+      },
+      "outputSchema": {
+        "subscription": {
+          "id": 98765,
+          "state": "active",
+          "subscribable_id": 12345,
+          "subscriber": {
+            "id": 55555
+          }
+        }
+      }
+    },
+    {
+      "id": "list_subscribers",
+      "name": "List Subscribers",
+      "description": "List all subscribers in your account (requires API Secret)",
+      "path": "/subscribers",
+      "method": "GET",
+      "queryParams": [
+        { "key": "api_secret", "value": "{{api_secret}}" }
+      ],
+      "fields": [],
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "outputSchema": {
+        "total_subscribers": 1,
+        "page": 1,
+        "total_pages": 1,
+        "subscribers": [
+          {
+            "id": 55555,
+            "first_name": "Jane",
+            "email_address": "user@example.com",
+            "state": "active",
+            "created_at": "2026-01-01T00:00:00.000Z"
+          }
+        ]
+      }
+    },
+    {
+      "id": "add_tag_to_subscriber",
+      "name": "Add Tag to Subscriber",
+      "description": "Tag a subscriber by email address",
+      "path": "/tags/{{tag_id}}/subscribe",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "payloadTemplate": "{\"api_key\": \"{{api_key}}\", \"email\": \"{{email}}\"}",
+      "fields": [
+        { "key": "tag_id", "label": "Tag ID", "required": true, "placeholder": "e.g. 67890" },
+        { "key": "email", "label": "Email Address", "required": true, "placeholder": "user@example.com" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "tag_id": { "type": "string", "description": "Tag ID", "example": "67890" },
+          "email": { "type": "string", "description": "Subscriber email", "example": "user@example.com" }
+        },
+        "required": ["tag_id", "email"]
+      },
+      "outputSchema": {
+        "subscription": {
+          "id": 98766,
+          "state": "active",
+          "subscribable_id": 67890,
+          "subscriber": {
+            "id": 55555
+          }
+        }
+      }
+    }
+  ]
+}

@@ -366,7 +366,9 @@ func checkConnectionHandler(w http.ResponseWriter, r *http.Request) {
 
 	conn, err := DBCon.GetConnection(id)
 	if err != nil {
-		http.Error(w, "connection not found", http.StatusNotFound)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]interface{}{"valid": false, "error": "Connection not found: " + err.Error()})
 		return
 	}
 
@@ -375,16 +377,21 @@ func checkConnectionHandler(w http.ResponseWriter, r *http.Request) {
 		decrypted, err := crypto.Decrypt(conn.Credentials)
 		if err == nil {
 			json.Unmarshal([]byte(decrypted), &creds)
+		} else {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(map[string]interface{}{"valid": false, "error": "Failed to decrypt credentials: " + err.Error()})
+			return
 		}
 	}
 	if creds == nil {
 		creds = map[string]string{}
 	}
 
-	valid := workflow.CheckConnectorConnection(conn.ConnectorID, creds)
+	valid, errorMsg := workflow.CheckConnectorConnection(conn.ConnectorID, creds)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]interface{}{"valid": valid})
+	json.NewEncoder(w).Encode(map[string]interface{}{"valid": valid, "error": errorMsg})
 }
 
 // createConnectionHandler creates a non-OAuth (API Key, PAT, Token) connection record directly.

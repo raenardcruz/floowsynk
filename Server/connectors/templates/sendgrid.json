@@ -27,11 +27,66 @@
       "queryParams": [],
       "payloadTemplate": "{\"personalizations\": [{\"to\": [{\"email\": \"{{to_email}}\"}]}], \"from\": {\"email\": \"{{from_email}}\"}, \"subject\": \"{{subject}}\", \"content\": [{\"type\": \"text/plain\", \"value\": \"{{content}}\"}]}",
       "fields": [
-        { "key": "to_email", "label": "Recipient Email", "required": true, "placeholder": "recipient@example.com" },
-        { "key": "from_email", "label": "Sender Email", "required": true, "placeholder": "sender@example.com" },
-        { "key": "subject", "label": "Subject", "required": true, "placeholder": "Email Subject" },
-        { "key": "content", "label": "Email Body", "required": true, "placeholder": "Email text content" }
-      ]
+        {
+          "key": "to_email",
+          "label": "Recipient Email",
+          "required": true,
+          "placeholder": "recipient@example.com"
+        },
+        {
+          "key": "from_email",
+          "label": "Sender Email",
+          "required": true,
+          "placeholder": "sender@example.com"
+        },
+        {
+          "key": "subject",
+          "label": "Subject",
+          "required": true,
+          "placeholder": "Email Subject"
+        },
+        {
+          "key": "content",
+          "label": "Email Body",
+          "required": true,
+          "placeholder": "Email text content"
+        }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "to": {
+            "type": "string",
+            "description": "Recipient Email Address",
+            "example": "client@example.com"
+          },
+          "from": {
+            "type": "string",
+            "description": "Sender Verified Email Address",
+            "example": "noreply@mycompany.com"
+          },
+          "subject": {
+            "type": "string",
+            "description": "Email Subject",
+            "example": "Welcome to FloowSynk!"
+          },
+          "body": {
+            "type": "string",
+            "description": "Plain text or HTML body",
+            "example": "Thank you for joining our platform."
+          }
+        },
+        "required": [
+          "to",
+          "from",
+          "subject",
+          "body"
+        ]
+      },
+      "outputSchema": {
+        "status": 202,
+        "message": "Email queued for delivery successfully"
+      }
     }
   ]
 }

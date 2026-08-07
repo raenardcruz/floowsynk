@@ -14,14 +14,17 @@ type OAuthConfig struct {
 }
 
 type ActionTemplate struct {
-	ID              string            `json:"id"`
-	Name            string            `json:"name"`
-	Description     string            `json:"description"`
-	Path            string            `json:"path"`
-	Method          string            `json:"method"`
-	Headers         map[string]string `json:"headers"`
-	QueryParams     []string          `json:"queryParams"`
-	PayloadTemplate string            `json:"payloadTemplate"`
+	ID              string                 `json:"id"`
+	Name            string                 `json:"name"`
+	Description     string                 `json:"description"`
+	Path            string                 `json:"path"`
+	Method          string                 `json:"method"`
+	Headers         map[string]string      `json:"headers"`
+	QueryParams     []string               `json:"queryParams"`
+	PayloadTemplate string                 `json:"payloadTemplate"`
+	Fields          []AuthField            `json:"fields,omitempty"`
+	InputSchema     map[string]interface{} `json:"inputSchema,omitempty"`
+	OutputSchema    interface{}            `json:"outputSchema,omitempty"`
 }
 
 type AuthField struct {

@@ -401,8 +401,11 @@ func (wp *WorkflowProcessor) ResponseNodeProcess(node *proto.Node) (string, erro
 }
 
 func (wp *WorkflowProcessor) ConnectorNodeProcess(node *proto.Node) (string, error) {
+	replayNode := CopyNode(node)
 	if node.Data == nil || node.Data.Listvar == nil || node.Data.Type == nil || node.Data.Variable == nil {
-		return "", errors.New("connector node missing required parameters (connectionId, actionId, output variable)")
+		err := errors.New("connector node missing required parameters (connectionId, actionId, output variable)")
+		wp.UpdateStatus(&replayNode, proto.NodeStatus_FAILED, nil, err.Error(), true)
+		return "", err
 	}
 
 	connectionID := *node.Data.Listvar
@@ -416,13 +419,17 @@ func (wp *WorkflowProcessor) ConnectorNodeProcess(node *proto.Node) (string, err
 	// 1. Fetch connection
 	conn, err := wp.DBcon.GetConnection(connectionID)
 	if err != nil {
-		return "", fmt.Errorf("connection %s not found: %v", connectionID, err)
+		err = fmt.Errorf("connection %s not found: %v", connectionID, err)
+		wp.UpdateStatus(&replayNode, proto.NodeStatus_FAILED, nil, err.Error(), true)
+		return "", err
 	}
 
 	// 2. Fetch template
 	template, ok := GetConnectorTemplate(conn.ConnectorID)
 	if !ok {
-		return "", fmt.Errorf("connector template %s not found", conn.ConnectorID)
+		err = fmt.Errorf("connector template %s not found", conn.ConnectorID)
+		wp.UpdateStatus(&replayNode, proto.NodeStatus_FAILED, nil, err.Error(), true)
+		return "", err
 	}
 
 	// Find the action template
@@ -436,17 +443,23 @@ func (wp *WorkflowProcessor) ConnectorNodeProcess(node *proto.Node) (string, err
 		}
 	}
 	if !found {
-		return "", fmt.Errorf("action %s not found in connector %s", actionID, conn.ConnectorID)
+		err = fmt.Errorf("action %s not found in connector %s", actionID, conn.ConnectorID)
+		wp.UpdateStatus(&replayNode, proto.NodeStatus_FAILED, nil, err.Error(), true)
+		return "", err
 	}
 
 	// 3. Decrypt credentials
 	var creds map[string]interface{}
 	decryptedCreds, err := crypto.Decrypt(conn.Credentials)
 	if err != nil {
-		return "", fmt.Errorf("failed to decrypt connection credentials: %v", err)
+		err = fmt.Errorf("failed to decrypt connection credentials: %v", err)
+		wp.UpdateStatus(&replayNode, proto.NodeStatus_FAILED, nil, err.Error(), true)
+		return "", err
 	}
 	if err := json.Unmarshal([]byte(decryptedCreds), &creds); err != nil {
-		return "", fmt.Errorf("failed to parse connection credentials: %v", err)
+		err = fmt.Errorf("failed to parse connection credentials: %v", err)
+		wp.UpdateStatus(&replayNode, proto.NodeStatus_FAILED, nil, err.Error(), true)
+		return "", err
 	}
 
 	// OAuth2 validation and token refresh logic
@@ -549,7 +562,7 @@ func (wp *WorkflowProcessor) ConnectorNodeProcess(node *proto.Node) (string, err
 	}
 
 	response, err := wp.makeRequest(urlStr, method, headers, payloadObj)
-	replayNode := CopyNode(node)
+	replayNode = CopyNode(node)
 	replayNode.Data.Url = &urlStr
 	replayNode.Data.Payload = &payloadStr
 

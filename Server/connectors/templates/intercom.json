@@ -1,0 +1,158 @@
+{
+  "id": "intercom",
+  "name": "Intercom",
+  "description": "Manage contacts, conversations, and support messages in Intercom.",
+  "icon": "/src/components/Icons/intercom.svg",
+  "baseUrl": "https://api.intercom.io",
+  "authType": "apikey, oauth2",
+  "fields": [
+    {
+      "key": "access_token",
+      "label": "Access Token",
+      "type": "password",
+      "required": false,
+      "placeholder": "dG9r..."
+    },
+    {
+      "key": "client_id",
+      "label": "Client ID",
+      "type": "text",
+      "required": false,
+      "placeholder": "Enter Intercom OAuth Client ID"
+    },
+    {
+      "key": "client_secret",
+      "label": "Client Secret",
+      "type": "password",
+      "required": false,
+      "placeholder": "Enter Intercom OAuth Client Secret"
+    }
+  ],
+  "oauthConfig": {
+    "authorizeUrl": "https://app.intercom.com/oauth",
+    "tokenUrl": "https://api.intercom.io/auth/oauth/token",
+    "defaultScopes": ["read", "write"]
+  },
+  "actions": [
+    {
+      "id": "list_contacts",
+      "name": "List Contacts",
+      "description": "Retrieve contacts from Intercom workspace",
+      "path": "/contacts",
+      "method": "GET",
+      "headers": {
+        "Intercom-Version": "2.11",
+        "Accept": "application/json"
+      },
+      "fields": [],
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "outputSchema": {
+        "type": "list",
+        "data": [
+          {
+            "id": "602d33b660a92d4263",
+            "type": "contact",
+            "role": "user",
+            "email": "user@example.com",
+            "name": "Jane Doe"
+          }
+        ]
+      }
+    },
+    {
+      "id": "create_contact",
+      "name": "Create Contact",
+      "description": "Create a new contact in Intercom",
+      "path": "/contacts",
+      "method": "POST",
+      "headers": {
+        "Intercom-Version": "2.11",
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+      },
+      "payloadTemplate": "{\"role\": \"{{role}}\", \"email\": \"{{email}}\", \"name\": \"{{name}}\"}",
+      "fields": [
+        { "key": "role", "label": "Role", "required": true, "placeholder": "user or lead" },
+        { "key": "email", "label": "Email Address", "required": true, "placeholder": "jane@example.com" },
+        { "key": "name", "label": "Full Name", "required": false, "placeholder": "Jane Doe" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "role": { "type": "string", "description": "Role type", "example": "user" },
+          "email": { "type": "string", "description": "Contact email", "example": "jane@example.com" },
+          "name": { "type": "string", "description": "Contact name", "example": "Jane Doe" }
+        },
+        "required": ["role", "email"]
+      },
+      "outputSchema": {
+        "id": "602d33b660a92d4263",
+        "type": "contact",
+        "role": "user",
+        "email": "jane@example.com",
+        "name": "Jane Doe"
+      }
+    },
+    {
+      "id": "list_conversations",
+      "name": "List Conversations",
+      "description": "Retrieve conversations list from Intercom",
+      "path": "/conversations",
+      "method": "GET",
+      "headers": {
+        "Intercom-Version": "2.11",
+        "Accept": "application/json"
+      },
+      "fields": [],
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "outputSchema": {
+        "type": "conversation.list",
+        "conversations": [
+          {
+            "id": "123456",
+            "title": "Support Request",
+            "state": "open"
+          }
+        ]
+      }
+    },
+    {
+      "id": "reply_conversation",
+      "name": "Reply to Conversation",
+      "description": "Send a reply to an existing Intercom conversation",
+      "path": "/conversations/{{id}}/reply",
+      "method": "POST",
+      "headers": {
+        "Intercom-Version": "2.11",
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+      },
+      "payloadTemplate": "{\"message_type\": \"comment\", \"type\": \"admin\", \"admin_id\": \"{{admin_id}}\", \"body\": \"{{body}}\"}",
+      "fields": [
+        { "key": "id", "label": "Conversation ID", "required": true, "placeholder": "123456" },
+        { "key": "admin_id", "label": "Admin ID", "required": true, "placeholder": "98765" },
+        { "key": "body", "label": "Reply Text", "required": true, "placeholder": "Thank you for reaching out..." }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "description": "Conversation ID" },
+          "admin_id": { "type": "string", "description": "Admin ID responding" },
+          "body": { "type": "string", "description": "Reply content" }
+        },
+        "required": ["id", "admin_id", "body"]
+      },
+      "outputSchema": {
+        "id": "123456",
+        "type": "conversation",
+        "state": "open"
+      }
+    }
+  ]
+}

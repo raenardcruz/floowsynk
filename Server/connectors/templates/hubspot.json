@@ -31,7 +31,10 @@
   "oauthConfig": {
     "authorizeUrl": "https://app.hubspot.com/oauth/authorize",
     "tokenUrl": "https://api.hubapi.com/oauth/v1/token",
-    "defaultScopes": ["crm.objects.contacts.write", "crm.objects.deals.write"]
+    "defaultScopes": [
+      "crm.objects.contacts.write",
+      "crm.objects.deals.write"
+    ]
   },
   "actions": [
     {
@@ -43,7 +46,30 @@
       "headers": {
         "Accept": "application/json"
       },
-      "queryParams": ["limit", "properties"]
+      "queryParams": [
+        "limit",
+        "properties"
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "Page limit",
+            "default": 10
+          }
+        }
+      },
+      "outputSchema": [
+        {
+          "id": "512",
+          "properties": {
+            "email": "john@example.com",
+            "firstname": "John"
+          },
+          "createdAt": "2026-08-07T10:00:00.000Z"
+        }
+      ]
     },
     {
       "id": "create_contact",
@@ -57,10 +83,57 @@
       "queryParams": [],
       "payloadTemplate": "{\"properties\": {\"email\": \"{{email}}\", \"firstname\": \"{{first_name}}\", \"lastname\": \"{{last_name}}\"}}",
       "fields": [
-        { "key": "email", "label": "Email Address", "required": true, "placeholder": "contact@example.com" },
-        { "key": "first_name", "label": "First Name", "required": false, "placeholder": "Jane" },
-        { "key": "last_name", "label": "Last Name", "required": false, "placeholder": "Smith" }
-      ]
+        {
+          "key": "email",
+          "label": "Email Address",
+          "required": true,
+          "placeholder": "contact@example.com"
+        },
+        {
+          "key": "first_name",
+          "label": "First Name",
+          "required": false,
+          "placeholder": "Jane"
+        },
+        {
+          "key": "last_name",
+          "label": "Last Name",
+          "required": false,
+          "placeholder": "Smith"
+        }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "Contact email address",
+            "example": "john@example.com"
+          },
+          "firstname": {
+            "type": "string",
+            "description": "First name",
+            "example": "John"
+          },
+          "lastname": {
+            "type": "string",
+            "description": "Last name",
+            "example": "Smith"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "outputSchema": {
+        "id": "512",
+        "properties": {
+          "email": "john@example.com",
+          "firstname": "John",
+          "lastname": "Smith"
+        },
+        "createdAt": "2026-08-07T10:00:00.000Z"
+      }
     },
     {
       "id": "search_contacts",
@@ -74,7 +147,35 @@
       "queryParams": [],
       "payloadTemplate": "{\"filterGroups\": {{filter_groups}}, \"query\": \"{{query}}\"}",
       "fields": [
-        { "key": "query", "label": "Search Query", "required": true, "placeholder": "Search term" }
+        {
+          "key": "query",
+          "label": "Search Query",
+          "required": true,
+          "placeholder": "Search term"
+        }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Search query",
+            "example": "john@example.com"
+          }
+        },
+        "required": [
+          "query"
+        ]
+      },
+      "outputSchema": [
+        {
+          "id": "512",
+          "properties": {
+            "email": "john@example.com",
+            "firstname": "John"
+          },
+          "createdAt": "2026-08-07T10:00:00.000Z"
+        }
       ]
     },
     {
@@ -86,7 +187,30 @@
       "headers": {
         "Accept": "application/json"
       },
-      "queryParams": ["limit", "properties"]
+      "queryParams": [
+        "limit",
+        "properties"
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "Limit",
+            "default": 10
+          }
+        }
+      },
+      "outputSchema": [
+        {
+          "id": "987",
+          "properties": {
+            "amount": "50000",
+            "dealname": "Enterprise Contract"
+          },
+          "createdAt": "2026-08-07T10:00:00.000Z"
+        }
+      ]
     },
     {
       "id": "create_deal",
@@ -100,9 +224,56 @@
       "queryParams": [],
       "payloadTemplate": "{\"properties\": {\"dealname\": \"{{deal_name}}\", \"amount\": \"{{amount}}\", \"pipeline\": \"default\", \"dealstage\": \"appointmentscheduled\"}}",
       "fields": [
-        { "key": "deal_name", "label": "Deal Name", "required": true, "placeholder": "Enterprise License Deal" },
-        { "key": "amount", "label": "Deal Amount", "required": true, "placeholder": "5000" }
-      ]
+        {
+          "key": "deal_name",
+          "label": "Deal Name",
+          "required": true,
+          "placeholder": "Enterprise License Deal"
+        },
+        {
+          "key": "amount",
+          "label": "Deal Amount",
+          "required": true,
+          "placeholder": "5000"
+        }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "dealname": {
+            "type": "string",
+            "description": "Deal Name",
+            "example": "Enterprise Contract"
+          },
+          "amount": {
+            "type": "string",
+            "description": "Deal Amount",
+            "example": "50000"
+          },
+          "pipeline": {
+            "type": "string",
+            "description": "Pipeline ID",
+            "example": "default"
+          },
+          "stage": {
+            "type": "string",
+            "description": "Deal Stage ID",
+            "example": "appointmentscheduled"
+          }
+        },
+        "required": [
+          "dealname",
+          "amount"
+        ]
+      },
+      "outputSchema": {
+        "id": "987",
+        "properties": {
+          "amount": "50000",
+          "dealname": "Enterprise Contract"
+        },
+        "createdAt": "2026-08-07T10:00:00.000Z"
+      }
     }
   ]
 }

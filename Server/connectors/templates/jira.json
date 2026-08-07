@@ -31,7 +31,10 @@
   "oauthConfig": {
     "authorizeUrl": "https://auth.atlassian.com/authorize",
     "tokenUrl": "https://auth.atlassian.com/oauth/token",
-    "defaultScopes": ["read:jira-work", "write:jira-work"]
+    "defaultScopes": [
+      "read:jira-work",
+      "write:jira-work"
+    ]
   },
   "actions": [
     {
@@ -47,8 +50,37 @@
       "queryParams": [],
       "payloadTemplate": "{\"jql\": \"{{jql}}\"}",
       "fields": [
-        { "key": "jql", "label": "JQL Query", "required": true, "placeholder": "project = PROJ AND status = Open" }
-      ]
+        {
+          "key": "jql",
+          "label": "JQL Query",
+          "required": true,
+          "placeholder": "project = PROJ AND status = Open"
+        }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "jql": {
+            "type": "string",
+            "description": "JQL query string",
+            "example": "project = PROJ"
+          }
+        },
+        "required": [
+          "jql"
+        ]
+      },
+      "outputSchema": {
+        "issues": [
+          {
+            "id": "10000",
+            "key": "PROJ-123",
+            "fields": {
+              "summary": "API 500 Error"
+            }
+          }
+        ]
+      }
     },
     {
       "id": "create_issue",
@@ -63,11 +95,65 @@
       "queryParams": [],
       "payloadTemplate": "{\"fields\": {\"project\": {\"key\": \"{{project_key}}\"}, \"summary\": \"{{summary}}\", \"description\": \"{{description}}\", \"issuetype\": {\"name\": \"{{issue_type}}\"}}}",
       "fields": [
-        { "key": "project_key", "label": "Project Key", "required": true, "placeholder": "e.g. PROJ" },
-        { "key": "summary", "label": "Issue Summary", "required": true, "placeholder": "Enter issue summary" },
-        { "key": "description", "label": "Description", "required": false, "placeholder": "Issue description" },
-        { "key": "issue_type", "label": "Issue Type", "required": false, "placeholder": "Task" }
-      ]
+        {
+          "key": "project_key",
+          "label": "Project Key",
+          "required": true,
+          "placeholder": "e.g. PROJ"
+        },
+        {
+          "key": "summary",
+          "label": "Issue Summary",
+          "required": true,
+          "placeholder": "Enter issue summary"
+        },
+        {
+          "key": "description",
+          "label": "Description",
+          "required": false,
+          "placeholder": "Issue description"
+        },
+        {
+          "key": "issue_type",
+          "label": "Issue Type",
+          "required": false,
+          "placeholder": "Task"
+        }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "projectKey": {
+            "type": "string",
+            "description": "Jira Project Key",
+            "example": "PROJ"
+          },
+          "summary": {
+            "type": "string",
+            "description": "Issue summary / title",
+            "example": "API Endpoint returns 500 error"
+          },
+          "description": {
+            "type": "string",
+            "description": "Issue detailed description",
+            "example": "Occurs when calling POST /api/data."
+          },
+          "issueType": {
+            "type": "string",
+            "description": "Issue Type Name",
+            "default": "Task"
+          }
+        },
+        "required": [
+          "projectKey",
+          "summary"
+        ]
+      },
+      "outputSchema": {
+        "id": "10000",
+        "key": "PROJ-123",
+        "self": "https://your-domain.atlassian.net/rest/api/3/issue/10000"
+      }
     },
     {
       "id": "get_issue",
@@ -80,8 +166,31 @@
       },
       "queryParams": [],
       "fields": [
-        { "key": "issue_key", "label": "Issue Key", "required": true, "placeholder": "PROJ-123" }
-      ]
+        {
+          "key": "issue_key",
+          "label": "Issue Key",
+          "required": true,
+          "placeholder": "PROJ-123"
+        }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "issue_id": {
+            "type": "string",
+            "description": "Issue Key or ID",
+            "example": "PROJ-123"
+          }
+        },
+        "required": [
+          "issue_id"
+        ]
+      },
+      "outputSchema": {
+        "id": "10000",
+        "key": "PROJ-123",
+        "self": "https://your-domain.atlassian.net/rest/api/3/issue/10000"
+      }
     },
     {
       "id": "update_issue",
@@ -96,9 +205,42 @@
       "queryParams": [],
       "payloadTemplate": "{\"fields\": {{fields}} }",
       "fields": [
-        { "key": "issue_key", "label": "Issue Key", "required": true, "placeholder": "PROJ-123" },
-        { "key": "fields", "label": "Fields (JSON)", "required": true, "placeholder": "{\"summary\": \"Updated summary\"}" }
-      ]
+        {
+          "key": "issue_key",
+          "label": "Issue Key",
+          "required": true,
+          "placeholder": "PROJ-123"
+        },
+        {
+          "key": "fields",
+          "label": "Fields (JSON)",
+          "required": true,
+          "placeholder": "{\"summary\": \"Updated summary\"}"
+        }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "issue_id": {
+            "type": "string",
+            "description": "Issue Key or ID",
+            "example": "PROJ-123"
+          },
+          "summary": {
+            "type": "string",
+            "description": "Updated Summary",
+            "example": "API 500 Error resolved"
+          }
+        },
+        "required": [
+          "issue_id"
+        ]
+      },
+      "outputSchema": {
+        "id": "10000",
+        "key": "PROJ-123",
+        "status": "updated"
+      }
     }
   ]
 }

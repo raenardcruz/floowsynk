@@ -31,7 +31,11 @@
   "oauthConfig": {
     "authorizeUrl": "https://discord.com/api/oauth2/authorize",
     "tokenUrl": "https://discord.com/api/oauth2/token",
-    "defaultScopes": ["bot", "messages.read", "webhook.incoming"]
+    "defaultScopes": [
+      "bot",
+      "messages.read",
+      "webhook.incoming"
+    ]
   },
   "actions": [
     {
@@ -46,9 +50,44 @@
       "queryParams": [],
       "payloadTemplate": "{\"content\": \"{{content}}\"}",
       "fields": [
-        { "key": "channel_id", "label": "Channel ID", "required": true, "placeholder": "Enter Discord Channel ID" },
-        { "key": "content", "label": "Message Content", "required": true, "placeholder": "Enter message to send" }
-      ]
+        {
+          "key": "channel_id",
+          "label": "Channel ID",
+          "required": true,
+          "placeholder": "Enter Discord Channel ID"
+        },
+        {
+          "key": "content",
+          "label": "Message Content",
+          "required": true,
+          "placeholder": "Enter message to send"
+        }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "channel_id": {
+            "type": "string",
+            "description": "Discord Channel ID",
+            "example": "1234567890"
+          },
+          "content": {
+            "type": "string",
+            "description": "Message content",
+            "example": "Build deployment finished."
+          }
+        },
+        "required": [
+          "channel_id",
+          "content"
+        ]
+      },
+      "outputSchema": {
+        "id": "998877665544332211",
+        "channel_id": "1234567890",
+        "content": "Build deployment finished.",
+        "timestamp": "2026-08-07T10:00:00.000Z"
+      }
     },
     {
       "id": "execute_webhook",
@@ -62,11 +101,54 @@
       "queryParams": [],
       "payloadTemplate": "{\"content\": \"{{content}}\", \"username\": \"{{username}}\"}",
       "fields": [
-        { "key": "webhook_id", "label": "Webhook ID", "required": true, "placeholder": "Enter Webhook ID" },
-        { "key": "webhook_token", "label": "Webhook Token", "required": true, "placeholder": "Enter Webhook Token" },
-        { "key": "content", "label": "Message Content", "required": true, "placeholder": "Enter message text" },
-        { "key": "username", "label": "Bot Username Override", "required": false, "placeholder": "FloowSynk Bot" }
-      ]
+        {
+          "key": "webhook_id",
+          "label": "Webhook ID",
+          "required": true,
+          "placeholder": "Enter Webhook ID"
+        },
+        {
+          "key": "webhook_token",
+          "label": "Webhook Token",
+          "required": true,
+          "placeholder": "Enter Webhook Token"
+        },
+        {
+          "key": "content",
+          "label": "Message Content",
+          "required": true,
+          "placeholder": "Enter message text"
+        },
+        {
+          "key": "username",
+          "label": "Bot Username Override",
+          "required": false,
+          "placeholder": "FloowSynk Bot"
+        }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "webhook_url": {
+            "type": "string",
+            "description": "Discord Webhook URL",
+            "example": "https://discord.com/api/webhooks/123/abc"
+          },
+          "content": {
+            "type": "string",
+            "description": "Message content",
+            "example": "Webhook notification"
+          }
+        },
+        "required": [
+          "webhook_url",
+          "content"
+        ]
+      },
+      "outputSchema": {
+        "id": "998877665544332212",
+        "content": "Webhook notification"
+      }
     },
     {
       "id": "list_messages",
@@ -77,9 +159,40 @@
       "headers": {
         "Accept": "application/json"
       },
-      "queryParams": ["limit"],
+      "queryParams": [
+        "limit"
+      ],
       "fields": [
-        { "key": "channel_id", "label": "Channel ID", "required": true, "placeholder": "Enter Discord Channel ID" }
+        {
+          "key": "channel_id",
+          "label": "Channel ID",
+          "required": true,
+          "placeholder": "Enter Discord Channel ID"
+        }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "channel_id": {
+            "type": "string",
+            "description": "Channel ID",
+            "example": "1234567890"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Message count",
+            "default": 50
+          }
+        },
+        "required": [
+          "channel_id"
+        ]
+      },
+      "outputSchema": [
+        {
+          "id": "998877665544332211",
+          "content": "Build deployment finished."
+        }
       ]
     }
   ]

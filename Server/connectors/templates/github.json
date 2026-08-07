@@ -31,7 +31,11 @@
   "oauthConfig": {
     "authorizeUrl": "https://github.com/login/oauth/authorize",
     "tokenUrl": "https://github.com/login/oauth/access_token",
-    "defaultScopes": ["repo", "read:user", "user:email"]
+    "defaultScopes": [
+      "repo",
+      "read:user",
+      "user:email"
+    ]
   },
   "actions": [
     {
@@ -48,11 +52,68 @@
       "queryParams": [],
       "payloadTemplate": "{\"title\": \"{{title}}\", \"body\": \"{{body}}\"}",
       "fields": [
-        { "key": "owner", "label": "Repository Owner", "required": true, "placeholder": "e.g. octocat" },
-        { "key": "repo", "label": "Repository Name", "required": true, "placeholder": "e.g. hello-world" },
-        { "key": "title", "label": "Issue Title", "required": true, "placeholder": "Bug in user login" },
-        { "key": "body", "label": "Issue Description", "required": false, "placeholder": "Details about the issue" }
-      ]
+        {
+          "key": "owner",
+          "label": "Repository Owner",
+          "required": true,
+          "placeholder": "e.g. octocat"
+        },
+        {
+          "key": "repo",
+          "label": "Repository Name",
+          "required": true,
+          "placeholder": "e.g. hello-world"
+        },
+        {
+          "key": "title",
+          "label": "Issue Title",
+          "required": true,
+          "placeholder": "Bug in user login"
+        },
+        {
+          "key": "body",
+          "label": "Issue Description",
+          "required": false,
+          "placeholder": "Details about the issue"
+        }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "owner": {
+            "type": "string",
+            "description": "Repository owner",
+            "example": "octocat"
+          },
+          "repo": {
+            "type": "string",
+            "description": "Repository name",
+            "example": "hello-world"
+          },
+          "title": {
+            "type": "string",
+            "description": "Issue title",
+            "example": "Bug in user login validation"
+          },
+          "body": {
+            "type": "string",
+            "description": "Issue body description",
+            "example": "Users receive 500 error when submitting empty email."
+          }
+        },
+        "required": [
+          "owner",
+          "repo",
+          "title"
+        ]
+      },
+      "outputSchema": {
+        "id": 12345678,
+        "number": 1,
+        "html_url": "https://github.com/octocat/hello-world/issues/1",
+        "state": "open",
+        "title": "Bug in user login validation"
+      }
     },
     {
       "id": "trigger_workflow",
@@ -68,11 +129,73 @@
       "queryParams": [],
       "payloadTemplate": "{\"ref\": \"{{ref}}\", \"inputs\": {{inputs}}}",
       "fields": [
-        { "key": "owner", "label": "Repository Owner", "required": true, "placeholder": "e.g. octocat" },
-        { "key": "repo", "label": "Repository Name", "required": true, "placeholder": "e.g. hello-world" },
-        { "key": "workflow_id", "label": "Workflow ID or File Name", "required": true, "placeholder": "main.yml" },
-        { "key": "ref", "label": "Git Ref / Branch", "required": true, "placeholder": "main" }
-      ]
+        {
+          "key": "owner",
+          "label": "Repository Owner",
+          "required": true,
+          "placeholder": "e.g. octocat"
+        },
+        {
+          "key": "repo",
+          "label": "Repository Name",
+          "required": true,
+          "placeholder": "e.g. hello-world"
+        },
+        {
+          "key": "workflow_id",
+          "label": "Workflow ID or File Name",
+          "required": true,
+          "placeholder": "main.yml"
+        },
+        {
+          "key": "ref",
+          "label": "Git Ref / Branch",
+          "required": true,
+          "placeholder": "main"
+        }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "owner": {
+            "type": "string",
+            "description": "Repository owner",
+            "example": "octocat"
+          },
+          "repo": {
+            "type": "string",
+            "description": "Repository name",
+            "example": "hello-world"
+          },
+          "workflow_id": {
+            "type": "string",
+            "description": "Workflow file name or ID",
+            "example": "main.yml"
+          },
+          "ref": {
+            "type": "string",
+            "description": "Git reference / branch name",
+            "example": "main"
+          },
+          "inputs": {
+            "type": "object",
+            "description": "Custom workflow inputs JSON",
+            "example": {
+              "environment": "production"
+            }
+          }
+        },
+        "required": [
+          "owner",
+          "repo",
+          "workflow_id",
+          "ref"
+        ]
+      },
+      "outputSchema": {
+        "status": 204,
+        "message": "Workflow dispatch event successfully triggered"
+      }
     },
     {
       "id": "list_repos",
@@ -84,7 +207,29 @@
         "Accept": "application/vnd.github+json",
         "X-GitHub-Api-Version": "2022-11-28"
       },
-      "queryParams": []
+      "queryParams": [],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "visibility": {
+            "type": "string",
+            "description": "Filter by repo visibility (all, public, private)",
+            "default": "all"
+          },
+          "sort": {
+            "type": "string",
+            "description": "Sort field (created, updated, pushed, full_name)",
+            "default": "full_name"
+          }
+        }
+      },
+      "outputSchema": [
+        {
+          "id": 1296269,
+          "name": "Hello-World",
+          "url": "https://github.com/octocat/Hello-World"
+        }
+      ]
     },
     {
       "id": "get_user_profile",
@@ -96,7 +241,18 @@
         "Accept": "application/vnd.github+json",
         "X-GitHub-Api-Version": "2022-11-28"
       },
-      "queryParams": []
+      "queryParams": [],
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "outputSchema": {
+        "id": 1,
+        "login": "octocat",
+        "name": "monalisa octocat",
+        "html_url": "https://github.com/octocat",
+        "avatar_url": "https://github.com/images/error/octocat_happy.gif"
+      }
     }
   ]
 }

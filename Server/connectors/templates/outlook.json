@@ -1,0 +1,176 @@
+{
+  "id": "outlook",
+  "name": "Outlook",
+  "description": "Send emails, manage messages, and organize calendar events with Microsoft Outlook.",
+  "icon": "/src/components/Icons/outlook.svg",
+  "baseUrl": "https://graph.microsoft.com/v1.0",
+  "authType": "oauth2",
+  "fields": [
+    {
+      "key": "client_id",
+      "label": "Client ID",
+      "type": "text",
+      "required": false,
+      "placeholder": "Azure Application Client ID"
+    },
+    {
+      "key": "client_secret",
+      "label": "Client Secret",
+      "type": "password",
+      "required": false,
+      "placeholder": "Azure Application Client Secret"
+    },
+    {
+      "key": "tenant_id",
+      "label": "Tenant ID",
+      "type": "text",
+      "required": false,
+      "placeholder": "common or specific tenant ID"
+    },
+    {
+      "key": "access_token",
+      "label": "Access Token",
+      "type": "password",
+      "required": false,
+      "placeholder": "OAuth2 Bearer Token"
+    }
+  ],
+  "oauthConfig": {
+    "authorizeUrl": "https://login.microsoftonline.com/common/oauth2/v2.0/authorize",
+    "tokenUrl": "https://login.microsoftonline.com/common/oauth2/v2.0/token",
+    "defaultScopes": [
+      "Mail.ReadWrite",
+      "Mail.Send",
+      "Calendars.ReadWrite",
+      "offline_access"
+    ]
+  },
+  "actions": [
+    {
+      "id": "send_mail",
+      "name": "Send Mail",
+      "description": "Send an email message using Microsoft Graph",
+      "path": "/me/sendMail",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      "payloadTemplate": "{\"message\": {\"subject\": \"{{subject}}\", \"body\": {\"contentType\": \"Text\", \"content\": \"{{body}}\"}, \"toRecipients\": [{\"emailAddress\": {\"address\": \"{{to}}\"}}]}}",
+      "fields": [
+        { "key": "to", "label": "Recipient Email", "required": true, "placeholder": "user@example.com" },
+        { "key": "subject", "label": "Subject", "required": true, "placeholder": "Enter email subject" },
+        { "key": "body", "label": "Body Content", "required": true, "placeholder": "Enter email body" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "to": { "type": "string", "description": "Recipient email address", "example": "recipient@example.com" },
+          "subject": { "type": "string", "description": "Email subject line", "example": "Weekly Sync Agenda" },
+          "body": { "type": "string", "description": "Email body content", "example": "Hi team, here is the agenda..." }
+        },
+        "required": ["to", "subject", "body"]
+      },
+      "outputSchema": {
+        "status": "success",
+        "message": "Email queued for delivery"
+      }
+    },
+    {
+      "id": "get_messages",
+      "name": "Get Messages",
+      "description": "List or search messages in user mailbox",
+      "path": "/me/messages",
+      "method": "GET",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "queryParams": [
+        { "key": "$top", "value": "10" }
+      ],
+      "fields": [],
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "outputSchema": {
+        "@odata.context": "https://graph.microsoft.com/v1.0/$metadata#users('id')/messages",
+        "value": [
+          {
+            "id": "AAMkAD...",
+            "subject": "Weekly Update",
+            "sender": { "emailAddress": { "name": "John Doe", "address": "john@example.com" } },
+            "isRead": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "create_event",
+      "name": "Create Event",
+      "description": "Create a new calendar event",
+      "path": "/me/events",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      "payloadTemplate": "{\"subject\": \"{{subject}}\", \"start\": {\"dateTime\": \"{{start_time}}\", \"timeZone\": \"UTC\"}, \"end\": {\"dateTime\": \"{{end_time}}\", \"timeZone\": \"UTC\"}}",
+      "fields": [
+        { "key": "subject", "label": "Event Title", "required": true, "placeholder": "Project Kickoff" },
+        { "key": "start_time", "label": "Start Time (ISO 8601)", "required": true, "placeholder": "2026-08-10T10:00:00" },
+        { "key": "end_time", "label": "End Time (ISO 8601)", "required": true, "placeholder": "2026-08-10T11:00:00" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "subject": { "type": "string", "description": "Event subject", "example": "Team Sync" },
+          "start_time": { "type": "string", "description": "Start datetime in ISO string", "example": "2026-08-10T10:00:00" },
+          "end_time": { "type": "string", "description": "End datetime in ISO string", "example": "2026-08-10T11:00:00" }
+        },
+        "required": ["subject", "start_time", "end_time"]
+      },
+      "outputSchema": {
+        "id": "AAMkAD...",
+        "subject": "Team Sync",
+        "start": { "dateTime": "2026-08-10T10:00:00.0000000", "timeZone": "UTC" },
+        "end": { "dateTime": "2026-08-10T11:00:00.0000000", "timeZone": "UTC" }
+      }
+    },
+    {
+      "id": "get_events",
+      "name": "Get Calendar Events",
+      "description": "Retrieve events within a specified date/time range",
+      "path": "/me/calendarView",
+      "method": "GET",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "queryParams": [
+        { "key": "startDateTime", "value": "{{start_datetime}}" },
+        { "key": "endDateTime", "value": "{{end_datetime}}" }
+      ],
+      "fields": [
+        { "key": "start_datetime", "label": "Start DateTime", "required": true, "placeholder": "2026-08-01T00:00:00Z" },
+        { "key": "end_datetime", "label": "End DateTime", "required": true, "placeholder": "2026-08-31T23:59:59Z" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "start_datetime": { "type": "string", "description": "Start datetime ISO filter", "example": "2026-08-01T00:00:00Z" },
+          "end_datetime": { "type": "string", "description": "End datetime ISO filter", "example": "2026-08-31T23:59:59Z" }
+        },
+        "required": ["start_datetime", "end_datetime"]
+      },
+      "outputSchema": {
+        "value": [
+          {
+            "id": "AAMkAD...",
+            "subject": "Team Sync",
+            "start": { "dateTime": "2026-08-10T10:00:00.0000000", "timeZone": "UTC" }
+          }
+        ]
+      }
+    }
+  ]
+}

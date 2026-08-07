@@ -7,23 +7,26 @@ import (
 )
 
 // CheckJiraConnection verifies Jira OAuth access token.
-func CheckJiraConnection(creds map[string]string) bool {
+func CheckJiraConnection(creds map[string]string) (bool, string) {
 	token := creds["access_token"]
 	if token == "" {
-		return false
+		return false, "Missing access token"
 	}
 	req, err := http.NewRequest("GET", "https://api.atlassian.com/oauth/token/accessible-resources", nil)
 	if err != nil {
-		return false
+		return false, fmt.Sprintf("Failed to create request: %v", err)
 	}
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return false
+		return false, fmt.Sprintf("Connection request failed: %v", err)
 	}
 	defer resp.Body.Close()
-	return resp.StatusCode == http.StatusOK
+	if resp.StatusCode != http.StatusOK {
+		return false, fmt.Sprintf("HTTP %d: %s", resp.StatusCode, resp.Status)
+	}
+	return true, ""
 }
 
 // TransformJiraResponse formats raw Jira API responses.

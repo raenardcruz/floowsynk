@@ -13,6 +13,9 @@ This guide outlines the step-by-step process of adding a new third-party connect
 > 3. **Section 5 (Header / Request Format)**: Configure exact headers (`Content-Type`, `Accept`, API version headers, custom tokens) in `headers` per action.
 4. **Multi-Authentication Support**: Specify all supported authentication methods in `authType` (e.g. `"oauth2, apikey"` or `"oauth2, pat"`) so the UI displays distinct pills and tabs for OAuth2 and API Key/Token authentication choices.
 5. **Action Required Parameters / Fields**: Specify required fields per action either explicitly in a `"fields"` array on the action object or via `{{variable_name}}` placeholders in `path`, `queryParams`, or `payloadTemplate`. The Workflow UI node popup menu automatically parses and presents these fields as dedicated input controls for workflow builders.
+6. **Input and Output Schemas (`inputSchema` & `outputSchema`)**: Every action MUST include explicit JSON schemas:
+   - `inputSchema`: A JSON Schema object (`type: "object"`, `properties`, `required`) describing all expected parameters and payloads.
+   - `outputSchema`: A representative JSON object or array reflecting the exact output payload produced by the connector node transformer (`TransformConnectorResponse`).
 
 ## Step 1: Create the Connector Template Configuration File
 
@@ -75,7 +78,24 @@ Create a new JSON template in the template directory:
         { "key": "repo", "label": "Repository Name", "required": true, "placeholder": "e.g. hello-world" },
         { "key": "title", "label": "Issue Title", "required": true, "placeholder": "Enter issue title" },
         { "key": "body", "label": "Issue Body", "required": false, "placeholder": "Enter issue description" }
-      ]
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "owner": { "type": "string", "description": "Repository owner", "example": "octocat" },
+          "repo": { "type": "string", "description": "Repository name", "example": "hello-world" },
+          "title": { "type": "string", "description": "Issue title", "example": "Bug in login" },
+          "body": { "type": "string", "description": "Issue description", "example": "Details..." }
+        },
+        "required": ["owner", "repo", "title"]
+      },
+      "outputSchema": {
+        "id": 12345678,
+        "number": 1,
+        "html_url": "https://github.com/octocat/hello-world/issues/1",
+        "state": "open",
+        "title": "Bug in login"
+      }
     }
   ]
 }

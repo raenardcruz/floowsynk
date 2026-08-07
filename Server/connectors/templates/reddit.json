@@ -1,0 +1,197 @@
+{
+  "id": "reddit",
+  "name": "Reddit",
+  "description": "Access Reddit API to submit posts, fetch subreddit posts, get user profile, and post comments.",
+  "icon": "/src/components/Icons/reddit.svg",
+  "baseUrl": "https://oauth.reddit.com",
+  "authType": "oauth2",
+  "fields": [
+    {
+      "key": "client_id",
+      "label": "Client ID",
+      "type": "text",
+      "required": true,
+      "placeholder": "14-character app client ID"
+    },
+    {
+      "key": "client_secret",
+      "label": "Client Secret",
+      "type": "password",
+      "required": true,
+      "placeholder": "App secret key"
+    },
+    {
+      "key": "username",
+      "label": "Reddit Username",
+      "type": "text",
+      "required": true,
+      "placeholder": "Your Reddit username"
+    },
+    {
+      "key": "password",
+      "label": "Reddit Password",
+      "type": "password",
+      "required": true,
+      "placeholder": "Your Reddit password"
+    },
+    {
+      "key": "user_agent",
+      "label": "User-Agent Header",
+      "type": "text",
+      "required": true,
+      "placeholder": "e.g. floowsynk:v1.0 (by /u/username)"
+    }
+  ],
+  "oauthConfig": {
+    "authorizeUrl": "https://www.reddit.com/api/v1/authorize",
+    "tokenUrl": "https://www.reddit.com/api/v1/access_token",
+    "defaultScopes": ["identity", "submit", "read", "edit"]
+  },
+  "actions": [
+    {
+      "id": "submit_post",
+      "name": "Submit Post",
+      "description": "Submit a new text or link post to a subreddit",
+      "path": "/api/submit",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "User-Agent": "{{user_agent}}"
+      },
+      "queryParams": [],
+      "payloadTemplate": "sr={{subreddit}}&title={{title}}&kind={{kind}}&text={{text}}",
+      "fields": [
+        { "key": "subreddit", "label": "Subreddit", "required": true, "placeholder": "e.g. technology" },
+        { "key": "title", "label": "Title", "required": true, "placeholder": "Post title" },
+        { "key": "kind", "label": "Kind", "required": true, "placeholder": "self or link" },
+        { "key": "text", "label": "Post Text", "required": false, "placeholder": "Post content" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "subreddit": { "type": "string", "description": "Target subreddit name", "example": "technology" },
+          "title": { "type": "string", "description": "Post title", "example": "Hello World" },
+          "kind": { "type": "string", "description": "Post type (self or link)", "example": "self" },
+          "text": { "type": "string", "description": "Post body text", "example": "Content here..." }
+        },
+        "required": ["subreddit", "title", "kind"]
+      },
+      "outputSchema": {
+        "json": {
+          "errors": [],
+          "data": {
+            "url": "https://www.reddit.com/r/technology/comments/...",
+            "id": "t3_xxxxxx",
+            "name": "t3_xxxxxx"
+          }
+        }
+      }
+    },
+    {
+      "id": "get_hot_posts",
+      "name": "Get Subreddit Posts",
+      "description": "Fetch hot posts from a specified subreddit",
+      "path": "/r/{{subreddit}}/hot",
+      "method": "GET",
+      "headers": {
+        "User-Agent": "{{user_agent}}"
+      },
+      "queryParams": [
+        { "key": "limit", "value": "{{limit}}" }
+      ],
+      "payloadTemplate": "",
+      "fields": [
+        { "key": "subreddit", "label": "Subreddit", "required": true, "placeholder": "e.g. news" },
+        { "key": "limit", "label": "Limit", "required": false, "placeholder": "Default 25" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "subreddit": { "type": "string", "description": "Subreddit name", "example": "news" },
+          "limit": { "type": "string", "description": "Number of posts to fetch", "example": "10" }
+        },
+        "required": ["subreddit"]
+      },
+      "outputSchema": {
+        "kind": "Listing",
+        "data": {
+          "children": [
+            {
+              "kind": "t3",
+              "data": {
+                "id": "xxxxxx",
+                "title": "Sample Post Title",
+                "score": 150,
+                "url": "https://..."
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "get_me",
+      "name": "Get User Information",
+      "description": "Fetch authenticated user details",
+      "path": "/api/v1/me",
+      "method": "GET",
+      "headers": {
+        "User-Agent": "{{user_agent}}"
+      },
+      "queryParams": [],
+      "payloadTemplate": "",
+      "fields": [],
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "outputSchema": {
+        "id": "xxxxxx",
+        "name": "reddit_username",
+        "total_karma": 1250,
+        "created_utc": 1600000000
+      }
+    },
+    {
+      "id": "add_comment",
+      "name": "Add Comment",
+      "description": "Add a comment to a post or comment",
+      "path": "/api/comment",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "User-Agent": "{{user_agent}}"
+      },
+      "queryParams": [],
+      "payloadTemplate": "thing_id={{thing_id}}&text={{text}}",
+      "fields": [
+        { "key": "thing_id", "label": "Parent Thing ID", "required": true, "placeholder": "e.g. t3_xxxxxx or t1_xxxxxx" },
+        { "key": "text", "label": "Comment Text", "required": true, "placeholder": "Your comment" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "thing_id": { "type": "string", "description": "Parent post or comment fullname", "example": "t3_12345" },
+          "text": { "type": "string", "description": "Comment markdown text", "example": "Great post!" }
+        },
+        "required": ["thing_id", "text"]
+      },
+      "outputSchema": {
+        "json": {
+          "errors": [],
+          "data": {
+            "things": [
+              {
+                "kind": "t1",
+                "data": {
+                  "id": "xxxxxx",
+                  "body": "Great post!"
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}
