@@ -14,6 +14,7 @@ export const newProcess = (): Workflow.AsObject => {
         createdat: new Date().toISOString(),
         updatedat: new Date().toISOString(),
         createdby: 'system',
-        updatedby: 'system'
+        updatedby: 'system',
+        ismodified: false
     }
 }

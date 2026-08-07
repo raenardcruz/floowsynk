@@ -40,7 +40,13 @@ export const useWorkflowCanvasControlButtonActions = (props: WorkflowCanvasProps
         await initWorkflows()
         tab.value.isnew = false
       } else {
-        await updateProcess(tab.value)
+        const resp = await updateProcess(tab.value)
+        const updatedObj = resp.toObject()
+        if (updatedObj && typeof updatedObj.ismodified === 'boolean') {
+          tab.value.ismodified = updatedObj.ismodified
+        } else if (import.meta.env.VITE_APP_ENVIRONMENT === 'production') {
+          tab.value.ismodified = true
+        }
       }
       console.log("Saved process:", tab.value)
       toast.add({severity:'success', summary: 'Success', detail: 'Workflow saved successfully', life: 3000});

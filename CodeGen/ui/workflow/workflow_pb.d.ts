@@ -258,6 +258,9 @@ export class Workflow extends jspb.Message {
   hasIsnew(): boolean;
   clearIsnew(): Workflow;
 
+  getIsmodified(): boolean;
+  setIsmodified(value: boolean): Workflow;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): Workflow.AsObject;
   static toObject(includeInstance: boolean, msg: Workflow): Workflow.AsObject;
@@ -280,6 +283,7 @@ export namespace Workflow {
     updatedby: string;
     tagsList: Array<string>;
     isnew?: boolean;
+    ismodified: boolean;
   };
 
   export enum IsnewCase {
@@ -1280,6 +1284,9 @@ export class ConnectionProto extends jspb.Message {
   getCreatedat(): string;
   setCreatedat(value: string): ConnectionProto;
 
+  getIsmodified(): boolean;
+  setIsmodified(value: boolean): ConnectionProto;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): ConnectionProto.AsObject;
   static toObject(includeInstance: boolean, msg: ConnectionProto): ConnectionProto.AsObject;
@@ -1295,6 +1302,7 @@ export namespace ConnectionProto {
     connectorid: string;
     authtype: string;
     createdat: string;
+    ismodified: boolean;
   };
 }
 

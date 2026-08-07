@@ -75,4 +75,17 @@ export const updateConnection = async (
     return res.json()
 }
 
+export const revertConnection = async (id: string): Promise<{ success: boolean; message: string }> => {
+    const res = await fetch(`${getRestUrl()}/api/connectors/revert`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `${localStorage.getItem("sessionToken") || ''}`
+        },
+        body: JSON.stringify({ id })
+    })
+    if (!res.ok) throw new Error(await res.text())
+    return res.json()
+}
+
 

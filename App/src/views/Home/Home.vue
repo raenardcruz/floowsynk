@@ -22,21 +22,20 @@
                     <span>Connectors</span>
                 </router-link>
             </div>
-
-            <!-- Environment indicator -->
-            <div :class="['nav-env-badge', isProduction ? 'nav-env-badge--prod' : 'nav-env-badge--staging']">
-                <span class="nav-env-dot"></span>
-                <span>{{ isProduction ? 'PRODUCTION' : 'STAGING' }}</span>
-            </div>
         </template>
         
         <template #end>
             <div class="user-actions-group">
+                <!-- Environment indicator -->
+                <div :class="['nav-env-badge', isProduction ? 'nav-env-badge--prod' : 'nav-env-badge--staging']">
+                    <span class="nav-env-dot"></span>
+                    <span>{{ isProduction ? 'PRODUCTION' : 'STAGING' }}</span>
+                </div>
                 <div class="user-pill">
                     <div class="user-avatar">
                         <i class="pi pi-user"></i>
                     </div>
-                    <span class="user-name">Developer</span>
+                    <span class="user-name">Name</span>
                 </div>
                 <div class="logout" @click="logout" title="Log Out">
                     <span class="material-symbols-outlined">logout</span>
@@ -80,7 +79,7 @@ pageInit();
     font-size: 10px;
     font-weight: 800;
     letter-spacing: 1.2px;
-    margin-left: 8px;
+    margin-right: 4px;
     flex-shrink: 0;
     user-select: none;
 }
@@ -91,20 +90,20 @@ pageInit();
     flex-shrink: 0;
 }
 .nav-env-badge--staging {
-    background: rgba(124, 140, 248, 0.12);
-    color: #a5b4fc;
-    border: 1px solid rgba(124, 140, 248, 0.25);
+    background: rgba(234, 179, 8, 0.12);
+    color: #facc15;
+    border: 1px solid rgba(234, 179, 8, 0.3);
 }
 .nav-env-badge--staging .nav-env-dot {
-    background: #7c8cf8;
+    background: #eab308;
 }
 .nav-env-badge--prod {
-    background: rgba(239, 68, 68, 0.12);
-    color: #f87171;
-    border: 1px solid rgba(239, 68, 68, 0.3);
+    background: rgba(34, 197, 94, 0.12);
+    color: #4ade80;
+    border: 1px solid rgba(34, 197, 94, 0.3);
 }
 .nav-env-badge--prod .nav-env-dot {
-    background: #ef4444;
+    background: #22c55e;
     animation: pulse-dot 1.5s infinite;
 }
 @keyframes pulse-dot {

@@ -13,6 +13,7 @@ type Connection struct {
 	UserID      string    `gorm:"type:uuid" json:"userId"`
 	CreatedAt   time.Time `json:"createdAt"`
 	UpdatedAt   time.Time `json:"updatedAt"`
+	IsModified  bool      `gorm:"default:false;column:is_modified" json:"isModified"`
 }
 
 func (db *DatabaseConnection) AddConnection(conn Connection) error {
@@ -20,6 +21,15 @@ func (db *DatabaseConnection) AddConnection(conn Connection) error {
 }
 
 func (db *DatabaseConnection) SaveConnection(conn *Connection) error {
+	if AppConfig.App_Environment == "production" && !conn.IsModified {
+		// When updated in production without explicit false flag, mark as modified
+		conn.IsModified = true
+	}
+	return db.conn.Save(conn).Error
+}
+
+func (db *DatabaseConnection) SavePublishedConnection(conn *Connection) error {
+	conn.IsModified = false
 	return db.conn.Save(conn).Error
 }
 
@@ -43,6 +53,9 @@ func (db *DatabaseConnection) UpdateConnection(id, name, credentials string) err
 	if credentials != "" {
 		updates["credentials"] = credentials
 	}
+	if AppConfig.App_Environment == "production" {
+		updates["is_modified"] = true
+	}
 	return db.conn.Model(&Connection{}).Where("id = ?", id).Updates(updates).Error
 }
 
@@ -53,5 +66,12 @@ func (db *DatabaseConnection) UpdateConnectionName(id, name string) error {
 
 func (db *DatabaseConnection) DeleteConnection(id string) error {
 	return db.conn.Where("id = ?", id).Delete(&Connection{}).Error
+}
+
+func (db *DatabaseConnection) RevertConnectionToStaging(id string) error {
+	return db.conn.Model(&Connection{}).Where("id = ?", id).Updates(map[string]interface{}{
+		"is_modified": false,
+		"updated_at":  time.Now(),
+	}).Error
 }
 

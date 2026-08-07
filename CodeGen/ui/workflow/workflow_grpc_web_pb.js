@@ -981,5 +981,66 @@ proto.proto.WorkflowServicePromiseClient.prototype.publishWorkflow =
 };
 
 
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.proto.GetWorkflowRequest,
+ *   !proto.proto.Workflow>}
+ */
+const methodDescriptor_WorkflowService_RevertWorkflowToStaging = new grpc.web.MethodDescriptor(
+  '/proto.WorkflowService/RevertWorkflowToStaging',
+  grpc.web.MethodType.UNARY,
+  proto.proto.GetWorkflowRequest,
+  proto.proto.Workflow,
+  /**
+   * @param {!proto.proto.GetWorkflowRequest} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.proto.Workflow.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.proto.GetWorkflowRequest} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.RpcError, ?proto.proto.Workflow)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.proto.Workflow>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.proto.WorkflowServiceClient.prototype.revertWorkflowToStaging =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/proto.WorkflowService/RevertWorkflowToStaging',
+      request,
+      metadata || {},
+      methodDescriptor_WorkflowService_RevertWorkflowToStaging,
+      callback);
+};
+
+
+/**
+ * @param {!proto.proto.GetWorkflowRequest} request The
+ *     request proto
+ * @param {?Object<string, string>=} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.proto.Workflow>}
+ *     Promise that resolves to the response
+ */
+proto.proto.WorkflowServicePromiseClient.prototype.revertWorkflowToStaging =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/proto.WorkflowService/RevertWorkflowToStaging',
+      request,
+      metadata || {},
+      methodDescriptor_WorkflowService_RevertWorkflowToStaging);
+};
+
+
 module.exports = proto.proto;
 

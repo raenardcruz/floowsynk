@@ -20,21 +20,22 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	WorkflowService_GetWorkflow_FullMethodName            = "/proto.WorkflowService/GetWorkflow"
-	WorkflowService_ListWorkflows_FullMethodName          = "/proto.WorkflowService/ListWorkflows"
-	WorkflowService_UpdateWorkflow_FullMethodName         = "/proto.WorkflowService/UpdateWorkflow"
-	WorkflowService_CreateWorkflow_FullMethodName         = "/proto.WorkflowService/CreateWorkflow"
-	WorkflowService_DeleteWorkflow_FullMethodName         = "/proto.WorkflowService/DeleteWorkflow"
-	WorkflowService_QuickRun_FullMethodName               = "/proto.WorkflowService/QuickRun"
-	WorkflowService_RunWorkflowId_FullMethodName          = "/proto.WorkflowService/RunWorkflowId"
-	WorkflowService_ListWorkflowHistory_FullMethodName    = "/proto.WorkflowService/ListWorkflowHistory"
-	WorkflowService_GetWorkflowHistory_FullMethodName     = "/proto.WorkflowService/GetWorkflowHistory"
-	WorkflowService_ListConnectorTemplates_FullMethodName = "/proto.WorkflowService/ListConnectorTemplates"
-	WorkflowService_ListConnections_FullMethodName        = "/proto.WorkflowService/ListConnections"
-	WorkflowService_DeleteConnection_FullMethodName       = "/proto.WorkflowService/DeleteConnection"
-	WorkflowService_ListWorkflowVersions_FullMethodName   = "/proto.WorkflowService/ListWorkflowVersions"
-	WorkflowService_RestoreWorkflowVersion_FullMethodName = "/proto.WorkflowService/RestoreWorkflowVersion"
-	WorkflowService_PublishWorkflow_FullMethodName        = "/proto.WorkflowService/PublishWorkflow"
+	WorkflowService_GetWorkflow_FullMethodName             = "/proto.WorkflowService/GetWorkflow"
+	WorkflowService_ListWorkflows_FullMethodName           = "/proto.WorkflowService/ListWorkflows"
+	WorkflowService_UpdateWorkflow_FullMethodName          = "/proto.WorkflowService/UpdateWorkflow"
+	WorkflowService_CreateWorkflow_FullMethodName          = "/proto.WorkflowService/CreateWorkflow"
+	WorkflowService_DeleteWorkflow_FullMethodName          = "/proto.WorkflowService/DeleteWorkflow"
+	WorkflowService_QuickRun_FullMethodName                = "/proto.WorkflowService/QuickRun"
+	WorkflowService_RunWorkflowId_FullMethodName           = "/proto.WorkflowService/RunWorkflowId"
+	WorkflowService_ListWorkflowHistory_FullMethodName     = "/proto.WorkflowService/ListWorkflowHistory"
+	WorkflowService_GetWorkflowHistory_FullMethodName      = "/proto.WorkflowService/GetWorkflowHistory"
+	WorkflowService_ListConnectorTemplates_FullMethodName  = "/proto.WorkflowService/ListConnectorTemplates"
+	WorkflowService_ListConnections_FullMethodName         = "/proto.WorkflowService/ListConnections"
+	WorkflowService_DeleteConnection_FullMethodName        = "/proto.WorkflowService/DeleteConnection"
+	WorkflowService_ListWorkflowVersions_FullMethodName    = "/proto.WorkflowService/ListWorkflowVersions"
+	WorkflowService_RestoreWorkflowVersion_FullMethodName  = "/proto.WorkflowService/RestoreWorkflowVersion"
+	WorkflowService_PublishWorkflow_FullMethodName         = "/proto.WorkflowService/PublishWorkflow"
+	WorkflowService_RevertWorkflowToStaging_FullMethodName = "/proto.WorkflowService/RevertWorkflowToStaging"
 )
 
 // WorkflowServiceClient is the client API for WorkflowService service.
@@ -57,6 +58,7 @@ type WorkflowServiceClient interface {
 	ListWorkflowVersions(ctx context.Context, in *GetWorkflowVersionsRequest, opts ...grpc.CallOption) (*WorkflowVersionList, error)
 	RestoreWorkflowVersion(ctx context.Context, in *WorkflowVersion, opts ...grpc.CallOption) (*Workflow, error)
 	PublishWorkflow(ctx context.Context, in *PublishWorkflowRequest, opts ...grpc.CallOption) (*PublishWorkflowResponse, error)
+	RevertWorkflowToStaging(ctx context.Context, in *GetWorkflowRequest, opts ...grpc.CallOption) (*Workflow, error)
 }
 
 type workflowServiceClient struct {
@@ -235,6 +237,16 @@ func (c *workflowServiceClient) PublishWorkflow(ctx context.Context, in *Publish
 	return out, nil
 }
 
+func (c *workflowServiceClient) RevertWorkflowToStaging(ctx context.Context, in *GetWorkflowRequest, opts ...grpc.CallOption) (*Workflow, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Workflow)
+	err := c.cc.Invoke(ctx, WorkflowService_RevertWorkflowToStaging_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // WorkflowServiceServer is the server API for WorkflowService service.
 // All implementations must embed UnimplementedWorkflowServiceServer
 // for forward compatibility.
@@ -255,6 +267,7 @@ type WorkflowServiceServer interface {
 	ListWorkflowVersions(context.Context, *GetWorkflowVersionsRequest) (*WorkflowVersionList, error)
 	RestoreWorkflowVersion(context.Context, *WorkflowVersion) (*Workflow, error)
 	PublishWorkflow(context.Context, *PublishWorkflowRequest) (*PublishWorkflowResponse, error)
+	RevertWorkflowToStaging(context.Context, *GetWorkflowRequest) (*Workflow, error)
 	mustEmbedUnimplementedWorkflowServiceServer()
 }
 
@@ -309,6 +322,9 @@ func (UnimplementedWorkflowServiceServer) RestoreWorkflowVersion(context.Context
 }
 func (UnimplementedWorkflowServiceServer) PublishWorkflow(context.Context, *PublishWorkflowRequest) (*PublishWorkflowResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method PublishWorkflow not implemented")
+}
+func (UnimplementedWorkflowServiceServer) RevertWorkflowToStaging(context.Context, *GetWorkflowRequest) (*Workflow, error) {
+	return nil, status.Error(codes.Unimplemented, "method RevertWorkflowToStaging not implemented")
 }
 func (UnimplementedWorkflowServiceServer) mustEmbedUnimplementedWorkflowServiceServer() {}
 func (UnimplementedWorkflowServiceServer) testEmbeddedByValue()                         {}
@@ -587,6 +603,24 @@ func _WorkflowService_PublishWorkflow_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _WorkflowService_RevertWorkflowToStaging_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetWorkflowRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkflowServiceServer).RevertWorkflowToStaging(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkflowService_RevertWorkflowToStaging_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkflowServiceServer).RevertWorkflowToStaging(ctx, req.(*GetWorkflowRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // WorkflowService_ServiceDesc is the grpc.ServiceDesc for WorkflowService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -645,6 +679,10 @@ var WorkflowService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "PublishWorkflow",
 			Handler:    _WorkflowService_PublishWorkflow_Handler,
+		},
+		{
+			MethodName: "RevertWorkflowToStaging",
+			Handler:    _WorkflowService_RevertWorkflowToStaging_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

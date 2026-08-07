@@ -616,6 +616,7 @@ type Workflow struct {
 	UpdatedBy     string                 `protobuf:"bytes,10,opt,name=updatedBy,proto3" json:"updatedBy,omitempty"`
 	Tags          []string               `protobuf:"bytes,11,rep,name=tags,proto3" json:"tags,omitempty"`
 	IsNew         *bool                  `protobuf:"varint,12,opt,name=isNew,proto3,oneof" json:"isNew,omitempty"`
+	IsModified    bool                   `protobuf:"varint,13,opt,name=isModified,proto3" json:"isModified,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -730,6 +731,13 @@ func (x *Workflow) GetTags() []string {
 func (x *Workflow) GetIsNew() bool {
 	if x != nil && x.IsNew != nil {
 		return *x.IsNew
+	}
+	return false
+}
+
+func (x *Workflow) GetIsModified() bool {
+	if x != nil {
+		return x.IsModified
 	}
 	return false
 }
@@ -2350,6 +2358,7 @@ type ConnectionProto struct {
 	ConnectorId   string                 `protobuf:"bytes,3,opt,name=connectorId,proto3" json:"connectorId,omitempty"`
 	AuthType      string                 `protobuf:"bytes,4,opt,name=authType,proto3" json:"authType,omitempty"`
 	CreatedAt     string                 `protobuf:"bytes,5,opt,name=createdAt,proto3" json:"createdAt,omitempty"`
+	IsModified    bool                   `protobuf:"varint,6,opt,name=isModified,proto3" json:"isModified,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2417,6 +2426,13 @@ func (x *ConnectionProto) GetCreatedAt() string {
 		return x.CreatedAt
 	}
 	return ""
+}
+
+func (x *ConnectionProto) GetIsModified() bool {
+	if x != nil {
+		return x.IsModified
+	}
+	return false
 }
 
 type DeleteConnectionRequest struct {
@@ -2501,7 +2517,7 @@ const file_workflow_proto_rawDesc = "" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"S\n" +
 	"\fWorkflowList\x12\x14\n" +
 	"\x05total\x18\x01 \x01(\x05R\x05total\x12-\n" +
-	"\tworkflows\x18\x02 \x03(\v2\x0f.proto.WorkflowR\tworkflows\"\xdb\x02\n" +
+	"\tworkflows\x18\x02 \x03(\v2\x0f.proto.WorkflowR\tworkflows\"\xfb\x02\n" +
 	"\bWorkflow\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
@@ -2515,7 +2531,10 @@ const file_workflow_proto_rawDesc = "" +
 	"\tupdatedBy\x18\n" +
 	" \x01(\tR\tupdatedBy\x12\x12\n" +
 	"\x04tags\x18\v \x03(\tR\x04tags\x12\x19\n" +
-	"\x05isNew\x18\f \x01(\bH\x00R\x05isNew\x88\x01\x01B\b\n" +
+	"\x05isNew\x18\f \x01(\bH\x00R\x05isNew\x88\x01\x01\x12\x1e\n" +
+	"\n" +
+	"isModified\x18\r \x01(\bR\n" +
+	"isModifiedB\b\n" +
 	"\x06_isNew\"\xf1\x01\n" +
 	"\x0fWorkflowVersion\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1e\n" +
@@ -2707,13 +2726,16 @@ const file_workflow_proto_rawDesc = "" +
 	"\x06fields\x18\a \x03(\v2\x1a.proto.ConnectorFieldProtoR\x06fields\x125\n" +
 	"\aactions\x18\b \x03(\v2\x1b.proto.ConnectorActionProtoR\aactions\"J\n" +
 	"\x0eConnectionList\x128\n" +
-	"\vconnections\x18\x01 \x03(\v2\x16.proto.ConnectionProtoR\vconnections\"\x91\x01\n" +
+	"\vconnections\x18\x01 \x03(\v2\x16.proto.ConnectionProtoR\vconnections\"\xb1\x01\n" +
 	"\x0fConnectionProto\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
 	"\vconnectorId\x18\x03 \x01(\tR\vconnectorId\x12\x1a\n" +
 	"\bauthType\x18\x04 \x01(\tR\bauthType\x12\x1c\n" +
-	"\tcreatedAt\x18\x05 \x01(\tR\tcreatedAt\")\n" +
+	"\tcreatedAt\x18\x05 \x01(\tR\tcreatedAt\x12\x1e\n" +
+	"\n" +
+	"isModified\x18\x06 \x01(\bR\n" +
+	"isModified\")\n" +
 	"\x17DeleteConnectionRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id*<\n" +
 	"\rArrayDataType\x12\n" +
@@ -2728,7 +2750,7 @@ const file_workflow_proto_rawDesc = "" +
 	"\tCOMPLETED\x10\x01\x12\n" +
 	"\n" +
 	"\x06FAILED\x10\x02\x12\b\n" +
-	"\x04INFO\x10\x032\x88\b\n" +
+	"\x04INFO\x10\x032\xcf\b\n" +
 	"\x0fWorkflowService\x129\n" +
 	"\vGetWorkflow\x12\x19.proto.GetWorkflowRequest\x1a\x0f.proto.Workflow\x128\n" +
 	"\rListWorkflows\x12\x12.proto.PageRequest\x1a\x13.proto.WorkflowList\x122\n" +
@@ -2744,7 +2766,8 @@ const file_workflow_proto_rawDesc = "" +
 	"\x10DeleteConnection\x12\x1e.proto.DeleteConnectionRequest\x1a\x16.google.protobuf.Empty\x12U\n" +
 	"\x14ListWorkflowVersions\x12!.proto.GetWorkflowVersionsRequest\x1a\x1a.proto.WorkflowVersionList\x12A\n" +
 	"\x16RestoreWorkflowVersion\x12\x16.proto.WorkflowVersion\x1a\x0f.proto.Workflow\x12P\n" +
-	"\x0fPublishWorkflow\x12\x1d.proto.PublishWorkflowRequest\x1a\x1e.proto.PublishWorkflowResponseB\tZ\a./protob\x06proto3"
+	"\x0fPublishWorkflow\x12\x1d.proto.PublishWorkflowRequest\x1a\x1e.proto.PublishWorkflowResponse\x12E\n" +
+	"\x17RevertWorkflowToStaging\x12\x19.proto.GetWorkflowRequest\x1a\x0f.proto.WorkflowB\tZ\a./protob\x06proto3"
 
 var (
 	file_workflow_proto_rawDescOnce sync.Once
@@ -2845,23 +2868,25 @@ var file_workflow_proto_depIdxs = []int32{
 	14, // 43: proto.WorkflowService.ListWorkflowVersions:input_type -> proto.GetWorkflowVersionsRequest
 	12, // 44: proto.WorkflowService.RestoreWorkflowVersion:input_type -> proto.WorkflowVersion
 	15, // 45: proto.WorkflowService.PublishWorkflow:input_type -> proto.PublishWorkflowRequest
-	11, // 46: proto.WorkflowService.GetWorkflow:output_type -> proto.Workflow
-	10, // 47: proto.WorkflowService.ListWorkflows:output_type -> proto.WorkflowList
-	11, // 48: proto.WorkflowService.UpdateWorkflow:output_type -> proto.Workflow
-	11, // 49: proto.WorkflowService.CreateWorkflow:output_type -> proto.Workflow
-	35, // 50: proto.WorkflowService.DeleteWorkflow:output_type -> google.protobuf.Empty
-	7,  // 51: proto.WorkflowService.QuickRun:output_type -> proto.ReplayData
-	7,  // 52: proto.WorkflowService.RunWorkflowId:output_type -> proto.ReplayData
-	3,  // 53: proto.WorkflowService.ListWorkflowHistory:output_type -> proto.WorkflowHistoryList
-	6,  // 54: proto.WorkflowService.GetWorkflowHistory:output_type -> proto.WorkflowHistoryResponse
-	27, // 55: proto.WorkflowService.ListConnectorTemplates:output_type -> proto.ConnectorTemplateList
-	31, // 56: proto.WorkflowService.ListConnections:output_type -> proto.ConnectionList
-	35, // 57: proto.WorkflowService.DeleteConnection:output_type -> google.protobuf.Empty
-	13, // 58: proto.WorkflowService.ListWorkflowVersions:output_type -> proto.WorkflowVersionList
-	11, // 59: proto.WorkflowService.RestoreWorkflowVersion:output_type -> proto.Workflow
-	16, // 60: proto.WorkflowService.PublishWorkflow:output_type -> proto.PublishWorkflowResponse
-	46, // [46:61] is the sub-list for method output_type
-	31, // [31:46] is the sub-list for method input_type
+	9,  // 46: proto.WorkflowService.RevertWorkflowToStaging:input_type -> proto.GetWorkflowRequest
+	11, // 47: proto.WorkflowService.GetWorkflow:output_type -> proto.Workflow
+	10, // 48: proto.WorkflowService.ListWorkflows:output_type -> proto.WorkflowList
+	11, // 49: proto.WorkflowService.UpdateWorkflow:output_type -> proto.Workflow
+	11, // 50: proto.WorkflowService.CreateWorkflow:output_type -> proto.Workflow
+	35, // 51: proto.WorkflowService.DeleteWorkflow:output_type -> google.protobuf.Empty
+	7,  // 52: proto.WorkflowService.QuickRun:output_type -> proto.ReplayData
+	7,  // 53: proto.WorkflowService.RunWorkflowId:output_type -> proto.ReplayData
+	3,  // 54: proto.WorkflowService.ListWorkflowHistory:output_type -> proto.WorkflowHistoryList
+	6,  // 55: proto.WorkflowService.GetWorkflowHistory:output_type -> proto.WorkflowHistoryResponse
+	27, // 56: proto.WorkflowService.ListConnectorTemplates:output_type -> proto.ConnectorTemplateList
+	31, // 57: proto.WorkflowService.ListConnections:output_type -> proto.ConnectionList
+	35, // 58: proto.WorkflowService.DeleteConnection:output_type -> google.protobuf.Empty
+	13, // 59: proto.WorkflowService.ListWorkflowVersions:output_type -> proto.WorkflowVersionList
+	11, // 60: proto.WorkflowService.RestoreWorkflowVersion:output_type -> proto.Workflow
+	16, // 61: proto.WorkflowService.PublishWorkflow:output_type -> proto.PublishWorkflowResponse
+	11, // 62: proto.WorkflowService.RevertWorkflowToStaging:output_type -> proto.Workflow
+	47, // [47:63] is the sub-list for method output_type
+	31, // [31:47] is the sub-list for method input_type
 	31, // [31:31] is the sub-list for extension type_name
 	31, // [31:31] is the sub-list for extension extendee
 	0,  // [0:31] is the sub-list for field type_name

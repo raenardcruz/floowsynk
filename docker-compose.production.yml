@@ -8,8 +8,8 @@ services:
       dockerfile: Server/Dockerfile
     container_name: floowsynk-server-production
     ports:
-      - "8084:8084"   # gRPC-Web
-      - "8085:8085"   # REST API
+      - "8085:8085"   # gRPC-Web
+      - "8086:8086"   # REST API
       - "50052:50052" # Plain gRPC
     env_file:
       - ./Server/.env.production

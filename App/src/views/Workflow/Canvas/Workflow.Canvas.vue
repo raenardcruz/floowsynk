@@ -11,6 +11,9 @@
                 <span v-else class="env-badge env-badge--staging" title="Staging — versioning enabled">
                     <span class="material-symbols-outlined">layers</span> STAGING
                 </span>
+                <span v-if="tab.ismodified" class="env-badge env-badge--modified" title="This workflow was modified directly in Production and is out of sync with Staging">
+                    <span class="material-symbols-outlined">sync_problem</span> OUT OF SYNC
+                </span>
                 <div class="canvas_tags">
                     <Tag pt:root:class="canvas__tag" @click="addTag" rounded>
                         <span class="material-symbols-outlined">add</span>
@@ -60,6 +63,10 @@
                         <ControlButton title="Version History" v-if="!isRunning && !isProduction" @click="showVersionHistory = true">
                             <span class="material-symbols-outlined">history</span>
                         </ControlButton>
+                        <!-- Revert to Staging copy (when modified in production) -->
+                        <ControlButton title="Revert to Staging Copy" v-if="!isRunning && tab.ismodified" style="background: #f97316; color: #ffffff;" @click="handleRevertWorkflow">
+                            <span class="material-symbols-outlined">restart_alt</span>
+                        </ControlButton>
                         <ControlButton title="Run" style="background: var(--green-2); color: var(--white-1);"
                             v-if="!isRunning">
                             <span class="material-symbols-outlined" @click="runProcess()">play_arrow</span>
@@ -98,6 +105,7 @@ import { ref } from 'vue'
 const isGuest = ref(localStorage.getItem('sessionToken') === 'guest')
 const isProduction = ref(import.meta.env.VITE_APP_ENVIRONMENT === 'production')
 const showVersionHistory = ref(false)
+import { revertWorkflowToStaging } from './Workflow.Canvas.versions.api'
 import { VueFlow, useVueFlow } from '@vue-flow/core'
 import { WorkflowCanvasProps } from './Workflow.Canvas.types'
 import { useWorkflowCanvasHooks, useWorkflowCanvasStore } from './Workflow.Canvas.hooks'
@@ -136,6 +144,16 @@ const onVersionRestored = () => {
     // Reload the workflow from the server after a version restore
     window.location.reload()
 }
+
+const handleRevertWorkflow = async () => {
+    if (!confirm('Revert this production workflow back to its staging copy? Any changes done directly on production will be removed.')) return
+    try {
+        await revertWorkflowToStaging(tab.value.id)
+        window.location.reload()
+    } catch (err: any) {
+        alert('Failed to revert workflow: ' + (err as Error).message)
+    }
+}
 </script>
 
 <style scoped src="./Workflow.Canvas.styles.css"></style>
@@ -156,9 +174,9 @@ const onVersionRestored = () => {
 }
 .env-badge .material-symbols-outlined { font-size: 10px; }
 .env-badge--live {
-    background: rgba(239, 68, 68, 0.15);
-    color: #f87171;
-    border: 1px solid rgba(239, 68, 68, 0.3);
+    background: rgba(34, 197, 94, 0.15);
+    color: #4ade80;
+    border: 1px solid rgba(34, 197, 94, 0.4);
     animation: pulse-live 2s infinite;
 }
 @keyframes pulse-live {
@@ -166,8 +184,13 @@ const onVersionRestored = () => {
     50% { opacity: 0.7; }
 }
 .env-badge--staging {
-    background: rgba(124, 140, 248, 0.12);
-    color: #a5b4fc;
-    border: 1px solid rgba(124, 140, 248, 0.25);
+    background: rgba(234, 179, 8, 0.15);
+    color: #facc15;
+    border: 1px solid rgba(234, 179, 8, 0.4);
+}
+.env-badge--modified {
+    background: rgba(249, 115, 22, 0.15);
+    color: #fb923c;
+    border: 1px solid rgba(249, 115, 22, 0.4);
 }
 </style>

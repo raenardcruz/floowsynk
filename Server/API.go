@@ -268,9 +268,18 @@ func (s *WorkflowServer) ListConnections(ctx context.Context, _ *emptypb.Empty) 
 			ConnectorId: c.ConnectorID,
 			AuthType:    c.AuthType,
 			CreatedAt:   c.CreatedAt.Format("2006-01-02T15:04:05Z07:00"),
+			IsModified:  c.IsModified,
 		})
 	}
 	return &wf.ConnectionList{Connections: pbConns}, nil
+}
+
+func (s *WorkflowServer) RevertWorkflowToStaging(ctx context.Context, req *wf.GetWorkflowRequest) (*wf.Workflow, error) {
+	_, err := getTokenFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return DBCon.RevertWorkflowToStaging(req.Id)
 }
 
 func (s *WorkflowServer) DeleteConnection(ctx context.Context, req *wf.DeleteConnectionRequest) (*emptypb.Empty, error) {

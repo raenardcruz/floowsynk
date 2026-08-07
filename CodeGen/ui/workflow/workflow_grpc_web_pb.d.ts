@@ -110,6 +110,13 @@ export class WorkflowServiceClient {
                response: workflow_pb.PublishWorkflowResponse) => void
   ): grpcWeb.ClientReadableStream<workflow_pb.PublishWorkflowResponse>;
 
+  revertWorkflowToStaging(
+    request: workflow_pb.GetWorkflowRequest,
+    metadata: grpcWeb.Metadata | undefined,
+    callback: (err: grpcWeb.RpcError,
+               response: workflow_pb.Workflow) => void
+  ): grpcWeb.ClientReadableStream<workflow_pb.Workflow>;
+
 }
 
 export class WorkflowServicePromiseClient {
@@ -191,6 +198,11 @@ export class WorkflowServicePromiseClient {
     request: workflow_pb.PublishWorkflowRequest,
     metadata?: grpcWeb.Metadata
   ): Promise<workflow_pb.PublishWorkflowResponse>;
+
+  revertWorkflowToStaging(
+    request: workflow_pb.GetWorkflowRequest,
+    metadata?: grpcWeb.Metadata
+  ): Promise<workflow_pb.Workflow>;
 
 }
 

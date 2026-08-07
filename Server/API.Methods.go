@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"strings"
@@ -271,6 +272,11 @@ func PublishWorkflowImpl(req *wf.PublishWorkflowRequest) (*wf.PublishWorkflowRes
 	}, nil
 }
 
+type RemotePublishPayload struct {
+	Workflow    *wf.Workflow    `json:"workflow"`
+	Connections []DB.Connection `json:"connections"`
+}
+
 // publishToRemoteServer sends a publish request to a separate production server via HTTP.
 func publishToRemoteServer(req *wf.PublishWorkflowRequest) (*wf.PublishWorkflowResponse, error) {
 	// Fetch the workflow version data to send
@@ -297,9 +303,33 @@ func publishToRemoteServer(req *wf.PublishWorkflowRequest) (*wf.PublishWorkflowR
 		workflow.Edges = edges
 	}
 
-	payload, err := json.Marshal(workflow)
+	// Extract referenced connections from nodes
+	connMap := make(map[string]DB.Connection)
+	for _, n := range workflow.Nodes {
+		if n.Data != nil && n.Data.Listvar != nil && *n.Data.Listvar != "" {
+			connID := *n.Data.Listvar
+			if _, exists := connMap[connID]; !exists {
+				conn, err := DBCon.GetConnection(connID)
+				if err == nil && conn.ID != "" {
+					connMap[connID] = conn
+				}
+			}
+		}
+	}
+
+	var connList []DB.Connection
+	for _, conn := range connMap {
+		connList = append(connList, conn)
+	}
+
+	payloadStruct := RemotePublishPayload{
+		Workflow:    workflow,
+		Connections: connList,
+	}
+
+	payload, err := json.Marshal(payloadStruct)
 	if err != nil {
-		return nil, fmt.Errorf("failed to marshal workflow: %w", err)
+		return nil, fmt.Errorf("failed to marshal workflow payload: %w", err)
 	}
 
 	targetURL := DB.AppConfig.Prod_Server_URL + "/api/publish/workflow"
@@ -318,6 +348,14 @@ func publishToRemoteServer(req *wf.PublishWorkflowRequest) (*wf.PublishWorkflowR
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
+		bodyBytes, _ := io.ReadAll(resp.Body)
+		errMsg := strings.TrimSpace(string(bodyBytes))
+		if errMsg != "" {
+			return &wf.PublishWorkflowResponse{
+				Success: false,
+				Message: fmt.Sprintf("Production server returned status %d: %s", resp.StatusCode, errMsg),
+			}, nil
+		}
 		return &wf.PublishWorkflowResponse{
 			Success: false,
 			Message: fmt.Sprintf("Production server returned status %d", resp.StatusCode),
@@ -328,4 +366,42 @@ func publishToRemoteServer(req *wf.PublishWorkflowRequest) (*wf.PublishWorkflowR
 		Message: fmt.Sprintf("Workflow %s published to remote production server successfully", req.WorkflowId),
 	}, nil
 }
+
+// PublishConnectionToRemoteServer sends a single connection record to a remote production server via HTTP.
+func PublishConnectionToRemoteServer(connID string) error {
+	if DB.AppConfig.Prod_Server_URL == "" {
+		return fmt.Errorf("remote production server URL is not configured")
+	}
+	conn, err := DBCon.GetConnection(connID)
+	if err != nil {
+		return fmt.Errorf("connection %s not found: %w", connID, err)
+	}
+
+	payload, err := json.Marshal(conn)
+	if err != nil {
+		return fmt.Errorf("failed to marshal connection: %w", err)
+	}
+
+	targetURL := DB.AppConfig.Prod_Server_URL + "/api/publish/connection"
+	httpReq, err := http.NewRequest(http.MethodPost, targetURL, strings.NewReader(string(payload)))
+	if err != nil {
+		return fmt.Errorf("failed to create HTTP request: %w", err)
+	}
+	httpReq.Header.Set("Content-Type", "application/json")
+	httpReq.Header.Set("Authorization", DB.AppConfig.Prod_API_Token)
+
+	client := &http.Client{Timeout: 30 * time.Second}
+	resp, err := client.Do(httpReq)
+	if err != nil {
+		return fmt.Errorf("failed to reach production server: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		bodyBytes, _ := io.ReadAll(resp.Body)
+		return fmt.Errorf("production server returned status %d: %s", resp.StatusCode, string(bodyBytes))
+	}
+	return nil
+}
+
 

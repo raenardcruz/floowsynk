@@ -5,6 +5,7 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"time"
 
@@ -28,6 +29,7 @@ type Workflow struct {
 	UpdatedAt   int64
 	// Environment: "staging" or "production"
 	Environment string `gorm:"default:'staging'"`
+	IsModified  bool   `gorm:"default:false;column:is_modified"`
 }
 
 func (j JSONB) Value() (driver.Value, error) {
@@ -114,6 +116,7 @@ func (db *DatabaseConnection) GetWorkflows(limit, offset int) (*pb.WorkflowList,
 			CreatedAt:   time.Unix(wf.CreatedAt, 0).Format("Jan 02, 2006"),
 			UpdatedAt:   time.Unix(wf.UpdatedAt, 0).Format("Jan 02, 2006"),
 			Tags:        []string(wf.Tags),
+			IsModified:  wf.IsModified,
 		})
 	}
 	return wl, nil
@@ -121,7 +124,7 @@ func (db *DatabaseConnection) GetWorkflows(limit, offset int) (*pb.WorkflowList,
 
 func (db *DatabaseConnection) GetWorkflow(id string) (*pb.Workflow, error) {
 	ctx := context.Background()
-	cacheKey := "workflow:" + id
+	cacheKey := fmt.Sprintf("workflow:%s:%s", AppConfig.App_Environment, id)
 
 	if cachedData, found := GetFromCache(ctx, cacheKey); found {
 		var cachedWorkflow pb.Workflow
@@ -131,9 +134,11 @@ func (db *DatabaseConnection) GetWorkflow(id string) (*pb.Workflow, error) {
 	}
 
 	var wf Workflow
-	if err := db.conn.First(&wf, "id = ?", id).Error; err != nil {
-		log.Printf("Error querying workflow: %v", err)
-		return nil, err
+	if err := db.conn.First(&wf, "id = ? AND environment = ?", id, AppConfig.App_Environment).Error; err != nil {
+		if err := db.conn.First(&wf, "id = ?", id).Error; err != nil {
+			log.Printf("Error querying workflow: %v", err)
+			return nil, err
+		}
 	}
 
 	var nodes []*pb.Node
@@ -157,6 +162,7 @@ func (db *DatabaseConnection) GetWorkflow(id string) (*pb.Workflow, error) {
 		CreatedAt:   time.Unix(wf.CreatedAt, 0).Format("Jan 02, 2006"),
 		UpdatedAt:   time.Unix(wf.UpdatedAt, 0).Format("jan 02, 2006"),
 		Tags:        wf.Tags,
+		IsModified:  wf.IsModified,
 	}
 
 	if err := SetCache(ctx, cacheKey, workflow, workflowCacheExpiration); err != nil {
@@ -202,6 +208,7 @@ func (db *DatabaseConnection) GetWebhookWorkflow(id string) (*pb.Workflow, error
 		Description: wf.Description,
 		Nodes:       nodes,
 		Edges:       edges,
+		IsModified:  wf.IsModified,
 	}
 
 	if err := SetCache(ctx, cacheKey, workflow, workflowCacheExpiration); err != nil {
@@ -251,6 +258,7 @@ func (db *DatabaseConnection) GetIntervalWorkflows() (*pb.WorkflowList, error) {
 			CreatedAt:   time.Unix(wf.CreatedAt, 0).Format("Jan 02, 2006"),
 			UpdatedAt:   time.Unix(wf.UpdatedAt, 0).Format("Jan 02, 2006"),
 			Tags:        wf.Tags,
+			IsModified:  wf.IsModified,
 		})
 	}
 
@@ -263,7 +271,7 @@ func (db *DatabaseConnection) GetIntervalWorkflows() (*pb.WorkflowList, error) {
 
 func (db *DatabaseConnection) UpdateWorkflow(workflow *pb.Workflow) error {
 	ctx := context.Background()
-	cacheKey := "workflow:" + workflow.Id
+	cacheKey := fmt.Sprintf("workflow:%s:%s", AppConfig.App_Environment, workflow.Id)
 
 	nodes, err := json.Marshal(workflow.Nodes)
 	if err != nil {
@@ -274,19 +282,23 @@ func (db *DatabaseConnection) UpdateWorkflow(workflow *pb.Workflow) error {
 		return err
 	}
 
-	wf := Workflow{
-		ID:          workflow.Id,
-		Name:        workflow.Name,
-		Type:        workflow.Type,
-		Description: workflow.Description,
-		Nodes:       nodes,
-		Edges:       edges,
-		UpdatedBy:   workflow.UpdatedBy,
-		UpdatedAt:   time.Now().UTC().Unix(),
-		Tags:        pq.StringArray(workflow.Tags),
+	updates := map[string]interface{}{
+		"name":        workflow.Name,
+		"type":        workflow.Type,
+		"description": workflow.Description,
+		"nodes":       nodes,
+		"edges":       edges,
+		"updated_by":  workflow.UpdatedBy,
+		"updated_at":  time.Now().UTC().Unix(),
+		"tags":        pq.StringArray(workflow.Tags),
 	}
 
-	if err := db.conn.Model(&Workflow{}).Where("id = ? AND environment = ?", wf.ID, AppConfig.App_Environment).Updates(&wf).Error; err != nil {
+	if AppConfig.App_Environment == "production" {
+		updates["is_modified"] = true
+		workflow.IsModified = true
+	}
+
+	if err := db.conn.Model(&Workflow{}).Where("id = ? AND environment = ?", workflow.Id, AppConfig.App_Environment).Updates(updates).Error; err != nil {
 		return err
 	}
 
@@ -321,4 +333,34 @@ func (db *DatabaseConnection) DeleteWorkflow(id string) error {
 		return err
 	}
 	return nil
+}
+
+func (db *DatabaseConnection) RevertWorkflowToStaging(workflowID string) (*pb.Workflow, error) {
+	ctx := context.Background()
+	var stagingWF Workflow
+	if err := db.conn.First(&stagingWF, "id = ? AND environment = ?", workflowID, "staging").Error; err != nil {
+		return nil, fmt.Errorf("staging workflow %s not found: %w", workflowID, err)
+	}
+
+	now := time.Now().UTC().Unix()
+	updates := map[string]interface{}{
+		"name":        stagingWF.Name,
+		"type":        stagingWF.Type,
+		"description": stagingWF.Description,
+		"nodes":       stagingWF.Nodes,
+		"edges":       stagingWF.Edges,
+		"updated_by":  stagingWF.UpdatedBy,
+		"tags":        stagingWF.Tags,
+		"updated_at":  now,
+		"is_modified": false,
+	}
+
+	if err := db.conn.Model(&Workflow{}).Where("id = ? AND environment = ?", workflowID, "production").Updates(updates).Error; err != nil {
+		return nil, fmt.Errorf("failed to revert production workflow: %w", err)
+	}
+
+	DeleteCache(ctx, fmt.Sprintf("workflow:%s:%s", "production", workflowID))
+	DeleteCache(ctx, "workflow:"+workflowID)
+
+	return db.GetWorkflow(workflowID)
 }

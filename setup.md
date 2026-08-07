@@ -116,28 +116,50 @@ You can run the server and jobs locally or via Docker Compose.
 The application and jobs automatically check for database existence, initialize tables, and create Kafka topics.
 
 1. **Start the backend server:**
-   ```bash
-   cd Server
-   go run .
-   ```
+   - **Shortcut:**
+     ```bash
+     make server-staging       # Staging server
+     # OR
+     make server-production    # Production server
+     ```
+   - **Manual:**
+     ```bash
+     cd Server
+     go run .
+     ```
 
 2. **Start the Kafka consumer job:**
-   ```bash
-   go run Jobs/Consumer/main.go
-   ```
+   - **Shortcut:**
+     ```bash
+     make job-consumer
+     ```
+   - **Manual:**
+     ```bash
+     go run Jobs/Consumer/main.go
+     ```
 
 3. **Start the Interval processor job:**
-   ```bash
-   go run Jobs/Interval/main.go
-   ```
+   - **Shortcut:**
+     ```bash
+     make job-interval
+     ```
+   - **Manual:**
+     ```bash
+     go run Jobs/Interval/main.go
+     ```
 
 #### Option B: Build and Deploy using Docker Compose
 To run the server and jobs inside a containerized environment (configured to connect to your manually run Postgres, Redis, and Kafka containers on the host machine):
 
-```bash
-docker compose -f docker-compose.server.yml up --build -d
-```
-This single command builds and deploys:
+- **Shortcut:**
+  ```bash
+  make start-docker
+  ```
+- **Manual:**
+  ```bash
+  docker compose -f docker-compose.server.yml up --build -d
+  ```
+This command builds and deploys:
 - `floowsynk-server` (Backend server)
 - `floowsynk-consumer` (Kafka replay consumer job)
 - `floowsynk-interval` (Timer interval trigger job)
@@ -145,11 +167,18 @@ This single command builds and deploys:
 ### 2. Run Front-end App
 In another terminal, install dependencies and start the Vite development server:
 
-```bash
-cd App
-npm install
-npm run dev
-```
+- **Shortcut:**
+  ```bash
+  make ui-staging      # Staging UI
+  # OR
+  make ui-production   # Production UI
+  ```
+- **Manual:**
+  ```bash
+  cd App
+  npm install
+  npm run dev
+  ```
 
 ---
 
@@ -244,36 +273,56 @@ PROD_API_TOKEN=my-secret-prod-token
 Open four terminal tabs:
 
 **Terminal 1 — Staging Server** (uses `Server/.env` by default)
-```bash
-cd Server
-go run .
-# Runs on :8082 (gRPC) / :8083 (REST)
-# APP_ENVIRONMENT=staging
-```
+- **Shortcut:**
+  ```bash
+  make server-staging
+  ```
+- **Manual:**
+  ```bash
+  cd Server
+  go run .
+  # Runs on :8082 (gRPC) / :8083 (REST)
+  # APP_ENVIRONMENT=staging
+  ```
 
 **Terminal 2 — Production Server** (loads `Server/.env.production` via `ENV_FILE`)
-```bash
-cd Server
-ENV_FILE=.env.production go run .
-# Runs on :8084 (gRPC) / :8085 (REST)
-# APP_ENVIRONMENT=production
-```
+- **Shortcut:**
+  ```bash
+  make server-production
+  ```
+- **Manual:**
+  ```bash
+  cd Server
+  ENV_FILE=.env.production go run .
+  # Runs on :8084 (gRPC) / :8085 (REST)
+  # APP_ENVIRONMENT=production
+  ```
 
 **Terminal 3 — Staging App** (uses `App/.env`)
-```bash
-cd App
-npm run dev
-# Opens at http://localhost:5173
-# Shows STAGING badge
-```
+- **Shortcut:**
+  ```bash
+  make ui-staging
+  ```
+- **Manual:**
+  ```bash
+  cd App
+  npm run dev
+  # Opens at http://localhost:5173
+  # Shows STAGING badge
+  ```
 
 **Terminal 4 — Production App** (uses `App/.env.production`)
-```bash
-cd App
-npx vite --mode production
-# Opens at http://localhost:5174
-# Shows LIVE badge — no version history UI
-```
+- **Shortcut:**
+  ```bash
+  make ui-production
+  ```
+- **Manual:**
+  ```bash
+  cd App
+  npx vite --mode production
+  # Opens at http://localhost:5174
+  # Shows LIVE badge — no version history UI
+  ```
 
 ### Step 4 — Publish a workflow from staging to production
 
@@ -313,9 +362,14 @@ Two dedicated compose files are provided — one per environment. Each bundles t
 
 ### Run Staging Only
 
-```bash
-docker compose -f docker-compose.staging.yml up --build -d
-```
+- **Shortcut:**
+  ```bash
+  make deploy-docker-staging
+  ```
+- **Manual:**
+  ```bash
+  docker compose -f docker-compose.staging.yml up --build -d
+  ```
 
 This starts:
 - `floowsynk-server-staging` — backend on `:8082` / `:8083`
@@ -324,9 +378,14 @@ This starts:
 - `floowsynk-app-staging` — frontend at **http://localhost:3000** (shows `STAGING` badge, version history enabled)
 
 To stop:
-```bash
-docker compose -f docker-compose.staging.yml down
-```
+- **Shortcut:**
+  ```bash
+  make stop-docker-staging    # or make down-docker-staging
+  ```
+- **Manual:**
+  ```bash
+  docker compose -f docker-compose.staging.yml down
+  ```
 
 ---
 
@@ -334,9 +393,14 @@ docker compose -f docker-compose.staging.yml down
 
 **First**, ensure `Server/.env.production` exists (see [Step 1](#step-1--create-the-production-env-files) above).
 
-```bash
-docker compose -f docker-compose.production.yml up --build -d
-```
+- **Shortcut:**
+  ```bash
+  make deploy-docker-production
+  ```
+- **Manual:**
+  ```bash
+  docker compose -f docker-compose.production.yml up --build -d
+  ```
 
 This starts:
 - `floowsynk-server-production` — backend on `:8084` / `:8085`
@@ -345,9 +409,14 @@ This starts:
 - `floowsynk-app-production` — frontend at **http://localhost:3001** (shows pulsing `LIVE` badge, no version history UI)
 
 To stop:
-```bash
-docker compose -f docker-compose.production.yml down
-```
+- **Shortcut:**
+  ```bash
+  make stop-docker-production    # or make down-docker-production
+  ```
+- **Manual:**
+  ```bash
+  docker compose -f docker-compose.production.yml down
+  ```
 
 ---
 
@@ -371,13 +440,19 @@ PROD_API_TOKEN=my-secret-prod-token
 
 **Step 3 — Start both stacks:**
 
-```bash
-# Start staging stack
-docker compose -f docker-compose.staging.yml up --build -d
+- **Shortcut:**
+  ```bash
+  make deploy-docker-staging
+  make deploy-docker-production
+  ```
+- **Manual:**
+  ```bash
+  # Start staging stack
+  docker compose -f docker-compose.staging.yml up --build -d
 
-# Start production stack
-docker compose -f docker-compose.production.yml up --build -d
-```
+  # Start production stack
+  docker compose -f docker-compose.production.yml up --build -d
+  ```
 
 **Step 4 — Access each environment:**
 

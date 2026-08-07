@@ -18,6 +18,7 @@
                 <div class="type">
                     <workflow-icon :type="process.type" />
                     <span class="type-text">{{ process.type }}</span>
+                    <span v-if="process.ismodified" class="modified-tag" title="Modified in Production (out of sync with Staging)">Out of Sync</span>
                 </div>
                 <div class="card-title">
                     <span>{{ process.name }}</span>

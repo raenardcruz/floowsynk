@@ -79,6 +79,7 @@ message Workflow {
     string updatedBy = 10;
     repeated string tags = 11;
     optional bool isNew = 12;
+    bool isModified = 13;
 }
 
 // WorkflowVersion is a point-in-time snapshot of a workflow (staging only).
@@ -260,6 +261,7 @@ message ConnectionProto {
     string connectorId = 3;
     string authType = 4;
     string createdAt = 5;
+    bool isModified = 6;
 }
 
 message DeleteConnectionRequest {
@@ -283,4 +285,5 @@ service WorkflowService {
     rpc ListWorkflowVersions(GetWorkflowVersionsRequest) returns (WorkflowVersionList);
     rpc RestoreWorkflowVersion(WorkflowVersion) returns (Workflow);
     rpc PublishWorkflow(PublishWorkflowRequest) returns (PublishWorkflowResponse);
+    rpc RevertWorkflowToStaging(GetWorkflowRequest) returns (Workflow);
 }

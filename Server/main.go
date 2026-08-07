@@ -118,9 +118,12 @@ func startRESTServer() {
 	restServer.HandleFunc("/api/connectors/check", checkConnectionHandler)
 	restServer.HandleFunc("/api/connectors/create", createConnectionHandler)
 	restServer.HandleFunc("/api/connectors/rename", updateConnectionHandler)
+	restServer.HandleFunc("/api/connectors/revert", revertConnectionHandler)
+	restServer.HandleFunc("/api/workflow/revert", revertWorkflowHandler)
 	restServer.HandleFunc("/api/history/clear", clearHistoryHandler)
-	// Publish endpoint: receives workflow pushes from a staging server (production mode only)
+	// Publish endpoints: receives workflow/connection pushes from a staging server (production mode only)
 	restServer.HandleFunc("/api/publish/workflow", publishWorkflowHandler)
+	restServer.HandleFunc("/api/publish/connection", publishConnectionHandler)
 
 	go func() {
 		log.Println("REST API server started at", restAPIPort)
@@ -709,21 +712,130 @@ func publishWorkflowHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer r.Body.Close()
 
+	var payload RemotePublishPayload
 	var workflow wf.Workflow
-	if err := json.Unmarshal(body, &workflow); err != nil {
-		http.Error(w, "Invalid workflow payload: "+err.Error(), http.StatusBadRequest)
+	var connections []db.Connection
+
+	if err := json.Unmarshal(body, &payload); err == nil && payload.Workflow != nil && payload.Workflow.Id != "" {
+		workflow = *payload.Workflow
+		connections = payload.Connections
+	} else if err := json.Unmarshal(body, &workflow); err != nil || workflow.Id == "" {
+		http.Error(w, "Invalid workflow payload: missing workflow ID", http.StatusBadRequest)
 		return
 	}
 
 	// Upsert workflow into production environment
-	if err := DBCon.PublishWorkflowVersion(workflow.Id, ""); err != nil {
+	if err := DBCon.SaveRemotePublishedWorkflow(&workflow); err != nil {
 		http.Error(w, "Failed to save workflow to production: "+err.Error(), http.StatusInternalServerError)
 		return
+	}
+
+	// Upsert referenced connections into production environment
+	for _, conn := range connections {
+		if conn.ID != "" {
+			if err := DBCon.SavePublishedConnection(&conn); err != nil {
+				log.Printf("Warning: failed to save published connection %s: %v", conn.ID, err)
+			}
+		}
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(`{"success": true, "message": "Workflow published to production"}`))
 }
+
+// publishConnectionHandler receives a connection published from a staging server.
+func publishConnectionHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "Only POST method is allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	token := r.Header.Get("Authorization")
+	if token == "" || token != db.AppConfig.Prod_API_Token {
+		http.Error(w, "Unauthorized: Invalid or missing API token", http.StatusUnauthorized)
+		return
+	}
+
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "Failed to read request body", http.StatusBadRequest)
+		return
+	}
+	defer r.Body.Close()
+
+	var conn db.Connection
+	if err := json.Unmarshal(body, &conn); err != nil || conn.ID == "" {
+		http.Error(w, "Invalid connection payload: missing connection ID", http.StatusBadRequest)
+		return
+	}
+
+	if err := DBCon.SavePublishedConnection(&conn); err != nil {
+		http.Error(w, "Failed to save connection to production: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(`{"success": true, "message": "Connection published to production"}`))
+}
+
+func revertConnectionHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost && r.Method != http.MethodPatch {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	var body struct {
+		ID string `json:"id"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil || body.ID == "" {
+		id := r.URL.Query().Get("id")
+		if id != "" {
+			body.ID = id
+		} else {
+			http.Error(w, "id is required", http.StatusBadRequest)
+			return
+		}
+	}
+
+	if err := DBCon.RevertConnectionToStaging(body.ID); err != nil {
+		http.Error(w, "Failed to revert connection: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(`{"success": true, "message": "Connection reverted to staging copy"}`))
+}
+
+func revertWorkflowHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost && r.Method != http.MethodPatch {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	var body struct {
+		ID string `json:"id"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil || body.ID == "" {
+		id := r.URL.Query().Get("id")
+		if id != "" {
+			body.ID = id
+		} else {
+			http.Error(w, "id is required", http.StatusBadRequest)
+			return
+		}
+	}
+
+	wfObj, err := DBCon.RevertWorkflowToStaging(body.ID)
+	if err != nil {
+		http.Error(w, "Failed to revert workflow: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]interface{}{"success": true, "message": "Workflow reverted to staging copy", "workflow": wfObj})
+}
+
 
 

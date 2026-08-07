@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/lib/pq"
 	pb "github.com/raenardcruz/floowsynk/CodeGen/go/workflow"
 )
 
@@ -127,11 +128,74 @@ func (db *DatabaseConnection) UpdateWorkflowVersionLabel(versionID, label string
 	return db.conn.Model(&WorkflowVersion{}).Where("id = ?", versionID).Update("label", label).Error
 }
 
+// SaveRemotePublishedWorkflow upserts a workflow received from a remote staging server into the production database.
+func (db *DatabaseConnection) SaveRemotePublishedWorkflow(workflow *pb.Workflow) error {
+	nodes, err := json.Marshal(workflow.Nodes)
+	if err != nil {
+		return fmt.Errorf("failed to marshal nodes: %w", err)
+	}
+	edges, err := json.Marshal(workflow.Edges)
+	if err != nil {
+		return fmt.Errorf("failed to marshal edges: %w", err)
+	}
+
+	now := time.Now().UTC().Unix()
+
+	var existing Workflow
+	err = db.conn.First(&existing, "id = ? AND environment = ?", workflow.Id, "production").Error
+	if err == nil {
+		err = db.conn.Model(&Workflow{}).
+			Where("id = ? AND environment = ?", workflow.Id, "production").
+			Updates(map[string]interface{}{
+				"name":        workflow.Name,
+				"type":        workflow.Type,
+				"description": workflow.Description,
+				"nodes":       nodes,
+				"edges":       edges,
+				"updated_by":  workflow.UpdatedBy,
+				"tags":        pq.StringArray(workflow.Tags),
+				"updated_at":  now,
+				"is_modified": false,
+			}).Error
+		if err != nil {
+			return fmt.Errorf("failed to update production workflow: %w", err)
+		}
+		log.Printf("Updated production workflow %s from remote publish", workflow.Id)
+		return nil
+	}
+
+	prodWF := Workflow{
+		ID:          workflow.Id,
+		Name:        workflow.Name,
+		Type:        workflow.Type,
+		Description: workflow.Description,
+		Nodes:       nodes,
+		Edges:       edges,
+		CreatedBy:   workflow.CreatedBy,
+		UpdatedBy:   workflow.UpdatedBy,
+		Tags:        pq.StringArray(workflow.Tags),
+		CreatedAt:   now,
+		UpdatedAt:   now,
+		Environment: "production",
+		IsModified:  false,
+	}
+	if err := db.conn.Create(&prodWF).Error; err != nil {
+		return fmt.Errorf("failed to create production workflow: %w", err)
+	}
+	log.Printf("Created production workflow %s from remote publish", workflow.Id)
+	return nil
+}
+
 // PublishWorkflowVersion copies a specific version's snapshot into the production workflow record (same-DB mode).
 // If versionID is empty, the current live workflow is used as-is.
 func (db *DatabaseConnection) PublishWorkflowVersion(workflowID, versionID string) error {
 	var nodes JSONB
 	var edges JSONB
+	var stagingWF Workflow
+
+	if err := db.conn.First(&stagingWF, "id = ? AND environment = ?", workflowID, "staging").Error; err != nil {
+		return fmt.Errorf("staging workflow %s not found: %w", workflowID, err)
+	}
 
 	if versionID != "" {
 		version, err := db.GetWorkflowVersion(versionID)
@@ -141,32 +205,34 @@ func (db *DatabaseConnection) PublishWorkflowVersion(workflowID, versionID strin
 		nodes = version.Nodes
 		edges = version.Edges
 	} else {
-		// Use live staging workflow
-		var stagingWF Workflow
-		if err := db.conn.First(&stagingWF, "id = ? AND environment = ?", workflowID, "staging").Error; err != nil {
-			return fmt.Errorf("staging workflow %s not found: %w", workflowID, err)
-		}
 		nodes = stagingWF.Nodes
 		edges = stagingWF.Edges
 	}
 
 	// Upsert into production environment
 	now := time.Now().UTC().Unix()
-	result := db.conn.Model(&Workflow{}).
-		Where("id = ? AND environment = ?", workflowID, "production").
-		Updates(map[string]interface{}{
-			"nodes":      nodes,
-			"edges":      edges,
-			"updated_at": now,
-		})
-
-	if result.RowsAffected == 0 {
-		// No production record yet — fetch staging record and clone to production
-		var stagingWF Workflow
-		if err := db.conn.First(&stagingWF, "id = ? AND environment = ?", workflowID, "staging").Error; err != nil {
-			return fmt.Errorf("staging workflow %s not found for clone: %w", workflowID, err)
+	var prodWF Workflow
+	err := db.conn.First(&prodWF, "id = ? AND environment = ?", workflowID, "production").Error
+	if err == nil {
+		err = db.conn.Model(&Workflow{}).
+			Where("id = ? AND environment = ?", workflowID, "production").
+			Updates(map[string]interface{}{
+				"name":        stagingWF.Name,
+				"type":        stagingWF.Type,
+				"description": stagingWF.Description,
+				"nodes":       nodes,
+				"edges":       edges,
+				"updated_by":  stagingWF.UpdatedBy,
+				"tags":        stagingWF.Tags,
+				"updated_at":  now,
+				"is_modified": false,
+			}).Error
+		if err != nil {
+			return fmt.Errorf("failed to update production workflow: %w", err)
 		}
-		prodWF := Workflow{
+		log.Printf("Updated production workflow %s from staging version %s", workflowID, versionID)
+	} else {
+		prodWF = Workflow{
 			ID:          stagingWF.ID,
 			Name:        stagingWF.Name,
 			Type:        stagingWF.Type,
@@ -179,13 +245,12 @@ func (db *DatabaseConnection) PublishWorkflowVersion(workflowID, versionID strin
 			CreatedAt:   stagingWF.CreatedAt,
 			UpdatedAt:   now,
 			Environment: "production",
+			IsModified:  false,
 		}
 		if err := db.conn.Create(&prodWF).Error; err != nil {
 			return fmt.Errorf("failed to create production workflow: %w", err)
 		}
 		log.Printf("Created production workflow %s from staging version %s", workflowID, versionID)
-	} else {
-		log.Printf("Updated production workflow %s from staging version %s", workflowID, versionID)
 	}
 	return nil
 }

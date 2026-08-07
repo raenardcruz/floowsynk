@@ -542,8 +542,8 @@ const executePublish = async () => {
 .prod-badge {
     display: inline-block;
     padding: 2px 8px;
-    background: rgba(239,68,68,0.15);
-    color: #f87171;
+    background: rgba(34, 197, 94, 0.15);
+    color: #4ade80;
     border-radius: 4px;
     font-size: 11px;
     font-weight: 700;

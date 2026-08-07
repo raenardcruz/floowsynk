@@ -56,6 +56,13 @@
             <div class="connection-details">
               <div class="connection-name-row">
                 <span class="connection-name">{{ conn.name }}</span>
+                <span
+                  v-if="conn.ismodified"
+                  class="status-badge status-modified"
+                  title="This connection was modified directly in Production and is out of sync with Staging"
+                >
+                  <i class="pi pi-sync"></i> Out of Sync
+                </span>
                 <!-- Credential status badge -->
                 <span
                   class="status-badge"
@@ -84,6 +91,9 @@
             </div>
           </div>
           <div class="connection-actions">
+            <button v-if="conn.ismodified" class="btn btn-warning" @click="handleRevert(conn.id)" title="Revert connection to staging copy">
+              <i class="pi pi-refresh"></i> Sync/Revert
+            </button>
             <button class="btn btn-secondary" @click="openEditModal(conn)" title="Edit connection">
               <i class="pi pi-pencil"></i> Edit
             </button>
@@ -354,6 +364,7 @@ import {
   checkConnectionStatus,
   createConnection,
   updateConnection,
+  revertConnection,
 } from './Connectors.api'
 import Modal from '@/components/Composable/UI/Modal'
 import { TextInput, PasswordInput } from '@/components/Composable/UI/Inputs'
@@ -395,6 +406,7 @@ interface ConnectionProto {
   connectorid: string
   authtype: string
   createdat: string
+  ismodified?: boolean
 }
 
 type ConnectionStatus = 'checking' | 'valid' | 'invalid' | 'unknown'
@@ -674,10 +686,22 @@ const loadData = async () => {
       name: c.name,
       connectorid: c.connectorid || c.connectorId || '',
       authtype: c.authtype || c.authType || '',
-      createdat: c.createdat || c.createdAt || ''
+      createdat: c.createdat || c.createdAt || '',
+      ismodified: c.ismodified ?? c.isModified ?? false
     }))
   } catch (err) {
     console.error('Failed to load data:', err)
+  }
+}
+
+const handleRevert = async (id: string) => {
+  if (!confirm('Revert this connection to its staging copy? Any direct modifications in production will be removed.')) return
+  try {
+    await revertConnection(id)
+    await loadData()
+    alert('Connection successfully reverted to staging copy.')
+  } catch (err: any) {
+    alert('Failed to revert connection: ' + (err as Error).message)
   }
 }
 

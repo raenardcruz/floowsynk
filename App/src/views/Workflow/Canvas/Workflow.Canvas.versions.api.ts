@@ -4,7 +4,7 @@ import {
     WorkflowVersion,
     PublishWorkflowRequest,
 } from 'proto/workflow/workflow_pb'
-import { getApiUrl } from '@/components/Composable/constants'
+import { getApiUrl, getRestUrl } from '@/components/Composable/constants'
 
 const getAuth = () => ({ 'Authorization': `${localStorage.getItem('sessionToken')}` })
 
@@ -41,4 +41,18 @@ export const publishWorkflow = async (workflowId: string, versionId: string = ''
     req.setWorkflowid(workflowId)
     req.setVersionid(versionId)
     return client.publishWorkflow(req, getAuth())
+}
+
+/** Reverts a production workflow back to its staging copy. */
+export const revertWorkflowToStaging = async (workflowId: string) => {
+    const res = await fetch(`${getRestUrl()}/api/workflow/revert`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `${localStorage.getItem("sessionToken") || ''}`
+        },
+        body: JSON.stringify({ id: workflowId })
+    })
+    if (!res.ok) throw new Error(await res.text())
+    return res.json()
 }

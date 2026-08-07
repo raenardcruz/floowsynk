@@ -2365,7 +2365,8 @@ updatedat: jspb.Message.getFieldWithDefault(msg, 8, ""),
 createdby: jspb.Message.getFieldWithDefault(msg, 9, ""),
 updatedby: jspb.Message.getFieldWithDefault(msg, 10, ""),
 tagsList: (f = jspb.Message.getRepeatedField(msg, 11)) == null ? undefined : f,
-isnew: (f = jspb.Message.getBooleanField(msg, 12)) == null ? undefined : f
+isnew: (f = jspb.Message.getBooleanField(msg, 12)) == null ? undefined : f,
+ismodified: jspb.Message.getBooleanFieldWithDefault(msg, 13, false)
   };
 
   if (includeInstance) {
@@ -2451,6 +2452,10 @@ proto.proto.Workflow.deserializeBinaryFromReader = function(msg, reader) {
     case 12:
       var value = /** @type {boolean} */ (reader.readBool());
       msg.setIsnew(value);
+      break;
+    case 13:
+      var value = /** @type {boolean} */ (reader.readBool());
+      msg.setIsmodified(value);
       break;
     default:
       reader.skipField();
@@ -2564,6 +2569,13 @@ proto.proto.Workflow.serializeBinaryToWriter = function(message, writer) {
   if (f != null) {
     writer.writeBool(
       12,
+      f
+    );
+  }
+  f = message.getIsmodified();
+  if (f) {
+    writer.writeBool(
+      13,
       f
     );
   }
@@ -2860,6 +2872,24 @@ proto.proto.Workflow.prototype.clearIsnew = function() {
  */
 proto.proto.Workflow.prototype.hasIsnew = function() {
   return jspb.Message.getField(this, 12) != null;
+};
+
+
+/**
+ * optional bool isModified = 13;
+ * @return {boolean}
+ */
+proto.proto.Workflow.prototype.getIsmodified = function() {
+  return /** @type {boolean} */ (jspb.Message.getBooleanFieldWithDefault(this, 13, false));
+};
+
+
+/**
+ * @param {boolean} value
+ * @return {!proto.proto.Workflow} returns this
+ */
+proto.proto.Workflow.prototype.setIsmodified = function(value) {
+  return jspb.Message.setProto3BooleanField(this, 13, value);
 };
 
 
@@ -9289,7 +9319,8 @@ id: jspb.Message.getFieldWithDefault(msg, 1, ""),
 name: jspb.Message.getFieldWithDefault(msg, 2, ""),
 connectorid: jspb.Message.getFieldWithDefault(msg, 3, ""),
 authtype: jspb.Message.getFieldWithDefault(msg, 4, ""),
-createdat: jspb.Message.getFieldWithDefault(msg, 5, "")
+createdat: jspb.Message.getFieldWithDefault(msg, 5, ""),
+ismodified: jspb.Message.getBooleanFieldWithDefault(msg, 6, false)
   };
 
   if (includeInstance) {
@@ -9345,6 +9376,10 @@ proto.proto.ConnectionProto.deserializeBinaryFromReader = function(msg, reader) 
     case 5:
       var value = /** @type {string} */ (reader.readStringRequireUtf8());
       msg.setCreatedat(value);
+      break;
+    case 6:
+      var value = /** @type {boolean} */ (reader.readBool());
+      msg.setIsmodified(value);
       break;
     default:
       reader.skipField();
@@ -9407,6 +9442,13 @@ proto.proto.ConnectionProto.serializeBinaryToWriter = function(message, writer) 
   if (f.length > 0) {
     writer.writeString(
       5,
+      f
+    );
+  }
+  f = message.getIsmodified();
+  if (f) {
+    writer.writeBool(
+      6,
       f
     );
   }
@@ -9500,6 +9542,24 @@ proto.proto.ConnectionProto.prototype.getCreatedat = function() {
  */
 proto.proto.ConnectionProto.prototype.setCreatedat = function(value) {
   return jspb.Message.setProto3StringField(this, 5, value);
+};
+
+
+/**
+ * optional bool isModified = 6;
+ * @return {boolean}
+ */
+proto.proto.ConnectionProto.prototype.getIsmodified = function() {
+  return /** @type {boolean} */ (jspb.Message.getBooleanFieldWithDefault(this, 6, false));
+};
+
+
+/**
+ * @param {boolean} value
+ * @return {!proto.proto.ConnectionProto} returns this
+ */
+proto.proto.ConnectionProto.prototype.setIsmodified = function(value) {
+  return jspb.Message.setProto3BooleanField(this, 6, value);
 };
 
 
