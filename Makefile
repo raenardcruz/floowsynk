@@ -14,12 +14,10 @@ PROTO_GEN_DIR  = './CodeGen'
 
 # Declare all phony targets to prevent collision with files of the same name
 .PHONY: all setup proto build \
-        start-server server-staging server-production \
-        start-ui ui-staging ui-production \
+        start-server \
+        start-ui \
         job-interval job-consumer job-clearcache \
-        deploy-docker-staging deploy-docker-production \
-        stop-docker-staging stop-docker-production \
-        down-docker-staging down-docker-production
+        deploy-docker stop-docker down-docker
 
 # Default target
 all: build
@@ -121,45 +119,21 @@ build:
 # Backend Server Commands
 # ==============================================================================
 
-# Run backend server locally (Development)
+# Run backend server locally (handles both Staging & Production dynamically)
 start-server:
 	@echo "🚀 Starting server..."
 	@cd $(SERVER_DIR) && go run .
 	@echo "✅ Server is running."
 
-# Run backend server in Staging environment mode
-server-staging:
-	@echo "🚀 Starting Staging server..."
-	@cd $(SERVER_DIR) && go run .
-	@echo "✅ Staging Server is running."
-
-# Run backend server in Production environment mode
-server-production:
-	@echo "🚀 Starting Production server..."
-	@cd $(SERVER_DIR) && ENV_FILE=.env.production go run .
-	@echo "✅ Production Server is running."
-
 # ==============================================================================
 # Frontend UI Commands
 # ==============================================================================
 
-# Run Vite dev server for frontend UI (Development)
+# Run Vite dev server for frontend UI
 start-ui:
 	@echo "🚀 Starting UI..."
 	@cd $(APP_DIR) && npm run dev
 	@echo "✅ UI is live."
-
-# Run frontend UI in Staging environment mode
-ui-staging:
-	@echo "🚀 Starting Staging UI..."
-	@cd $(APP_DIR) && npm run dev
-	@echo "✅ Staging UI is live."
-
-# Run frontend UI preview/serve in Production environment mode
-ui-production:
-	@echo "🚀 Starting Production UI..."
-	@cd $(APP_DIR) && npx vite --mode production
-	@echo "✅ Production UI is live."
 
 # ==============================================================================
 # Background Job Processors
@@ -187,30 +161,16 @@ job-clearcache:
 # Docker & Container Deployment Commands
 # ==============================================================================
 
-# Deploy staging containers using Docker Compose
-deploy-docker-staging:
-	@echo "🐳 Deploying Staging environment via Docker..."
-	docker compose -f docker-compose.staging.yml up --build -d
-	@echo "✅ Staging environment deployed."
+# Deploy containers using Docker Compose
+deploy-docker:
+	@echo "🐳 Deploying environment via Docker..."
+	docker compose up --build -d
+	@echo "✅ Environment deployed."
 
-# Deploy production containers using Docker Compose
-deploy-docker-production:
-	@echo "🐳 Deploying Production environment via Docker..."
-	docker compose -f docker-compose.production.yml up --build -d
-	@echo "✅ Production environment deployed."
+# Stop Docker containers
+stop-docker:
+	@echo "🐳 Stopping Docker containers..."
+	docker compose down
+	@echo "✅ Docker containers stopped."
 
-# Stop staging Docker containers
-stop-docker-staging:
-	@echo "🐳 Stopping Staging environment Docker containers..."
-	docker compose -f docker-compose.staging.yml down
-	@echo "✅ Staging Docker containers stopped."
-
-# Stop production Docker containers
-stop-docker-production:
-	@echo "🐳 Stopping Production environment Docker containers..."
-	docker compose -f docker-compose.production.yml down
-	@echo "✅ Production Docker containers stopped."
-
-# Aliases for stopping docker containers
-down-docker-staging: stop-docker-staging
-down-docker-production: stop-docker-production
+down-docker: stop-docker

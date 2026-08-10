@@ -4,13 +4,28 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/google/uuid"
 	lg "github.com/raenardcruz/floowsynk/CodeGen/go/login"
 	wf "github.com/raenardcruz/floowsynk/CodeGen/go/workflow"
 	"github.com/raenardcruz/floowsynk/Server/workflow"
+	"google.golang.org/grpc/metadata"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
+
+func getEnvironmentFromContextOrProto(ctx context.Context, protoEnv wf.Environment) string {
+	if protoEnv == wf.Environment_STAGING {
+		return "staging"
+	}
+	if md, ok := metadata.FromIncomingContext(ctx); ok {
+		envs := md.Get("x-environment")
+		if len(envs) > 0 && (strings.ToLower(envs[0]) == "staging" || strings.Contains(envs[0], "staging")) {
+			return "staging"
+		}
+	}
+	return "production"
+}
 
 func (s *LoginServer) Login(ctx context.Context, in *lg.Credential) (*lg.Token, error) {
 	token, err := Login(in.Username, in.Password)
@@ -44,7 +59,8 @@ func (s *WorkflowServer) GetWorkflow(ctx context.Context, req *wf.GetWorkflowReq
 	if validateResults.status != http.StatusOK {
 		return nil, fmt.Errorf(validateResults.message)
 	}
-	workflow, err = GetWorkflow(req.Id)
+	env := getEnvironmentFromContextOrProto(ctx, req.Environment)
+	workflow, err = GetWorkflow(req.Id, env)
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +76,8 @@ func (s *WorkflowServer) ListWorkflows(ctx context.Context, req *wf.PageRequest)
 	if validateResults.status != http.StatusOK {
 		return nil, fmt.Errorf(validateResults.message)
 	}
-	wl, err = ListWorkflows(req.Offset, req.Limit)
+	env := getEnvironmentFromContextOrProto(ctx, req.Environment)
+	wl, err = ListWorkflows(req.Offset, req.Limit, env)
 	if err != nil {
 		return nil, err
 	}
@@ -80,8 +97,9 @@ func (s *WorkflowServer) UpdateWorkflow(ctx context.Context, req *wf.Workflow) (
 		return nil, fmt.Errorf("saving or modifying workflows is disabled in Guest Mode")
 	}
 	req.UpdatedBy = validateResults.id
+	env := getEnvironmentFromContextOrProto(ctx, req.Environment)
 
-	if wl, err = UpdateWorkflow(req); err != nil {
+	if wl, err = UpdateWorkflow(req, env); err != nil {
 		return nil, err
 	}
 	return wl, nil
@@ -101,8 +119,9 @@ func (s *WorkflowServer) CreateWorkflow(ctx context.Context, req *wf.Workflow) (
 	}
 	req.CreatedBy = validateResults.id
 	req.UpdatedBy = validateResults.id
+	env := getEnvironmentFromContextOrProto(ctx, req.Environment)
 
-	if wl, err = CreateWorkflow(req); err != nil {
+	if wl, err = CreateWorkflow(req, env); err != nil {
 		return nil, err
 	}
 	return wl, nil
@@ -120,7 +139,8 @@ func (s *WorkflowServer) DeleteWorkflow(ctx context.Context, req *wf.Workflow) (
 	if validateResults.role == "guest" {
 		return nil, fmt.Errorf("saving or modifying workflows is disabled in Guest Mode")
 	}
-	if err := DeleteWorkflow(req.Id); err != nil {
+	env := getEnvironmentFromContextOrProto(ctx, req.Environment)
+	if err := DeleteWorkflow(req.Id, env); err != nil {
 		return nil, err
 	}
 	return &emptypb.Empty{}, nil
@@ -162,19 +182,23 @@ func (s *WorkflowServer) RunWorkflowId(req *wf.RunWorkflowIdRequest, stream wf.W
 	if validateResults.status != http.StatusOK {
 		return fmt.Errorf(validateResults.message)
 	}
-	wf, err := GetWorkflow(req.Id)
+	env := getEnvironmentFromContextOrProto(ctx, req.Environment)
+	wfObj, err := GetWorkflow(req.Id, env)
+	if err != nil {
+		return err
+	}
 	processor := workflow.WorkflowProcessor{
 		Stream:           nil,
 		ProcessVariables: make(map[string]interface{}),
 		DBcon:            *DBCon,
-		Workflow:         wf,
+		Workflow:         wfObj,
 		Step:             1,
 	}
 	processor.StartWorkflow()
 	return nil
 }
 
-func (s *WorkflowServer) ListWorkflowHistory(ctx context.Context, in *emptypb.Empty) (*wf.WorkflowHistoryList, error) {
+func (s *WorkflowServer) ListWorkflowHistory(ctx context.Context, req *wf.ListWorkflowHistoryRequest) (*wf.WorkflowHistoryList, error) {
 	token, err := getTokenFromContext(ctx)
 	if err != nil {
 		return nil, err
@@ -183,7 +207,8 @@ func (s *WorkflowServer) ListWorkflowHistory(ctx context.Context, in *emptypb.Em
 	if validateResults.status != http.StatusOK {
 		return nil, fmt.Errorf(validateResults.message)
 	}
-	wh, err := ListWorkflowHistoryImpl()
+	env := getEnvironmentFromContextOrProto(ctx, req.Environment)
+	wh, err := ListWorkflowHistoryImpl(env)
 	if err != nil {
 		return nil, err
 	}
@@ -201,7 +226,8 @@ func (s *WorkflowServer) GetWorkflowHistory(ctx context.Context, req *wf.Workflo
 		return nil, fmt.Errorf(validateResults.message)
 	}
 
-	res, err := GetWorkflowHistoryImpl(req.Id)
+	env := getEnvironmentFromContextOrProto(ctx, req.Environment)
+	res, err := GetWorkflowHistoryImpl(req.Id, env)
 	if err != nil {
 		return &wf.WorkflowHistoryResponse{}, err
 	}
@@ -251,12 +277,13 @@ func (s *WorkflowServer) ListConnectorTemplates(ctx context.Context, _ *emptypb.
 	return &wf.ConnectorTemplateList{Templates: pbTemplates}, nil
 }
 
-func (s *WorkflowServer) ListConnections(ctx context.Context, _ *emptypb.Empty) (*wf.ConnectionList, error) {
+func (s *WorkflowServer) ListConnections(ctx context.Context, req *wf.ListConnectionsRequest) (*wf.ConnectionList, error) {
 	_, err := getTokenFromContext(ctx)
 	if err != nil {
 		return nil, err
 	}
-	conns, err := DBCon.ListConnections()
+	env := getEnvironmentFromContextOrProto(ctx, req.Environment)
+	conns, err := DBCon.ListConnectionsEnv(env)
 	if err != nil {
 		return nil, err
 	}
@@ -287,7 +314,8 @@ func (s *WorkflowServer) DeleteConnection(ctx context.Context, req *wf.DeleteCon
 	if err != nil {
 		return nil, err
 	}
-	err = DBCon.DeleteConnection(req.Id)
+	env := getEnvironmentFromContextOrProto(ctx, req.Environment)
+	err = DBCon.DeleteConnectionEnv(req.Id, env)
 	if err != nil {
 		return nil, err
 	}
@@ -303,7 +331,8 @@ func (s *WorkflowServer) ListWorkflowVersions(ctx context.Context, req *wf.GetWo
 	if validateResults.status != http.StatusOK {
 		return nil, fmt.Errorf(validateResults.message)
 	}
-	versions, err := ListWorkflowVersionsImpl(req.WorkflowId)
+	env := getEnvironmentFromContextOrProto(ctx, req.Environment)
+	versions, err := ListWorkflowVersionsImpl(req.WorkflowId, env)
 	if err != nil {
 		return nil, err
 	}
@@ -322,7 +351,8 @@ func (s *WorkflowServer) RestoreWorkflowVersion(ctx context.Context, req *wf.Wor
 	if validateResults.role == "guest" {
 		return nil, fmt.Errorf("restoring workflow versions is disabled in Guest Mode")
 	}
-	workflow, err := RestoreWorkflowVersionImpl(req, validateResults.id)
+	env := getEnvironmentFromContextOrProto(ctx, req.Environment)
+	workflow, err := RestoreWorkflowVersionImpl(req, validateResults.id, env)
 	if err != nil {
 		return nil, err
 	}

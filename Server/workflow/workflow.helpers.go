@@ -71,13 +71,14 @@ func (wp *WorkflowProcessor) UpdateStatus(node *proto.Node, status proto.NodeSta
 			Message:         res.Message,
 			ProcessSequence: int(wp.Step),
 		}
+		env := DB.ResolveEnvName(wp.Workflow.Environment)
 		rdBytes, err := json.Marshal(dbRD)
 		if err == nil {
 			if wp.Producer != nil && *wp.Producer != nil {
 				kafka.SendMessage(*wp.Producer, Broker.WORKFLOW_REPLAY_DATA, wp.ID, string(rdBytes))
 			}
-			if _, err := wp.DBcon.CreateReplayData(&dbRD); err != nil {
-				fmt.Printf("Error saving replay data to DB: %v\n", err)
+			if _, err := wp.DBcon.CreateReplayDataEnv(&dbRD, env); err != nil {
+				fmt.Printf("Error saving replay data to DB (%s): %v\n", env, err)
 			}
 		}
 	}

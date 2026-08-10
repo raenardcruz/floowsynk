@@ -1,17 +1,24 @@
+export const getSelectedEnvironment = (): 'staging' | 'production' => {
+    const env = localStorage.getItem('app_environment');
+    return env === 'production' ? 'production' : 'staging';
+}
+
 export const getApiUrl = (): string => {
-    const apiUrl = import.meta.env.VITE_SERVER;
-    if (!apiUrl) {
-        throw new Error("VITE_SERVER is not defined");
+    const baseUrl = import.meta.env.VITE_SERVER || 'http://localhost:8082';
+    const env = getSelectedEnvironment();
+    if (env === 'staging') {
+        return `${baseUrl.replace(/\/$/, '')}/staging`;
     }
-    return apiUrl;
+    return baseUrl;
 }
 
 export const getRestUrl = (): string => {
-    const restUrl = import.meta.env.VITE_REST_SERVER;
-    if (restUrl) return restUrl;
-    // Fallback: derive from gRPC server URL by replacing port
-    const apiUrl = import.meta.env.VITE_SERVER || 'http://localhost:8082';
-    return apiUrl.replace(/:\d+$/, ':8083');
+    const restUrl = import.meta.env.VITE_REST_SERVER || 'http://localhost:8083';
+    const env = getSelectedEnvironment();
+    if (env === 'staging') {
+        return `${restUrl.replace(/\/$/, '')}/staging`;
+    }
+    return restUrl;
 }
 
 export interface IdProps {

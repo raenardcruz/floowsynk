@@ -163,6 +163,7 @@ import { MONACO_EDITOR_DATA_PROPERTIES } from './Workflow.Sidebar.Node.Fields.co
 import { Checkbox as CheckboxInput, TextCodeInput, Select as SelectInput, ListField as ListInput } from '@/components/Composable/UI/Inputs'
 import { useTab } from '@/views/Workflow'
 import { getConnections } from '@/views/Connectors/Connectors.api'
+import { getRestUrl } from '@/components/Composable/constants'
 
 const props = defineProps<SidebarNodeProps>()
 const disabled = computed(() => props.disabled)
@@ -177,7 +178,7 @@ const fetchConnectorData = async () => {
         const connRes = await getConnections()
         connectionsList.value = connRes.toObject().connectionsList || []
 
-        const tempRes = await fetch('http://localhost:8083/api/connectors/templates')
+        const tempRes = await fetch(`${getRestUrl()}/api/connectors/templates`)
         if (tempRes.ok) {
             templatesList.value = await tempRes.json()
         }

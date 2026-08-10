@@ -4,6 +4,7 @@ import { useWorkflowStore, newProcess } from '@/views/Workflow'
 import { startNodes } from '@/views/Workflow/Nodes/FloowsynkNode.contants'
 import { Workflow, WorkflowHistory, NodeStatus } from 'proto/workflow/workflow_pb'
 import { useWorkflowCanvasStore } from '../Canvas/Workflow.Canvas.hooks'
+import { getRestUrl } from '@/components/Composable/constants'
 
 export const initWorkflows = async () => {
     const { processes, history } = useProcessListStore()
@@ -26,7 +27,7 @@ export const initWorkflows = async () => {
 
 export const clearHistoryAction = async () => {
     try {
-        const res = await fetch('http://localhost:8083/api/history/clear', {
+        const res = await fetch(`${getRestUrl()}/api/history/clear`, {
             method: 'POST',
         })
         if (res.ok) {

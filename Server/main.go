@@ -98,10 +98,22 @@ func setupGRPCServer() *grpc.Server {
 }
 
 func setupHTTPServer(grpcServer *grpc.Server) *http.ServeMux {
-	wrap := grpcweb.WrapServer(grpcServer)
+	wrap := grpcweb.WrapServer(
+		grpcServer,
+		grpcweb.WithOriginFunc(func(origin string) bool { return true }),
+		grpcweb.WithCorsForRegisteredEndpointsOnly(false),
+	)
 	httpServer := http.NewServeMux()
 	httpServer.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		wrap.ServeHTTP(w, r)
+		if strings.HasPrefix(r.URL.Path, "/staging/") {
+			r.URL.Path = "/" + strings.TrimPrefix(r.URL.Path, "/staging/")
+			r.Header.Set("X-Environment", "staging")
+		}
+		if wrap.IsGrpcWebRequest(r) || wrap.IsAcceptableGrpcCorsRequest(r) {
+			wrap.ServeHTTP(w, r)
+			return
+		}
+		http.DefaultServeMux.ServeHTTP(w, r)
 	})
 	return httpServer
 }
@@ -110,7 +122,6 @@ func startRESTServer() {
 	restAPIPort := db.AppConfig.Server_REST_Port
 	restServer := http.NewServeMux()
 
-	// Define the route for the webhook handler
 	restServer.HandleFunc("/api/webhook/", runWebhookHandler)
 	restServer.HandleFunc("/api/connectors/oauth/start", startOAuthHandler)
 	restServer.HandleFunc("/api/connectors/callback", oauthCallbackHandler)
@@ -121,17 +132,24 @@ func startRESTServer() {
 	restServer.HandleFunc("/api/connectors/revert", revertConnectionHandler)
 	restServer.HandleFunc("/api/workflow/revert", revertWorkflowHandler)
 	restServer.HandleFunc("/api/history/clear", clearHistoryHandler)
-	// Publish endpoints: receives workflow/connection pushes from a staging server (production mode only)
 	restServer.HandleFunc("/api/publish/workflow", publishWorkflowHandler)
 	restServer.HandleFunc("/api/publish/connection", publishConnectionHandler)
 
+	mainHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if strings.HasPrefix(r.URL.Path, "/staging/") {
+			r.URL.Path = strings.TrimPrefix(r.URL.Path, "/staging")
+			r.Header.Set("X-Environment", "staging")
+		}
+		restServer.ServeHTTP(w, r)
+	})
+
 	go func() {
 		log.Println("REST API server started at", restAPIPort)
-		listener, err := net.Listen("tcp", ":" + restAPIPort)
+		listener, err := net.Listen("tcp", ":"+restAPIPort)
 		if err != nil {
 			log.Fatalf("Failed to start REST API server: %v", err)
 		}
-		if err := http.Serve(listener, corsMiddleware(restServer)); err != nil {
+		if err := http.Serve(listener, corsMiddleware(mainHandler)); err != nil {
 			log.Fatalf("Failed to serve REST API: %v", err)
 		}
 	}()
@@ -162,7 +180,6 @@ func runWebhookHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Extract workflow ID from the route after /webhook/
 	pathParts := strings.Split(r.URL.Path, "/")
 	if len(pathParts) < 4 || pathParts[2] != "webhook" {
 		http.Error(w, "Invalid webhook route", http.StatusBadRequest)
@@ -175,7 +192,12 @@ func runWebhookHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	workflowObj, err := DBCon.GetWebhookWorkflow(workflowID)
+	env := r.Header.Get("X-Environment")
+	if env == "" {
+		env = "production"
+	}
+
+	workflowObj, err := DBCon.GetWebhookWorkflowEnv(workflowID, env)
 	if err != nil {
 		http.Error(w, "Failed to get workflow: "+err.Error(), http.StatusInternalServerError)
 		return
@@ -244,11 +266,11 @@ func runWebhookHandler(w http.ResponseWriter, r *http.Request) {
 func corsMiddleware(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, x-user-agent, x-grpc-web, grpc-timeout, x-accept-content-transfer-encoding, x-accept-response-streaming, x-requested-with")
-		w.Header().Set("Access-Control-Expose-Headers", "grpc-status, grpc-message")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, PATCH")
+		w.Header().Set("Access-Control-Allow-Headers", "*")
+		w.Header().Set("Access-Control-Expose-Headers", "grpc-status, grpc-message, X-Environment")
 		if r.Method == "OPTIONS" {
-			w.WriteHeader(http.StatusNoContent)
+			w.WriteHeader(http.StatusOK)
 			return
 		}
 		h.ServeHTTP(w, r)

@@ -102,9 +102,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { getSelectedEnvironment } from '@/components/Composable/constants'
 const isGuest = ref(localStorage.getItem('sessionToken') === 'guest')
-const isProduction = ref(import.meta.env.VITE_APP_ENVIRONMENT === 'production')
+const isProduction = computed(() => getSelectedEnvironment() === 'production')
 const showVersionHistory = ref(false)
 import { revertWorkflowToStaging } from './Workflow.Canvas.versions.api'
 import { VueFlow, useVueFlow } from '@vue-flow/core'
@@ -147,9 +148,14 @@ const onVersionRestored = () => {
 }
 
 const handleRevertWorkflow = async () => {
-    if (!confirm('Revert this production workflow back to its staging copy? Any changes done directly on production will be removed.')) return
+    if (!confirm('Revert this production workflow? Any changes done directly on production will be discarded.')) return
     try {
-        await revertWorkflowToStaging(tab.value.id)
+        const res = await revertWorkflowToStaging(tab.value.id)
+        if (res && res.workflow) {
+            tab.value.ismodified = res.workflow.ismodified || res.workflow.isModified || false
+        } else {
+            tab.value.ismodified = false
+        }
         window.location.reload()
     } catch (err: any) {
         alert('Failed to revert workflow: ' + (err as Error).message)

@@ -1,15 +1,15 @@
 services:
   # ─────────────────────────────────────────────
-  # Backend server (staging)
+  # Unified Backend server (handles Staging & Production)
   # ─────────────────────────────────────────────
-  server-staging:
+  server:
     build:
       context: .
       dockerfile: Server/Dockerfile
-    container_name: floowsynk-server-staging
+    container_name: floowsynk-server
     ports:
-      - "8082:8082"   # gRPC-Web
-      - "8083:8083"   # REST API
+      - "8090:8090"   # gRPC-Web
+      - "8091:8091"   # REST API (/api/... & /staging/api/...)
       - "50051:50051" # Plain gRPC
     env_file:
       - ./Server/.env
@@ -17,67 +17,63 @@ services:
       - DB_HOST=${DB_HOST:-host.docker.internal}
       - REDIS_HOST=${REDIS_HOST:-host.docker.internal}
       - KAFKA_BROKERS=${KAFKA_BROKERS:-host.docker.internal:9092}
-      - APP_ENVIRONMENT=staging
     extra_hosts:
       - "host.docker.internal:host-gateway"
     restart: unless-stopped
 
   # ─────────────────────────────────────────────
-  # Kafka consumer job (staging)
+  # Kafka consumer job
   # ─────────────────────────────────────────────
-  consumer-staging:
+  consumer:
     build:
       context: .
       dockerfile: Jobs/Consumer/Dockerfile
-    container_name: floowsynk-consumer-staging
+    container_name: floowsynk-consumer
     env_file:
       - ./Server/.env
     environment:
       - DB_HOST=${DB_HOST:-host.docker.internal}
       - REDIS_HOST=${REDIS_HOST:-host.docker.internal}
       - KAFKA_BROKERS=${KAFKA_BROKERS:-host.docker.internal:9092}
-      - APP_ENVIRONMENT=staging
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
-      - server-staging
+      - server
     restart: unless-stopped
 
   # ─────────────────────────────────────────────
-  # Interval trigger job (staging)
+  # Interval trigger job
   # ─────────────────────────────────────────────
-  interval-staging:
+  interval:
     build:
       context: .
       dockerfile: Jobs/Interval/Dockerfile
-    container_name: floowsynk-interval-staging
+    container_name: floowsynk-interval
     env_file:
       - ./Server/.env
     environment:
       - DB_HOST=${DB_HOST:-host.docker.internal}
       - REDIS_HOST=${REDIS_HOST:-host.docker.internal}
       - KAFKA_BROKERS=${KAFKA_BROKERS:-host.docker.internal:9092}
-      - SERVER_GRPC_HOST=server-staging
-      - APP_ENVIRONMENT=staging
+      - SERVER_GRPC_HOST=server
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
-      - server-staging
+      - server
     restart: unless-stopped
 
   # ─────────────────────────────────────────────
-  # Frontend app (staging)
+  # Frontend app
   # ─────────────────────────────────────────────
-  app-staging:
+  app:
     build:
       context: .
       dockerfile: App/Dockerfile
       args:
-        - VITE_SERVER=${VITE_SERVER_STAGING:-http://localhost:8082}
-        - VITE_APP_ENVIRONMENT=staging
-    container_name: floowsynk-app-staging
+        - VITE_SERVER=${VITE_SERVER:-http://localhost:8090}
+    container_name: floowsynk-app
     ports:
       - "3000:80"   # http://localhost:3000
     depends_on:
-      - server-staging
+      - server
     restart: unless-stopped

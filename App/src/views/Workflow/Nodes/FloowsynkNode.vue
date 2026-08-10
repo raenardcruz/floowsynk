@@ -52,6 +52,7 @@ import { onKeyStroke } from '@vueuse/core'
 import Popover from 'primevue/popover'
 import Divider from 'primevue/divider'
 import { getConnections } from '@/views/Connectors/Connectors.api'
+import { getRestUrl } from '@/components/Composable/constants'
 
 const op = ref()
 const props = defineProps<NodeProps>()
@@ -78,7 +79,7 @@ const fetchConnectorInfo = async () => {
             const connRes = await getConnections()
             connectionsList.value = connRes.toObject().connectionsList || []
 
-            const tempRes = await fetch('http://localhost:8083/api/connectors/templates')
+            const tempRes = await fetch(`${getRestUrl()}/api/connectors/templates`)
             if (tempRes.ok) {
                 templatesList.value = await tempRes.json()
             }

@@ -5,8 +5,8 @@ import {
     WorkflowHistoryList,
     WorkflowHistoryRequest,
     WorkflowHistoryResponse,
+    ListWorkflowHistoryRequest
     } from 'proto/workflow/workflow_pb'
-import { Empty } from 'google-protobuf/google/protobuf/empty_pb' 
 import { getApiUrl } from '@/components/Composable/constants'
 
 export const getAllWorkflows = async (limit: number, offset: number): Promise<WorkflowList> => {
@@ -21,7 +21,7 @@ export const getAllWorkflows = async (limit: number, offset: number): Promise<Wo
 
 export const listWorkflowRunHistory = async (): Promise<WorkflowHistoryList> => {
     const client = new WorkflowServicePromiseClient(getApiUrl())
-    return await client.listWorkflowHistory(new Empty(), {
+    return await client.listWorkflowHistory(new ListWorkflowHistoryRequest(), {
         'Authorization': `${localStorage.getItem("sessionToken")}`
     })
 }

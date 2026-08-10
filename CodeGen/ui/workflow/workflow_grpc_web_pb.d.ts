@@ -55,7 +55,7 @@ export class WorkflowServiceClient {
   ): grpcWeb.ClientReadableStream<workflow_pb.ReplayData>;
 
   listWorkflowHistory(
-    request: google_protobuf_empty_pb.Empty,
+    request: workflow_pb.ListWorkflowHistoryRequest,
     metadata: grpcWeb.Metadata | undefined,
     callback: (err: grpcWeb.RpcError,
                response: workflow_pb.WorkflowHistoryList) => void
@@ -76,7 +76,7 @@ export class WorkflowServiceClient {
   ): grpcWeb.ClientReadableStream<workflow_pb.ConnectorTemplateList>;
 
   listConnections(
-    request: google_protobuf_empty_pb.Empty,
+    request: workflow_pb.ListConnectionsRequest,
     metadata: grpcWeb.Metadata | undefined,
     callback: (err: grpcWeb.RpcError,
                response: workflow_pb.ConnectionList) => void
@@ -160,7 +160,7 @@ export class WorkflowServicePromiseClient {
   ): grpcWeb.ClientReadableStream<workflow_pb.ReplayData>;
 
   listWorkflowHistory(
-    request: google_protobuf_empty_pb.Empty,
+    request: workflow_pb.ListWorkflowHistoryRequest,
     metadata?: grpcWeb.Metadata
   ): Promise<workflow_pb.WorkflowHistoryList>;
 
@@ -175,7 +175,7 @@ export class WorkflowServicePromiseClient {
   ): Promise<workflow_pb.ConnectorTemplateList>;
 
   listConnections(
-    request: google_protobuf_empty_pb.Empty,
+    request: workflow_pb.ListConnectionsRequest,
     metadata?: grpcWeb.Metadata
   ): Promise<workflow_pb.ConnectionList>;
 

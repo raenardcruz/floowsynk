@@ -367,6 +367,7 @@ import {
   revertConnection,
 } from './Connectors.api'
 import Modal from '@/components/Composable/UI/Modal'
+import { getRestUrl } from '@/components/Composable/constants'
 import { TextInput, PasswordInput } from '@/components/Composable/UI/Inputs'
 
 interface ConnectorFieldProto {
@@ -853,7 +854,7 @@ const buildOAuthUrl = (connectionId?: string) => {
   if (!selectedTemplate.value) return ''
   const cId = dynamicFields['client_id'] || clientId.value
   const cSec = dynamicFields['client_secret'] || clientSecret.value
-  let url = `http://localhost:8083/api/connectors/oauth/start?connectorId=${selectedTemplate.value.id}&name=${encodeURIComponent(newConnectionName.value)}&token=${encodeURIComponent(token)}&clientId=${encodeURIComponent(cId)}&clientSecret=${encodeURIComponent(cSec)}&frontendUrl=${encodeURIComponent(frontendUrl)}`
+  let url = `${getRestUrl()}/api/connectors/oauth/start?connectorId=${selectedTemplate.value.id}&name=${encodeURIComponent(newConnectionName.value)}&token=${encodeURIComponent(token)}&clientId=${encodeURIComponent(cId)}&clientSecret=${encodeURIComponent(cSec)}&frontendUrl=${encodeURIComponent(frontendUrl)}`
   
   // Attach any extra dynamic parameters (e.g. account_sid, auth_token, bot_token, access_token, api_key)
   Object.keys(dynamicFields).forEach(key => {
@@ -905,7 +906,7 @@ onMounted(async () => {
   const state = route.query.state as string
   if (code && state) {
     try {
-      const response = await fetch(`http://localhost:8083/api/connectors/callback?code=${encodeURIComponent(code)}&state=${encodeURIComponent(state)}`)
+      const response = await fetch(`${getRestUrl()}/api/connectors/callback?code=${encodeURIComponent(code)}&state=${encodeURIComponent(state)}`)
       if (!response.ok) {
         throw new Error(await response.text())
       }

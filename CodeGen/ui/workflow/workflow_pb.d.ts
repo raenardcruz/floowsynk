@@ -7,6 +7,9 @@ export class RunWorkflowIdRequest extends jspb.Message {
   getId(): string;
   setId(value: string): RunWorkflowIdRequest;
 
+  getEnvironment(): Environment;
+  setEnvironment(value: Environment): RunWorkflowIdRequest;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): RunWorkflowIdRequest.AsObject;
   static toObject(includeInstance: boolean, msg: RunWorkflowIdRequest): RunWorkflowIdRequest.AsObject;
@@ -18,6 +21,7 @@ export class RunWorkflowIdRequest extends jspb.Message {
 export namespace RunWorkflowIdRequest {
   export type AsObject = {
     id: string;
+    environment: Environment;
   };
 }
 
@@ -79,6 +83,9 @@ export class WorkflowHistoryRequest extends jspb.Message {
   getId(): string;
   setId(value: string): WorkflowHistoryRequest;
 
+  getEnvironment(): Environment;
+  setEnvironment(value: Environment): WorkflowHistoryRequest;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): WorkflowHistoryRequest.AsObject;
   static toObject(includeInstance: boolean, msg: WorkflowHistoryRequest): WorkflowHistoryRequest.AsObject;
@@ -90,6 +97,25 @@ export class WorkflowHistoryRequest extends jspb.Message {
 export namespace WorkflowHistoryRequest {
   export type AsObject = {
     id: string;
+    environment: Environment;
+  };
+}
+
+export class ListWorkflowHistoryRequest extends jspb.Message {
+  getEnvironment(): Environment;
+  setEnvironment(value: Environment): ListWorkflowHistoryRequest;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ListWorkflowHistoryRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: ListWorkflowHistoryRequest): ListWorkflowHistoryRequest.AsObject;
+  static serializeBinaryToWriter(message: ListWorkflowHistoryRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ListWorkflowHistoryRequest;
+  static deserializeBinaryFromReader(message: ListWorkflowHistoryRequest, reader: jspb.BinaryReader): ListWorkflowHistoryRequest;
+}
+
+export namespace ListWorkflowHistoryRequest {
+  export type AsObject = {
+    environment: Environment;
   };
 }
 
@@ -156,6 +182,9 @@ export class PageRequest extends jspb.Message {
   getOffset(): number;
   setOffset(value: number): PageRequest;
 
+  getEnvironment(): Environment;
+  setEnvironment(value: Environment): PageRequest;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): PageRequest.AsObject;
   static toObject(includeInstance: boolean, msg: PageRequest): PageRequest.AsObject;
@@ -168,12 +197,16 @@ export namespace PageRequest {
   export type AsObject = {
     limit: number;
     offset: number;
+    environment: Environment;
   };
 }
 
 export class GetWorkflowRequest extends jspb.Message {
   getId(): string;
   setId(value: string): GetWorkflowRequest;
+
+  getEnvironment(): Environment;
+  setEnvironment(value: Environment): GetWorkflowRequest;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): GetWorkflowRequest.AsObject;
@@ -186,6 +219,7 @@ export class GetWorkflowRequest extends jspb.Message {
 export namespace GetWorkflowRequest {
   export type AsObject = {
     id: string;
+    environment: Environment;
   };
 }
 
@@ -267,6 +301,9 @@ export class Workflow extends jspb.Message {
   getPublishedversionnum(): number;
   setPublishedversionnum(value: number): Workflow;
 
+  getEnvironment(): Environment;
+  setEnvironment(value: Environment): Workflow;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): Workflow.AsObject;
   static toObject(includeInstance: boolean, msg: Workflow): Workflow.AsObject;
@@ -292,6 +329,7 @@ export namespace Workflow {
     ismodified: boolean;
     publishedversionid: string;
     publishedversionnum: number;
+    environment: Environment;
   };
 
   export enum IsnewCase {
@@ -329,6 +367,9 @@ export class WorkflowVersion extends jspb.Message {
   getSavedat(): string;
   setSavedat(value: string): WorkflowVersion;
 
+  getEnvironment(): Environment;
+  setEnvironment(value: Environment): WorkflowVersion;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): WorkflowVersion.AsObject;
   static toObject(includeInstance: boolean, msg: WorkflowVersion): WorkflowVersion.AsObject;
@@ -347,6 +388,7 @@ export namespace WorkflowVersion {
     edgesList: Array<Edge.AsObject>;
     savedby: string;
     savedat: string;
+    environment: Environment;
   };
 }
 
@@ -374,6 +416,9 @@ export class GetWorkflowVersionsRequest extends jspb.Message {
   getWorkflowid(): string;
   setWorkflowid(value: string): GetWorkflowVersionsRequest;
 
+  getEnvironment(): Environment;
+  setEnvironment(value: Environment): GetWorkflowVersionsRequest;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): GetWorkflowVersionsRequest.AsObject;
   static toObject(includeInstance: boolean, msg: GetWorkflowVersionsRequest): GetWorkflowVersionsRequest.AsObject;
@@ -385,6 +430,7 @@ export class GetWorkflowVersionsRequest extends jspb.Message {
 export namespace GetWorkflowVersionsRequest {
   export type AsObject = {
     workflowid: string;
+    environment: Environment;
   };
 }
 
@@ -394,6 +440,9 @@ export class PublishWorkflowRequest extends jspb.Message {
 
   getVersionid(): string;
   setVersionid(value: string): PublishWorkflowRequest;
+
+  getEnvironment(): Environment;
+  setEnvironment(value: Environment): PublishWorkflowRequest;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): PublishWorkflowRequest.AsObject;
@@ -407,6 +456,7 @@ export namespace PublishWorkflowRequest {
   export type AsObject = {
     workflowid: string;
     versionid: string;
+    environment: Environment;
   };
 }
 
@@ -1314,9 +1364,30 @@ export namespace ConnectionProto {
   };
 }
 
+export class ListConnectionsRequest extends jspb.Message {
+  getEnvironment(): Environment;
+  setEnvironment(value: Environment): ListConnectionsRequest;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ListConnectionsRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: ListConnectionsRequest): ListConnectionsRequest.AsObject;
+  static serializeBinaryToWriter(message: ListConnectionsRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ListConnectionsRequest;
+  static deserializeBinaryFromReader(message: ListConnectionsRequest, reader: jspb.BinaryReader): ListConnectionsRequest;
+}
+
+export namespace ListConnectionsRequest {
+  export type AsObject = {
+    environment: Environment;
+  };
+}
+
 export class DeleteConnectionRequest extends jspb.Message {
   getId(): string;
   setId(value: string): DeleteConnectionRequest;
+
+  getEnvironment(): Environment;
+  setEnvironment(value: Environment): DeleteConnectionRequest;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): DeleteConnectionRequest.AsObject;
@@ -1329,9 +1400,14 @@ export class DeleteConnectionRequest extends jspb.Message {
 export namespace DeleteConnectionRequest {
   export type AsObject = {
     id: string;
+    environment: Environment;
   };
 }
 
+export enum Environment {
+  PRODUCTION = 0,
+  STAGING = 1,
+}
 export enum ArrayDataType {
   STRING = 0,
   INT = 1,

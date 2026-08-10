@@ -12,6 +12,8 @@ import {
 } from '../Workflow.Canvas.api'
 import { useToast } from 'primevue/usetoast'
 
+import { getSelectedEnvironment } from '@/components/Composable/constants'
+
 export const useWorkflowCanvasControlButtonActions = (props: WorkflowCanvasProps, vueFlowInstance: any) => {
   const toast = useToast()
   const {
@@ -42,14 +44,17 @@ export const useWorkflowCanvasControlButtonActions = (props: WorkflowCanvasProps
       } else {
         const resp = await updateProcess(tab.value)
         const updatedObj = resp.toObject()
-        if (updatedObj && typeof updatedObj.ismodified === 'boolean') {
-          tab.value.ismodified = updatedObj.ismodified
-        } else if (import.meta.env.VITE_APP_ENVIRONMENT === 'production') {
+        if (getSelectedEnvironment() === 'production') {
           tab.value.ismodified = true
+        } else if (updatedObj && typeof updatedObj.ismodified === 'boolean') {
+          tab.value.ismodified = updatedObj.ismodified
         }
       }
       console.log("Saved process:", tab.value)
       toast.add({severity:'success', summary: 'Success', detail: 'Workflow saved successfully', life: 3000});
+      if (getSelectedEnvironment() === 'production') {
+        window.location.reload()
+      }
     }
     catch (error) {
       toast.add({severity:'error', summary: 'Error', detail: 'Failed to save workflow' + error, life: 3000});

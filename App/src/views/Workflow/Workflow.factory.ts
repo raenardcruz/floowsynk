@@ -1,5 +1,5 @@
-import { Workflow, Node, Edge } from 'proto/workflow/workflow_pb'
-import {generateUUID} from "@/components/Composable/Utilities"
+import { Workflow, Node, Edge, Environment } from 'proto/workflow/workflow_pb'
+import { generateUUID } from "@/components/Composable/Utilities"
 
 export const newProcess = (): Workflow.AsObject => {
     return {
@@ -17,6 +17,7 @@ export const newProcess = (): Workflow.AsObject => {
         updatedby: 'system',
         ismodified: false,
         publishedversionid: '',
-        publishedversionnum: 0
+        publishedversionnum: 0,
+        environment: Environment.PRODUCTION
     }
 }

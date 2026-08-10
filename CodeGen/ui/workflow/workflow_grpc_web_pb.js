@@ -496,16 +496,16 @@ proto.proto.WorkflowServicePromiseClient.prototype.runWorkflowId =
 /**
  * @const
  * @type {!grpc.web.MethodDescriptor<
- *   !proto.google.protobuf.Empty,
+ *   !proto.proto.ListWorkflowHistoryRequest,
  *   !proto.proto.WorkflowHistoryList>}
  */
 const methodDescriptor_WorkflowService_ListWorkflowHistory = new grpc.web.MethodDescriptor(
   '/proto.WorkflowService/ListWorkflowHistory',
   grpc.web.MethodType.UNARY,
-  google_protobuf_empty_pb.Empty,
+  proto.proto.ListWorkflowHistoryRequest,
   proto.proto.WorkflowHistoryList,
   /**
-   * @param {!proto.google.protobuf.Empty} request
+   * @param {!proto.proto.ListWorkflowHistoryRequest} request
    * @return {!Uint8Array}
    */
   function(request) {
@@ -516,7 +516,7 @@ const methodDescriptor_WorkflowService_ListWorkflowHistory = new grpc.web.Method
 
 
 /**
- * @param {!proto.google.protobuf.Empty} request The
+ * @param {!proto.proto.ListWorkflowHistoryRequest} request The
  *     request proto
  * @param {?Object<string, string>} metadata User defined
  *     call metadata
@@ -537,7 +537,7 @@ proto.proto.WorkflowServiceClient.prototype.listWorkflowHistory =
 
 
 /**
- * @param {!proto.google.protobuf.Empty} request The
+ * @param {!proto.proto.ListWorkflowHistoryRequest} request The
  *     request proto
  * @param {?Object<string, string>=} metadata User defined
  *     call metadata
@@ -679,16 +679,16 @@ proto.proto.WorkflowServicePromiseClient.prototype.listConnectorTemplates =
 /**
  * @const
  * @type {!grpc.web.MethodDescriptor<
- *   !proto.google.protobuf.Empty,
+ *   !proto.proto.ListConnectionsRequest,
  *   !proto.proto.ConnectionList>}
  */
 const methodDescriptor_WorkflowService_ListConnections = new grpc.web.MethodDescriptor(
   '/proto.WorkflowService/ListConnections',
   grpc.web.MethodType.UNARY,
-  google_protobuf_empty_pb.Empty,
+  proto.proto.ListConnectionsRequest,
   proto.proto.ConnectionList,
   /**
-   * @param {!proto.google.protobuf.Empty} request
+   * @param {!proto.proto.ListConnectionsRequest} request
    * @return {!Uint8Array}
    */
   function(request) {
@@ -699,7 +699,7 @@ const methodDescriptor_WorkflowService_ListConnections = new grpc.web.MethodDesc
 
 
 /**
- * @param {!proto.google.protobuf.Empty} request The
+ * @param {!proto.proto.ListConnectionsRequest} request The
  *     request proto
  * @param {?Object<string, string>} metadata User defined
  *     call metadata
@@ -720,7 +720,7 @@ proto.proto.WorkflowServiceClient.prototype.listConnections =
 
 
 /**
- * @param {!proto.google.protobuf.Empty} request The
+ * @param {!proto.proto.ListConnectionsRequest} request The
  *     request proto
  * @param {?Object<string, string>=} metadata User defined
  *     call metadata

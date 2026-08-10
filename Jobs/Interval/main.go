@@ -24,19 +24,21 @@ func (job *IntervalJob) ProcessIntervalWorkflows() {
 	ticker := time.NewTicker(5 * time.Second)
 	defer ticker.Stop()
 	for {
-		workflows, err := DBCon.GetIntervalWorkflows()
-		if err != nil {
-			log.Printf("Error fetching workflows from database: %v", err)
-		} else if workflows != nil {
-			for _, workflow := range workflows.Workflows {
-				go job.processNode(workflow)
+		for _, envName := range []string{"staging", "production"} {
+			workflows, err := DBCon.GetIntervalWorkflowsEnv(envName)
+			if err != nil {
+				log.Printf("Error fetching interval workflows for %s: %v", envName, err)
+			} else if workflows != nil {
+				for _, workflowObj := range workflows.Workflows {
+					go job.processNode(workflowObj, envName)
+				}
 			}
 		}
 		<-ticker.C
 	}
 }
 
-func (job *IntervalJob) processNode(workflow *wf.Workflow) {
+func (job *IntervalJob) processNode(workflow *wf.Workflow, envName string) {
 	ctx := metadata.AppendToOutgoingContext(context.Background(), "Authorization", JobToken)
 	node := workflow.Nodes[0]
 	interval := node.Data.GetInterval()
@@ -63,10 +65,10 @@ func (job *IntervalJob) processNode(workflow *wf.Workflow) {
 		return
 	}
 
-	cacheKey := "workflow:interval:" + workflow.Id
+	cacheKey := fmt.Sprintf("workflow:interval:%s:%s", envName, workflow.Id)
 	set, err := db.SetCacheNX(ctx, cacheKey, "running", duration)
 	if err != nil {
-		log.Printf("Error setting Redis cache lock for workflow %v: %v", workflow.Id, err)
+		log.Printf("Error setting Redis cache lock for workflow %v (%s): %v", workflow.Id, envName, err)
 		return
 	}
 
@@ -74,8 +76,7 @@ func (job *IntervalJob) processNode(workflow *wf.Workflow) {
 		return
 	}
 
-	log.Printf("Processing workflow %v", workflow.Id)
-	// Add logic to execute the node's workflow
+	log.Printf("Processing workflow %v (%s)", workflow.Id, envName)
 	grpcAddr := fmt.Sprintf("%s:%s", db.AppConfig.Server_GRPC_Host, db.AppConfig.Server_Plain_Port)
 	conn, err := grpc.NewClient(grpcAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
@@ -86,9 +87,15 @@ func (job *IntervalJob) processNode(workflow *wf.Workflow) {
 
 	client := wf.NewWorkflowServiceClient(conn)
 
-	log.Printf("Executing workflow %s", workflow.Id)
+	envEnum := wf.Environment_PRODUCTION
+	if envName == "staging" {
+		envEnum = wf.Environment_STAGING
+	}
+
+	log.Printf("Executing workflow %s (%s)", workflow.Id, envName)
 	stream, err := client.RunWorkflowId(ctx, &wf.RunWorkflowIdRequest{
-		Id: workflow.Id,
+		Id:          workflow.Id,
+		Environment: envEnum,
 	})
 	if err != nil {
 		log.Printf("Error running workflow %v: %v", workflow.Id, err)

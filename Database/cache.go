@@ -28,7 +28,7 @@ func ConnectToRedis() {
 }
 
 func GetFromCache(ctx context.Context, key string) ([]byte, bool) {
-	if !UseCache {
+	if !UseCache || RedisClient == nil {
 		return nil, false
 	}
 	val, err := RedisClient.Get(ctx, key).Result()
@@ -42,7 +42,7 @@ func GetFromCache(ctx context.Context, key string) ([]byte, bool) {
 }
 
 func SetCache(ctx context.Context, key string, data interface{}, expiration time.Duration) error {
-	if !UseCache {
+	if !UseCache || RedisClient == nil {
 		return nil
 	}
 	jsonData, err := json.Marshal(data)
@@ -57,7 +57,7 @@ func SetCache(ctx context.Context, key string, data interface{}, expiration time
 }
 
 func DeleteCache(ctx context.Context, key string) error {
-	if !UseCache {
+	if !UseCache || RedisClient == nil {
 		return nil
 	}
 

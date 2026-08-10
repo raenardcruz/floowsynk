@@ -113,33 +113,24 @@ You can start the different components using separate `make` commands. It is rec
 
 ---
 
-## 🐳 Deployment (Docker Compose)
+## 🐳 Deployment & Environment Architecture
 
-For a production-like environment or a quick deployment, you can run the entire stack using Docker Compose:
+Floowsynk uses a **single unified server architecture** and a single configuration file (`Server/.env`) to run both Staging and Production workloads seamlessly:
 
-1. **Build and Start**:
-   ```bash
-   docker compose -f docker/postgres.yml up -d
-   docker compose -f docker/redis.yml up -d
-   docker compose -f docker/kafka.yml up -d
-   docker compose up --build -d
-   ```
-
-2. **Accessing the App**:
-   - **Frontend UI**: [http://localhost:3000](http://localhost:3000)
-   - **REST API**: [http://localhost:8082](http://localhost:8082)
-   - **gRPC API**: [http://localhost:8083](http://localhost:8083)
-
-3. **Stop & Cleanup**:
-   ```bash
-   docker compose down -v
-   ```
+1. **URL Routing**:
+   - **Production Endpoints**: `<baseurl>/<route>` (e.g. `http://localhost:8091/api/webhook/<id>`)
+   - **Staging Endpoints**: `<baseurl>/staging/<route>` (e.g. `http://localhost:8091/staging/api/webhook/<id>`)
+2. **Database Isolation**:
+   - Staging data is stored in `workflows_staging`, `connections_staging`, `workflow_versions_staging`, `replay_data_staging`.
+   - Production data is stored in `workflows_production`, `connections_production`, `workflow_versions_production`, `replay_data_production`.
+3. **Environment Switcher**:
+   - The UI header features a dropdown selector to switch between STAGING and PRODUCTION instantly.
 
 ---
 
 ## ⚙️ Environment Configuration
 
-Environment variables are managed via `.env` files located in the `Server/` directory.
+All environment variables are managed via a single configuration file located at `Server/.env`.
 
 > [!TIP]
 > Make sure to configure your `DB_USER`, `DB_PASSWORD`, and `KAFKA_BROKERS` accordingly if you are not using the default Docker setup.

@@ -26,10 +26,14 @@
         
         <template #end>
             <div class="user-actions-group">
-                <!-- Environment indicator -->
-                <div :class="['nav-env-badge', isProduction ? 'nav-env-badge--prod' : 'nav-env-badge--staging']">
+                <!-- Environment Switcher Dropdown -->
+                <div :class="['nav-env-dropdown', currentEnv === 'production' ? 'nav-env-dropdown--prod' : 'nav-env-dropdown--staging']">
                     <span class="nav-env-dot"></span>
-                    <span>{{ isProduction ? 'PRODUCTION' : 'STAGING' }}</span>
+                    <select class="nav-env-select" v-model="currentEnv" @change="onEnvChange">
+                        <option value="staging">STAGING</option>
+                        <option value="production">PRODUCTION</option>
+                    </select>
+                    <i class="pi pi-chevron-down nav-env-arrow"></i>
                 </div>
                 <div class="user-pill">
                     <div class="user-avatar">
@@ -62,26 +66,61 @@ import { useRoute } from 'vue-router'
 import { ref } from 'vue'
 
 const route = useRoute()
-const isProduction = ref(import.meta.env.VITE_APP_ENVIRONMENT === 'production')
+const currentEnv = ref<'staging' | 'production'>(
+    (localStorage.getItem('app_environment') as 'staging' | 'production') || 'staging'
+)
+
+const onEnvChange = () => {
+    localStorage.setItem('app_environment', currentEnv.value)
+    window.location.reload()
+}
+
 pageInit();
 </script>
 
 <style scoped src="./Home.style.css"></style>
 
 <style scoped>
-/* Environment badge in the navbar */
-.nav-env-badge {
+/* Environment selector dropdown in the navbar */
+.nav-env-dropdown {
+    position: relative;
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 4px 12px;
+    padding: 4px 10px;
     border-radius: 20px;
     font-size: 10px;
     font-weight: 800;
     letter-spacing: 1.2px;
-    margin-right: 4px;
+    margin-right: 8px;
     flex-shrink: 0;
     user-select: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+.nav-env-select {
+    appearance: none;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: inherit;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+    cursor: pointer;
+    padding-right: 14px;
+}
+.nav-env-select option {
+    background: #1e1e2d;
+    color: #e1e1e6;
+    font-weight: 600;
+}
+.nav-env-arrow {
+    position: absolute;
+    right: 8px;
+    font-size: 9px;
+    pointer-events: none;
+    opacity: 0.8;
 }
 .nav-env-dot {
     width: 6px;
@@ -89,20 +128,20 @@ pageInit();
     border-radius: 50%;
     flex-shrink: 0;
 }
-.nav-env-badge--staging {
+.nav-env-dropdown--staging {
     background: rgba(234, 179, 8, 0.12);
     color: #facc15;
     border: 1px solid rgba(234, 179, 8, 0.3);
 }
-.nav-env-badge--staging .nav-env-dot {
+.nav-env-dropdown--staging .nav-env-dot {
     background: #eab308;
 }
-.nav-env-badge--prod {
+.nav-env-dropdown--prod {
     background: rgba(34, 197, 94, 0.12);
     color: #4ade80;
     border: 1px solid rgba(34, 197, 94, 0.3);
 }
-.nav-env-badge--prod .nav-env-dot {
+.nav-env-dropdown--prod .nav-env-dot {
     background: #22c55e;
     animation: pulse-dot 1.5s infinite;
 }

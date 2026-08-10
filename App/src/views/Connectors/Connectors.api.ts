@@ -1,7 +1,8 @@
 import { WorkflowServicePromiseClient } from 'proto/workflow/workflow_grpc_web_pb'
 import {
     ConnectionList,
-    DeleteConnectionRequest
+    DeleteConnectionRequest,
+    ListConnectionsRequest
 } from 'proto/workflow/workflow_pb'
 import { Empty } from 'google-protobuf/google/protobuf/empty_pb'
 import { getApiUrl, getRestUrl } from '@/components/Composable/constants'
@@ -18,7 +19,7 @@ export const getConnectorTemplates = async (): Promise<any[]> => {
 
 export const getConnections = async (): Promise<ConnectionList> => {
     const client = new WorkflowServicePromiseClient(getApiUrl())
-    return await client.listConnections(new Empty(), getHeaders())
+    return await client.listConnections(new ListConnectionsRequest(), getHeaders())
 }
 
 export const deleteConnection = async (id: string): Promise<Empty> => {

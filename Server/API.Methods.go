@@ -114,47 +114,51 @@ func Login(userName string, password string) (string, error) {
 	return "", fmt.Errorf("invalid password")
 }
 
-func GetWorkflow(id string) (workflow *wf.Workflow, err error) {
-	workflow, err = DBCon.GetWorkflow(id)
+func GetWorkflow(id string, env string) (workflow *wf.Workflow, err error) {
+	workflow, err = DBCon.GetWorkflowEnv(id, env)
 	if err != nil {
 		return workflow, err
 	}
 	return workflow, nil
 }
 
-func ListWorkflows(offset int32, limit int32) (wl *wf.WorkflowList, err error) {
-	wl, err = DBCon.GetWorkflows(int(limit), int(offset))
+func ListWorkflows(offset int32, limit int32, env string) (wl *wf.WorkflowList, err error) {
+	wl, err = DBCon.GetWorkflowsEnv(int(limit), int(offset), env)
 	if err != nil {
 		return nil, err
 	}
 	return wl, nil
 }
-func UpdateWorkflow(workflow *wf.Workflow) (w *wf.Workflow, err error) {
-	if err := DBCon.UpdateWorkflow(workflow); err != nil {
+
+func UpdateWorkflow(workflow *wf.Workflow, env string) (w *wf.Workflow, err error) {
+	if err := DBCon.UpdateWorkflowEnv(workflow, env); err != nil {
 		return nil, err
 	}
 	return workflow, nil
 }
-func CreateWorkflow(workflow *wf.Workflow) (*wf.Workflow, error) {
-	id, err := DBCon.CreateWorkflow(workflow)
+
+func CreateWorkflow(workflow *wf.Workflow, env string) (*wf.Workflow, error) {
+	id, err := DBCon.CreateWorkflowEnv(workflow, env)
 	if err != nil {
 		return nil, err
 	}
 	workflow.Id = id
 	return workflow, nil
 }
-func DeleteWorkflow(id string) error {
-	return DBCon.DeleteWorkflow(id)
+
+func DeleteWorkflow(id string, env string) error {
+	return DBCon.DeleteWorkflowEnv(id, env)
 }
-func ListWorkflowHistoryImpl() (*wf.WorkflowHistoryList, error) {
-	history, err := DBCon.GetWorkflowHistory()
+
+func ListWorkflowHistoryImpl(env string) (*wf.WorkflowHistoryList, error) {
+	history, err := DBCon.GetWorkflowHistoryEnv(env)
 	if err != nil {
 		return nil, err
 	}
 
 	var hl []*wf.WorkflowHistory
 	for _, data := range history {
-		w, err := DBCon.GetWorkflow(data.WorkflowID)
+		w, err := DBCon.GetWorkflowEnv(data.WorkflowID, env)
 		if err != nil {
 			continue
 		}
@@ -171,8 +175,9 @@ func ListWorkflowHistoryImpl() (*wf.WorkflowHistoryList, error) {
 		History: hl,
 	}, nil
 }
-func GetWorkflowHistoryImpl(Id string) (*wf.WorkflowHistoryResponse, error) {
-	replayDataList, err := DBCon.GetReplayDataGroupedByProcessID(Id)
+
+func GetWorkflowHistoryImpl(Id string, env string) (*wf.WorkflowHistoryResponse, error) {
+	replayDataList, err := DBCon.GetReplayDataGroupedByProcessIDEnv(Id, env)
 	if err != nil {
 		return nil, err
 	}
@@ -209,48 +214,29 @@ func GetWorkflowHistoryImpl(Id string) (*wf.WorkflowHistoryResponse, error) {
 	}, nil
 }
 
-// ListWorkflowVersionsImpl returns all version snapshots for a workflow.
-// Only meaningful in staging environments.
-func ListWorkflowVersionsImpl(workflowID string) (*wf.WorkflowVersionList, error) {
-	versions, err := DBCon.ListWorkflowVersions(workflowID)
+func ListWorkflowVersionsImpl(workflowID string, env string) (*wf.WorkflowVersionList, error) {
+	versions, err := DBCon.ListWorkflowVersionsEnv(workflowID, env)
 	if err != nil {
 		return nil, err
 	}
 	return &wf.WorkflowVersionList{Versions: versions}, nil
 }
 
-// RestoreWorkflowVersionImpl restores the live staging workflow to a previous version's snapshot.
-func RestoreWorkflowVersionImpl(version *wf.WorkflowVersion, userID string) (*wf.Workflow, error) {
-	if DB.AppConfig.App_Environment != "staging" {
-		return nil, fmt.Errorf("version restore is only available in the staging environment")
-	}
-	// Fetch the current workflow to preserve metadata
-	existing, err := DBCon.GetWorkflow(version.WorkflowId)
+func RestoreWorkflowVersionImpl(version *wf.WorkflowVersion, userID string, env string) (*wf.Workflow, error) {
+	existing, err := DBCon.GetWorkflowEnv(version.WorkflowId, env)
 	if err != nil {
 		return nil, fmt.Errorf("workflow %s not found: %w", version.WorkflowId, err)
 	}
-	// Apply the version's nodes and edges onto the live workflow
 	existing.Nodes = version.Nodes
 	existing.Edges = version.Edges
 	existing.UpdatedBy = userID
-	if err := DBCon.UpdateWorkflow(existing); err != nil {
+	if err := DBCon.UpdateWorkflowEnv(existing, env); err != nil {
 		return nil, fmt.Errorf("failed to restore workflow version: %w", err)
 	}
 	return existing, nil
 }
 
-// PublishWorkflowImpl pushes a workflow version to production.
-// If PROD_SERVER_URL is set, it pushes via HTTP to the remote server.
-// Otherwise, it upserts the workflow in the same DB with environment="production".
 func PublishWorkflowImpl(req *wf.PublishWorkflowRequest) (*wf.PublishWorkflowResponse, error) {
-	if DB.AppConfig.App_Environment != "staging" {
-		return &wf.PublishWorkflowResponse{
-			Success: false,
-			Message: "Publishing is only available from the staging environment",
-		}, nil
-	}
-
-	// Remote server publish mode
 	if DB.AppConfig.Prod_Server_URL != "" {
 		resp, err := publishToRemoteServer(req)
 		if err != nil {
@@ -259,7 +245,6 @@ func PublishWorkflowImpl(req *wf.PublishWorkflowRequest) (*wf.PublishWorkflowRes
 		return resp, nil
 	}
 
-	// Same-DB publish mode: upsert with environment="production"
 	if err := DBCon.PublishWorkflowVersion(req.WorkflowId, req.VersionId); err != nil {
 		return &wf.PublishWorkflowResponse{
 			Success: false,
