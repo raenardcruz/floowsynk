@@ -4,7 +4,7 @@ export const getSelectedEnvironment = (): 'staging' | 'production' => {
 }
 
 export const getApiUrl = (): string => {
-    const baseUrl = import.meta.env.VITE_SERVER || 'http://localhost:8082';
+    const baseUrl = import.meta.env.VITE_SERVER || 'http://localhost:8090';
     const env = getSelectedEnvironment();
     if (env === 'staging') {
         return `${baseUrl.replace(/\/$/, '')}/staging`;
@@ -13,7 +13,7 @@ export const getApiUrl = (): string => {
 }
 
 export const getRestUrl = (): string => {
-    const restUrl = import.meta.env.VITE_REST_SERVER || 'http://localhost:8083';
+    const restUrl = import.meta.env.VITE_REST_SERVER || 'http://localhost:8091';
     const env = getSelectedEnvironment();
     if (env === 'staging') {
         return `${restUrl.replace(/\/$/, '')}/staging`;

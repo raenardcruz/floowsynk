@@ -20,11 +20,13 @@ RUN apk --no-cache add ca-certificates
 
 WORKDIR /root/
 
-# Copy binary from builder
+# Copy binary and connector templates from builder
 COPY --from=builder /app/main .
+COPY --from=builder /app/Server/connectors ./connectors
+COPY --from=builder /app/Server/connectors ./Server/connectors
 
 # Expose ports based on .env
-EXPOSE 8082 8083 50051
+EXPOSE 8090 8091 50051
 
 # Run the server
 CMD ["./main"]

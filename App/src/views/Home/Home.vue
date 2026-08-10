@@ -39,7 +39,7 @@
                     <div class="user-avatar">
                         <i class="pi pi-user"></i>
                     </div>
-                    <span class="user-name">Name</span>
+                    <span class="user-name">{{ userName }}</span>
                 </div>
                 <div class="logout" @click="logout" title="Log Out">
                     <span class="material-symbols-outlined">logout</span>
@@ -64,8 +64,11 @@ import AppDrawer from "./AppDrawer"
 import { openAppDrawer, logout, pageInit } from './Home.helper'
 import { useRoute } from 'vue-router'
 import { ref } from 'vue'
+import { useStorage } from '@vueuse/core'
+import { SESSION_USER_KEY } from '@/views/Login/Login.constants'
 
 const route = useRoute()
+const userName = useStorage(SESSION_USER_KEY, 'Guest')
 const currentEnv = ref<'staging' | 'production'>(
     (localStorage.getItem('app_environment') as 'staging' | 'production') || 'staging'
 )

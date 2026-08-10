@@ -16,11 +16,17 @@ RUN npm install
 ARG VITE_SERVER
 ENV VITE_SERVER=$VITE_SERVER
 
+ARG VITE_REST_SERVER
+ENV VITE_REST_SERVER=$VITE_REST_SERVER
+
 ARG VITE_APP_ENVIRONMENT=staging
 ENV VITE_APP_ENVIRONMENT=$VITE_APP_ENVIRONMENT
 
 # Copy source code
 COPY App/ .
+
+# Ensure SVG icons referenced via /src/components/Icons/... are exposed as static public assets in production
+RUN mkdir -p public/src/components/Icons && cp -r src/components/Icons/* public/src/components/Icons/
 
 # Build the app (assuming production build)
 RUN npm run build

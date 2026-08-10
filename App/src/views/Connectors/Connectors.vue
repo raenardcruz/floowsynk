@@ -50,7 +50,7 @@
         <div v-for="conn in filteredConnections" :key="conn.id" class="connection-item">
           <div class="connection-meta">
             <span class="connector-icon-wrapper">
-              <img v-if="getTemplateIcon(conn.connectorid) && (getTemplateIcon(conn.connectorid).startsWith('/') || getTemplateIcon(conn.connectorid).endsWith('.svg'))" :src="getTemplateIcon(conn.connectorid)" class="connector-img-icon" alt="icon" />
+              <img v-if="getTemplateIcon(conn.connectorid) && (getTemplateIcon(conn.connectorid).startsWith('/') || getTemplateIcon(conn.connectorid).endsWith('.svg'))" :src="resolveIconUrl(getTemplateIcon(conn.connectorid))" class="connector-img-icon" alt="icon" />
               <i v-else :class="getTemplateIcon(conn.connectorid)"></i>
             </span>
             <div class="connection-details">
@@ -149,7 +149,7 @@
         <div v-for="temp in filteredTemplates" :key="temp.id" class="template-card">
           <div class="template-header">
             <span class="template-icon">
-              <img v-if="temp.icon && (temp.icon.startsWith('/') || temp.icon.endsWith('.svg'))" :src="temp.icon" class="connector-img-icon" alt="icon" />
+              <img v-if="temp.icon && (temp.icon.startsWith('/') || temp.icon.endsWith('.svg'))" :src="resolveIconUrl(temp.icon)" class="connector-img-icon" alt="icon" />
               <i v-else :class="temp.icon || 'pi pi-box'"></i>
             </span>
             <div class="auth-pills-wrapper">
@@ -183,7 +183,7 @@
           <!-- Connector identity header -->
           <div class="modal-connector-header">
             <span class="modal-connector-icon">
-              <img v-if="selectedTemplate.icon && (selectedTemplate.icon.startsWith('/') || selectedTemplate.icon.endsWith('.svg'))" :src="selectedTemplate.icon" class="modal-connector-img" alt="icon" />
+              <img v-if="selectedTemplate.icon && (selectedTemplate.icon.startsWith('/') || selectedTemplate.icon.endsWith('.svg'))" :src="resolveIconUrl(selectedTemplate.icon)" class="modal-connector-img" alt="icon" />
               <i v-else :class="selectedTemplate.icon || 'pi pi-box'"></i>
             </span>
             <div class="modal-connector-identity">
@@ -723,6 +723,12 @@ const checkAllStatuses = async () => {
 }
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
+const resolveIconUrl = (iconPath?: string) => {
+  if (!iconPath) return ''
+  if (iconPath.includes('?') || !iconPath.endsWith('.svg')) return iconPath
+  return `${iconPath}?v=2`
+}
+
 const getTemplateIcon = (connectorId: string) => {
   const match = templates.value.find(t => t.id === connectorId)
   return match ? match.icon : 'pi pi-box'

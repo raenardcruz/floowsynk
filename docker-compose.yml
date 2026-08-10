@@ -16,7 +16,7 @@ services:
     environment:
       - DB_HOST=${DB_HOST:-host.docker.internal}
       - REDIS_HOST=${REDIS_HOST:-host.docker.internal}
-      - KAFKA_BROKERS=${KAFKA_BROKERS:-host.docker.internal:9092}
+      - KAFKA_BROKERS=${KAFKA_BROKERS:-host.docker.internal:29092}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     restart: unless-stopped
@@ -34,7 +34,7 @@ services:
     environment:
       - DB_HOST=${DB_HOST:-host.docker.internal}
       - REDIS_HOST=${REDIS_HOST:-host.docker.internal}
-      - KAFKA_BROKERS=${KAFKA_BROKERS:-host.docker.internal:9092}
+      - KAFKA_BROKERS=${KAFKA_BROKERS:-host.docker.internal:29092}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
@@ -54,7 +54,7 @@ services:
     environment:
       - DB_HOST=${DB_HOST:-host.docker.internal}
       - REDIS_HOST=${REDIS_HOST:-host.docker.internal}
-      - KAFKA_BROKERS=${KAFKA_BROKERS:-host.docker.internal:9092}
+      - KAFKA_BROKERS=${KAFKA_BROKERS:-host.docker.internal:29092}
       - SERVER_GRPC_HOST=server
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -70,10 +70,15 @@ services:
       context: .
       dockerfile: App/Dockerfile
       args:
-        - VITE_SERVER=${VITE_SERVER:-http://localhost:8090}
+        - VITE_SERVER=${VITE_SERVER:-https://floowsynkapi.raenardcruz.com}
+        - VITE_REST_SERVER=${VITE_REST_SERVER:-https://flowapi.raenardcruz.com}
     container_name: floowsynk-app
     ports:
       - "3000:80"   # http://localhost:3000
     depends_on:
       - server
     restart: unless-stopped
+
+volumes:
+  kafka_data:
+

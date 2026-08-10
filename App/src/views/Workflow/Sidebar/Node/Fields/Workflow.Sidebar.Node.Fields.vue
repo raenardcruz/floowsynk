@@ -78,8 +78,8 @@
         <div style="padding: 8px; background: rgba(0,0,0,0.15); border-radius: 4px; border: 1px solid rgba(255,255,255,0.08);">
             <label style="font-weight: 600; font-size: 0.8rem; color: var(--primary-color); display: block; margin-bottom: 4px;">API Webhook Trigger URL</label>
             <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px;">
-                <code style="word-break: break-all; font-size: 0.8rem; color: #ffca28;">http://localhost:8082/api/webhook/{{ tab.id }}</code>
-                <button type="button" @click="copyToClipboard(`http://localhost:8082/api/webhook/${tab.id}`)" style="background: transparent; border: none; color: var(--text-color-secondary); cursor: pointer; padding: 4px; display: flex; align-items: center;"><span class="material-symbols-outlined" style="font-size: 1.15rem;">content_copy</span></button>
+                <code style="word-break: break-all; font-size: 0.8rem; color: #ffca28;">{{ webhookUrl }}</code>
+                <button type="button" @click="copyToClipboard(webhookUrl)" style="background: transparent; border: none; color: var(--text-color-secondary); cursor: pointer; padding: 4px; display: flex; align-items: center;"><span class="material-symbols-outlined" style="font-size: 1.15rem;">content_copy</span></button>
             </div>
         </div>
 
@@ -323,10 +323,14 @@ const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
 }
 
+const webhookUrl = computed(() => {
+    return `${getRestUrl()}/api/webhook/${tab.value.id}`;
+})
+
 const curlCommand = computed(() => {
     const secret = modelValue.value ? modelValue.value['value'] : '';
     const header = secret ? `-H "X-Webhook-Secret: ${secret}" \\\n  ` : '';
-    return `curl -X POST \\\n  -H "Content-Type: application/json" \\\n  ${header}http://localhost:8082/api/webhook/${tab.value.id}`;
+    return `curl -X POST \\\n  -H "Content-Type: application/json" \\\n  ${header}${webhookUrl.value}`;
 })
 const { filteredProcesses: rawProcesses, variables } = useSidebarNodeHooks(props.tabid)
 const filteredProcesses = rawProcesses.value.map((process: any) => ({
