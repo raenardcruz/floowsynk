@@ -80,6 +80,8 @@ message Workflow {
     repeated string tags = 11;
     optional bool isNew = 12;
     bool isModified = 13;
+    string publishedVersionId = 14;
+    int32 publishedVersionNum = 15;
 }
 
 // WorkflowVersion is a point-in-time snapshot of a workflow (staging only).

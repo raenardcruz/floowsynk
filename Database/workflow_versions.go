@@ -1,6 +1,7 @@
 package DB
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -140,6 +141,12 @@ func (db *DatabaseConnection) SaveRemotePublishedWorkflow(workflow *pb.Workflow)
 	}
 
 	now := time.Now().UTC().Unix()
+	// A new publish supersedes any local production edit; the published copy is
+	// once again the authoritative state.
+	if err := db.conn.Where("source_workflow_id = ? AND environment = ?", workflow.Id, "production_modified").Delete(&Workflow{}).Error; err != nil {
+		return fmt.Errorf("failed to remove modified production workflow copy: %w", err)
+	}
+	defer DeleteCache(context.Background(), fmt.Sprintf("workflow:production:%s", workflow.Id))
 
 	var existing Workflow
 	err = db.conn.First(&existing, "id = ? AND environment = ?", workflow.Id, "production").Error
@@ -197,6 +204,9 @@ func (db *DatabaseConnection) PublishWorkflowVersion(workflowID, versionID strin
 		return fmt.Errorf("staging workflow %s not found: %w", workflowID, err)
 	}
 
+	pubVersionID := ""
+	pubVersionNum := 0
+
 	if versionID != "" {
 		version, err := db.GetWorkflowVersion(versionID)
 		if err != nil {
@@ -204,10 +214,44 @@ func (db *DatabaseConnection) PublishWorkflowVersion(workflowID, versionID strin
 		}
 		nodes = version.Nodes
 		edges = version.Edges
+		pubVersionID = version.ID
+		pubVersionNum = version.VersionNum
 	} else {
 		nodes = stagingWF.Nodes
 		edges = stagingWF.Edges
+
+		// Always ensure an explicit WorkflowVersion snapshot exists when publishing current live workflow
+		var maxVersion WorkflowVersion
+		nextNum := 1
+		if err := db.conn.Where("workflow_id = ?", workflowID).Order("version_num DESC").First(&maxVersion).Error; err == nil {
+			nextNum = maxVersion.VersionNum + 1
+		}
+
+		now := time.Now().UTC().Unix()
+		newVersion := WorkflowVersion{
+			ID:         uuid.NewString(),
+			WorkflowID: workflowID,
+			VersionNum: nextNum,
+			Label:      fmt.Sprintf("v%d (Published)", nextNum),
+			Nodes:      nodes,
+			Edges:      edges,
+			SavedBy:    stagingWF.UpdatedBy,
+			SavedAt:    now,
+		}
+		if err := db.conn.Create(&newVersion).Error; err != nil {
+			log.Printf("Warning: could not create snapshot version on publish: %v", err)
+			pubVersionNum = nextNum
+		} else {
+			pubVersionID = newVersion.ID
+			pubVersionNum = newVersion.VersionNum
+		}
 	}
+
+	// Delete any existing production_modified draft record when publishing a new version to production
+	if err := db.conn.Where("source_workflow_id = ? AND environment = ?", workflowID, "production_modified").Delete(&Workflow{}).Error; err != nil {
+		return fmt.Errorf("failed to remove modified production workflow copy: %w", err)
+	}
+	defer DeleteCache(context.Background(), fmt.Sprintf("workflow:production:%s", workflowID))
 
 	// Upsert into production environment
 	now := time.Now().UTC().Unix()
@@ -217,40 +261,44 @@ func (db *DatabaseConnection) PublishWorkflowVersion(workflowID, versionID strin
 		err = db.conn.Model(&Workflow{}).
 			Where("id = ? AND environment = ?", workflowID, "production").
 			Updates(map[string]interface{}{
-				"name":        stagingWF.Name,
-				"type":        stagingWF.Type,
-				"description": stagingWF.Description,
-				"nodes":       nodes,
-				"edges":       edges,
-				"updated_by":  stagingWF.UpdatedBy,
-				"tags":        stagingWF.Tags,
-				"updated_at":  now,
-				"is_modified": false,
+				"name":                  stagingWF.Name,
+				"type":                  stagingWF.Type,
+				"description":           stagingWF.Description,
+				"nodes":                 nodes,
+				"edges":                 edges,
+				"updated_by":            stagingWF.UpdatedBy,
+				"tags":                  stagingWF.Tags,
+				"updated_at":            now,
+				"is_modified":           false,
+				"published_version_id":  pubVersionID,
+				"published_version_num": pubVersionNum,
 			}).Error
 		if err != nil {
 			return fmt.Errorf("failed to update production workflow: %w", err)
 		}
-		log.Printf("Updated production workflow %s from staging version %s", workflowID, versionID)
+		log.Printf("Updated production workflow %s from staging version %s (v%d)", workflowID, pubVersionID, pubVersionNum)
 	} else {
 		prodWF = Workflow{
-			ID:          stagingWF.ID,
-			Name:        stagingWF.Name,
-			Type:        stagingWF.Type,
-			Description: stagingWF.Description,
-			Nodes:       nodes,
-			Edges:       edges,
-			CreatedBy:   stagingWF.CreatedBy,
-			UpdatedBy:   stagingWF.UpdatedBy,
-			Tags:        stagingWF.Tags,
-			CreatedAt:   stagingWF.CreatedAt,
-			UpdatedAt:   now,
-			Environment: "production",
-			IsModified:  false,
+			ID:                  stagingWF.ID,
+			Name:                stagingWF.Name,
+			Type:                stagingWF.Type,
+			Description:         stagingWF.Description,
+			Nodes:               nodes,
+			Edges:               edges,
+			CreatedBy:           stagingWF.CreatedBy,
+			UpdatedBy:           stagingWF.UpdatedBy,
+			Tags:                stagingWF.Tags,
+			CreatedAt:           stagingWF.CreatedAt,
+			UpdatedAt:           now,
+			Environment:         "production",
+			IsModified:          false,
+			PublishedVersionID:  pubVersionID,
+			PublishedVersionNum: pubVersionNum,
 		}
 		if err := db.conn.Create(&prodWF).Error; err != nil {
 			return fmt.Errorf("failed to create production workflow: %w", err)
 		}
-		log.Printf("Created production workflow %s from staging version %s", workflowID, versionID)
+		log.Printf("Created production workflow %s from staging version %s (v%d)", workflowID, pubVersionID, pubVersionNum)
 	}
 	return nil
 }

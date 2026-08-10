@@ -9,6 +9,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/lib/pq"
 	pb "github.com/raenardcruz/floowsynk/CodeGen/go/workflow"
 )
@@ -28,8 +29,13 @@ type Workflow struct {
 	CreatedAt   int64
 	UpdatedAt   int64
 	// Environment: "staging" or "production"
-	Environment string `gorm:"default:'staging'"`
-	IsModified  bool   `gorm:"default:false;column:is_modified"`
+	Environment         string `gorm:"default:'staging'"`
+	IsModified          bool   `gorm:"default:false;column:is_modified"`
+	PublishedVersionID  string `gorm:"column:published_version_id"`
+	PublishedVersionNum int    `gorm:"column:published_version_num"`
+	// SourceWorkflowID links a production edit copy to its immutable published workflow.
+	// It is empty for staging and published production records.
+	SourceWorkflowID string `gorm:"index;column:source_workflow_id"`
 }
 
 func (j JSONB) Value() (driver.Value, error) {
@@ -96,6 +102,16 @@ func (db *DatabaseConnection) GetWorkflows(limit, offset int) (*pb.WorkflowList,
 
 	wl := &pb.WorkflowList{Workflows: make([]*pb.Workflow, 0)}
 	for _, wf := range workflows {
+		// A modified production copy has its own database primary key.  Present its
+		// published workflow ID to callers so all API operations continue to use the
+		// stable workflow identity.
+		workflowID := wf.ID
+		if AppConfig.App_Environment == "production" {
+			var modified Workflow
+			if err := db.conn.Where("source_workflow_id = ? AND environment = ?", wf.ID, "production_modified").Order("updated_at DESC").First(&modified).Error; err == nil {
+				wf = modified
+			}
+		}
 		var nodes []*pb.Node
 		if err := json.Unmarshal(wf.Nodes, &nodes); err != nil {
 			log.Printf("Error unmarshalling nodes: %v", err)
@@ -107,16 +123,18 @@ func (db *DatabaseConnection) GetWorkflows(limit, offset int) (*pb.WorkflowList,
 			return nil, err
 		}
 		wl.Workflows = append(wl.Workflows, &pb.Workflow{
-			Id:          wf.ID,
-			Name:        wf.Name,
-			Type:        wf.Type,
-			Description: wf.Description,
-			Nodes:       nodes,
-			Edges:       edges,
-			CreatedAt:   time.Unix(wf.CreatedAt, 0).Format("Jan 02, 2006"),
-			UpdatedAt:   time.Unix(wf.UpdatedAt, 0).Format("Jan 02, 2006"),
-			Tags:        []string(wf.Tags),
-			IsModified:  wf.IsModified,
+			Id:                  workflowID,
+			Name:                wf.Name,
+			Type:                wf.Type,
+			Description:         wf.Description,
+			Nodes:               nodes,
+			Edges:               edges,
+			CreatedAt:           time.Unix(wf.CreatedAt, 0).Format("Jan 02, 2006"),
+			UpdatedAt:           time.Unix(wf.UpdatedAt, 0).Format("Jan 02, 2006"),
+			Tags:                []string(wf.Tags),
+			IsModified:          wf.IsModified,
+			PublishedVersionId:  wf.PublishedVersionID,
+			PublishedVersionNum: int32(wf.PublishedVersionNum),
 		})
 	}
 	return wl, nil
@@ -134,10 +152,21 @@ func (db *DatabaseConnection) GetWorkflow(id string) (*pb.Workflow, error) {
 	}
 
 	var wf Workflow
-	if err := db.conn.First(&wf, "id = ? AND environment = ?", id, AppConfig.App_Environment).Error; err != nil {
-		if err := db.conn.First(&wf, "id = ?", id).Error; err != nil {
-			log.Printf("Error querying workflow: %v", err)
-			return nil, err
+	if AppConfig.App_Environment == "production" {
+		if err := db.conn.First(&wf, "source_workflow_id = ? AND environment = ?", id, "production_modified").Error; err != nil {
+			if err := db.conn.First(&wf, "id = ? AND environment = ?", id, "production").Error; err != nil {
+				if err := db.conn.First(&wf, "id = ?", id).Error; err != nil {
+					log.Printf("Error querying workflow: %v", err)
+					return nil, err
+				}
+			}
+		}
+	} else {
+		if err := db.conn.First(&wf, "id = ? AND environment = ?", id, AppConfig.App_Environment).Error; err != nil {
+			if err := db.conn.First(&wf, "id = ?", id).Error; err != nil {
+				log.Printf("Error querying workflow: %v", err)
+				return nil, err
+			}
 		}
 	}
 
@@ -153,16 +182,19 @@ func (db *DatabaseConnection) GetWorkflow(id string) (*pb.Workflow, error) {
 	}
 
 	workflow := &pb.Workflow{
-		Id:          wf.ID,
-		Name:        wf.Name,
-		Type:        wf.Type,
-		Description: wf.Description,
-		Nodes:       nodes,
-		Edges:       edges,
-		CreatedAt:   time.Unix(wf.CreatedAt, 0).Format("Jan 02, 2006"),
-		UpdatedAt:   time.Unix(wf.UpdatedAt, 0).Format("jan 02, 2006"),
-		Tags:        wf.Tags,
-		IsModified:  wf.IsModified,
+		// Keep the published ID stable even while serving fields from an edited copy.
+		Id:                  id,
+		Name:                wf.Name,
+		Type:                wf.Type,
+		Description:         wf.Description,
+		Nodes:               nodes,
+		Edges:               edges,
+		CreatedAt:           time.Unix(wf.CreatedAt, 0).Format("Jan 02, 2006"),
+		UpdatedAt:           time.Unix(wf.UpdatedAt, 0).Format("jan 02, 2006"),
+		Tags:                wf.Tags,
+		IsModified:          wf.IsModified,
+		PublishedVersionId:  wf.PublishedVersionID,
+		PublishedVersionNum: int32(wf.PublishedVersionNum),
 	}
 
 	if err := SetCache(ctx, cacheKey, workflow, workflowCacheExpiration); err != nil {
@@ -184,10 +216,20 @@ func (db *DatabaseConnection) GetWebhookWorkflow(id string) (*pb.Workflow, error
 	}
 
 	var wf Workflow
-	// Webhook workflows check both staging and production (webhooks are always live)
-	if err := db.conn.First(&wf, "id = ? and type = ?", id, "webhook").Error; err != nil {
-		log.Printf("Error querying workflow: %v", err)
-		return nil, err
+	// Production edits are stored as a linked copy and must take precedence when
+	// the webhook is executed by its published workflow ID.
+	loadedModifiedCopy := false
+	if AppConfig.App_Environment == "production" {
+		if err := db.conn.First(&wf, "source_workflow_id = ? AND environment = ? AND type = ?", id, "production_modified", "webhook").Error; err == nil {
+			loadedModifiedCopy = true
+		}
+	}
+	// Webhook workflows check both staging and production (webhooks are always live).
+	if !loadedModifiedCopy {
+		if err := db.conn.First(&wf, "id = ? and type = ?", id, "webhook").Error; err != nil {
+			log.Printf("Error querying workflow: %v", err)
+			return nil, err
+		}
 	}
 
 	var nodes []*pb.Node
@@ -202,7 +244,7 @@ func (db *DatabaseConnection) GetWebhookWorkflow(id string) (*pb.Workflow, error
 	}
 
 	workflow := &pb.Workflow{
-		Id:          wf.ID,
+		Id:          id,
 		Name:        wf.Name,
 		Type:        wf.Type,
 		Description: wf.Description,
@@ -238,6 +280,13 @@ func (db *DatabaseConnection) GetIntervalWorkflows() (*pb.WorkflowList, error) {
 
 	wl := &pb.WorkflowList{Workflows: make([]*pb.Workflow, 0)}
 	for _, wf := range workflows {
+		workflowID := wf.ID
+		if AppConfig.App_Environment == "production" {
+			var modified Workflow
+			if err := db.conn.Where("source_workflow_id = ? AND environment = ?", wf.ID, "production_modified").Order("updated_at DESC").First(&modified).Error; err == nil {
+				wf = modified
+			}
+		}
 		var nodes []*pb.Node
 		if err := json.Unmarshal(wf.Nodes, &nodes); err != nil {
 			log.Printf("Error unmarshalling nodes: %v", err)
@@ -249,7 +298,7 @@ func (db *DatabaseConnection) GetIntervalWorkflows() (*pb.WorkflowList, error) {
 			return nil, err
 		}
 		wl.Workflows = append(wl.Workflows, &pb.Workflow{
-			Id:          wf.ID,
+			Id:          workflowID,
 			Name:        wf.Name,
 			Type:        wf.Type,
 			Description: wf.Description,
@@ -282,28 +331,78 @@ func (db *DatabaseConnection) UpdateWorkflow(workflow *pb.Workflow) error {
 		return err
 	}
 
-	updates := map[string]interface{}{
-		"name":        workflow.Name,
-		"type":        workflow.Type,
-		"description": workflow.Description,
-		"nodes":       nodes,
-		"edges":       edges,
-		"updated_by":  workflow.UpdatedBy,
-		"updated_at":  time.Now().UTC().Unix(),
-		"tags":        pq.StringArray(workflow.Tags),
-	}
-
 	if AppConfig.App_Environment == "production" {
-		updates["is_modified"] = true
 		workflow.IsModified = true
-	}
+		// Check if a separate modified draft record already exists for production
+		var modWF Workflow
+		errMod := db.conn.First(&modWF, "source_workflow_id = ? AND environment = ?", workflow.Id, "production_modified").Error
+		now := time.Now().UTC().Unix()
 
-	if err := db.conn.Model(&Workflow{}).Where("id = ? AND environment = ?", workflow.Id, AppConfig.App_Environment).Updates(updates).Error; err != nil {
-		return err
-	}
+		if errMod == nil {
+			// Update existing draft record
+			updates := map[string]interface{}{
+				"name":        workflow.Name,
+				"type":        workflow.Type,
+				"description": workflow.Description,
+				"nodes":       nodes,
+				"edges":       edges,
+				"updated_by":  workflow.UpdatedBy,
+				"updated_at":  now,
+				"tags":        pq.StringArray(workflow.Tags),
+				"is_modified": true,
+			}
+			if err := db.conn.Model(&Workflow{}).Where("source_workflow_id = ? AND environment = ?", workflow.Id, "production_modified").Updates(updates).Error; err != nil {
+				return err
+			}
+		} else {
+			// Create a separate draft record for production edits
+			var prodBase Workflow
+			if err := db.conn.First(&prodBase, "id = ? AND environment = ?", workflow.Id, "production").Error; err != nil {
+				return fmt.Errorf("published production workflow %s not found: %w", workflow.Id, err)
+			}
 
-	// Create or update version snapshot (staging only)
-	if AppConfig.App_Environment == "staging" {
+			modWF = Workflow{
+				ID:                  uuid.NewString(),
+				Name:                workflow.Name,
+				Type:                workflow.Type,
+				Description:         workflow.Description,
+				Nodes:               nodes,
+				Edges:               edges,
+				CreatedBy:           workflow.CreatedBy,
+				UpdatedBy:           workflow.UpdatedBy,
+				Tags:                pq.StringArray(workflow.Tags),
+				CreatedAt:           now,
+				UpdatedAt:           now,
+				Environment:         "production_modified",
+				IsModified:          true,
+				PublishedVersionID:  prodBase.PublishedVersionID,
+				PublishedVersionNum: prodBase.PublishedVersionNum,
+				SourceWorkflowID:    workflow.Id,
+			}
+			if err := db.conn.Create(&modWF).Error; err != nil {
+				return fmt.Errorf("failed to create modified production workflow copy: %w", err)
+			}
+		}
+
+		// Also update is_modified status on the published base workflow so queries mark it as modified
+		db.conn.Model(&Workflow{}).Where("id = ? AND environment = ?", workflow.Id, "production").Update("is_modified", true)
+	} else {
+		updates := map[string]interface{}{
+			"name":        workflow.Name,
+			"type":        workflow.Type,
+			"description": workflow.Description,
+			"nodes":       nodes,
+			"edges":       edges,
+			"updated_by":  workflow.UpdatedBy,
+			"updated_at":  time.Now().UTC().Unix(),
+			"tags":        pq.StringArray(workflow.Tags),
+		}
+
+		if err := db.conn.Model(&Workflow{}).Where("id = ? AND environment = ?", workflow.Id, AppConfig.App_Environment).Updates(updates).Error; err != nil {
+			return err
+		}
+
+		// Create or update version snapshot (staging only)
 		if err := db.CreateOrUpdateWorkflowVersion(workflow.Id, nodes, edges, workflow.UpdatedBy); err != nil {
 			log.Printf("Warning: Failed to create workflow version for %s: %v", workflow.Id, err)
 		}
@@ -321,15 +420,23 @@ func (db *DatabaseConnection) UpdateWorkflow(workflow *pb.Workflow) error {
 	}
 
 	if workflow.Type == "interval" {
-		intervalCacheKey := "workflow:interval:" + workflow.Id
-		DeleteCache(ctx, intervalCacheKey)
+		DeleteCache(ctx, "interval_workflows:")
 	}
 
 	return nil
 }
 
 func (db *DatabaseConnection) DeleteWorkflow(id string) error {
-	if err := db.conn.Delete(&Workflow{}, "id = ?", id).Error; err != nil {
+	if AppConfig.App_Environment == "production" {
+		if err := db.conn.Where("source_workflow_id = ? AND environment = ?", id, "production_modified").Delete(&Workflow{}).Error; err != nil {
+			return err
+		}
+		if err := db.conn.Where("id = ? AND environment = ?", id, "production").Delete(&Workflow{}).Error; err != nil {
+			return err
+		}
+		return nil
+	}
+	if err := db.conn.Delete(&Workflow{}, "id = ? AND environment = ?", id, AppConfig.App_Environment).Error; err != nil {
 		return err
 	}
 	return nil
@@ -337,30 +444,20 @@ func (db *DatabaseConnection) DeleteWorkflow(id string) error {
 
 func (db *DatabaseConnection) RevertWorkflowToStaging(workflowID string) (*pb.Workflow, error) {
 	ctx := context.Background()
-	var stagingWF Workflow
-	if err := db.conn.First(&stagingWF, "id = ? AND environment = ?", workflowID, "staging").Error; err != nil {
-		return nil, fmt.Errorf("staging workflow %s not found: %w", workflowID, err)
+
+	// Delete the separate modified draft record if it exists
+	if err := db.conn.Where("source_workflow_id = ? AND environment = ?", workflowID, "production_modified").Delete(&Workflow{}).Error; err != nil {
+		return nil, fmt.Errorf("failed to delete modified production workflow copy: %w", err)
 	}
 
-	now := time.Now().UTC().Unix()
-	updates := map[string]interface{}{
-		"name":        stagingWF.Name,
-		"type":        stagingWF.Type,
-		"description": stagingWF.Description,
-		"nodes":       stagingWF.Nodes,
-		"edges":       stagingWF.Edges,
-		"updated_by":  stagingWF.UpdatedBy,
-		"tags":        stagingWF.Tags,
-		"updated_at":  now,
-		"is_modified": false,
-	}
-
-	if err := db.conn.Model(&Workflow{}).Where("id = ? AND environment = ?", workflowID, "production").Updates(updates).Error; err != nil {
-		return nil, fmt.Errorf("failed to revert production workflow: %w", err)
+	// Reset is_modified flag on the published production workflow
+	if err := db.conn.Model(&Workflow{}).Where("id = ? AND environment = ?", workflowID, "production").Update("is_modified", false).Error; err != nil {
+		return nil, fmt.Errorf("failed to reset published production workflow: %w", err)
 	}
 
 	DeleteCache(ctx, fmt.Sprintf("workflow:%s:%s", "production", workflowID))
 	DeleteCache(ctx, "workflow:"+workflowID)
+	DeleteCache(ctx, "interval_workflows:")
 
 	return db.GetWorkflow(workflowID)
 }

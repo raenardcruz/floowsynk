@@ -2366,7 +2366,9 @@ createdby: jspb.Message.getFieldWithDefault(msg, 9, ""),
 updatedby: jspb.Message.getFieldWithDefault(msg, 10, ""),
 tagsList: (f = jspb.Message.getRepeatedField(msg, 11)) == null ? undefined : f,
 isnew: (f = jspb.Message.getBooleanField(msg, 12)) == null ? undefined : f,
-ismodified: jspb.Message.getBooleanFieldWithDefault(msg, 13, false)
+ismodified: jspb.Message.getBooleanFieldWithDefault(msg, 13, false),
+publishedversionid: jspb.Message.getFieldWithDefault(msg, 14, ""),
+publishedversionnum: jspb.Message.getFieldWithDefault(msg, 15, 0)
   };
 
   if (includeInstance) {
@@ -2456,6 +2458,14 @@ proto.proto.Workflow.deserializeBinaryFromReader = function(msg, reader) {
     case 13:
       var value = /** @type {boolean} */ (reader.readBool());
       msg.setIsmodified(value);
+      break;
+    case 14:
+      var value = /** @type {string} */ (reader.readStringRequireUtf8());
+      msg.setPublishedversionid(value);
+      break;
+    case 15:
+      var value = /** @type {number} */ (reader.readInt32());
+      msg.setPublishedversionnum(value);
       break;
     default:
       reader.skipField();
@@ -2576,6 +2586,20 @@ proto.proto.Workflow.serializeBinaryToWriter = function(message, writer) {
   if (f) {
     writer.writeBool(
       13,
+      f
+    );
+  }
+  f = message.getPublishedversionid();
+  if (f.length > 0) {
+    writer.writeString(
+      14,
+      f
+    );
+  }
+  f = message.getPublishedversionnum();
+  if (f !== 0) {
+    writer.writeInt32(
+      15,
       f
     );
   }
@@ -2890,6 +2914,42 @@ proto.proto.Workflow.prototype.getIsmodified = function() {
  */
 proto.proto.Workflow.prototype.setIsmodified = function(value) {
   return jspb.Message.setProto3BooleanField(this, 13, value);
+};
+
+
+/**
+ * optional string publishedVersionId = 14;
+ * @return {string}
+ */
+proto.proto.Workflow.prototype.getPublishedversionid = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 14, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.proto.Workflow} returns this
+ */
+proto.proto.Workflow.prototype.setPublishedversionid = function(value) {
+  return jspb.Message.setProto3StringField(this, 14, value);
+};
+
+
+/**
+ * optional int32 publishedVersionNum = 15;
+ * @return {number}
+ */
+proto.proto.Workflow.prototype.getPublishedversionnum = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 15, 0));
+};
+
+
+/**
+ * @param {number} value
+ * @return {!proto.proto.Workflow} returns this
+ */
+proto.proto.Workflow.prototype.setPublishedversionnum = function(value) {
+  return jspb.Message.setProto3IntField(this, 15, value);
 };
 
 

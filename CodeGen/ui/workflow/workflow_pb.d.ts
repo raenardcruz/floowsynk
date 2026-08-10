@@ -261,6 +261,12 @@ export class Workflow extends jspb.Message {
   getIsmodified(): boolean;
   setIsmodified(value: boolean): Workflow;
 
+  getPublishedversionid(): string;
+  setPublishedversionid(value: string): Workflow;
+
+  getPublishedversionnum(): number;
+  setPublishedversionnum(value: number): Workflow;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): Workflow.AsObject;
   static toObject(includeInstance: boolean, msg: Workflow): Workflow.AsObject;
@@ -284,6 +290,8 @@ export namespace Workflow {
     tagsList: Array<string>;
     isnew?: boolean;
     ismodified: boolean;
+    publishedversionid: string;
+    publishedversionnum: number;
   };
 
   export enum IsnewCase {

@@ -7,6 +7,7 @@
                 <!-- Environment badges -->
                 <span v-if="isProduction" class="env-badge env-badge--live" title="Production — live data, no versioning">
                     <span class="material-symbols-outlined">circle</span> LIVE
+                    <template v-if="(tab as any).publishedversionnum"> (v{{ (tab as any).publishedversionnum }})</template>
                 </span>
                 <span v-else class="env-badge env-badge--staging" title="Staging — versioning enabled">
                     <span class="material-symbols-outlined">layers</span> STAGING

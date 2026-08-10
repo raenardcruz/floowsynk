@@ -231,6 +231,8 @@ const executePublish = async () => {
         const result = resp as any
         if (result.getSuccess()) {
             alert(`✅ ${result.getMessage()}`)
+            await loadVersions()
+            emit('restored')
         } else {
             alert(`❌ Publish failed: ${result.getMessage()}`)
         }

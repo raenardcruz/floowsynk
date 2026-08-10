@@ -603,22 +603,24 @@ func (x *WorkflowList) GetWorkflows() []*Workflow {
 }
 
 type Workflow struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
-	Nodes         []*Node                `protobuf:"bytes,4,rep,name=nodes,proto3" json:"nodes,omitempty"`
-	Edges         []*Edge                `protobuf:"bytes,5,rep,name=edges,proto3" json:"edges,omitempty"`
-	Type          string                 `protobuf:"bytes,6,opt,name=type,proto3" json:"type,omitempty"`
-	CreatedAt     string                 `protobuf:"bytes,7,opt,name=createdAt,proto3" json:"createdAt,omitempty"`
-	UpdatedAt     string                 `protobuf:"bytes,8,opt,name=updatedAt,proto3" json:"updatedAt,omitempty"`
-	CreatedBy     string                 `protobuf:"bytes,9,opt,name=createdBy,proto3" json:"createdBy,omitempty"`
-	UpdatedBy     string                 `protobuf:"bytes,10,opt,name=updatedBy,proto3" json:"updatedBy,omitempty"`
-	Tags          []string               `protobuf:"bytes,11,rep,name=tags,proto3" json:"tags,omitempty"`
-	IsNew         *bool                  `protobuf:"varint,12,opt,name=isNew,proto3,oneof" json:"isNew,omitempty"`
-	IsModified    bool                   `protobuf:"varint,13,opt,name=isModified,proto3" json:"isModified,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state               protoimpl.MessageState `protogen:"open.v1"`
+	Id                  string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name                string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Description         string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	Nodes               []*Node                `protobuf:"bytes,4,rep,name=nodes,proto3" json:"nodes,omitempty"`
+	Edges               []*Edge                `protobuf:"bytes,5,rep,name=edges,proto3" json:"edges,omitempty"`
+	Type                string                 `protobuf:"bytes,6,opt,name=type,proto3" json:"type,omitempty"`
+	CreatedAt           string                 `protobuf:"bytes,7,opt,name=createdAt,proto3" json:"createdAt,omitempty"`
+	UpdatedAt           string                 `protobuf:"bytes,8,opt,name=updatedAt,proto3" json:"updatedAt,omitempty"`
+	CreatedBy           string                 `protobuf:"bytes,9,opt,name=createdBy,proto3" json:"createdBy,omitempty"`
+	UpdatedBy           string                 `protobuf:"bytes,10,opt,name=updatedBy,proto3" json:"updatedBy,omitempty"`
+	Tags                []string               `protobuf:"bytes,11,rep,name=tags,proto3" json:"tags,omitempty"`
+	IsNew               *bool                  `protobuf:"varint,12,opt,name=isNew,proto3,oneof" json:"isNew,omitempty"`
+	IsModified          bool                   `protobuf:"varint,13,opt,name=isModified,proto3" json:"isModified,omitempty"`
+	PublishedVersionId  string                 `protobuf:"bytes,14,opt,name=publishedVersionId,proto3" json:"publishedVersionId,omitempty"`
+	PublishedVersionNum int32                  `protobuf:"varint,15,opt,name=publishedVersionNum,proto3" json:"publishedVersionNum,omitempty"`
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
 }
 
 func (x *Workflow) Reset() {
@@ -740,6 +742,20 @@ func (x *Workflow) GetIsModified() bool {
 		return x.IsModified
 	}
 	return false
+}
+
+func (x *Workflow) GetPublishedVersionId() string {
+	if x != nil {
+		return x.PublishedVersionId
+	}
+	return ""
+}
+
+func (x *Workflow) GetPublishedVersionNum() int32 {
+	if x != nil {
+		return x.PublishedVersionNum
+	}
+	return 0
 }
 
 // WorkflowVersion is a point-in-time snapshot of a workflow (staging only).
@@ -2517,7 +2533,7 @@ const file_workflow_proto_rawDesc = "" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"S\n" +
 	"\fWorkflowList\x12\x14\n" +
 	"\x05total\x18\x01 \x01(\x05R\x05total\x12-\n" +
-	"\tworkflows\x18\x02 \x03(\v2\x0f.proto.WorkflowR\tworkflows\"\xfb\x02\n" +
+	"\tworkflows\x18\x02 \x03(\v2\x0f.proto.WorkflowR\tworkflows\"\xdd\x03\n" +
 	"\bWorkflow\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
@@ -2534,7 +2550,9 @@ const file_workflow_proto_rawDesc = "" +
 	"\x05isNew\x18\f \x01(\bH\x00R\x05isNew\x88\x01\x01\x12\x1e\n" +
 	"\n" +
 	"isModified\x18\r \x01(\bR\n" +
-	"isModifiedB\b\n" +
+	"isModified\x12.\n" +
+	"\x12publishedVersionId\x18\x0e \x01(\tR\x12publishedVersionId\x120\n" +
+	"\x13publishedVersionNum\x18\x0f \x01(\x05R\x13publishedVersionNumB\b\n" +
 	"\x06_isNew\"\xf1\x01\n" +
 	"\x0fWorkflowVersion\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1e\n" +
