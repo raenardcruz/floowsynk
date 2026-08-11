@@ -5,6 +5,11 @@ import "google/protobuf/empty.proto";
 
 option go_package = "./proto";
 
+enum Environment {
+    PRODUCTION = 0;
+    STAGING = 1;
+}
+
 enum ArrayDataType {
     STRING = 0;
     INT = 1;
@@ -22,6 +27,7 @@ enum NodeStatus {
 
 message RunWorkflowIdRequest {
     string id = 1;
+    Environment environment = 2;
 }
 
 message WorkflowHistoryList {
@@ -38,6 +44,11 @@ message WorkflowHistory {
 
 message WorkflowHistoryRequest {
     string id = 1;
+    Environment environment = 2;
+}
+
+message ListWorkflowHistoryRequest {
+    Environment environment = 1;
 }
 
 message WorkflowHistoryResponse {
@@ -55,10 +66,12 @@ message ReplayData {
 message PageRequest {
     int32 limit = 1;
     int32 offset = 2;
+    Environment environment = 3;
 }
 
 message GetWorkflowRequest {
     string id = 1;
+    Environment environment = 2;
 }
 
 message WorkflowList {
@@ -79,6 +92,43 @@ message Workflow {
     string updatedBy = 10;
     repeated string tags = 11;
     optional bool isNew = 12;
+    bool isModified = 13;
+    string publishedVersionId = 14;
+    int32 publishedVersionNum = 15;
+    Environment environment = 16;
+}
+
+// WorkflowVersion is a point-in-time snapshot of a workflow (staging only).
+message WorkflowVersion {
+    string id = 1;
+    string workflowId = 2;
+    int32  versionNum = 3;
+    string label = 4;       // user-defined label, e.g. "v3 - fixed loop"
+    repeated Node nodes = 5;
+    repeated Edge edges = 6;
+    string savedBy = 7;
+    string savedAt = 8;     // formatted timestamp
+    Environment environment = 9;
+}
+
+message WorkflowVersionList {
+    repeated WorkflowVersion versions = 1;
+}
+
+message GetWorkflowVersionsRequest {
+    string workflowId = 1;
+    Environment environment = 2;
+}
+
+message PublishWorkflowRequest {
+    string workflowId = 1;
+    string versionId = 2;   // empty = publish current live staging workflow
+    Environment environment = 3;
+}
+
+message PublishWorkflowResponse {
+    bool   success = 1;
+    string message = 2;
 }
 
 message Edge {
@@ -189,6 +239,59 @@ message Handle {
     string position = 8;
 }
 
+message ConnectorTemplateList {
+    repeated ConnectorProtoTemplate templates = 1;
+}
+
+message ConnectorFieldProto {
+    string key = 1;
+    string label = 2;
+    string type = 3;
+    bool required = 4;
+    string placeholder = 5;
+}
+
+message ConnectorActionProto {
+    string id = 1;
+    string name = 2;
+    string description = 3;
+    string method = 4;
+    string path = 5;
+}
+
+message ConnectorProtoTemplate {
+    string id = 1;
+    string name = 2;
+    string description = 3;
+    string icon = 4;
+    string baseUrl = 5;
+    string authType = 6;
+    repeated ConnectorFieldProto fields = 7;
+    repeated ConnectorActionProto actions = 8;
+}
+
+message ConnectionList {
+    repeated ConnectionProto connections = 1;
+}
+
+message ConnectionProto {
+    string id = 1;
+    string name = 2;
+    string connectorId = 3;
+    string authType = 4;
+    string createdAt = 5;
+    bool isModified = 6;
+}
+
+message ListConnectionsRequest {
+    Environment environment = 1;
+}
+
+message DeleteConnectionRequest {
+    string id = 1;
+    Environment environment = 2;
+}
+
 service WorkflowService {
     rpc GetWorkflow(GetWorkflowRequest) returns (Workflow);
     rpc ListWorkflows(PageRequest) returns (WorkflowList);
@@ -197,6 +300,14 @@ service WorkflowService {
     rpc DeleteWorkflow(Workflow) returns (google.protobuf.Empty);
     rpc QuickRun(Workflow) returns (stream ReplayData);
     rpc RunWorkflowId(RunWorkflowIdRequest) returns (stream ReplayData);
-    rpc ListWorkflowHistory(google.protobuf.Empty) returns (WorkflowHistoryList);
+    rpc ListWorkflowHistory(ListWorkflowHistoryRequest) returns (WorkflowHistoryList);
     rpc GetWorkflowHistory(WorkflowHistoryRequest) returns (WorkflowHistoryResponse);
+    rpc ListConnectorTemplates(google.protobuf.Empty) returns (ConnectorTemplateList);
+    rpc ListConnections(ListConnectionsRequest) returns (ConnectionList);
+    rpc DeleteConnection(DeleteConnectionRequest) returns (google.protobuf.Empty);
+    // Versioning (staging environment only)
+    rpc ListWorkflowVersions(GetWorkflowVersionsRequest) returns (WorkflowVersionList);
+    rpc RestoreWorkflowVersion(WorkflowVersion) returns (Workflow);
+    rpc PublishWorkflow(PublishWorkflowRequest) returns (PublishWorkflowResponse);
+    rpc RevertWorkflowToStaging(GetWorkflowRequest) returns (Workflow);
 }

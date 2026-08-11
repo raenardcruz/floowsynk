@@ -7,6 +7,9 @@ export class RunWorkflowIdRequest extends jspb.Message {
   getId(): string;
   setId(value: string): RunWorkflowIdRequest;
 
+  getEnvironment(): Environment;
+  setEnvironment(value: Environment): RunWorkflowIdRequest;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): RunWorkflowIdRequest.AsObject;
   static toObject(includeInstance: boolean, msg: RunWorkflowIdRequest): RunWorkflowIdRequest.AsObject;
@@ -18,6 +21,7 @@ export class RunWorkflowIdRequest extends jspb.Message {
 export namespace RunWorkflowIdRequest {
   export type AsObject = {
     id: string;
+    environment: Environment;
   };
 }
 
@@ -79,6 +83,9 @@ export class WorkflowHistoryRequest extends jspb.Message {
   getId(): string;
   setId(value: string): WorkflowHistoryRequest;
 
+  getEnvironment(): Environment;
+  setEnvironment(value: Environment): WorkflowHistoryRequest;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): WorkflowHistoryRequest.AsObject;
   static toObject(includeInstance: boolean, msg: WorkflowHistoryRequest): WorkflowHistoryRequest.AsObject;
@@ -90,6 +97,25 @@ export class WorkflowHistoryRequest extends jspb.Message {
 export namespace WorkflowHistoryRequest {
   export type AsObject = {
     id: string;
+    environment: Environment;
+  };
+}
+
+export class ListWorkflowHistoryRequest extends jspb.Message {
+  getEnvironment(): Environment;
+  setEnvironment(value: Environment): ListWorkflowHistoryRequest;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ListWorkflowHistoryRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: ListWorkflowHistoryRequest): ListWorkflowHistoryRequest.AsObject;
+  static serializeBinaryToWriter(message: ListWorkflowHistoryRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ListWorkflowHistoryRequest;
+  static deserializeBinaryFromReader(message: ListWorkflowHistoryRequest, reader: jspb.BinaryReader): ListWorkflowHistoryRequest;
+}
+
+export namespace ListWorkflowHistoryRequest {
+  export type AsObject = {
+    environment: Environment;
   };
 }
 
@@ -156,6 +182,9 @@ export class PageRequest extends jspb.Message {
   getOffset(): number;
   setOffset(value: number): PageRequest;
 
+  getEnvironment(): Environment;
+  setEnvironment(value: Environment): PageRequest;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): PageRequest.AsObject;
   static toObject(includeInstance: boolean, msg: PageRequest): PageRequest.AsObject;
@@ -168,12 +197,16 @@ export namespace PageRequest {
   export type AsObject = {
     limit: number;
     offset: number;
+    environment: Environment;
   };
 }
 
 export class GetWorkflowRequest extends jspb.Message {
   getId(): string;
   setId(value: string): GetWorkflowRequest;
+
+  getEnvironment(): Environment;
+  setEnvironment(value: Environment): GetWorkflowRequest;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): GetWorkflowRequest.AsObject;
@@ -186,6 +219,7 @@ export class GetWorkflowRequest extends jspb.Message {
 export namespace GetWorkflowRequest {
   export type AsObject = {
     id: string;
+    environment: Environment;
   };
 }
 
@@ -258,6 +292,18 @@ export class Workflow extends jspb.Message {
   hasIsnew(): boolean;
   clearIsnew(): Workflow;
 
+  getIsmodified(): boolean;
+  setIsmodified(value: boolean): Workflow;
+
+  getPublishedversionid(): string;
+  setPublishedversionid(value: string): Workflow;
+
+  getPublishedversionnum(): number;
+  setPublishedversionnum(value: number): Workflow;
+
+  getEnvironment(): Environment;
+  setEnvironment(value: Environment): Workflow;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): Workflow.AsObject;
   static toObject(includeInstance: boolean, msg: Workflow): Workflow.AsObject;
@@ -280,12 +326,160 @@ export namespace Workflow {
     updatedby: string;
     tagsList: Array<string>;
     isnew?: boolean;
+    ismodified: boolean;
+    publishedversionid: string;
+    publishedversionnum: number;
+    environment: Environment;
   };
 
   export enum IsnewCase {
     _ISNEW_NOT_SET = 0,
     ISNEW = 12,
   }
+}
+
+export class WorkflowVersion extends jspb.Message {
+  getId(): string;
+  setId(value: string): WorkflowVersion;
+
+  getWorkflowid(): string;
+  setWorkflowid(value: string): WorkflowVersion;
+
+  getVersionnum(): number;
+  setVersionnum(value: number): WorkflowVersion;
+
+  getLabel(): string;
+  setLabel(value: string): WorkflowVersion;
+
+  getNodesList(): Array<Node>;
+  setNodesList(value: Array<Node>): WorkflowVersion;
+  clearNodesList(): WorkflowVersion;
+  addNodes(value?: Node, index?: number): Node;
+
+  getEdgesList(): Array<Edge>;
+  setEdgesList(value: Array<Edge>): WorkflowVersion;
+  clearEdgesList(): WorkflowVersion;
+  addEdges(value?: Edge, index?: number): Edge;
+
+  getSavedby(): string;
+  setSavedby(value: string): WorkflowVersion;
+
+  getSavedat(): string;
+  setSavedat(value: string): WorkflowVersion;
+
+  getEnvironment(): Environment;
+  setEnvironment(value: Environment): WorkflowVersion;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): WorkflowVersion.AsObject;
+  static toObject(includeInstance: boolean, msg: WorkflowVersion): WorkflowVersion.AsObject;
+  static serializeBinaryToWriter(message: WorkflowVersion, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): WorkflowVersion;
+  static deserializeBinaryFromReader(message: WorkflowVersion, reader: jspb.BinaryReader): WorkflowVersion;
+}
+
+export namespace WorkflowVersion {
+  export type AsObject = {
+    id: string;
+    workflowid: string;
+    versionnum: number;
+    label: string;
+    nodesList: Array<Node.AsObject>;
+    edgesList: Array<Edge.AsObject>;
+    savedby: string;
+    savedat: string;
+    environment: Environment;
+  };
+}
+
+export class WorkflowVersionList extends jspb.Message {
+  getVersionsList(): Array<WorkflowVersion>;
+  setVersionsList(value: Array<WorkflowVersion>): WorkflowVersionList;
+  clearVersionsList(): WorkflowVersionList;
+  addVersions(value?: WorkflowVersion, index?: number): WorkflowVersion;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): WorkflowVersionList.AsObject;
+  static toObject(includeInstance: boolean, msg: WorkflowVersionList): WorkflowVersionList.AsObject;
+  static serializeBinaryToWriter(message: WorkflowVersionList, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): WorkflowVersionList;
+  static deserializeBinaryFromReader(message: WorkflowVersionList, reader: jspb.BinaryReader): WorkflowVersionList;
+}
+
+export namespace WorkflowVersionList {
+  export type AsObject = {
+    versionsList: Array<WorkflowVersion.AsObject>;
+  };
+}
+
+export class GetWorkflowVersionsRequest extends jspb.Message {
+  getWorkflowid(): string;
+  setWorkflowid(value: string): GetWorkflowVersionsRequest;
+
+  getEnvironment(): Environment;
+  setEnvironment(value: Environment): GetWorkflowVersionsRequest;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): GetWorkflowVersionsRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: GetWorkflowVersionsRequest): GetWorkflowVersionsRequest.AsObject;
+  static serializeBinaryToWriter(message: GetWorkflowVersionsRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): GetWorkflowVersionsRequest;
+  static deserializeBinaryFromReader(message: GetWorkflowVersionsRequest, reader: jspb.BinaryReader): GetWorkflowVersionsRequest;
+}
+
+export namespace GetWorkflowVersionsRequest {
+  export type AsObject = {
+    workflowid: string;
+    environment: Environment;
+  };
+}
+
+export class PublishWorkflowRequest extends jspb.Message {
+  getWorkflowid(): string;
+  setWorkflowid(value: string): PublishWorkflowRequest;
+
+  getVersionid(): string;
+  setVersionid(value: string): PublishWorkflowRequest;
+
+  getEnvironment(): Environment;
+  setEnvironment(value: Environment): PublishWorkflowRequest;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): PublishWorkflowRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: PublishWorkflowRequest): PublishWorkflowRequest.AsObject;
+  static serializeBinaryToWriter(message: PublishWorkflowRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): PublishWorkflowRequest;
+  static deserializeBinaryFromReader(message: PublishWorkflowRequest, reader: jspb.BinaryReader): PublishWorkflowRequest;
+}
+
+export namespace PublishWorkflowRequest {
+  export type AsObject = {
+    workflowid: string;
+    versionid: string;
+    environment: Environment;
+  };
+}
+
+export class PublishWorkflowResponse extends jspb.Message {
+  getSuccess(): boolean;
+  setSuccess(value: boolean): PublishWorkflowResponse;
+
+  getMessage(): string;
+  setMessage(value: string): PublishWorkflowResponse;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): PublishWorkflowResponse.AsObject;
+  static toObject(includeInstance: boolean, msg: PublishWorkflowResponse): PublishWorkflowResponse.AsObject;
+  static serializeBinaryToWriter(message: PublishWorkflowResponse, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): PublishWorkflowResponse;
+  static deserializeBinaryFromReader(message: PublishWorkflowResponse, reader: jspb.BinaryReader): PublishWorkflowResponse;
+}
+
+export namespace PublishWorkflowResponse {
+  export type AsObject = {
+    success: boolean;
+    message: string;
+  };
 }
 
 export class Edge extends jspb.Message {
@@ -974,6 +1168,246 @@ export namespace Handle {
   };
 }
 
+export class ConnectorTemplateList extends jspb.Message {
+  getTemplatesList(): Array<ConnectorProtoTemplate>;
+  setTemplatesList(value: Array<ConnectorProtoTemplate>): ConnectorTemplateList;
+  clearTemplatesList(): ConnectorTemplateList;
+  addTemplates(value?: ConnectorProtoTemplate, index?: number): ConnectorProtoTemplate;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ConnectorTemplateList.AsObject;
+  static toObject(includeInstance: boolean, msg: ConnectorTemplateList): ConnectorTemplateList.AsObject;
+  static serializeBinaryToWriter(message: ConnectorTemplateList, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ConnectorTemplateList;
+  static deserializeBinaryFromReader(message: ConnectorTemplateList, reader: jspb.BinaryReader): ConnectorTemplateList;
+}
+
+export namespace ConnectorTemplateList {
+  export type AsObject = {
+    templatesList: Array<ConnectorProtoTemplate.AsObject>;
+  };
+}
+
+export class ConnectorFieldProto extends jspb.Message {
+  getKey(): string;
+  setKey(value: string): ConnectorFieldProto;
+
+  getLabel(): string;
+  setLabel(value: string): ConnectorFieldProto;
+
+  getType(): string;
+  setType(value: string): ConnectorFieldProto;
+
+  getRequired(): boolean;
+  setRequired(value: boolean): ConnectorFieldProto;
+
+  getPlaceholder(): string;
+  setPlaceholder(value: string): ConnectorFieldProto;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ConnectorFieldProto.AsObject;
+  static toObject(includeInstance: boolean, msg: ConnectorFieldProto): ConnectorFieldProto.AsObject;
+  static serializeBinaryToWriter(message: ConnectorFieldProto, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ConnectorFieldProto;
+  static deserializeBinaryFromReader(message: ConnectorFieldProto, reader: jspb.BinaryReader): ConnectorFieldProto;
+}
+
+export namespace ConnectorFieldProto {
+  export type AsObject = {
+    key: string;
+    label: string;
+    type: string;
+    required: boolean;
+    placeholder: string;
+  };
+}
+
+export class ConnectorActionProto extends jspb.Message {
+  getId(): string;
+  setId(value: string): ConnectorActionProto;
+
+  getName(): string;
+  setName(value: string): ConnectorActionProto;
+
+  getDescription(): string;
+  setDescription(value: string): ConnectorActionProto;
+
+  getMethod(): string;
+  setMethod(value: string): ConnectorActionProto;
+
+  getPath(): string;
+  setPath(value: string): ConnectorActionProto;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ConnectorActionProto.AsObject;
+  static toObject(includeInstance: boolean, msg: ConnectorActionProto): ConnectorActionProto.AsObject;
+  static serializeBinaryToWriter(message: ConnectorActionProto, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ConnectorActionProto;
+  static deserializeBinaryFromReader(message: ConnectorActionProto, reader: jspb.BinaryReader): ConnectorActionProto;
+}
+
+export namespace ConnectorActionProto {
+  export type AsObject = {
+    id: string;
+    name: string;
+    description: string;
+    method: string;
+    path: string;
+  };
+}
+
+export class ConnectorProtoTemplate extends jspb.Message {
+  getId(): string;
+  setId(value: string): ConnectorProtoTemplate;
+
+  getName(): string;
+  setName(value: string): ConnectorProtoTemplate;
+
+  getDescription(): string;
+  setDescription(value: string): ConnectorProtoTemplate;
+
+  getIcon(): string;
+  setIcon(value: string): ConnectorProtoTemplate;
+
+  getBaseurl(): string;
+  setBaseurl(value: string): ConnectorProtoTemplate;
+
+  getAuthtype(): string;
+  setAuthtype(value: string): ConnectorProtoTemplate;
+
+  getFieldsList(): Array<ConnectorFieldProto>;
+  setFieldsList(value: Array<ConnectorFieldProto>): ConnectorProtoTemplate;
+  clearFieldsList(): ConnectorProtoTemplate;
+  addFields(value?: ConnectorFieldProto, index?: number): ConnectorFieldProto;
+
+  getActionsList(): Array<ConnectorActionProto>;
+  setActionsList(value: Array<ConnectorActionProto>): ConnectorProtoTemplate;
+  clearActionsList(): ConnectorProtoTemplate;
+  addActions(value?: ConnectorActionProto, index?: number): ConnectorActionProto;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ConnectorProtoTemplate.AsObject;
+  static toObject(includeInstance: boolean, msg: ConnectorProtoTemplate): ConnectorProtoTemplate.AsObject;
+  static serializeBinaryToWriter(message: ConnectorProtoTemplate, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ConnectorProtoTemplate;
+  static deserializeBinaryFromReader(message: ConnectorProtoTemplate, reader: jspb.BinaryReader): ConnectorProtoTemplate;
+}
+
+export namespace ConnectorProtoTemplate {
+  export type AsObject = {
+    id: string;
+    name: string;
+    description: string;
+    icon: string;
+    baseurl: string;
+    authtype: string;
+    fieldsList: Array<ConnectorFieldProto.AsObject>;
+    actionsList: Array<ConnectorActionProto.AsObject>;
+  };
+}
+
+export class ConnectionList extends jspb.Message {
+  getConnectionsList(): Array<ConnectionProto>;
+  setConnectionsList(value: Array<ConnectionProto>): ConnectionList;
+  clearConnectionsList(): ConnectionList;
+  addConnections(value?: ConnectionProto, index?: number): ConnectionProto;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ConnectionList.AsObject;
+  static toObject(includeInstance: boolean, msg: ConnectionList): ConnectionList.AsObject;
+  static serializeBinaryToWriter(message: ConnectionList, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ConnectionList;
+  static deserializeBinaryFromReader(message: ConnectionList, reader: jspb.BinaryReader): ConnectionList;
+}
+
+export namespace ConnectionList {
+  export type AsObject = {
+    connectionsList: Array<ConnectionProto.AsObject>;
+  };
+}
+
+export class ConnectionProto extends jspb.Message {
+  getId(): string;
+  setId(value: string): ConnectionProto;
+
+  getName(): string;
+  setName(value: string): ConnectionProto;
+
+  getConnectorid(): string;
+  setConnectorid(value: string): ConnectionProto;
+
+  getAuthtype(): string;
+  setAuthtype(value: string): ConnectionProto;
+
+  getCreatedat(): string;
+  setCreatedat(value: string): ConnectionProto;
+
+  getIsmodified(): boolean;
+  setIsmodified(value: boolean): ConnectionProto;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ConnectionProto.AsObject;
+  static toObject(includeInstance: boolean, msg: ConnectionProto): ConnectionProto.AsObject;
+  static serializeBinaryToWriter(message: ConnectionProto, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ConnectionProto;
+  static deserializeBinaryFromReader(message: ConnectionProto, reader: jspb.BinaryReader): ConnectionProto;
+}
+
+export namespace ConnectionProto {
+  export type AsObject = {
+    id: string;
+    name: string;
+    connectorid: string;
+    authtype: string;
+    createdat: string;
+    ismodified: boolean;
+  };
+}
+
+export class ListConnectionsRequest extends jspb.Message {
+  getEnvironment(): Environment;
+  setEnvironment(value: Environment): ListConnectionsRequest;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ListConnectionsRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: ListConnectionsRequest): ListConnectionsRequest.AsObject;
+  static serializeBinaryToWriter(message: ListConnectionsRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ListConnectionsRequest;
+  static deserializeBinaryFromReader(message: ListConnectionsRequest, reader: jspb.BinaryReader): ListConnectionsRequest;
+}
+
+export namespace ListConnectionsRequest {
+  export type AsObject = {
+    environment: Environment;
+  };
+}
+
+export class DeleteConnectionRequest extends jspb.Message {
+  getId(): string;
+  setId(value: string): DeleteConnectionRequest;
+
+  getEnvironment(): Environment;
+  setEnvironment(value: Environment): DeleteConnectionRequest;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): DeleteConnectionRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: DeleteConnectionRequest): DeleteConnectionRequest.AsObject;
+  static serializeBinaryToWriter(message: DeleteConnectionRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): DeleteConnectionRequest;
+  static deserializeBinaryFromReader(message: DeleteConnectionRequest, reader: jspb.BinaryReader): DeleteConnectionRequest;
+}
+
+export namespace DeleteConnectionRequest {
+  export type AsObject = {
+    id: string;
+    environment: Environment;
+  };
+}
+
+export enum Environment {
+  PRODUCTION = 0,
+  STAGING = 1,
+}
 export enum ArrayDataType {
   STRING = 0,
   INT = 1,

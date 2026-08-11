@@ -1,0 +1,173 @@
+{
+  "id": "shopify",
+  "name": "Shopify",
+  "description": "Access Shopify Admin API to manage orders, products, customers, and inventory levels.",
+  "icon": "/src/components/Icons/shopify.svg",
+  "baseUrl": "https://{{shop_subdomain}}.myshopify.com/admin/api/{{api_version}}",
+  "authType": "apikey",
+  "fields": [
+    {
+      "key": "shop_subdomain",
+      "label": "Shop Subdomain",
+      "type": "text",
+      "required": true,
+      "placeholder": "Store name prefix from yourstore.myshopify.com"
+    },
+    {
+      "key": "access_token",
+      "label": "Admin API Access Token",
+      "type": "password",
+      "required": true,
+      "placeholder": "shpat_..."
+    },
+    {
+      "key": "api_version",
+      "label": "API Version",
+      "type": "text",
+      "required": true,
+      "placeholder": "e.g. 2024-04"
+    }
+  ],
+  "actions": [
+    {
+      "id": "list_orders",
+      "name": "List Orders",
+      "description": "Retrieve a list of orders from your Shopify store",
+      "path": "/orders.json",
+      "method": "GET",
+      "headers": {
+        "X-Shopify-Access-Token": "{{access_token}}",
+        "Content-Type": "application/json"
+      },
+      "queryParams": [
+        { "key": "status", "value": "{{status}}" },
+        { "key": "limit", "value": "{{limit}}" }
+      ],
+      "payloadTemplate": "",
+      "fields": [
+        { "key": "status", "label": "Order Status", "required": false, "placeholder": "any, open, closed" },
+        { "key": "limit", "label": "Limit", "required": false, "placeholder": "Default 50" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "string", "description": "Filter orders by status", "example": "open" },
+          "limit": { "type": "string", "description": "Number of results to return", "example": "10" }
+        }
+      },
+      "outputSchema": {
+        "orders": [
+          {
+            "id": 123456789,
+            "email": "customer@example.com",
+            "created_at": "2024-01-01T00:00:00Z",
+            "total_price": "99.99",
+            "financial_status": "paid"
+          }
+        ]
+      }
+    },
+    {
+      "id": "get_product",
+      "name": "Get Product",
+      "description": "Fetch details of a single product by ID",
+      "path": "/products/{{product_id}}.json",
+      "method": "GET",
+      "headers": {
+        "X-Shopify-Access-Token": "{{access_token}}",
+        "Content-Type": "application/json"
+      },
+      "queryParams": [],
+      "payloadTemplate": "",
+      "fields": [
+        { "key": "product_id", "label": "Product ID", "required": true, "placeholder": "e.g. 632910392" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "product_id": { "type": "string", "description": "Shopify product ID", "example": "632910392" }
+        },
+        "required": ["product_id"]
+      },
+      "outputSchema": {
+        "product": {
+          "id": 632910392,
+          "title": "Sample T-Shirt",
+          "vendor": "My Store",
+          "product_type": "Apparel",
+          "variants": []
+        }
+      }
+    },
+    {
+      "id": "list_customers",
+      "name": "List Customers",
+      "description": "Retrieve customer profiles from your Shopify store",
+      "path": "/customers.json",
+      "method": "GET",
+      "headers": {
+        "X-Shopify-Access-Token": "{{access_token}}",
+        "Content-Type": "application/json"
+      },
+      "queryParams": [
+        { "key": "limit", "value": "{{limit}}" }
+      ],
+      "payloadTemplate": "",
+      "fields": [
+        { "key": "limit", "label": "Limit", "required": false, "placeholder": "Default 50" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "limit": { "type": "string", "description": "Max number of customers", "example": "50" }
+        }
+      },
+      "outputSchema": {
+        "customers": [
+          {
+            "id": 207119551,
+            "email": "john@example.com",
+            "first_name": "John",
+            "last_name": "Doe",
+            "orders_count": 5
+          }
+        ]
+      }
+    },
+    {
+      "id": "update_inventory",
+      "name": "Update Inventory",
+      "description": "Set available inventory level for an inventory item",
+      "path": "/inventory_levels/set.json",
+      "method": "POST",
+      "headers": {
+        "X-Shopify-Access-Token": "{{access_token}}",
+        "Content-Type": "application/json"
+      },
+      "queryParams": [],
+      "payloadTemplate": "{\"location_id\": {{location_id}}, \"inventory_item_id\": {{inventory_item_id}}, \"available\": {{available}}}",
+      "fields": [
+        { "key": "location_id", "label": "Location ID", "required": true, "placeholder": "e.g. 905684977" },
+        { "key": "inventory_item_id", "label": "Inventory Item ID", "required": true, "placeholder": "e.g. 808950810" },
+        { "key": "available", "label": "Available Quantity", "required": true, "placeholder": "e.g. 100" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "location_id": { "type": "number", "description": "Shopify Location ID", "example": 905684977 },
+          "inventory_item_id": { "type": "number", "description": "Inventory Item ID", "example": 808950810 },
+          "available": { "type": "number", "description": "Available stock count", "example": 100 }
+        },
+        "required": ["location_id", "inventory_item_id", "available"]
+      },
+      "outputSchema": {
+        "inventory_level": {
+          "location_id": 905684977,
+          "inventory_item_id": 808950810,
+          "available": 100,
+          "updated_at": "2024-01-01T00:00:00Z"
+        }
+      }
+    }
+  ]
+}

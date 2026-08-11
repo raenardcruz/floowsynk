@@ -120,18 +120,26 @@
   --white-2: #f9fafb;
   --white-3: #f3f4f6;
   --white-4: #e5e7eb;
+  /* Premium Dark / Glass UI Variables */
+  --bg-gradient-primary: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+  --brand-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+  --accent-cyan-violet: linear-gradient(135deg, #06b6d4 0%, #3b82f6 50%, #8b5cf6 100%);
+  --accent-emerald-teal: linear-gradient(135deg, #10b981 0%, #14b8a6 50%, #06b6d4 100%);
+  --card-glass-bg: rgba(255, 255, 255, 0.85);
+  --card-glass-border: rgba(226, 232, 240, 0.8);
+  --glass-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
 }
-
 
 /* Font family */
 body {
-  font-family: 'Inter', sans-serif; /* Default sans-serif font for body text */
-  font-size: 16px; /* Base font size for readability on most screens */
-  line-height: 1.6; /* Optimal line height for comfortable reading */
-  color: var(--grey-1);
-  background-color: var(--neutral-3);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  color: #1e293b;
+  background-color: #f8fafc;
   height: 100vh;
   width: 100vw;
+  overflow-x: hidden;
 }
 
 body #app {
@@ -145,12 +153,12 @@ body #app {
 /* Link styling */
 a {
   text-decoration: none;
-  color: var(--blue-6);
-  transition: all 0.3s;
+  color: #4f46e5;
+  transition: all 0.3s ease;
 }
 
 a:hover {
-  color: var(--blue-8);
+  color: #4338ca;
 }
 
 /* Button styling */
@@ -158,13 +166,14 @@ button {
   cursor: pointer;
   border: none;
   padding: 8px 16px;
-  font-size: 16px;
+  font-size: 14px;
+  font-weight: 500;
   border-radius: 8px;
-  transition: all 0.2s ease;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 button:hover {
-  filter: brightness(0.6);
+  transform: translateY(-1px);
 }
 
 @keyframes fadeInFromTop {
@@ -179,20 +188,41 @@ button:hover {
 }
 
 .fade-in-top {
-  animation: fadeInFromTop 1s ease-out forwards;
+  animation: fadeInFromTop 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 @keyframes fadeIn {
   0% {
     opacity: 0;
+    transform: scale(0.98);
   }
   100% {
     opacity: 1;
+    transform: scale(1);
   }
 }
 
 .fade-in {
-  animation: fadeIn 0.5s ease-in forwards;
+  animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Custom Glass & Animation Utilities */
+.glass-card {
+  background: var(--card-glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--card-glass-border);
+  box-shadow: var(--glass-shadow);
+  border-radius: 16px;
+}
+
+.hover-lift {
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hover-lift:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
 }
 
 .mal {

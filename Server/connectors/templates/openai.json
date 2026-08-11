@@ -1,0 +1,141 @@
+{
+  "id": "openai",
+  "name": "OpenAI",
+  "description": "Generate text, create embeddings, and transcribe audio using OpenAI models.",
+  "icon": "/src/components/Icons/openai.svg",
+  "baseUrl": "https://api.openai.com/v1",
+  "authType": "apikey",
+  "fields": [
+    {
+      "key": "api_key",
+      "label": "API Key",
+      "type": "password",
+      "required": true,
+      "placeholder": "sk-..."
+    },
+    {
+      "key": "organization_id",
+      "label": "Organization ID",
+      "type": "text",
+      "required": false,
+      "placeholder": "org-..."
+    },
+    {
+      "key": "project_id",
+      "label": "Project ID",
+      "type": "text",
+      "required": false,
+      "placeholder": "proj_..."
+    }
+  ],
+  "actions": [
+    {
+      "id": "chat_completions",
+      "name": "Chat Completions",
+      "description": "Generate model responses for given chat conversation messages",
+      "path": "/chat/completions",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "payloadTemplate": "{\"model\": \"{{model}}\", \"messages\": [{\"role\": \"user\", \"content\": \"{{prompt}}\"}]}",
+      "fields": [
+        { "key": "model", "label": "Model", "required": true, "placeholder": "gpt-4o" },
+        { "key": "prompt", "label": "Prompt / User Message", "required": true, "placeholder": "Enter prompt or message content" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "model": { "type": "string", "description": "Model ID", "example": "gpt-4o" },
+          "prompt": { "type": "string", "description": "Prompt text", "example": "Explain quantum computing" }
+        },
+        "required": ["model", "prompt"]
+      },
+      "outputSchema": {
+        "id": "chatcmpl-123",
+        "object": "chat.completion",
+        "created": 1677652288,
+        "model": "gpt-4o",
+        "choices": [
+          {
+            "index": 0,
+            "message": {
+              "role": "assistant",
+              "content": "Hello! How can I help you today?"
+            },
+            "finish_reason": "stop"
+          }
+        ],
+        "usage": {
+          "prompt_tokens": 9,
+          "completion_tokens": 12,
+          "total_tokens": 21
+        }
+      }
+    },
+    {
+      "id": "create_embeddings",
+      "name": "Create Embeddings",
+      "description": "Get a vector representation of a given input",
+      "path": "/embeddings",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "payloadTemplate": "{\"model\": \"{{model}}\", \"input\": \"{{input}}\"}",
+      "fields": [
+        { "key": "model", "label": "Model", "required": true, "placeholder": "text-embedding-3-small" },
+        { "key": "input", "label": "Input Text", "required": true, "placeholder": "Text to embed" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "model": { "type": "string", "description": "Embedding model ID", "example": "text-embedding-3-small" },
+          "input": { "type": "string", "description": "Input string to embed", "example": "The food was delicious" }
+        },
+        "required": ["model", "input"]
+      },
+      "outputSchema": {
+        "object": "list",
+        "data": [
+          {
+            "object": "embedding",
+            "index": 0,
+            "embedding": [0.0023, -0.009, 0.015]
+          }
+        ],
+        "model": "text-embedding-3-small",
+        "usage": {
+          "prompt_tokens": 8,
+          "total_tokens": 8
+        }
+      }
+    },
+    {
+      "id": "audio_transcriptions",
+      "name": "Audio Transcription",
+      "description": "Transcribe audio into input language",
+      "path": "/audio/transcriptions",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "payloadTemplate": "{\"model\": \"{{model}}\", \"file\": \"{{file}}\"}",
+      "fields": [
+        { "key": "model", "label": "Model", "required": true, "placeholder": "whisper-1" },
+        { "key": "file", "label": "Audio File URL / Base64", "required": true, "placeholder": "Audio data or file link" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "model": { "type": "string", "description": "Whisper model ID", "example": "whisper-1" },
+          "file": { "type": "string", "description": "Audio file input" }
+        },
+        "required": ["model", "file"]
+      },
+      "outputSchema": {
+        "text": "Imagine something wonderful."
+      }
+    }
+  ]
+}

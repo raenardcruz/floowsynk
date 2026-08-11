@@ -1,0 +1,137 @@
+{
+  "id": "microsoft_teams",
+  "name": "Microsoft Teams",
+  "description": "Send channel and chat messages, and inspect joined teams in Microsoft Teams via Microsoft Graph API.",
+  "icon": "/src/components/Icons/microsoft_teams.svg",
+  "baseUrl": "https://graph.microsoft.com/v1.0",
+  "authType": "oauth2",
+  "fields": [
+    {
+      "key": "client_id",
+      "label": "Client ID (Application ID)",
+      "type": "text",
+      "required": true,
+      "placeholder": "Enter Azure App Client ID"
+    },
+    {
+      "key": "client_secret",
+      "label": "Client Secret",
+      "type": "password",
+      "required": true,
+      "placeholder": "Enter Azure App Client Secret Value"
+    },
+    {
+      "key": "tenant_id",
+      "label": "Directory (Tenant) ID",
+      "type": "text",
+      "required": true,
+      "placeholder": "Enter Azure Directory Tenant ID"
+    },
+    {
+      "key": "access_token",
+      "label": "Access Token",
+      "type": "password",
+      "required": false,
+      "placeholder": "eyJ0eXAi..."
+    }
+  ],
+  "oauthConfig": {
+    "authorizeUrl": "https://login.microsoftonline.com/common/oauth2/v2.0/authorize",
+    "tokenUrl": "https://login.microsoftonline.com/common/oauth2/v2.0/token",
+    "defaultScopes": [
+      "ChannelMessage.Send",
+      "Team.ReadBasic.All",
+      "Chat.ReadWrite",
+      "offline_access"
+    ]
+  },
+  "actions": [
+    {
+      "id": "send_channel_message",
+      "name": "Send Channel Message",
+      "description": "Post a new message to a Microsoft Teams channel",
+      "path": "/teams/{{team_id}}/channels/{{channel_id}}/messages",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "payloadTemplate": "{\"body\": {\"content\": \"{{content}}\"}}",
+      "fields": [
+        { "key": "team_id", "label": "Team ID", "required": true, "placeholder": "00000000-0000-0000-0000-000000000000" },
+        { "key": "channel_id", "label": "Channel ID", "required": true, "placeholder": "19:channel_hash@thread.tacv2" },
+        { "key": "content", "label": "Message Content", "required": true, "placeholder": "Hello Team!" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "team_id": { "type": "string", "description": "Team ID" },
+          "channel_id": { "type": "string", "description": "Channel ID" },
+          "content": { "type": "string", "description": "Message text" }
+        },
+        "required": ["team_id", "channel_id", "content"]
+      },
+      "outputSchema": {
+        "id": "1620000000000",
+        "createdDateTime": "2026-08-07T11:40:00Z",
+        "body": {
+          "contentType": "html",
+          "content": "Hello Team!"
+        }
+      }
+    },
+    {
+      "id": "list_joined_teams",
+      "name": "List Joined Teams",
+      "description": "List all Microsoft Teams the authenticated user has joined",
+      "path": "/me/joinedTeams",
+      "method": "GET",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "fields": [],
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "outputSchema": {
+        "value": [
+          {
+            "id": "00000000-0000-0000-0000-000000000000",
+            "displayName": "Engineering Team",
+            "description": "Engineering discussions and updates"
+          }
+        ]
+      }
+    },
+    {
+      "id": "send_chat_message",
+      "name": "Send Chat Message",
+      "description": "Send a chat message in a 1:1 or group chat",
+      "path": "/chats/{{chat_id}}/messages",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "payloadTemplate": "{\"body\": {\"content\": \"{{content}}\"}}",
+      "fields": [
+        { "key": "chat_id", "label": "Chat ID", "required": true, "placeholder": "19:chat_hash@thread.v2" },
+        { "key": "content", "label": "Message Content", "required": true, "placeholder": "Direct message content" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "chat_id": { "type": "string", "description": "Target Chat ID" },
+          "content": { "type": "string", "description": "Chat message text" }
+        },
+        "required": ["chat_id", "content"]
+      },
+      "outputSchema": {
+        "id": "1620000000001",
+        "createdDateTime": "2026-08-07T11:40:00Z",
+        "body": {
+          "content": "Direct message content"
+        }
+      }
+    }
+  ]
+}

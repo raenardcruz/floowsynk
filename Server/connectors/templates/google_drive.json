@@ -1,0 +1,234 @@
+{
+  "id": "google_drive",
+  "name": "Google Drive",
+  "description": "Upload files, manage folders, and share documents on Google Drive.",
+  "icon": "/src/components/Icons/google_drive.svg",
+  "baseUrl": "https://www.googleapis.com/drive/v3",
+  "authType": "oauth2",
+  "fields": [
+    {
+      "key": "client_id",
+      "label": "Client ID",
+      "type": "text",
+      "required": true,
+      "placeholder": "Enter Google Cloud OAuth Client ID"
+    },
+    {
+      "key": "client_secret",
+      "label": "Client Secret",
+      "type": "password",
+      "required": true,
+      "placeholder": "Enter Google Cloud OAuth Client Secret"
+    }
+  ],
+  "oauthConfig": {
+    "authorizeUrl": "https://accounts.google.com/o/oauth2/auth",
+    "tokenUrl": "https://oauth2.googleapis.com/token",
+    "defaultScopes": [
+      "https://www.googleapis.com/auth/drive.file"
+    ]
+  },
+  "actions": [
+    {
+      "id": "upload_file",
+      "name": "Upload File",
+      "description": "Create a file metadata entry in Google Drive",
+      "path": "/files",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "queryParams": [],
+      "payloadTemplate": "{\"name\": \"{{name}}\", \"mimeType\": \"{{mime_type}}\"}",
+      "fields": [
+        {
+          "key": "name",
+          "label": "File Name",
+          "required": true,
+          "placeholder": "my-file.txt"
+        },
+        {
+          "key": "mime_type",
+          "label": "MIME Type",
+          "required": false,
+          "placeholder": "text/plain"
+        }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "File Name",
+            "example": "Document.pdf"
+          },
+          "mimeType": {
+            "type": "string",
+            "description": "MIME Type",
+            "example": "application/pdf"
+          },
+          "content": {
+            "type": "string",
+            "description": "Content",
+            "example": "File text content"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "outputSchema": {
+        "id": "1a2b3c4d5e",
+        "name": "Document.pdf",
+        "mimeType": "application/pdf"
+      }
+    },
+    {
+      "id": "create_folder",
+      "name": "Create Folder",
+      "description": "Create a new folder in Google Drive",
+      "path": "/files",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "queryParams": [],
+      "payloadTemplate": "{\"name\": \"{{name}}\", \"mimeType\": \"application/vnd.google-apps.folder\"}",
+      "fields": [
+        {
+          "key": "name",
+          "label": "Folder Name",
+          "required": true,
+          "placeholder": "New Folder"
+        }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Folder name",
+            "example": "Project Backups"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "outputSchema": {
+        "id": "1x2y3z4w5v",
+        "name": "Project Backups",
+        "mimeType": "application/vnd.google-apps.folder"
+      }
+    },
+    {
+      "id": "download_file",
+      "name": "Download File",
+      "description": "Download file content from Google Drive",
+      "path": "/files/{{file_id}}",
+      "method": "GET",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "queryParams": [
+        "alt"
+      ],
+      "fields": [
+        {
+          "key": "file_id",
+          "label": "File ID",
+          "required": true,
+          "placeholder": "Enter Google Drive File ID"
+        }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "file_id": {
+            "type": "string",
+            "description": "File ID",
+            "example": "1a2b3c4d5e"
+          }
+        },
+        "required": [
+          "file_id"
+        ]
+      },
+      "outputSchema": {
+        "id": "1a2b3c4d5e",
+        "content": "[Binary / String Content]"
+      }
+    },
+    {
+      "id": "list_files",
+      "name": "List Files",
+      "description": "List non-trashed files in Google Drive",
+      "path": "/files",
+      "method": "GET",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "queryParams": [
+        "q"
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "q": {
+            "type": "string",
+            "description": "Search query string",
+            "example": "name contains 'Report'"
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "Max files to return",
+            "default": 10
+          }
+        }
+      },
+      "outputSchema": {
+        "files": [
+          {
+            "id": "1a2b3c4d5e",
+            "name": "Annual Report 2026.pdf",
+            "mimeType": "application/pdf"
+          }
+        ]
+      }
+    },
+    {
+      "id": "delete_file",
+      "name": "Delete File",
+      "description": "Permanently delete a file from Google Drive",
+      "path": "/files/{{file_id}}",
+      "method": "DELETE",
+      "headers": {},
+      "queryParams": [],
+      "fields": [
+        {
+          "key": "file_id",
+          "label": "File ID",
+          "required": true,
+          "placeholder": "Enter Google Drive File ID"
+        }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "file_id": {
+            "type": "string",
+            "description": "File ID to delete",
+            "example": "1a2b3c4d5e"
+          }
+        },
+        "required": [
+          "file_id"
+        ]
+      },
+      "outputSchema": {
+        "deleted": true,
+        "file_id": "1a2b3c4d5e"
+      }
+    }
+  ]
+}

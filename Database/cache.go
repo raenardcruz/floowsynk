@@ -28,7 +28,7 @@ func ConnectToRedis() {
 }
 
 func GetFromCache(ctx context.Context, key string) ([]byte, bool) {
-	if !UseCache {
+	if !UseCache || RedisClient == nil {
 		return nil, false
 	}
 	val, err := RedisClient.Get(ctx, key).Result()
@@ -42,7 +42,7 @@ func GetFromCache(ctx context.Context, key string) ([]byte, bool) {
 }
 
 func SetCache(ctx context.Context, key string, data interface{}, expiration time.Duration) error {
-	if !UseCache {
+	if !UseCache || RedisClient == nil {
 		return nil
 	}
 	jsonData, err := json.Marshal(data)
@@ -57,7 +57,7 @@ func SetCache(ctx context.Context, key string, data interface{}, expiration time
 }
 
 func DeleteCache(ctx context.Context, key string) error {
-	if !UseCache {
+	if !UseCache || RedisClient == nil {
 		return nil
 	}
 
@@ -69,7 +69,7 @@ func DeleteCache(ctx context.Context, key string) error {
 }
 
 func ClearCache(ctx context.Context) error {
-	if !UseCache {
+	if !UseCache || RedisClient == nil {
 		return nil
 	}
 	keys, err := RedisClient.Keys(ctx, "*").Result()
@@ -86,6 +86,21 @@ func ClearCache(ctx context.Context) error {
 
 	log.Println("Cache cleared")
 	return nil
+}
+
+func SetCacheNX(ctx context.Context, key string, data interface{}, expiration time.Duration) (bool, error) {
+	if !UseCache {
+		return true, nil
+	}
+	jsonData, err := json.Marshal(data)
+	if err != nil {
+		return false, fmt.Errorf("failed to marshal data to JSON: %w", err)
+	}
+	set, err := RedisClient.SetNX(ctx, key, jsonData, expiration).Result()
+	if err != nil {
+		return false, fmt.Errorf("failed to setnx cache key %s: %w", key, err)
+	}
+	return set, nil
 }
 
 func CacheExists(ctx context.Context, key string) (bool, error) {

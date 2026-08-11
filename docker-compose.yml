@@ -1,38 +1,84 @@
-include:
-  - path: docker/postgres.yml
-  - path: docker/redis.yml
-  - path: docker/kafka.yml
-
 services:
+  # ─────────────────────────────────────────────
+  # Unified Backend server (handles Staging & Production)
+  # ─────────────────────────────────────────────
   server:
     build:
       context: .
       dockerfile: Server/Dockerfile
+    container_name: floowsynk-server
     ports:
-      - "8082:8082"
-      - "8083:8083"
-      - "${SERVER_PLAIN_GRPC_PORT:-50051}:${SERVER_PLAIN_GRPC_PORT:-50051}"
+      - "8090:8090"   # gRPC-Web
+      - "8091:8091"   # REST API (/api/... & /staging/api/...)
+      - "50051:50051" # Plain gRPC
     env_file:
       - ./Server/.env
     environment:
-      - DB_HOST=db
-      - KAFKA_BROKERS=kafka:29092
-      - REDIS_HOST=redis
-      - REDIS_PORT=6379
-    depends_on:
-      - redis
-      - db
-      - kafka
+      - DB_HOST=${DB_HOST:-host.docker.internal}
+      - REDIS_HOST=${REDIS_HOST:-host.docker.internal}
+      - KAFKA_BROKERS=${KAFKA_BROKERS:-host.docker.internal:29092}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
 
+  # ─────────────────────────────────────────────
+  # Kafka consumer job
+  # ─────────────────────────────────────────────
+  consumer:
+    build:
+      context: .
+      dockerfile: Jobs/Consumer/Dockerfile
+    container_name: floowsynk-consumer
+    env_file:
+      - ./Server/.env
+    environment:
+      - DB_HOST=${DB_HOST:-host.docker.internal}
+      - REDIS_HOST=${REDIS_HOST:-host.docker.internal}
+      - KAFKA_BROKERS=${KAFKA_BROKERS:-host.docker.internal:29092}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - server
+    restart: unless-stopped
+
+  # ─────────────────────────────────────────────
+  # Interval trigger job
+  # ─────────────────────────────────────────────
+  interval:
+    build:
+      context: .
+      dockerfile: Jobs/Interval/Dockerfile
+    container_name: floowsynk-interval
+    env_file:
+      - ./Server/.env
+    environment:
+      - DB_HOST=${DB_HOST:-host.docker.internal}
+      - REDIS_HOST=${REDIS_HOST:-host.docker.internal}
+      - KAFKA_BROKERS=${KAFKA_BROKERS:-host.docker.internal:29092}
+      - SERVER_GRPC_HOST=server
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - server
+    restart: unless-stopped
+
+  # ─────────────────────────────────────────────
+  # Frontend app
+  # ─────────────────────────────────────────────
   app:
     build:
       context: .
       dockerfile: App/Dockerfile
       args:
         - VITE_SERVER=${VITE_SERVER:-https://floowsynkapi.raenardcruz.com}
+        - VITE_REST_SERVER=${VITE_REST_SERVER:-https://flowapi.raenardcruz.com}
+    container_name: floowsynk-app
     ports:
-      - "3000:80"
-    environment:
-      - VITE_SERVER=${VITE_SERVER:-https://floowsynkapi.raenardcruz.com}
+      - "3000:80"   # http://localhost:3000
     depends_on:
       - server
+    restart: unless-stopped
+
+volumes:
+  kafka_data:
+

@@ -1,0 +1,160 @@
+{
+  "id": "google_sheets",
+  "name": "Google Sheets",
+  "description": "Read, append, and update rows and values in Google Sheets spreadsheets.",
+  "icon": "/src/components/Icons/google_sheets.svg",
+  "baseUrl": "https://sheets.googleapis.com/v4/spreadsheets",
+  "authType": "oauth2, service_account",
+  "fields": [
+    {
+      "key": "client_id",
+      "label": "Client ID",
+      "type": "text",
+      "required": false,
+      "placeholder": "Enter Google OAuth Client ID"
+    },
+    {
+      "key": "client_secret",
+      "label": "Client Secret",
+      "type": "password",
+      "required": false,
+      "placeholder": "Enter Google OAuth Client Secret"
+    },
+    {
+      "key": "access_token",
+      "label": "Access Token",
+      "type": "password",
+      "required": false,
+      "placeholder": "ya29..."
+    },
+    {
+      "key": "service_account_email",
+      "label": "Service Account Email",
+      "type": "text",
+      "required": false,
+      "placeholder": "service-account@project.iam.gserviceaccount.com"
+    },
+    {
+      "key": "private_key",
+      "label": "Private Key (JSON)",
+      "type": "password",
+      "required": false,
+      "placeholder": "-----BEGIN PRIVATE KEY-----\n..."
+    }
+  ],
+  "oauthConfig": {
+    "authorizeUrl": "https://accounts.google.com/o/oauth2/v2/auth",
+    "tokenUrl": "https://oauth2.googleapis.com/token",
+    "defaultScopes": [
+      "https://www.googleapis.com/auth/spreadsheets",
+      "https://www.googleapis.com/auth/drive.readonly"
+    ]
+  },
+  "actions": [
+    {
+      "id": "read_values",
+      "name": "Read Values",
+      "description": "Read row values from a spreadsheet range",
+      "path": "/{{spreadsheetId}}/values/{{range}}",
+      "method": "GET",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "fields": [
+        { "key": "spreadsheetId", "label": "Spreadsheet ID", "required": true, "placeholder": "1BxiMVs0XRX5nGrowIYh..." },
+        { "key": "range", "label": "Range (A1 Notation)", "required": true, "placeholder": "Sheet1!A1:D10" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "spreadsheetId": { "type": "string", "description": "Spreadsheet ID", "example": "1BxiMVs0XRX5nGrowIYh..." },
+          "range": { "type": "string", "description": "Cell range in A1 notation", "example": "Sheet1!A1:D10" }
+        },
+        "required": ["spreadsheetId", "range"]
+      },
+      "outputSchema": {
+        "range": "Sheet1!A1:D10",
+        "majorDimension": "ROWS",
+        "values": [
+          ["Name", "Email", "Role"],
+          ["Alice", "alice@example.com", "Admin"]
+        ]
+      }
+    },
+    {
+      "id": "append_rows",
+      "name": "Append Rows",
+      "description": "Append row data to a sheet range",
+      "path": "/{{spreadsheetId}}/values/{{range}}:append",
+      "method": "POST",
+      "queryParams": [
+        { "key": "valueInputOption", "value": "USER_ENTERED" }
+      ],
+      "headers": {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      "payloadTemplate": "{\"values\": {{values}}}",
+      "fields": [
+        { "key": "spreadsheetId", "label": "Spreadsheet ID", "required": true, "placeholder": "1BxiMVs0XRX5nGrowIYh..." },
+        { "key": "range", "label": "Target Range", "required": true, "placeholder": "Sheet1!A1" },
+        { "key": "values", "label": "Values (JSON Array of Arrays)", "required": true, "placeholder": "[[\"Bob\", \"bob@example.com\", \"User\"]]" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "spreadsheetId": { "type": "string", "description": "Spreadsheet ID" },
+          "range": { "type": "string", "description": "Target sheet/range" },
+          "values": { "type": "array", "description": "2D array of cell values" }
+        },
+        "required": ["spreadsheetId", "range", "values"]
+      },
+      "outputSchema": {
+        "spreadsheetId": "1BxiMVs0XRX5nGrowIYh...",
+        "tableRange": "Sheet1!A1:C1",
+        "updates": {
+          "updatedRange": "Sheet1!A2:C2",
+          "updatedRows": 1,
+          "updatedColumns": 3,
+          "updatedCells": 3
+        }
+      }
+    },
+    {
+      "id": "update_values",
+      "name": "Update Values",
+      "description": "Update specific cell values in a range",
+      "path": "/{{spreadsheetId}}/values/{{range}}",
+      "method": "PUT",
+      "queryParams": [
+        { "key": "valueInputOption", "value": "USER_ENTERED" }
+      ],
+      "headers": {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      "payloadTemplate": "{\"values\": {{values}}}",
+      "fields": [
+        { "key": "spreadsheetId", "label": "Spreadsheet ID", "required": true, "placeholder": "1BxiMVs0XRX5nGrowIYh..." },
+        { "key": "range", "label": "Target Range", "required": true, "placeholder": "Sheet1!A2:C2" },
+        { "key": "values", "label": "Values (JSON Array of Arrays)", "required": true, "placeholder": "[[\"Updated Name\", \"updated@example.com\"]]" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "spreadsheetId": { "type": "string", "description": "Spreadsheet ID" },
+          "range": { "type": "string", "description": "Target range" },
+          "values": { "type": "array", "description": "2D array of updated cell values" }
+        },
+        "required": ["spreadsheetId", "range", "values"]
+      },
+      "outputSchema": {
+        "spreadsheetId": "1BxiMVs0XRX5nGrowIYh...",
+        "updatedRange": "Sheet1!A2:C2",
+        "updatedRows": 1,
+        "updatedColumns": 2,
+        "updatedCells": 2
+      }
+    }
+  ]
+}

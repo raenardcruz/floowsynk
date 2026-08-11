@@ -3,7 +3,7 @@
  */
 
 import type { ListFieldWrapperProps, ListFieldOption } from './ListField.types'
-import TextInput from './TextInput.vue'
+import TextCodeInput from './TextCodeInput.vue'
 import Checkbox from './Checkbox.vue'
 import KeyValue from './KeyValue.vue'
 
@@ -20,13 +20,13 @@ export const listFieldTypeOptions: ListFieldOption[] = [
   {
     value: 'string',
     label: 'String',
-    component: TextInput,
+    component: TextCodeInput,
     defaultValue: ''
   },
   {
     value: 'number',
     label: 'Number',
-    component: TextInput,
+    component: TextCodeInput,
     defaultValue: 0
   },
   {

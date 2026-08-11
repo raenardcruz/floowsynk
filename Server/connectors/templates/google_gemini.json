@@ -1,0 +1,116 @@
+{
+  "id": "google_gemini",
+  "name": "Google Gemini",
+  "description": "Generate text, count tokens, and generate embeddings using Google Gemini API.",
+  "icon": "/src/components/Icons/google_gemini.svg",
+  "baseUrl": "https://generativelanguage.googleapis.com/v1beta",
+  "authType": "apikey",
+  "fields": [
+    {
+      "key": "api_key",
+      "label": "API Key",
+      "type": "password",
+      "required": true,
+      "placeholder": "AIzaSy..."
+    }
+  ],
+  "actions": [
+    {
+      "id": "generate_content",
+      "name": "Generate Content",
+      "description": "Generate content with Gemini models (e.g. gemini-1.5-flash)",
+      "path": "/models/{{model}}:generateContent",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "queryParams": [
+        { "key": "key", "value": "{{api_key}}" }
+      ],
+      "payloadTemplate": "{\"contents\": [{\"parts\": [{\"text\": \"{{prompt}}\"}]}]}",
+      "fields": [
+        { "key": "model", "label": "Model Name", "required": true, "placeholder": "gemini-1.5-flash" },
+        { "key": "prompt", "label": "Prompt Text", "required": true, "placeholder": "Enter your prompt here" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "model": { "type": "string", "description": "Model identifier", "example": "gemini-1.5-flash" },
+          "prompt": { "type": "string", "description": "Prompt text", "example": "Explain quantum computing" }
+        },
+        "required": ["model", "prompt"]
+      },
+      "outputSchema": {
+        "candidates": [
+          {
+            "content": {
+              "parts": [
+                {
+                  "text": "Generated response text..."
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "id": "count_tokens",
+      "name": "Count Tokens",
+      "description": "Count tokens for a given prompt",
+      "path": "/models/{{model}}:countTokens",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "queryParams": [
+        { "key": "key", "value": "{{api_key}}" }
+      ],
+      "payloadTemplate": "{\"contents\": [{\"parts\": [{\"text\": \"{{prompt}}\"}]}]}",
+      "fields": [
+        { "key": "model", "label": "Model Name", "required": true, "placeholder": "gemini-1.5-flash" },
+        { "key": "prompt", "label": "Prompt Text", "required": true, "placeholder": "Text to count tokens for" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "model": { "type": "string", "description": "Model identifier", "example": "gemini-1.5-flash" },
+          "prompt": { "type": "string", "description": "Prompt text" }
+        },
+        "required": ["model", "prompt"]
+      },
+      "outputSchema": {
+        "totalTokens": 15
+      }
+    },
+    {
+      "id": "embed_content",
+      "name": "Embed Content",
+      "description": "Generate vector embeddings for input text using text-embedding-004",
+      "path": "/models/text-embedding-004:embedContent",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "queryParams": [
+        { "key": "key", "value": "{{api_key}}" }
+      ],
+      "payloadTemplate": "{\"model\": \"models/text-embedding-004\", \"content\": {\"parts\": [{\"text\": \"{{text}}\"}]}}",
+      "fields": [
+        { "key": "text", "label": "Input Text", "required": true, "placeholder": "Text to embed" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "text": { "type": "string", "description": "Input text", "example": "Hello world" }
+        },
+        "required": ["text"]
+      },
+      "outputSchema": {
+        "embedding": {
+          "values": [0.012, -0.045, 0.089]
+        }
+      }
+    }
+  ]
+}

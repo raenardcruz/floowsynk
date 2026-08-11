@@ -22,6 +22,52 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type Environment int32
+
+const (
+	Environment_PRODUCTION Environment = 0
+	Environment_STAGING    Environment = 1
+)
+
+// Enum value maps for Environment.
+var (
+	Environment_name = map[int32]string{
+		0: "PRODUCTION",
+		1: "STAGING",
+	}
+	Environment_value = map[string]int32{
+		"PRODUCTION": 0,
+		"STAGING":    1,
+	}
+)
+
+func (x Environment) Enum() *Environment {
+	p := new(Environment)
+	*p = x
+	return p
+}
+
+func (x Environment) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (Environment) Descriptor() protoreflect.EnumDescriptor {
+	return file_workflow_proto_enumTypes[0].Descriptor()
+}
+
+func (Environment) Type() protoreflect.EnumType {
+	return &file_workflow_proto_enumTypes[0]
+}
+
+func (x Environment) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use Environment.Descriptor instead.
+func (Environment) EnumDescriptor() ([]byte, []int) {
+	return file_workflow_proto_rawDescGZIP(), []int{0}
+}
+
 type ArrayDataType int32
 
 const (
@@ -58,11 +104,11 @@ func (x ArrayDataType) String() string {
 }
 
 func (ArrayDataType) Descriptor() protoreflect.EnumDescriptor {
-	return file_workflow_proto_enumTypes[0].Descriptor()
+	return file_workflow_proto_enumTypes[1].Descriptor()
 }
 
 func (ArrayDataType) Type() protoreflect.EnumType {
-	return &file_workflow_proto_enumTypes[0]
+	return &file_workflow_proto_enumTypes[1]
 }
 
 func (x ArrayDataType) Number() protoreflect.EnumNumber {
@@ -71,7 +117,7 @@ func (x ArrayDataType) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use ArrayDataType.Descriptor instead.
 func (ArrayDataType) EnumDescriptor() ([]byte, []int) {
-	return file_workflow_proto_rawDescGZIP(), []int{0}
+	return file_workflow_proto_rawDescGZIP(), []int{1}
 }
 
 type NodeStatus int32
@@ -110,11 +156,11 @@ func (x NodeStatus) String() string {
 }
 
 func (NodeStatus) Descriptor() protoreflect.EnumDescriptor {
-	return file_workflow_proto_enumTypes[1].Descriptor()
+	return file_workflow_proto_enumTypes[2].Descriptor()
 }
 
 func (NodeStatus) Type() protoreflect.EnumType {
-	return &file_workflow_proto_enumTypes[1]
+	return &file_workflow_proto_enumTypes[2]
 }
 
 func (x NodeStatus) Number() protoreflect.EnumNumber {
@@ -123,12 +169,13 @@ func (x NodeStatus) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use NodeStatus.Descriptor instead.
 func (NodeStatus) EnumDescriptor() ([]byte, []int) {
-	return file_workflow_proto_rawDescGZIP(), []int{1}
+	return file_workflow_proto_rawDescGZIP(), []int{2}
 }
 
 type RunWorkflowIdRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Environment   Environment            `protobuf:"varint,2,opt,name=environment,proto3,enum=proto.Environment" json:"environment,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -168,6 +215,13 @@ func (x *RunWorkflowIdRequest) GetId() string {
 		return x.Id
 	}
 	return ""
+}
+
+func (x *RunWorkflowIdRequest) GetEnvironment() Environment {
+	if x != nil {
+		return x.Environment
+	}
+	return Environment_PRODUCTION
 }
 
 type WorkflowHistoryList struct {
@@ -293,6 +347,7 @@ func (x *WorkflowHistory) GetStatus() NodeStatus {
 type WorkflowHistoryRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Environment   Environment            `protobuf:"varint,2,opt,name=environment,proto3,enum=proto.Environment" json:"environment,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -334,6 +389,57 @@ func (x *WorkflowHistoryRequest) GetId() string {
 	return ""
 }
 
+func (x *WorkflowHistoryRequest) GetEnvironment() Environment {
+	if x != nil {
+		return x.Environment
+	}
+	return Environment_PRODUCTION
+}
+
+type ListWorkflowHistoryRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Environment   Environment            `protobuf:"varint,1,opt,name=environment,proto3,enum=proto.Environment" json:"environment,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListWorkflowHistoryRequest) Reset() {
+	*x = ListWorkflowHistoryRequest{}
+	mi := &file_workflow_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListWorkflowHistoryRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListWorkflowHistoryRequest) ProtoMessage() {}
+
+func (x *ListWorkflowHistoryRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_workflow_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListWorkflowHistoryRequest.ProtoReflect.Descriptor instead.
+func (*ListWorkflowHistoryRequest) Descriptor() ([]byte, []int) {
+	return file_workflow_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *ListWorkflowHistoryRequest) GetEnvironment() Environment {
+	if x != nil {
+		return x.Environment
+	}
+	return Environment_PRODUCTION
+}
+
 type WorkflowHistoryResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Data          []*ReplayData          `protobuf:"bytes,1,rep,name=data,proto3" json:"data,omitempty"`
@@ -343,7 +449,7 @@ type WorkflowHistoryResponse struct {
 
 func (x *WorkflowHistoryResponse) Reset() {
 	*x = WorkflowHistoryResponse{}
-	mi := &file_workflow_proto_msgTypes[4]
+	mi := &file_workflow_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -355,7 +461,7 @@ func (x *WorkflowHistoryResponse) String() string {
 func (*WorkflowHistoryResponse) ProtoMessage() {}
 
 func (x *WorkflowHistoryResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_workflow_proto_msgTypes[4]
+	mi := &file_workflow_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -368,7 +474,7 @@ func (x *WorkflowHistoryResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WorkflowHistoryResponse.ProtoReflect.Descriptor instead.
 func (*WorkflowHistoryResponse) Descriptor() ([]byte, []int) {
-	return file_workflow_proto_rawDescGZIP(), []int{4}
+	return file_workflow_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *WorkflowHistoryResponse) GetData() []*ReplayData {
@@ -391,7 +497,7 @@ type ReplayData struct {
 
 func (x *ReplayData) Reset() {
 	*x = ReplayData{}
-	mi := &file_workflow_proto_msgTypes[5]
+	mi := &file_workflow_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -403,7 +509,7 @@ func (x *ReplayData) String() string {
 func (*ReplayData) ProtoMessage() {}
 
 func (x *ReplayData) ProtoReflect() protoreflect.Message {
-	mi := &file_workflow_proto_msgTypes[5]
+	mi := &file_workflow_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -416,7 +522,7 @@ func (x *ReplayData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReplayData.ProtoReflect.Descriptor instead.
 func (*ReplayData) Descriptor() ([]byte, []int) {
-	return file_workflow_proto_rawDescGZIP(), []int{5}
+	return file_workflow_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *ReplayData) GetNodeId() string {
@@ -458,13 +564,14 @@ type PageRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Limit         int32                  `protobuf:"varint,1,opt,name=limit,proto3" json:"limit,omitempty"`
 	Offset        int32                  `protobuf:"varint,2,opt,name=offset,proto3" json:"offset,omitempty"`
+	Environment   Environment            `protobuf:"varint,3,opt,name=environment,proto3,enum=proto.Environment" json:"environment,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *PageRequest) Reset() {
 	*x = PageRequest{}
-	mi := &file_workflow_proto_msgTypes[6]
+	mi := &file_workflow_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -476,7 +583,7 @@ func (x *PageRequest) String() string {
 func (*PageRequest) ProtoMessage() {}
 
 func (x *PageRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_workflow_proto_msgTypes[6]
+	mi := &file_workflow_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -489,7 +596,7 @@ func (x *PageRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PageRequest.ProtoReflect.Descriptor instead.
 func (*PageRequest) Descriptor() ([]byte, []int) {
-	return file_workflow_proto_rawDescGZIP(), []int{6}
+	return file_workflow_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *PageRequest) GetLimit() int32 {
@@ -506,16 +613,24 @@ func (x *PageRequest) GetOffset() int32 {
 	return 0
 }
 
+func (x *PageRequest) GetEnvironment() Environment {
+	if x != nil {
+		return x.Environment
+	}
+	return Environment_PRODUCTION
+}
+
 type GetWorkflowRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Environment   Environment            `protobuf:"varint,2,opt,name=environment,proto3,enum=proto.Environment" json:"environment,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *GetWorkflowRequest) Reset() {
 	*x = GetWorkflowRequest{}
-	mi := &file_workflow_proto_msgTypes[7]
+	mi := &file_workflow_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -527,7 +642,7 @@ func (x *GetWorkflowRequest) String() string {
 func (*GetWorkflowRequest) ProtoMessage() {}
 
 func (x *GetWorkflowRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_workflow_proto_msgTypes[7]
+	mi := &file_workflow_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -540,7 +655,7 @@ func (x *GetWorkflowRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetWorkflowRequest.ProtoReflect.Descriptor instead.
 func (*GetWorkflowRequest) Descriptor() ([]byte, []int) {
-	return file_workflow_proto_rawDescGZIP(), []int{7}
+	return file_workflow_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *GetWorkflowRequest) GetId() string {
@@ -548,6 +663,13 @@ func (x *GetWorkflowRequest) GetId() string {
 		return x.Id
 	}
 	return ""
+}
+
+func (x *GetWorkflowRequest) GetEnvironment() Environment {
+	if x != nil {
+		return x.Environment
+	}
+	return Environment_PRODUCTION
 }
 
 type WorkflowList struct {
@@ -560,7 +682,7 @@ type WorkflowList struct {
 
 func (x *WorkflowList) Reset() {
 	*x = WorkflowList{}
-	mi := &file_workflow_proto_msgTypes[8]
+	mi := &file_workflow_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -572,7 +694,7 @@ func (x *WorkflowList) String() string {
 func (*WorkflowList) ProtoMessage() {}
 
 func (x *WorkflowList) ProtoReflect() protoreflect.Message {
-	mi := &file_workflow_proto_msgTypes[8]
+	mi := &file_workflow_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -585,7 +707,7 @@ func (x *WorkflowList) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WorkflowList.ProtoReflect.Descriptor instead.
 func (*WorkflowList) Descriptor() ([]byte, []int) {
-	return file_workflow_proto_rawDescGZIP(), []int{8}
+	return file_workflow_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *WorkflowList) GetTotal() int32 {
@@ -603,26 +725,30 @@ func (x *WorkflowList) GetWorkflows() []*Workflow {
 }
 
 type Workflow struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
-	Nodes         []*Node                `protobuf:"bytes,4,rep,name=nodes,proto3" json:"nodes,omitempty"`
-	Edges         []*Edge                `protobuf:"bytes,5,rep,name=edges,proto3" json:"edges,omitempty"`
-	Type          string                 `protobuf:"bytes,6,opt,name=type,proto3" json:"type,omitempty"`
-	CreatedAt     string                 `protobuf:"bytes,7,opt,name=createdAt,proto3" json:"createdAt,omitempty"`
-	UpdatedAt     string                 `protobuf:"bytes,8,opt,name=updatedAt,proto3" json:"updatedAt,omitempty"`
-	CreatedBy     string                 `protobuf:"bytes,9,opt,name=createdBy,proto3" json:"createdBy,omitempty"`
-	UpdatedBy     string                 `protobuf:"bytes,10,opt,name=updatedBy,proto3" json:"updatedBy,omitempty"`
-	Tags          []string               `protobuf:"bytes,11,rep,name=tags,proto3" json:"tags,omitempty"`
-	IsNew         *bool                  `protobuf:"varint,12,opt,name=isNew,proto3,oneof" json:"isNew,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state               protoimpl.MessageState `protogen:"open.v1"`
+	Id                  string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name                string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Description         string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	Nodes               []*Node                `protobuf:"bytes,4,rep,name=nodes,proto3" json:"nodes,omitempty"`
+	Edges               []*Edge                `protobuf:"bytes,5,rep,name=edges,proto3" json:"edges,omitempty"`
+	Type                string                 `protobuf:"bytes,6,opt,name=type,proto3" json:"type,omitempty"`
+	CreatedAt           string                 `protobuf:"bytes,7,opt,name=createdAt,proto3" json:"createdAt,omitempty"`
+	UpdatedAt           string                 `protobuf:"bytes,8,opt,name=updatedAt,proto3" json:"updatedAt,omitempty"`
+	CreatedBy           string                 `protobuf:"bytes,9,opt,name=createdBy,proto3" json:"createdBy,omitempty"`
+	UpdatedBy           string                 `protobuf:"bytes,10,opt,name=updatedBy,proto3" json:"updatedBy,omitempty"`
+	Tags                []string               `protobuf:"bytes,11,rep,name=tags,proto3" json:"tags,omitempty"`
+	IsNew               *bool                  `protobuf:"varint,12,opt,name=isNew,proto3,oneof" json:"isNew,omitempty"`
+	IsModified          bool                   `protobuf:"varint,13,opt,name=isModified,proto3" json:"isModified,omitempty"`
+	PublishedVersionId  string                 `protobuf:"bytes,14,opt,name=publishedVersionId,proto3" json:"publishedVersionId,omitempty"`
+	PublishedVersionNum int32                  `protobuf:"varint,15,opt,name=publishedVersionNum,proto3" json:"publishedVersionNum,omitempty"`
+	Environment         Environment            `protobuf:"varint,16,opt,name=environment,proto3,enum=proto.Environment" json:"environment,omitempty"`
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
 }
 
 func (x *Workflow) Reset() {
 	*x = Workflow{}
-	mi := &file_workflow_proto_msgTypes[9]
+	mi := &file_workflow_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -634,7 +760,7 @@ func (x *Workflow) String() string {
 func (*Workflow) ProtoMessage() {}
 
 func (x *Workflow) ProtoReflect() protoreflect.Message {
-	mi := &file_workflow_proto_msgTypes[9]
+	mi := &file_workflow_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -647,7 +773,7 @@ func (x *Workflow) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Workflow.ProtoReflect.Descriptor instead.
 func (*Workflow) Descriptor() ([]byte, []int) {
-	return file_workflow_proto_rawDescGZIP(), []int{9}
+	return file_workflow_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *Workflow) GetId() string {
@@ -734,6 +860,351 @@ func (x *Workflow) GetIsNew() bool {
 	return false
 }
 
+func (x *Workflow) GetIsModified() bool {
+	if x != nil {
+		return x.IsModified
+	}
+	return false
+}
+
+func (x *Workflow) GetPublishedVersionId() string {
+	if x != nil {
+		return x.PublishedVersionId
+	}
+	return ""
+}
+
+func (x *Workflow) GetPublishedVersionNum() int32 {
+	if x != nil {
+		return x.PublishedVersionNum
+	}
+	return 0
+}
+
+func (x *Workflow) GetEnvironment() Environment {
+	if x != nil {
+		return x.Environment
+	}
+	return Environment_PRODUCTION
+}
+
+// WorkflowVersion is a point-in-time snapshot of a workflow (staging only).
+type WorkflowVersion struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	WorkflowId    string                 `protobuf:"bytes,2,opt,name=workflowId,proto3" json:"workflowId,omitempty"`
+	VersionNum    int32                  `protobuf:"varint,3,opt,name=versionNum,proto3" json:"versionNum,omitempty"`
+	Label         string                 `protobuf:"bytes,4,opt,name=label,proto3" json:"label,omitempty"` // user-defined label, e.g. "v3 - fixed loop"
+	Nodes         []*Node                `protobuf:"bytes,5,rep,name=nodes,proto3" json:"nodes,omitempty"`
+	Edges         []*Edge                `protobuf:"bytes,6,rep,name=edges,proto3" json:"edges,omitempty"`
+	SavedBy       string                 `protobuf:"bytes,7,opt,name=savedBy,proto3" json:"savedBy,omitempty"`
+	SavedAt       string                 `protobuf:"bytes,8,opt,name=savedAt,proto3" json:"savedAt,omitempty"` // formatted timestamp
+	Environment   Environment            `protobuf:"varint,9,opt,name=environment,proto3,enum=proto.Environment" json:"environment,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *WorkflowVersion) Reset() {
+	*x = WorkflowVersion{}
+	mi := &file_workflow_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *WorkflowVersion) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WorkflowVersion) ProtoMessage() {}
+
+func (x *WorkflowVersion) ProtoReflect() protoreflect.Message {
+	mi := &file_workflow_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WorkflowVersion.ProtoReflect.Descriptor instead.
+func (*WorkflowVersion) Descriptor() ([]byte, []int) {
+	return file_workflow_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *WorkflowVersion) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *WorkflowVersion) GetWorkflowId() string {
+	if x != nil {
+		return x.WorkflowId
+	}
+	return ""
+}
+
+func (x *WorkflowVersion) GetVersionNum() int32 {
+	if x != nil {
+		return x.VersionNum
+	}
+	return 0
+}
+
+func (x *WorkflowVersion) GetLabel() string {
+	if x != nil {
+		return x.Label
+	}
+	return ""
+}
+
+func (x *WorkflowVersion) GetNodes() []*Node {
+	if x != nil {
+		return x.Nodes
+	}
+	return nil
+}
+
+func (x *WorkflowVersion) GetEdges() []*Edge {
+	if x != nil {
+		return x.Edges
+	}
+	return nil
+}
+
+func (x *WorkflowVersion) GetSavedBy() string {
+	if x != nil {
+		return x.SavedBy
+	}
+	return ""
+}
+
+func (x *WorkflowVersion) GetSavedAt() string {
+	if x != nil {
+		return x.SavedAt
+	}
+	return ""
+}
+
+func (x *WorkflowVersion) GetEnvironment() Environment {
+	if x != nil {
+		return x.Environment
+	}
+	return Environment_PRODUCTION
+}
+
+type WorkflowVersionList struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Versions      []*WorkflowVersion     `protobuf:"bytes,1,rep,name=versions,proto3" json:"versions,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *WorkflowVersionList) Reset() {
+	*x = WorkflowVersionList{}
+	mi := &file_workflow_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *WorkflowVersionList) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WorkflowVersionList) ProtoMessage() {}
+
+func (x *WorkflowVersionList) ProtoReflect() protoreflect.Message {
+	mi := &file_workflow_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WorkflowVersionList.ProtoReflect.Descriptor instead.
+func (*WorkflowVersionList) Descriptor() ([]byte, []int) {
+	return file_workflow_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *WorkflowVersionList) GetVersions() []*WorkflowVersion {
+	if x != nil {
+		return x.Versions
+	}
+	return nil
+}
+
+type GetWorkflowVersionsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	WorkflowId    string                 `protobuf:"bytes,1,opt,name=workflowId,proto3" json:"workflowId,omitempty"`
+	Environment   Environment            `protobuf:"varint,2,opt,name=environment,proto3,enum=proto.Environment" json:"environment,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetWorkflowVersionsRequest) Reset() {
+	*x = GetWorkflowVersionsRequest{}
+	mi := &file_workflow_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetWorkflowVersionsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetWorkflowVersionsRequest) ProtoMessage() {}
+
+func (x *GetWorkflowVersionsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_workflow_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetWorkflowVersionsRequest.ProtoReflect.Descriptor instead.
+func (*GetWorkflowVersionsRequest) Descriptor() ([]byte, []int) {
+	return file_workflow_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *GetWorkflowVersionsRequest) GetWorkflowId() string {
+	if x != nil {
+		return x.WorkflowId
+	}
+	return ""
+}
+
+func (x *GetWorkflowVersionsRequest) GetEnvironment() Environment {
+	if x != nil {
+		return x.Environment
+	}
+	return Environment_PRODUCTION
+}
+
+type PublishWorkflowRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	WorkflowId    string                 `protobuf:"bytes,1,opt,name=workflowId,proto3" json:"workflowId,omitempty"`
+	VersionId     string                 `protobuf:"bytes,2,opt,name=versionId,proto3" json:"versionId,omitempty"` // empty = publish current live staging workflow
+	Environment   Environment            `protobuf:"varint,3,opt,name=environment,proto3,enum=proto.Environment" json:"environment,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PublishWorkflowRequest) Reset() {
+	*x = PublishWorkflowRequest{}
+	mi := &file_workflow_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PublishWorkflowRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PublishWorkflowRequest) ProtoMessage() {}
+
+func (x *PublishWorkflowRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_workflow_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PublishWorkflowRequest.ProtoReflect.Descriptor instead.
+func (*PublishWorkflowRequest) Descriptor() ([]byte, []int) {
+	return file_workflow_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *PublishWorkflowRequest) GetWorkflowId() string {
+	if x != nil {
+		return x.WorkflowId
+	}
+	return ""
+}
+
+func (x *PublishWorkflowRequest) GetVersionId() string {
+	if x != nil {
+		return x.VersionId
+	}
+	return ""
+}
+
+func (x *PublishWorkflowRequest) GetEnvironment() Environment {
+	if x != nil {
+		return x.Environment
+	}
+	return Environment_PRODUCTION
+}
+
+type PublishWorkflowResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *PublishWorkflowResponse) Reset() {
+	*x = PublishWorkflowResponse{}
+	mi := &file_workflow_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PublishWorkflowResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PublishWorkflowResponse) ProtoMessage() {}
+
+func (x *PublishWorkflowResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_workflow_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PublishWorkflowResponse.ProtoReflect.Descriptor instead.
+func (*PublishWorkflowResponse) Descriptor() ([]byte, []int) {
+	return file_workflow_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *PublishWorkflowResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *PublishWorkflowResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
 type Edge struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -757,7 +1228,7 @@ type Edge struct {
 
 func (x *Edge) Reset() {
 	*x = Edge{}
-	mi := &file_workflow_proto_msgTypes[10]
+	mi := &file_workflow_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -769,7 +1240,7 @@ func (x *Edge) String() string {
 func (*Edge) ProtoMessage() {}
 
 func (x *Edge) ProtoReflect() protoreflect.Message {
-	mi := &file_workflow_proto_msgTypes[10]
+	mi := &file_workflow_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -782,7 +1253,7 @@ func (x *Edge) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Edge.ProtoReflect.Descriptor instead.
 func (*Edge) Descriptor() ([]byte, []int) {
-	return file_workflow_proto_rawDescGZIP(), []int{10}
+	return file_workflow_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *Edge) GetId() string {
@@ -914,7 +1385,7 @@ type Node struct {
 
 func (x *Node) Reset() {
 	*x = Node{}
-	mi := &file_workflow_proto_msgTypes[11]
+	mi := &file_workflow_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -926,7 +1397,7 @@ func (x *Node) String() string {
 func (*Node) ProtoMessage() {}
 
 func (x *Node) ProtoReflect() protoreflect.Message {
-	mi := &file_workflow_proto_msgTypes[11]
+	mi := &file_workflow_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -939,7 +1410,7 @@ func (x *Node) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Node.ProtoReflect.Descriptor instead.
 func (*Node) Descriptor() ([]byte, []int) {
-	return file_workflow_proto_rawDescGZIP(), []int{11}
+	return file_workflow_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *Node) GetId() string {
@@ -1084,7 +1555,7 @@ type NodeData struct {
 
 func (x *NodeData) Reset() {
 	*x = NodeData{}
-	mi := &file_workflow_proto_msgTypes[12]
+	mi := &file_workflow_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1096,7 +1567,7 @@ func (x *NodeData) String() string {
 func (*NodeData) ProtoMessage() {}
 
 func (x *NodeData) ProtoReflect() protoreflect.Message {
-	mi := &file_workflow_proto_msgTypes[12]
+	mi := &file_workflow_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1109,7 +1580,7 @@ func (x *NodeData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NodeData.ProtoReflect.Descriptor instead.
 func (*NodeData) Descriptor() ([]byte, []int) {
-	return file_workflow_proto_rawDescGZIP(), []int{12}
+	return file_workflow_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *NodeData) GetName() string {
@@ -1279,7 +1750,7 @@ type NodeDataArray struct {
 
 func (x *NodeDataArray) Reset() {
 	*x = NodeDataArray{}
-	mi := &file_workflow_proto_msgTypes[13]
+	mi := &file_workflow_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1291,7 +1762,7 @@ func (x *NodeDataArray) String() string {
 func (*NodeDataArray) ProtoMessage() {}
 
 func (x *NodeDataArray) ProtoReflect() protoreflect.Message {
-	mi := &file_workflow_proto_msgTypes[13]
+	mi := &file_workflow_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1304,7 +1775,7 @@ func (x *NodeDataArray) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NodeDataArray.ProtoReflect.Descriptor instead.
 func (*NodeDataArray) Descriptor() ([]byte, []int) {
-	return file_workflow_proto_rawDescGZIP(), []int{13}
+	return file_workflow_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *NodeDataArray) GetType() ArrayDataType {
@@ -1352,7 +1823,7 @@ type NodeIcon struct {
 
 func (x *NodeIcon) Reset() {
 	*x = NodeIcon{}
-	mi := &file_workflow_proto_msgTypes[14]
+	mi := &file_workflow_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1364,7 +1835,7 @@ func (x *NodeIcon) String() string {
 func (*NodeIcon) ProtoMessage() {}
 
 func (x *NodeIcon) ProtoReflect() protoreflect.Message {
-	mi := &file_workflow_proto_msgTypes[14]
+	mi := &file_workflow_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1377,7 +1848,7 @@ func (x *NodeIcon) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NodeIcon.ProtoReflect.Descriptor instead.
 func (*NodeIcon) Descriptor() ([]byte, []int) {
-	return file_workflow_proto_rawDescGZIP(), []int{14}
+	return file_workflow_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *NodeIcon) GetName() string {
@@ -1404,7 +1875,7 @@ type NodeDimensions struct {
 
 func (x *NodeDimensions) Reset() {
 	*x = NodeDimensions{}
-	mi := &file_workflow_proto_msgTypes[15]
+	mi := &file_workflow_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1416,7 +1887,7 @@ func (x *NodeDimensions) String() string {
 func (*NodeDimensions) ProtoMessage() {}
 
 func (x *NodeDimensions) ProtoReflect() protoreflect.Message {
-	mi := &file_workflow_proto_msgTypes[15]
+	mi := &file_workflow_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1429,7 +1900,7 @@ func (x *NodeDimensions) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NodeDimensions.ProtoReflect.Descriptor instead.
 func (*NodeDimensions) Descriptor() ([]byte, []int) {
-	return file_workflow_proto_rawDescGZIP(), []int{15}
+	return file_workflow_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *NodeDimensions) GetWidth() float32 {
@@ -1457,7 +1928,7 @@ type NodePosition struct {
 
 func (x *NodePosition) Reset() {
 	*x = NodePosition{}
-	mi := &file_workflow_proto_msgTypes[16]
+	mi := &file_workflow_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1469,7 +1940,7 @@ func (x *NodePosition) String() string {
 func (*NodePosition) ProtoMessage() {}
 
 func (x *NodePosition) ProtoReflect() protoreflect.Message {
-	mi := &file_workflow_proto_msgTypes[16]
+	mi := &file_workflow_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1482,7 +1953,7 @@ func (x *NodePosition) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NodePosition.ProtoReflect.Descriptor instead.
 func (*NodePosition) Descriptor() ([]byte, []int) {
-	return file_workflow_proto_rawDescGZIP(), []int{16}
+	return file_workflow_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *NodePosition) GetX() float32 {
@@ -1516,7 +1987,7 @@ type KeyValue struct {
 
 func (x *KeyValue) Reset() {
 	*x = KeyValue{}
-	mi := &file_workflow_proto_msgTypes[17]
+	mi := &file_workflow_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1528,7 +1999,7 @@ func (x *KeyValue) String() string {
 func (*KeyValue) ProtoMessage() {}
 
 func (x *KeyValue) ProtoReflect() protoreflect.Message {
-	mi := &file_workflow_proto_msgTypes[17]
+	mi := &file_workflow_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1541,7 +2012,7 @@ func (x *KeyValue) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use KeyValue.ProtoReflect.Descriptor instead.
 func (*KeyValue) Descriptor() ([]byte, []int) {
-	return file_workflow_proto_rawDescGZIP(), []int{17}
+	return file_workflow_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *KeyValue) GetKey() string {
@@ -1568,7 +2039,7 @@ type NodeHandleBounds struct {
 
 func (x *NodeHandleBounds) Reset() {
 	*x = NodeHandleBounds{}
-	mi := &file_workflow_proto_msgTypes[18]
+	mi := &file_workflow_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1580,7 +2051,7 @@ func (x *NodeHandleBounds) String() string {
 func (*NodeHandleBounds) ProtoMessage() {}
 
 func (x *NodeHandleBounds) ProtoReflect() protoreflect.Message {
-	mi := &file_workflow_proto_msgTypes[18]
+	mi := &file_workflow_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1593,7 +2064,7 @@ func (x *NodeHandleBounds) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NodeHandleBounds.ProtoReflect.Descriptor instead.
 func (*NodeHandleBounds) Descriptor() ([]byte, []int) {
-	return file_workflow_proto_rawDescGZIP(), []int{18}
+	return file_workflow_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *NodeHandleBounds) GetSource() []*Handle {
@@ -1626,7 +2097,7 @@ type Handle struct {
 
 func (x *Handle) Reset() {
 	*x = Handle{}
-	mi := &file_workflow_proto_msgTypes[19]
+	mi := &file_workflow_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1638,7 +2109,7 @@ func (x *Handle) String() string {
 func (*Handle) ProtoMessage() {}
 
 func (x *Handle) ProtoReflect() protoreflect.Message {
-	mi := &file_workflow_proto_msgTypes[19]
+	mi := &file_workflow_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1651,7 +2122,7 @@ func (x *Handle) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Handle.ProtoReflect.Descriptor instead.
 func (*Handle) Descriptor() ([]byte, []int) {
-	return file_workflow_proto_rawDescGZIP(), []int{19}
+	return file_workflow_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *Handle) GetX() float32 {
@@ -1710,13 +2181,534 @@ func (x *Handle) GetPosition() string {
 	return ""
 }
 
+type ConnectorTemplateList struct {
+	state         protoimpl.MessageState    `protogen:"open.v1"`
+	Templates     []*ConnectorProtoTemplate `protobuf:"bytes,1,rep,name=templates,proto3" json:"templates,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ConnectorTemplateList) Reset() {
+	*x = ConnectorTemplateList{}
+	mi := &file_workflow_proto_msgTypes[26]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ConnectorTemplateList) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ConnectorTemplateList) ProtoMessage() {}
+
+func (x *ConnectorTemplateList) ProtoReflect() protoreflect.Message {
+	mi := &file_workflow_proto_msgTypes[26]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ConnectorTemplateList.ProtoReflect.Descriptor instead.
+func (*ConnectorTemplateList) Descriptor() ([]byte, []int) {
+	return file_workflow_proto_rawDescGZIP(), []int{26}
+}
+
+func (x *ConnectorTemplateList) GetTemplates() []*ConnectorProtoTemplate {
+	if x != nil {
+		return x.Templates
+	}
+	return nil
+}
+
+type ConnectorFieldProto struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Key           string                 `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+	Label         string                 `protobuf:"bytes,2,opt,name=label,proto3" json:"label,omitempty"`
+	Type          string                 `protobuf:"bytes,3,opt,name=type,proto3" json:"type,omitempty"`
+	Required      bool                   `protobuf:"varint,4,opt,name=required,proto3" json:"required,omitempty"`
+	Placeholder   string                 `protobuf:"bytes,5,opt,name=placeholder,proto3" json:"placeholder,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ConnectorFieldProto) Reset() {
+	*x = ConnectorFieldProto{}
+	mi := &file_workflow_proto_msgTypes[27]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ConnectorFieldProto) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ConnectorFieldProto) ProtoMessage() {}
+
+func (x *ConnectorFieldProto) ProtoReflect() protoreflect.Message {
+	mi := &file_workflow_proto_msgTypes[27]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ConnectorFieldProto.ProtoReflect.Descriptor instead.
+func (*ConnectorFieldProto) Descriptor() ([]byte, []int) {
+	return file_workflow_proto_rawDescGZIP(), []int{27}
+}
+
+func (x *ConnectorFieldProto) GetKey() string {
+	if x != nil {
+		return x.Key
+	}
+	return ""
+}
+
+func (x *ConnectorFieldProto) GetLabel() string {
+	if x != nil {
+		return x.Label
+	}
+	return ""
+}
+
+func (x *ConnectorFieldProto) GetType() string {
+	if x != nil {
+		return x.Type
+	}
+	return ""
+}
+
+func (x *ConnectorFieldProto) GetRequired() bool {
+	if x != nil {
+		return x.Required
+	}
+	return false
+}
+
+func (x *ConnectorFieldProto) GetPlaceholder() string {
+	if x != nil {
+		return x.Placeholder
+	}
+	return ""
+}
+
+type ConnectorActionProto struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	Method        string                 `protobuf:"bytes,4,opt,name=method,proto3" json:"method,omitempty"`
+	Path          string                 `protobuf:"bytes,5,opt,name=path,proto3" json:"path,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ConnectorActionProto) Reset() {
+	*x = ConnectorActionProto{}
+	mi := &file_workflow_proto_msgTypes[28]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ConnectorActionProto) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ConnectorActionProto) ProtoMessage() {}
+
+func (x *ConnectorActionProto) ProtoReflect() protoreflect.Message {
+	mi := &file_workflow_proto_msgTypes[28]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ConnectorActionProto.ProtoReflect.Descriptor instead.
+func (*ConnectorActionProto) Descriptor() ([]byte, []int) {
+	return file_workflow_proto_rawDescGZIP(), []int{28}
+}
+
+func (x *ConnectorActionProto) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *ConnectorActionProto) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *ConnectorActionProto) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *ConnectorActionProto) GetMethod() string {
+	if x != nil {
+		return x.Method
+	}
+	return ""
+}
+
+func (x *ConnectorActionProto) GetPath() string {
+	if x != nil {
+		return x.Path
+	}
+	return ""
+}
+
+type ConnectorProtoTemplate struct {
+	state         protoimpl.MessageState  `protogen:"open.v1"`
+	Id            string                  `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name          string                  `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Description   string                  `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	Icon          string                  `protobuf:"bytes,4,opt,name=icon,proto3" json:"icon,omitempty"`
+	BaseUrl       string                  `protobuf:"bytes,5,opt,name=baseUrl,proto3" json:"baseUrl,omitempty"`
+	AuthType      string                  `protobuf:"bytes,6,opt,name=authType,proto3" json:"authType,omitempty"`
+	Fields        []*ConnectorFieldProto  `protobuf:"bytes,7,rep,name=fields,proto3" json:"fields,omitempty"`
+	Actions       []*ConnectorActionProto `protobuf:"bytes,8,rep,name=actions,proto3" json:"actions,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ConnectorProtoTemplate) Reset() {
+	*x = ConnectorProtoTemplate{}
+	mi := &file_workflow_proto_msgTypes[29]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ConnectorProtoTemplate) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ConnectorProtoTemplate) ProtoMessage() {}
+
+func (x *ConnectorProtoTemplate) ProtoReflect() protoreflect.Message {
+	mi := &file_workflow_proto_msgTypes[29]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ConnectorProtoTemplate.ProtoReflect.Descriptor instead.
+func (*ConnectorProtoTemplate) Descriptor() ([]byte, []int) {
+	return file_workflow_proto_rawDescGZIP(), []int{29}
+}
+
+func (x *ConnectorProtoTemplate) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *ConnectorProtoTemplate) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *ConnectorProtoTemplate) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *ConnectorProtoTemplate) GetIcon() string {
+	if x != nil {
+		return x.Icon
+	}
+	return ""
+}
+
+func (x *ConnectorProtoTemplate) GetBaseUrl() string {
+	if x != nil {
+		return x.BaseUrl
+	}
+	return ""
+}
+
+func (x *ConnectorProtoTemplate) GetAuthType() string {
+	if x != nil {
+		return x.AuthType
+	}
+	return ""
+}
+
+func (x *ConnectorProtoTemplate) GetFields() []*ConnectorFieldProto {
+	if x != nil {
+		return x.Fields
+	}
+	return nil
+}
+
+func (x *ConnectorProtoTemplate) GetActions() []*ConnectorActionProto {
+	if x != nil {
+		return x.Actions
+	}
+	return nil
+}
+
+type ConnectionList struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Connections   []*ConnectionProto     `protobuf:"bytes,1,rep,name=connections,proto3" json:"connections,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ConnectionList) Reset() {
+	*x = ConnectionList{}
+	mi := &file_workflow_proto_msgTypes[30]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ConnectionList) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ConnectionList) ProtoMessage() {}
+
+func (x *ConnectionList) ProtoReflect() protoreflect.Message {
+	mi := &file_workflow_proto_msgTypes[30]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ConnectionList.ProtoReflect.Descriptor instead.
+func (*ConnectionList) Descriptor() ([]byte, []int) {
+	return file_workflow_proto_rawDescGZIP(), []int{30}
+}
+
+func (x *ConnectionList) GetConnections() []*ConnectionProto {
+	if x != nil {
+		return x.Connections
+	}
+	return nil
+}
+
+type ConnectionProto struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	ConnectorId   string                 `protobuf:"bytes,3,opt,name=connectorId,proto3" json:"connectorId,omitempty"`
+	AuthType      string                 `protobuf:"bytes,4,opt,name=authType,proto3" json:"authType,omitempty"`
+	CreatedAt     string                 `protobuf:"bytes,5,opt,name=createdAt,proto3" json:"createdAt,omitempty"`
+	IsModified    bool                   `protobuf:"varint,6,opt,name=isModified,proto3" json:"isModified,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ConnectionProto) Reset() {
+	*x = ConnectionProto{}
+	mi := &file_workflow_proto_msgTypes[31]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ConnectionProto) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ConnectionProto) ProtoMessage() {}
+
+func (x *ConnectionProto) ProtoReflect() protoreflect.Message {
+	mi := &file_workflow_proto_msgTypes[31]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ConnectionProto.ProtoReflect.Descriptor instead.
+func (*ConnectionProto) Descriptor() ([]byte, []int) {
+	return file_workflow_proto_rawDescGZIP(), []int{31}
+}
+
+func (x *ConnectionProto) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *ConnectionProto) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *ConnectionProto) GetConnectorId() string {
+	if x != nil {
+		return x.ConnectorId
+	}
+	return ""
+}
+
+func (x *ConnectionProto) GetAuthType() string {
+	if x != nil {
+		return x.AuthType
+	}
+	return ""
+}
+
+func (x *ConnectionProto) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
+func (x *ConnectionProto) GetIsModified() bool {
+	if x != nil {
+		return x.IsModified
+	}
+	return false
+}
+
+type ListConnectionsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Environment   Environment            `protobuf:"varint,1,opt,name=environment,proto3,enum=proto.Environment" json:"environment,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListConnectionsRequest) Reset() {
+	*x = ListConnectionsRequest{}
+	mi := &file_workflow_proto_msgTypes[32]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListConnectionsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListConnectionsRequest) ProtoMessage() {}
+
+func (x *ListConnectionsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_workflow_proto_msgTypes[32]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListConnectionsRequest.ProtoReflect.Descriptor instead.
+func (*ListConnectionsRequest) Descriptor() ([]byte, []int) {
+	return file_workflow_proto_rawDescGZIP(), []int{32}
+}
+
+func (x *ListConnectionsRequest) GetEnvironment() Environment {
+	if x != nil {
+		return x.Environment
+	}
+	return Environment_PRODUCTION
+}
+
+type DeleteConnectionRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Environment   Environment            `protobuf:"varint,2,opt,name=environment,proto3,enum=proto.Environment" json:"environment,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteConnectionRequest) Reset() {
+	*x = DeleteConnectionRequest{}
+	mi := &file_workflow_proto_msgTypes[33]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteConnectionRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteConnectionRequest) ProtoMessage() {}
+
+func (x *DeleteConnectionRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_workflow_proto_msgTypes[33]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteConnectionRequest.ProtoReflect.Descriptor instead.
+func (*DeleteConnectionRequest) Descriptor() ([]byte, []int) {
+	return file_workflow_proto_rawDescGZIP(), []int{33}
+}
+
+func (x *DeleteConnectionRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *DeleteConnectionRequest) GetEnvironment() Environment {
+	if x != nil {
+		return x.Environment
+	}
+	return Environment_PRODUCTION
+}
+
 var File_workflow_proto protoreflect.FileDescriptor
 
 const file_workflow_proto_rawDesc = "" +
 	"\n" +
-	"\x0eworkflow.proto\x12\x05proto\x1a\x1bgoogle/protobuf/empty.proto\"&\n" +
+	"\x0eworkflow.proto\x12\x05proto\x1a\x1bgoogle/protobuf/empty.proto\"\\\n" +
 	"\x14RunWorkflowIdRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\"G\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x124\n" +
+	"\venvironment\x18\x02 \x01(\x0e2\x12.proto.EnvironmentR\venvironment\"G\n" +
 	"\x13WorkflowHistoryList\x120\n" +
 	"\ahistory\x18\x01 \x03(\v2\x16.proto.WorkflowHistoryR\ahistory\"\xaa\x01\n" +
 	"\x0fWorkflowHistory\x12\x0e\n" +
@@ -1726,9 +2718,12 @@ const file_workflow_proto_rawDesc = "" +
 	"WorkflowId\x12\"\n" +
 	"\fWorkflowName\x18\x03 \x01(\tR\fWorkflowName\x12\x18\n" +
 	"\aRunDate\x18\x04 \x01(\tR\aRunDate\x12)\n" +
-	"\x06Status\x18\x05 \x01(\x0e2\x11.proto.NodeStatusR\x06Status\"(\n" +
+	"\x06Status\x18\x05 \x01(\x0e2\x11.proto.NodeStatusR\x06Status\"^\n" +
 	"\x16WorkflowHistoryRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\"@\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x124\n" +
+	"\venvironment\x18\x02 \x01(\x0e2\x12.proto.EnvironmentR\venvironment\"R\n" +
+	"\x1aListWorkflowHistoryRequest\x124\n" +
+	"\venvironment\x18\x01 \x01(\x0e2\x12.proto.EnvironmentR\venvironment\"@\n" +
 	"\x17WorkflowHistoryResponse\x12%\n" +
 	"\x04data\x18\x01 \x03(\v2\x11.proto.ReplayDataR\x04data\"\x8c\x02\n" +
 	"\n" +
@@ -1740,15 +2735,17 @@ const file_workflow_proto_rawDesc = "" +
 	"\amessage\x18\x05 \x01(\tR\amessage\x1a<\n" +
 	"\x0eVariablesEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\";\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"q\n" +
 	"\vPageRequest\x12\x14\n" +
 	"\x05limit\x18\x01 \x01(\x05R\x05limit\x12\x16\n" +
-	"\x06offset\x18\x02 \x01(\x05R\x06offset\"$\n" +
+	"\x06offset\x18\x02 \x01(\x05R\x06offset\x124\n" +
+	"\venvironment\x18\x03 \x01(\x0e2\x12.proto.EnvironmentR\venvironment\"Z\n" +
 	"\x12GetWorkflowRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\"S\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x124\n" +
+	"\venvironment\x18\x02 \x01(\x0e2\x12.proto.EnvironmentR\venvironment\"S\n" +
 	"\fWorkflowList\x12\x14\n" +
 	"\x05total\x18\x01 \x01(\x05R\x05total\x12-\n" +
-	"\tworkflows\x18\x02 \x03(\v2\x0f.proto.WorkflowR\tworkflows\"\xdb\x02\n" +
+	"\tworkflows\x18\x02 \x03(\v2\x0f.proto.WorkflowR\tworkflows\"\x93\x04\n" +
 	"\bWorkflow\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
@@ -1762,8 +2759,44 @@ const file_workflow_proto_rawDesc = "" +
 	"\tupdatedBy\x18\n" +
 	" \x01(\tR\tupdatedBy\x12\x12\n" +
 	"\x04tags\x18\v \x03(\tR\x04tags\x12\x19\n" +
-	"\x05isNew\x18\f \x01(\bH\x00R\x05isNew\x88\x01\x01B\b\n" +
-	"\x06_isNew\"\xac\x03\n" +
+	"\x05isNew\x18\f \x01(\bH\x00R\x05isNew\x88\x01\x01\x12\x1e\n" +
+	"\n" +
+	"isModified\x18\r \x01(\bR\n" +
+	"isModified\x12.\n" +
+	"\x12publishedVersionId\x18\x0e \x01(\tR\x12publishedVersionId\x120\n" +
+	"\x13publishedVersionNum\x18\x0f \x01(\x05R\x13publishedVersionNum\x124\n" +
+	"\venvironment\x18\x10 \x01(\x0e2\x12.proto.EnvironmentR\venvironmentB\b\n" +
+	"\x06_isNew\"\xa7\x02\n" +
+	"\x0fWorkflowVersion\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1e\n" +
+	"\n" +
+	"workflowId\x18\x02 \x01(\tR\n" +
+	"workflowId\x12\x1e\n" +
+	"\n" +
+	"versionNum\x18\x03 \x01(\x05R\n" +
+	"versionNum\x12\x14\n" +
+	"\x05label\x18\x04 \x01(\tR\x05label\x12!\n" +
+	"\x05nodes\x18\x05 \x03(\v2\v.proto.NodeR\x05nodes\x12!\n" +
+	"\x05edges\x18\x06 \x03(\v2\v.proto.EdgeR\x05edges\x12\x18\n" +
+	"\asavedBy\x18\a \x01(\tR\asavedBy\x12\x18\n" +
+	"\asavedAt\x18\b \x01(\tR\asavedAt\x124\n" +
+	"\venvironment\x18\t \x01(\x0e2\x12.proto.EnvironmentR\venvironment\"I\n" +
+	"\x13WorkflowVersionList\x122\n" +
+	"\bversions\x18\x01 \x03(\v2\x16.proto.WorkflowVersionR\bversions\"r\n" +
+	"\x1aGetWorkflowVersionsRequest\x12\x1e\n" +
+	"\n" +
+	"workflowId\x18\x01 \x01(\tR\n" +
+	"workflowId\x124\n" +
+	"\venvironment\x18\x02 \x01(\x0e2\x12.proto.EnvironmentR\venvironment\"\x8c\x01\n" +
+	"\x16PublishWorkflowRequest\x12\x1e\n" +
+	"\n" +
+	"workflowId\x18\x01 \x01(\tR\n" +
+	"workflowId\x12\x1c\n" +
+	"\tversionId\x18\x02 \x01(\tR\tversionId\x124\n" +
+	"\venvironment\x18\x03 \x01(\x0e2\x12.proto.EnvironmentR\venvironment\"M\n" +
+	"\x17PublishWorkflowResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"\xac\x03\n" +
 	"\x04Edge\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04type\x18\x02 \x01(\tR\x04type\x12\x14\n" +
@@ -1902,7 +2935,50 @@ const file_workflow_proto_rawDesc = "" +
 	"\x05width\x18\x05 \x01(\x02R\x05width\x12\x16\n" +
 	"\x06height\x18\x06 \x01(\x02R\x06height\x12\x16\n" +
 	"\x06nodeId\x18\a \x01(\tR\x06nodeId\x12\x1a\n" +
-	"\bposition\x18\b \x01(\tR\bposition*<\n" +
+	"\bposition\x18\b \x01(\tR\bposition\"T\n" +
+	"\x15ConnectorTemplateList\x12;\n" +
+	"\ttemplates\x18\x01 \x03(\v2\x1d.proto.ConnectorProtoTemplateR\ttemplates\"\x8f\x01\n" +
+	"\x13ConnectorFieldProto\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05label\x18\x02 \x01(\tR\x05label\x12\x12\n" +
+	"\x04type\x18\x03 \x01(\tR\x04type\x12\x1a\n" +
+	"\brequired\x18\x04 \x01(\bR\brequired\x12 \n" +
+	"\vplaceholder\x18\x05 \x01(\tR\vplaceholder\"\x88\x01\n" +
+	"\x14ConnectorActionProto\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
+	"\vdescription\x18\x03 \x01(\tR\vdescription\x12\x16\n" +
+	"\x06method\x18\x04 \x01(\tR\x06method\x12\x12\n" +
+	"\x04path\x18\x05 \x01(\tR\x04path\"\x93\x02\n" +
+	"\x16ConnectorProtoTemplate\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
+	"\vdescription\x18\x03 \x01(\tR\vdescription\x12\x12\n" +
+	"\x04icon\x18\x04 \x01(\tR\x04icon\x12\x18\n" +
+	"\abaseUrl\x18\x05 \x01(\tR\abaseUrl\x12\x1a\n" +
+	"\bauthType\x18\x06 \x01(\tR\bauthType\x122\n" +
+	"\x06fields\x18\a \x03(\v2\x1a.proto.ConnectorFieldProtoR\x06fields\x125\n" +
+	"\aactions\x18\b \x03(\v2\x1b.proto.ConnectorActionProtoR\aactions\"J\n" +
+	"\x0eConnectionList\x128\n" +
+	"\vconnections\x18\x01 \x03(\v2\x16.proto.ConnectionProtoR\vconnections\"\xb1\x01\n" +
+	"\x0fConnectionProto\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
+	"\vconnectorId\x18\x03 \x01(\tR\vconnectorId\x12\x1a\n" +
+	"\bauthType\x18\x04 \x01(\tR\bauthType\x12\x1c\n" +
+	"\tcreatedAt\x18\x05 \x01(\tR\tcreatedAt\x12\x1e\n" +
+	"\n" +
+	"isModified\x18\x06 \x01(\bR\n" +
+	"isModified\"N\n" +
+	"\x16ListConnectionsRequest\x124\n" +
+	"\venvironment\x18\x01 \x01(\x0e2\x12.proto.EnvironmentR\venvironment\"_\n" +
+	"\x17DeleteConnectionRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x124\n" +
+	"\venvironment\x18\x02 \x01(\x0e2\x12.proto.EnvironmentR\venvironment**\n" +
+	"\vEnvironment\x12\x0e\n" +
+	"\n" +
+	"PRODUCTION\x10\x00\x12\v\n" +
+	"\aSTAGING\x10\x01*<\n" +
 	"\rArrayDataType\x12\n" +
 	"\n" +
 	"\x06STRING\x10\x00\x12\a\n" +
@@ -1915,7 +2991,7 @@ const file_workflow_proto_rawDesc = "" +
 	"\tCOMPLETED\x10\x01\x12\n" +
 	"\n" +
 	"\x06FAILED\x10\x02\x12\b\n" +
-	"\x04INFO\x10\x032\xbe\x04\n" +
+	"\x04INFO\x10\x032\xe1\b\n" +
 	"\x0fWorkflowService\x129\n" +
 	"\vGetWorkflow\x12\x19.proto.GetWorkflowRequest\x1a\x0f.proto.Workflow\x128\n" +
 	"\rListWorkflows\x12\x12.proto.PageRequest\x1a\x13.proto.WorkflowList\x122\n" +
@@ -1923,9 +2999,16 @@ const file_workflow_proto_rawDesc = "" +
 	"\x0eCreateWorkflow\x12\x0f.proto.Workflow\x1a\x0f.proto.Workflow\x129\n" +
 	"\x0eDeleteWorkflow\x12\x0f.proto.Workflow\x1a\x16.google.protobuf.Empty\x120\n" +
 	"\bQuickRun\x12\x0f.proto.Workflow\x1a\x11.proto.ReplayData0\x01\x12A\n" +
-	"\rRunWorkflowId\x12\x1b.proto.RunWorkflowIdRequest\x1a\x11.proto.ReplayData0\x01\x12I\n" +
-	"\x13ListWorkflowHistory\x12\x16.google.protobuf.Empty\x1a\x1a.proto.WorkflowHistoryList\x12S\n" +
-	"\x12GetWorkflowHistory\x12\x1d.proto.WorkflowHistoryRequest\x1a\x1e.proto.WorkflowHistoryResponseB\tZ\a./protob\x06proto3"
+	"\rRunWorkflowId\x12\x1b.proto.RunWorkflowIdRequest\x1a\x11.proto.ReplayData0\x01\x12T\n" +
+	"\x13ListWorkflowHistory\x12!.proto.ListWorkflowHistoryRequest\x1a\x1a.proto.WorkflowHistoryList\x12S\n" +
+	"\x12GetWorkflowHistory\x12\x1d.proto.WorkflowHistoryRequest\x1a\x1e.proto.WorkflowHistoryResponse\x12N\n" +
+	"\x16ListConnectorTemplates\x12\x16.google.protobuf.Empty\x1a\x1c.proto.ConnectorTemplateList\x12G\n" +
+	"\x0fListConnections\x12\x1d.proto.ListConnectionsRequest\x1a\x15.proto.ConnectionList\x12J\n" +
+	"\x10DeleteConnection\x12\x1e.proto.DeleteConnectionRequest\x1a\x16.google.protobuf.Empty\x12U\n" +
+	"\x14ListWorkflowVersions\x12!.proto.GetWorkflowVersionsRequest\x1a\x1a.proto.WorkflowVersionList\x12A\n" +
+	"\x16RestoreWorkflowVersion\x12\x16.proto.WorkflowVersion\x1a\x0f.proto.Workflow\x12P\n" +
+	"\x0fPublishWorkflow\x12\x1d.proto.PublishWorkflowRequest\x1a\x1e.proto.PublishWorkflowResponse\x12E\n" +
+	"\x17RevertWorkflowToStaging\x12\x19.proto.GetWorkflowRequest\x1a\x0f.proto.WorkflowB\tZ\a./protob\x06proto3"
 
 var (
 	file_workflow_proto_rawDescOnce sync.Once
@@ -1939,82 +3022,129 @@ func file_workflow_proto_rawDescGZIP() []byte {
 	return file_workflow_proto_rawDescData
 }
 
-var file_workflow_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_workflow_proto_msgTypes = make([]protoimpl.MessageInfo, 21)
+var file_workflow_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
+var file_workflow_proto_msgTypes = make([]protoimpl.MessageInfo, 35)
 var file_workflow_proto_goTypes = []any{
-	(ArrayDataType)(0),              // 0: proto.ArrayDataType
-	(NodeStatus)(0),                 // 1: proto.NodeStatus
-	(*RunWorkflowIdRequest)(nil),    // 2: proto.RunWorkflowIdRequest
-	(*WorkflowHistoryList)(nil),     // 3: proto.WorkflowHistoryList
-	(*WorkflowHistory)(nil),         // 4: proto.WorkflowHistory
-	(*WorkflowHistoryRequest)(nil),  // 5: proto.WorkflowHistoryRequest
-	(*WorkflowHistoryResponse)(nil), // 6: proto.WorkflowHistoryResponse
-	(*ReplayData)(nil),              // 7: proto.ReplayData
-	(*PageRequest)(nil),             // 8: proto.PageRequest
-	(*GetWorkflowRequest)(nil),      // 9: proto.GetWorkflowRequest
-	(*WorkflowList)(nil),            // 10: proto.WorkflowList
-	(*Workflow)(nil),                // 11: proto.Workflow
-	(*Edge)(nil),                    // 12: proto.Edge
-	(*Node)(nil),                    // 13: proto.Node
-	(*NodeData)(nil),                // 14: proto.NodeData
-	(*NodeDataArray)(nil),           // 15: proto.NodeDataArray
-	(*NodeIcon)(nil),                // 16: proto.NodeIcon
-	(*NodeDimensions)(nil),          // 17: proto.NodeDimensions
-	(*NodePosition)(nil),            // 18: proto.NodePosition
-	(*KeyValue)(nil),                // 19: proto.KeyValue
-	(*NodeHandleBounds)(nil),        // 20: proto.NodeHandleBounds
-	(*Handle)(nil),                  // 21: proto.Handle
-	nil,                             // 22: proto.ReplayData.VariablesEntry
-	(*emptypb.Empty)(nil),           // 23: google.protobuf.Empty
+	(Environment)(0),                   // 0: proto.Environment
+	(ArrayDataType)(0),                 // 1: proto.ArrayDataType
+	(NodeStatus)(0),                    // 2: proto.NodeStatus
+	(*RunWorkflowIdRequest)(nil),       // 3: proto.RunWorkflowIdRequest
+	(*WorkflowHistoryList)(nil),        // 4: proto.WorkflowHistoryList
+	(*WorkflowHistory)(nil),            // 5: proto.WorkflowHistory
+	(*WorkflowHistoryRequest)(nil),     // 6: proto.WorkflowHistoryRequest
+	(*ListWorkflowHistoryRequest)(nil), // 7: proto.ListWorkflowHistoryRequest
+	(*WorkflowHistoryResponse)(nil),    // 8: proto.WorkflowHistoryResponse
+	(*ReplayData)(nil),                 // 9: proto.ReplayData
+	(*PageRequest)(nil),                // 10: proto.PageRequest
+	(*GetWorkflowRequest)(nil),         // 11: proto.GetWorkflowRequest
+	(*WorkflowList)(nil),               // 12: proto.WorkflowList
+	(*Workflow)(nil),                   // 13: proto.Workflow
+	(*WorkflowVersion)(nil),            // 14: proto.WorkflowVersion
+	(*WorkflowVersionList)(nil),        // 15: proto.WorkflowVersionList
+	(*GetWorkflowVersionsRequest)(nil), // 16: proto.GetWorkflowVersionsRequest
+	(*PublishWorkflowRequest)(nil),     // 17: proto.PublishWorkflowRequest
+	(*PublishWorkflowResponse)(nil),    // 18: proto.PublishWorkflowResponse
+	(*Edge)(nil),                       // 19: proto.Edge
+	(*Node)(nil),                       // 20: proto.Node
+	(*NodeData)(nil),                   // 21: proto.NodeData
+	(*NodeDataArray)(nil),              // 22: proto.NodeDataArray
+	(*NodeIcon)(nil),                   // 23: proto.NodeIcon
+	(*NodeDimensions)(nil),             // 24: proto.NodeDimensions
+	(*NodePosition)(nil),               // 25: proto.NodePosition
+	(*KeyValue)(nil),                   // 26: proto.KeyValue
+	(*NodeHandleBounds)(nil),           // 27: proto.NodeHandleBounds
+	(*Handle)(nil),                     // 28: proto.Handle
+	(*ConnectorTemplateList)(nil),      // 29: proto.ConnectorTemplateList
+	(*ConnectorFieldProto)(nil),        // 30: proto.ConnectorFieldProto
+	(*ConnectorActionProto)(nil),       // 31: proto.ConnectorActionProto
+	(*ConnectorProtoTemplate)(nil),     // 32: proto.ConnectorProtoTemplate
+	(*ConnectionList)(nil),             // 33: proto.ConnectionList
+	(*ConnectionProto)(nil),            // 34: proto.ConnectionProto
+	(*ListConnectionsRequest)(nil),     // 35: proto.ListConnectionsRequest
+	(*DeleteConnectionRequest)(nil),    // 36: proto.DeleteConnectionRequest
+	nil,                                // 37: proto.ReplayData.VariablesEntry
+	(*emptypb.Empty)(nil),              // 38: google.protobuf.Empty
 }
 var file_workflow_proto_depIdxs = []int32{
-	4,  // 0: proto.WorkflowHistoryList.history:type_name -> proto.WorkflowHistory
-	1,  // 1: proto.WorkflowHistory.Status:type_name -> proto.NodeStatus
-	7,  // 2: proto.WorkflowHistoryResponse.data:type_name -> proto.ReplayData
-	14, // 3: proto.ReplayData.data:type_name -> proto.NodeData
-	22, // 4: proto.ReplayData.variables:type_name -> proto.ReplayData.VariablesEntry
-	1,  // 5: proto.ReplayData.status:type_name -> proto.NodeStatus
-	11, // 6: proto.WorkflowList.workflows:type_name -> proto.Workflow
-	13, // 7: proto.Workflow.nodes:type_name -> proto.Node
-	12, // 8: proto.Workflow.edges:type_name -> proto.Edge
-	13, // 9: proto.Edge.sourcenode:type_name -> proto.Node
-	13, // 10: proto.Edge.targetnode:type_name -> proto.Node
-	14, // 11: proto.Node.data:type_name -> proto.NodeData
-	16, // 12: proto.Node.icon:type_name -> proto.NodeIcon
-	18, // 13: proto.Node.position:type_name -> proto.NodePosition
-	17, // 14: proto.Node.dimensions:type_name -> proto.NodeDimensions
-	20, // 15: proto.Node.handleBounds:type_name -> proto.NodeHandleBounds
-	18, // 16: proto.Node.computedPosition:type_name -> proto.NodePosition
-	15, // 17: proto.NodeData.headers:type_name -> proto.NodeDataArray
-	15, // 18: proto.NodeData.list:type_name -> proto.NodeDataArray
-	15, // 19: proto.NodeData.weeks:type_name -> proto.NodeDataArray
-	0,  // 20: proto.NodeDataArray.type:type_name -> proto.ArrayDataType
-	19, // 21: proto.NodeDataArray.keyValueItems:type_name -> proto.KeyValue
-	21, // 22: proto.NodeHandleBounds.source:type_name -> proto.Handle
-	21, // 23: proto.NodeHandleBounds.target:type_name -> proto.Handle
-	9,  // 24: proto.WorkflowService.GetWorkflow:input_type -> proto.GetWorkflowRequest
-	8,  // 25: proto.WorkflowService.ListWorkflows:input_type -> proto.PageRequest
-	11, // 26: proto.WorkflowService.UpdateWorkflow:input_type -> proto.Workflow
-	11, // 27: proto.WorkflowService.CreateWorkflow:input_type -> proto.Workflow
-	11, // 28: proto.WorkflowService.DeleteWorkflow:input_type -> proto.Workflow
-	11, // 29: proto.WorkflowService.QuickRun:input_type -> proto.Workflow
-	2,  // 30: proto.WorkflowService.RunWorkflowId:input_type -> proto.RunWorkflowIdRequest
-	23, // 31: proto.WorkflowService.ListWorkflowHistory:input_type -> google.protobuf.Empty
-	5,  // 32: proto.WorkflowService.GetWorkflowHistory:input_type -> proto.WorkflowHistoryRequest
-	11, // 33: proto.WorkflowService.GetWorkflow:output_type -> proto.Workflow
-	10, // 34: proto.WorkflowService.ListWorkflows:output_type -> proto.WorkflowList
-	11, // 35: proto.WorkflowService.UpdateWorkflow:output_type -> proto.Workflow
-	11, // 36: proto.WorkflowService.CreateWorkflow:output_type -> proto.Workflow
-	23, // 37: proto.WorkflowService.DeleteWorkflow:output_type -> google.protobuf.Empty
-	7,  // 38: proto.WorkflowService.QuickRun:output_type -> proto.ReplayData
-	7,  // 39: proto.WorkflowService.RunWorkflowId:output_type -> proto.ReplayData
-	3,  // 40: proto.WorkflowService.ListWorkflowHistory:output_type -> proto.WorkflowHistoryList
-	6,  // 41: proto.WorkflowService.GetWorkflowHistory:output_type -> proto.WorkflowHistoryResponse
-	33, // [33:42] is the sub-list for method output_type
-	24, // [24:33] is the sub-list for method input_type
-	24, // [24:24] is the sub-list for extension type_name
-	24, // [24:24] is the sub-list for extension extendee
-	0,  // [0:24] is the sub-list for field type_name
+	0,  // 0: proto.RunWorkflowIdRequest.environment:type_name -> proto.Environment
+	5,  // 1: proto.WorkflowHistoryList.history:type_name -> proto.WorkflowHistory
+	2,  // 2: proto.WorkflowHistory.Status:type_name -> proto.NodeStatus
+	0,  // 3: proto.WorkflowHistoryRequest.environment:type_name -> proto.Environment
+	0,  // 4: proto.ListWorkflowHistoryRequest.environment:type_name -> proto.Environment
+	9,  // 5: proto.WorkflowHistoryResponse.data:type_name -> proto.ReplayData
+	21, // 6: proto.ReplayData.data:type_name -> proto.NodeData
+	37, // 7: proto.ReplayData.variables:type_name -> proto.ReplayData.VariablesEntry
+	2,  // 8: proto.ReplayData.status:type_name -> proto.NodeStatus
+	0,  // 9: proto.PageRequest.environment:type_name -> proto.Environment
+	0,  // 10: proto.GetWorkflowRequest.environment:type_name -> proto.Environment
+	13, // 11: proto.WorkflowList.workflows:type_name -> proto.Workflow
+	20, // 12: proto.Workflow.nodes:type_name -> proto.Node
+	19, // 13: proto.Workflow.edges:type_name -> proto.Edge
+	0,  // 14: proto.Workflow.environment:type_name -> proto.Environment
+	20, // 15: proto.WorkflowVersion.nodes:type_name -> proto.Node
+	19, // 16: proto.WorkflowVersion.edges:type_name -> proto.Edge
+	0,  // 17: proto.WorkflowVersion.environment:type_name -> proto.Environment
+	14, // 18: proto.WorkflowVersionList.versions:type_name -> proto.WorkflowVersion
+	0,  // 19: proto.GetWorkflowVersionsRequest.environment:type_name -> proto.Environment
+	0,  // 20: proto.PublishWorkflowRequest.environment:type_name -> proto.Environment
+	20, // 21: proto.Edge.sourcenode:type_name -> proto.Node
+	20, // 22: proto.Edge.targetnode:type_name -> proto.Node
+	21, // 23: proto.Node.data:type_name -> proto.NodeData
+	23, // 24: proto.Node.icon:type_name -> proto.NodeIcon
+	25, // 25: proto.Node.position:type_name -> proto.NodePosition
+	24, // 26: proto.Node.dimensions:type_name -> proto.NodeDimensions
+	27, // 27: proto.Node.handleBounds:type_name -> proto.NodeHandleBounds
+	25, // 28: proto.Node.computedPosition:type_name -> proto.NodePosition
+	22, // 29: proto.NodeData.headers:type_name -> proto.NodeDataArray
+	22, // 30: proto.NodeData.list:type_name -> proto.NodeDataArray
+	22, // 31: proto.NodeData.weeks:type_name -> proto.NodeDataArray
+	1,  // 32: proto.NodeDataArray.type:type_name -> proto.ArrayDataType
+	26, // 33: proto.NodeDataArray.keyValueItems:type_name -> proto.KeyValue
+	28, // 34: proto.NodeHandleBounds.source:type_name -> proto.Handle
+	28, // 35: proto.NodeHandleBounds.target:type_name -> proto.Handle
+	32, // 36: proto.ConnectorTemplateList.templates:type_name -> proto.ConnectorProtoTemplate
+	30, // 37: proto.ConnectorProtoTemplate.fields:type_name -> proto.ConnectorFieldProto
+	31, // 38: proto.ConnectorProtoTemplate.actions:type_name -> proto.ConnectorActionProto
+	34, // 39: proto.ConnectionList.connections:type_name -> proto.ConnectionProto
+	0,  // 40: proto.ListConnectionsRequest.environment:type_name -> proto.Environment
+	0,  // 41: proto.DeleteConnectionRequest.environment:type_name -> proto.Environment
+	11, // 42: proto.WorkflowService.GetWorkflow:input_type -> proto.GetWorkflowRequest
+	10, // 43: proto.WorkflowService.ListWorkflows:input_type -> proto.PageRequest
+	13, // 44: proto.WorkflowService.UpdateWorkflow:input_type -> proto.Workflow
+	13, // 45: proto.WorkflowService.CreateWorkflow:input_type -> proto.Workflow
+	13, // 46: proto.WorkflowService.DeleteWorkflow:input_type -> proto.Workflow
+	13, // 47: proto.WorkflowService.QuickRun:input_type -> proto.Workflow
+	3,  // 48: proto.WorkflowService.RunWorkflowId:input_type -> proto.RunWorkflowIdRequest
+	7,  // 49: proto.WorkflowService.ListWorkflowHistory:input_type -> proto.ListWorkflowHistoryRequest
+	6,  // 50: proto.WorkflowService.GetWorkflowHistory:input_type -> proto.WorkflowHistoryRequest
+	38, // 51: proto.WorkflowService.ListConnectorTemplates:input_type -> google.protobuf.Empty
+	35, // 52: proto.WorkflowService.ListConnections:input_type -> proto.ListConnectionsRequest
+	36, // 53: proto.WorkflowService.DeleteConnection:input_type -> proto.DeleteConnectionRequest
+	16, // 54: proto.WorkflowService.ListWorkflowVersions:input_type -> proto.GetWorkflowVersionsRequest
+	14, // 55: proto.WorkflowService.RestoreWorkflowVersion:input_type -> proto.WorkflowVersion
+	17, // 56: proto.WorkflowService.PublishWorkflow:input_type -> proto.PublishWorkflowRequest
+	11, // 57: proto.WorkflowService.RevertWorkflowToStaging:input_type -> proto.GetWorkflowRequest
+	13, // 58: proto.WorkflowService.GetWorkflow:output_type -> proto.Workflow
+	12, // 59: proto.WorkflowService.ListWorkflows:output_type -> proto.WorkflowList
+	13, // 60: proto.WorkflowService.UpdateWorkflow:output_type -> proto.Workflow
+	13, // 61: proto.WorkflowService.CreateWorkflow:output_type -> proto.Workflow
+	38, // 62: proto.WorkflowService.DeleteWorkflow:output_type -> google.protobuf.Empty
+	9,  // 63: proto.WorkflowService.QuickRun:output_type -> proto.ReplayData
+	9,  // 64: proto.WorkflowService.RunWorkflowId:output_type -> proto.ReplayData
+	4,  // 65: proto.WorkflowService.ListWorkflowHistory:output_type -> proto.WorkflowHistoryList
+	8,  // 66: proto.WorkflowService.GetWorkflowHistory:output_type -> proto.WorkflowHistoryResponse
+	29, // 67: proto.WorkflowService.ListConnectorTemplates:output_type -> proto.ConnectorTemplateList
+	33, // 68: proto.WorkflowService.ListConnections:output_type -> proto.ConnectionList
+	38, // 69: proto.WorkflowService.DeleteConnection:output_type -> google.protobuf.Empty
+	15, // 70: proto.WorkflowService.ListWorkflowVersions:output_type -> proto.WorkflowVersionList
+	13, // 71: proto.WorkflowService.RestoreWorkflowVersion:output_type -> proto.Workflow
+	18, // 72: proto.WorkflowService.PublishWorkflow:output_type -> proto.PublishWorkflowResponse
+	13, // 73: proto.WorkflowService.RevertWorkflowToStaging:output_type -> proto.Workflow
+	58, // [58:74] is the sub-list for method output_type
+	42, // [42:58] is the sub-list for method input_type
+	42, // [42:42] is the sub-list for extension type_name
+	42, // [42:42] is the sub-list for extension extendee
+	0,  // [0:42] is the sub-list for field type_name
 }
 
 func init() { file_workflow_proto_init() }
@@ -2022,17 +3152,17 @@ func file_workflow_proto_init() {
 	if File_workflow_proto != nil {
 		return
 	}
-	file_workflow_proto_msgTypes[9].OneofWrappers = []any{}
-	file_workflow_proto_msgTypes[11].OneofWrappers = []any{}
-	file_workflow_proto_msgTypes[12].OneofWrappers = []any{}
-	file_workflow_proto_msgTypes[16].OneofWrappers = []any{}
+	file_workflow_proto_msgTypes[10].OneofWrappers = []any{}
+	file_workflow_proto_msgTypes[17].OneofWrappers = []any{}
+	file_workflow_proto_msgTypes[18].OneofWrappers = []any{}
+	file_workflow_proto_msgTypes[22].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_workflow_proto_rawDesc), len(file_workflow_proto_rawDesc)),
-			NumEnums:      2,
-			NumMessages:   21,
+			NumEnums:      3,
+			NumMessages:   35,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

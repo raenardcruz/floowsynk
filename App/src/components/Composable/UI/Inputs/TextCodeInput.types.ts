@@ -21,7 +21,7 @@ export interface TextCodeInputWrapperProps extends BaseComponentProps {
   /** Input type */
   type?: 'text' | 'number' | 'email' | 'url' | 'tel'
   /** Editor configuration for Monaco Editor integration */
-  editorConfig?: EditorConfig
+  editorConfig?: EditorConfig | null
   /** Whether to show the code editor button */
   showEditorButton?: boolean
   /** Input variant style */

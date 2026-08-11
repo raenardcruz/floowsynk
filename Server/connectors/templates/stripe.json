@@ -1,0 +1,161 @@
+{
+  "id": "stripe",
+  "name": "Stripe",
+  "description": "Access Stripe API for managing customers, creating payment intents, and listing subscriptions.",
+  "icon": "/src/components/Icons/stripe.svg",
+  "baseUrl": "https://api.stripe.com/v1",
+  "authType": "apikey",
+  "fields": [
+    {
+      "key": "secret_key",
+      "label": "Secret Key / Restricted Key",
+      "type": "password",
+      "required": true,
+      "placeholder": "sk_test_... or rk_test_..."
+    },
+    {
+      "key": "webhook_secret",
+      "label": "Webhook Signing Secret",
+      "type": "password",
+      "required": false,
+      "placeholder": "whsec_..."
+    }
+  ],
+  "actions": [
+    {
+      "id": "list_customers",
+      "name": "List Customers",
+      "description": "Retrieve a list of Stripe customers",
+      "path": "/customers",
+      "method": "GET",
+      "headers": {
+        "Authorization": "Bearer {{secret_key}}"
+      },
+      "queryParams": [
+        { "key": "limit", "value": "{{limit}}" }
+      ],
+      "payloadTemplate": "",
+      "fields": [
+        { "key": "limit", "label": "Limit", "required": false, "placeholder": "Default 10" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "limit": { "type": "string", "description": "Number of customers to return", "example": "10" }
+        }
+      },
+      "outputSchema": {
+        "object": "list",
+        "data": [
+          {
+            "id": "cus_xxxxxx",
+            "object": "customer",
+            "email": "customer@example.com",
+            "name": "Jane Doe",
+            "created": 1600000000
+          }
+        ],
+        "has_more": false
+      }
+    },
+    {
+      "id": "create_customer",
+      "name": "Create Customer",
+      "description": "Create a new customer in Stripe",
+      "path": "/customers",
+      "method": "POST",
+      "headers": {
+        "Authorization": "Bearer {{secret_key}}",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "queryParams": [],
+      "payloadTemplate": "email={{email}}&name={{name}}",
+      "fields": [
+        { "key": "email", "label": "Customer Email", "required": true, "placeholder": "customer@example.com" },
+        { "key": "name", "label": "Customer Name", "required": false, "placeholder": "Jane Doe" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "email": { "type": "string", "description": "Customer email address", "example": "customer@example.com" },
+          "name": { "type": "string", "description": "Customer full name", "example": "Jane Doe" }
+        },
+        "required": ["email"]
+      },
+      "outputSchema": {
+        "id": "cus_xxxxxx",
+        "object": "customer",
+        "email": "customer@example.com",
+        "name": "Jane Doe",
+        "created": 1600000000
+      }
+    },
+    {
+      "id": "create_payment_intent",
+      "name": "Create Payment Intent",
+      "description": "Create a new Payment Intent in Stripe",
+      "path": "/payment_intents",
+      "method": "POST",
+      "headers": {
+        "Authorization": "Bearer {{secret_key}}",
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "queryParams": [],
+      "payloadTemplate": "amount={{amount}}&currency={{currency}}",
+      "fields": [
+        { "key": "amount", "label": "Amount (in cents)", "required": true, "placeholder": "e.g. 2000 for $20.00" },
+        { "key": "currency", "label": "Currency Code", "required": true, "placeholder": "e.g. usd" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "amount": { "type": "string", "description": "Amount in smallest currency unit", "example": "2000" },
+          "currency": { "type": "string", "description": "Three-letter ISO currency code", "example": "usd" }
+        },
+        "required": ["amount", "currency"]
+      },
+      "outputSchema": {
+        "id": "pi_xxxxxx",
+        "object": "payment_intent",
+        "amount": 2000,
+        "currency": "usd",
+        "status": "requires_payment_method",
+        "client_secret": "pi_xxxxxx_secret_yyyyyy"
+      }
+    },
+    {
+      "id": "list_subscriptions",
+      "name": "List Subscriptions",
+      "description": "Retrieve a list of active active/canceled subscriptions",
+      "path": "/subscriptions",
+      "method": "GET",
+      "headers": {
+        "Authorization": "Bearer {{secret_key}}"
+      },
+      "queryParams": [
+        { "key": "limit", "value": "{{limit}}" }
+      ],
+      "payloadTemplate": "",
+      "fields": [
+        { "key": "limit", "label": "Limit", "required": false, "placeholder": "Default 10" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "limit": { "type": "string", "description": "Number of subscriptions to fetch", "example": "10" }
+        }
+      },
+      "outputSchema": {
+        "object": "list",
+        "data": [
+          {
+            "id": "sub_xxxxxx",
+            "object": "subscription",
+            "customer": "cus_xxxxxx",
+            "status": "active"
+          }
+        ]
+      }
+    }
+  ]
+}

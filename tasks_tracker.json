@@ -1,0 +1,127 @@
+{
+  "project": "Floowsynk",
+  "goal": "Architecture overhaul and feature implementation for Drag-and-Drop Workflow Maker with Recurring Jobs and API Webhooks",
+  "version": "1.0.0",
+  "created_at": "2026-08-05T08:55:00Z",
+  "summary": {
+    "total_tasks": 12,
+    "completed_tasks": 12,
+    "pending_tasks": 0,
+    "categories": [
+      "Security",
+      "Reliability",
+      "Performance",
+      "User Experience & Features"
+    ]
+  },
+  "tasks": [
+    {
+      "id": "TASK-001",
+      "category": "Security",
+      "title": "Upgrade Password Storage from AES Encryption to Bcrypt Hashing",
+      "description": "Replace vulnerable AES-GCM fixed-nonce password encryption in Server/crypto/crypto.go with standard secure Bcrypt hashing.",
+      "instruction": "1. Update Server/crypto/crypto.go to use golang.org/x/crypto/bcrypt for HashPassword and CompareHashAndPassword.\n2. Refactor Database/users.go and Server/API.Methods.go Login and AddUser functions to use bcrypt verification.\n3. Ensure database seed and user creation write hashed passwords.",
+      "status": "completed",
+      "verification": "Run unit tests for user authentication and verify password comparison succeeds while raw text passwords cannot be decrypted."
+    },
+    {
+      "id": "TASK-002",
+      "category": "Security",
+      "title": "Implement Webhook API Trigger Authentication and Secret Token Verification",
+      "description": "Secure the public REST endpoint /api/webhook/{id} with mandatory secret header/query verification and optional HMAC payload signing.",
+      "instruction": "1. Add a WebhookSecret field to the Workflow definition in proto/workflow.proto and Database/workflows.go.\n2. Update runWebhookHandler in Server/main.go to validate incoming headers (X-Webhook-Secret / X-Signature) against the workflow's configured secret.\n3. Return HTTP 401 Unauthorized if secret validation fails.",
+      "status": "completed",
+      "verification": "Test sending POST requests to /api/webhook/{id} with valid and invalid secret tokens, verifying invalid requests are rejected."
+    },
+    {
+      "id": "TASK-003",
+      "category": "Security",
+      "title": "Hardening Input Validation and ReDoS Protection",
+      "description": "Prevent Regular Expression Denial of Service (ReDoS) and dangerous math expression execution in Math and Regex workflow nodes.",
+      "instruction": "1. Add timeout contexts and length limits to regex matching in ReplaceNodeProcess and FindAllNodeProcess in Server/workflow/workflow.node.process.go.\n2. Restrict allowed syntax in Server/matheval to prevent unsafe expression evaluation.",
+      "status": "completed",
+      "verification": "Pass long or complex expressions into Math and Regex nodes and verify execution safely times out without hanging the server."
+    },
+    {
+      "id": "TASK-004",
+      "category": "Reliability",
+      "title": "Fix Critical Nil Pointer Dereference in HTTP API Node Processor",
+      "description": "Fix server panic crash in makeRequest when HTTP client request returns an error before response headers are populated.",
+      "instruction": "1. In Server/workflow/workflow.helpers.go, move the err check immediately after client.Do(req).\n2. Ensure response status code, headers, and length variables are set only when err == nil.",
+      "status": "completed",
+      "verification": "Trigger an API node pointing to an invalid/unreachable URL (e.g. http://localhost:99999) and verify the node fails gracefully without crashing the server."
+    },
+    {
+      "id": "TASK-005",
+      "category": "Reliability",
+      "title": "Fix Concurrent Data Race in Kafka Consumer Replay Data Flusher",
+      "description": "Add thread-safe mutex synchronization to the global replayData slice in the Kafka consumer worker to prevent memory corruption.",
+      "instruction": "1. In Jobs/Consumer/main.go, wrap replayData slice access with a sync.Mutex in ConsumeClaim and the periodic flush goroutine.\n2. Ensure atomic swap of the replay buffer during database batch writes.",
+      "status": "completed",
+      "verification": "Run the Kafka consumer with `go run -race Jobs/Consumer/main.go` while executing high-volume parallel workflows to confirm zero data races."
+    },
+    {
+      "id": "TASK-006",
+      "category": "Reliability",
+      "title": "Implement Atomic Redis SETNX Distributed Locking for Recurring Jobs",
+      "description": "Replace race-prone check-then-set logic in interval job processing with atomic Redis distributed locking (SETNX with TTL).",
+      "instruction": "1. In Jobs/Interval/main.go, replace CacheExists followed by SetCache with an atomic SetNX / SetWithLock call in Database/cache.go.\n2. Ensure only a single worker instance acquires the execution lock for a recurring job run.",
+      "status": "completed",
+      "verification": "Run multiple instances of Jobs/Interval in parallel and verify recurring workflows are executed exactly once per interval."
+    },
+    {
+      "id": "TASK-007",
+      "category": "Reliability",
+      "title": "Add Recursion Depth Limit and Cycle Detection for SubProcess Nodes",
+      "description": "Prevent infinite recursion and stack overflow panics in SubProcessNodeProcess.",
+      "instruction": "1. Track call depth in WorkflowProcessor context (max depth e.g. 10).\n2. Detect circular sub-process references (A calls B calls A) and return a clean execution error if maximum depth or cycle is detected.",
+      "status": "completed",
+      "verification": "Create a sub-process workflow that references itself and verify it fails with a clear recursion depth exceeded error message."
+    },
+    {
+      "id": "TASK-008",
+      "category": "Performance",
+      "title": "Throttle Interval Job Polling Loop with Ticker and Cache Invalidation",
+      "description": "Eliminate 100% CPU spinning and Postgres database hammering in Jobs/Interval by replacing infinite unthrottled loop with a controlled ticker.",
+      "instruction": "1. In Jobs/Interval/main.go, convert `for { DBCon.GetIntervalWorkflows() }` to use `ticker := time.NewTicker(5 * time.Second)`.\n2. In Database/workflows.go, standardize interval cache keys and invalidate interval caches when a workflow is saved or deleted.",
+      "status": "completed",
+      "verification": "Monitor CPU and database load while running Jobs/Interval and confirm near 0% idle CPU usage."
+    },
+    {
+      "id": "TASK-009",
+      "category": "Performance",
+      "title": "Pre-compile and Cache Workflow Templates for Fast Variable Substitution",
+      "description": "Optimize populateTemplate in Server/workflow/workflow.helpers.go to reduce template compilation overhead during workflow execution.",
+      "instruction": "1. Implement template caching or fast regex/string variable substitution in WorkflowProcessor.\n2. Reduce allocation overhead during node execution loops.",
+      "status": "completed",
+      "verification": "Run quick-run benchmark on a 100-node workflow and verify reduced execution time."
+    },
+    {
+      "id": "TASK-010",
+      "category": "User Experience & Features",
+      "title": "Enhance Drag-and-Drop Workflow Canvas with Visual Node Builder and Palette",
+      "description": "Refine the Vue Flow canvas interface in App/src/views/Workflow with drag-and-drop node sidebar, snap-to-grid alignment, category search filtering, and node connection validation.",
+      "instruction": "1. Update Canvas and Sidebar components in App/src/views/Workflow.\n2. Add interactive node palette with categorization (Triggers, Logic, Actions, Data).\n3. Enhance visual handle connections and node status indicators.",
+      "status": "completed",
+      "verification": "Verify dragging nodes from sidebar onto canvas, connecting handles, and configuring node data in the UI."
+    },
+    {
+      "id": "TASK-011",
+      "category": "User Experience & Features",
+      "title": "Build Dedicated Recurring Job (Scheduler) Node and Modal Configuration",
+      "description": "Provide a rich UI editor for recurring jobs supporting interval presets (seconds, minutes, hours, days), day-of-week selection, and next run preview.",
+      "instruction": "1. Create IntervalNode.vue component and interval configuration panel.\n2. Allow users to configure intervals, active days of the week, and enable/disable schedules.\n3. Display active schedule status badge on the workflow list and builder header.",
+      "status": "completed",
+      "verification": "Create a recurring workflow in the UI, set it to run every 10 seconds, and observe execution logs triggering automatically."
+    },
+    {
+      "id": "TASK-012",
+      "category": "User Experience & Features",
+      "title": "Build Webhook API Trigger Endpoint Generator and cURL Exporter UI",
+      "description": "Add a dedicated Webhook Trigger Node UI with auto-generated trigger URLs, secret token manager, sample JSON payload builder, and cURL snippet generator.",
+      "instruction": "1. Update WebhookNode component with interactive endpoint URL generator (`http://localhost:8082/api/webhook/{workflow_id}`).\n2. Provide copyable cURL command snippet with custom headers and body sample.\n3. Add a 'Test Trigger' button in the builder to trigger the webhook directly.",
+      "status": "completed",
+      "verification": "Click 'Test Trigger' or paste the cURL command into a terminal and verify the workflow executes in real-time."
+    }
+  ]
+}

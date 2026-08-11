@@ -1,0 +1,291 @@
+{
+  "id": "asana",
+  "name": "Asana",
+  "description": "Manage tasks, projects, and team workflows in Asana.",
+  "icon": "/src/components/Icons/asana.svg",
+  "baseUrl": "https://app.asana.com/api/1.0",
+  "authType": "oauth2, pat",
+  "fields": [
+    {
+      "key": "access_token",
+      "label": "Personal Access Token (PAT)",
+      "type": "password",
+      "required": false,
+      "placeholder": "1/ or 2/..."
+    },
+    {
+      "key": "client_id",
+      "label": "Client ID",
+      "type": "text",
+      "required": false,
+      "placeholder": "Enter OAuth Client ID"
+    },
+    {
+      "key": "client_secret",
+      "label": "Client Secret",
+      "type": "password",
+      "required": false,
+      "placeholder": "Enter OAuth Client Secret"
+    }
+  ],
+  "oauthConfig": {
+    "authorizeUrl": "https://app.asana.com/-/oauth_authorize",
+    "tokenUrl": "https://app.asana.com/-/oauth_token",
+    "defaultScopes": [
+      "default"
+    ]
+  },
+  "actions": [
+    {
+      "id": "create_task",
+      "name": "Create Task",
+      "description": "Create a new task in an Asana workspace or project",
+      "path": "/tasks",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "queryParams": [],
+      "payloadTemplate": "{\"data\": {\"name\": \"{{name}}\", \"notes\": \"{{notes}}\", \"projects\": [\"{{project_gid}}\"]}}",
+      "fields": [
+        {
+          "key": "name",
+          "label": "Task Name",
+          "required": true,
+          "placeholder": "New Task Name"
+        },
+        {
+          "key": "project_gid",
+          "label": "Project GID",
+          "required": true,
+          "placeholder": "Enter Asana Project GID"
+        },
+        {
+          "key": "notes",
+          "label": "Task Notes / Description",
+          "required": false,
+          "placeholder": "Enter task details"
+        }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Task title",
+            "example": "Draft Q3 Marketing Strategy"
+          },
+          "workspace": {
+            "type": "string",
+            "description": "Workspace GID",
+            "example": "1234567890"
+          },
+          "notes": {
+            "type": "string",
+            "description": "Task description or notes",
+            "example": "Include social media campaign roadmap."
+          },
+          "due_on": {
+            "type": "string",
+            "description": "Due date (YYYY-MM-DD)",
+            "example": "2026-08-31"
+          }
+        },
+        "required": [
+          "name",
+          "workspace"
+        ]
+      },
+      "outputSchema": {
+        "gid": "9876543210",
+        "name": "Draft Q3 Marketing Strategy",
+        "notes": "Include social media campaign roadmap.",
+        "completed": false
+      }
+    },
+    {
+      "id": "get_project_tasks",
+      "name": "Get Tasks in Project",
+      "description": "Retrieve tasks belonging to a specific project",
+      "path": "/projects/{{project_gid}}/tasks",
+      "method": "GET",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "queryParams": [
+        "opt_fields"
+      ],
+      "fields": [
+        {
+          "key": "project_gid",
+          "label": "Project GID",
+          "required": true,
+          "placeholder": "Enter Asana Project GID"
+        }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "project_id": {
+            "type": "string",
+            "description": "Project GID",
+            "example": "1122334455"
+          }
+        },
+        "required": [
+          "project_id"
+        ]
+      },
+      "outputSchema": [
+        {
+          "gid": "9876543210",
+          "name": "Draft Q3 Marketing Strategy"
+        }
+      ]
+    },
+    {
+      "id": "get_task",
+      "name": "Get Task Details",
+      "description": "Retrieve detailed information for a specific task",
+      "path": "/tasks/{{task_gid}}",
+      "method": "GET",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "queryParams": [
+        "opt_fields"
+      ],
+      "fields": [
+        {
+          "key": "task_gid",
+          "label": "Task GID",
+          "required": true,
+          "placeholder": "Enter Asana Task GID"
+        }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "task_id": {
+            "type": "string",
+            "description": "Task GID",
+            "example": "9876543210"
+          }
+        },
+        "required": [
+          "task_id"
+        ]
+      },
+      "outputSchema": {
+        "gid": "9876543210",
+        "name": "Draft Q3 Marketing Strategy",
+        "notes": "Include social media campaign roadmap.",
+        "completed": false
+      }
+    },
+    {
+      "id": "update_task",
+      "name": "Update Task",
+      "description": "Update task details in Asana",
+      "path": "/tasks/{{task_gid}}",
+      "method": "PUT",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "queryParams": [],
+      "payloadTemplate": "{\"data\": {\"name\": \"{{name}}\", \"notes\": \"{{notes}}\", \"completed\": {{completed}} }}",
+      "fields": [
+        {
+          "key": "task_gid",
+          "label": "Task GID",
+          "required": true,
+          "placeholder": "Enter Asana Task GID"
+        },
+        {
+          "key": "name",
+          "label": "Task Name",
+          "required": false,
+          "placeholder": "Updated Task Name"
+        },
+        {
+          "key": "notes",
+          "label": "Notes",
+          "required": false,
+          "placeholder": "Updated notes"
+        }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "task_id": {
+            "type": "string",
+            "description": "Task GID to update",
+            "example": "9876543210"
+          },
+          "completed": {
+            "type": "boolean",
+            "description": "Mark task as completed",
+            "example": true
+          }
+        },
+        "required": [
+          "task_id"
+        ]
+      },
+      "outputSchema": {
+        "gid": "9876543210",
+        "name": "Draft Q3 Marketing Strategy",
+        "completed": true
+      }
+    },
+    {
+      "id": "create_project",
+      "name": "Create Project",
+      "description": "Create a new project in Asana",
+      "path": "/projects",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "queryParams": [],
+      "payloadTemplate": "{\"data\": {\"name\": \"{{name}}\", \"workspace\": \"{{workspace_gid}}\"}}",
+      "fields": [
+        {
+          "key": "name",
+          "label": "Project Name",
+          "required": true,
+          "placeholder": "New Project Title"
+        },
+        {
+          "key": "workspace_gid",
+          "label": "Workspace GID",
+          "required": true,
+          "placeholder": "Enter Workspace GID"
+        }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Project Name",
+            "example": "Product Launch 2026"
+          },
+          "workspace": {
+            "type": "string",
+            "description": "Workspace GID",
+            "example": "1234567890"
+          }
+        },
+        "required": [
+          "name",
+          "workspace"
+        ]
+      },
+      "outputSchema": {
+        "gid": "5544332211",
+        "name": "Product Launch 2026"
+      }
+    }
+  ]
+}

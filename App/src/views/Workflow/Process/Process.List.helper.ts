@@ -4,10 +4,12 @@ import { useWorkflowStore, newProcess } from '@/views/Workflow'
 import { startNodes } from '@/views/Workflow/Nodes/FloowsynkNode.contants'
 import { Workflow, WorkflowHistory, NodeStatus } from 'proto/workflow/workflow_pb'
 import { useWorkflowCanvasStore } from '../Canvas/Workflow.Canvas.hooks'
+import { getRestUrl } from '@/components/Composable/constants'
 
 export const initWorkflows = async () => {
     const { processes, history } = useProcessListStore()
     processes.value = []
+    history.value = []
     const [ respHistory, respProcesses ] = await Promise.all([ listWorkflowRunHistory(), getAllWorkflows(10, 0) ])
     
     const workflows: Workflow[] = respProcesses.getWorkflowsList() || []
@@ -17,9 +19,24 @@ export const initWorkflows = async () => {
     })
 
     const historyList: WorkflowHistory[] = respHistory.getHistoryList() || []
-    historyList.forEach((data: WorkflowHistory) => {
-        history.value.push(data.toObject())
-    })
+    const sorted = historyList
+        .map((data: WorkflowHistory) => data.toObject())
+        .sort((a, b) => new Date(b.rundate).getTime() - new Date(a.rundate).getTime())
+    history.value = sorted
+}
+
+export const clearHistoryAction = async () => {
+    try {
+        const res = await fetch(`${getRestUrl()}/api/history/clear`, {
+            method: 'POST',
+        })
+        if (res.ok) {
+            const { history } = useProcessListStore()
+            history.value = []
+        }
+    } catch (err) {
+        console.error('Failed to clear run history:', err)
+    }
 }
 
 export const cardClicked = (e: MouseEvent, process: Workflow.AsObject) => {
@@ -56,21 +73,17 @@ export const historyClicked = async (historyItem: WorkflowHistory.AsObject) => {
     const resp = await getWorkflowHistory(historyItem.id)
     const dataList = resp.getDataList() || []
     for (const response of dataList) {
-        switch (response.getStatus()) {
-                case NodeStatus.RUNNING:
-                  nodeStatuses.value[response.getNodeid()] = 'running'
-                  break
-                case NodeStatus.COMPLETED:
-                  nodeStatuses.value[response.getNodeid()] = 'success'
-                  break
-                case NodeStatus.FAILED:
-                  nodeStatuses.value[response.getNodeid()] = 'error'
-                  break
-                case NodeStatus.INFO:
-                  nodeStatuses.value[response.getNodeid()] = 'info'
-                  break
-              }
-              replayData.value.push(response.toObject())
+        const nodeId = response.getNodeid()
+        if (nodeId) {
+            if (response.getStatus() === NodeStatus.FAILED) {
+                nodeStatuses.value[nodeId] = 'error'
+            } else {
+                nodeStatuses.value[nodeId] = 'success'
+            }
+        }
+        if (response.getMessage() || response.getStatus() !== NodeStatus.RUNNING) {
+            replayData.value.push(response.toObject())
+        }
     }
     showReplayData.value = true
 }

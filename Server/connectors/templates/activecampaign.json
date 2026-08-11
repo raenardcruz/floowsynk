@@ -1,0 +1,310 @@
+{
+  "id": "activecampaign",
+  "name": "ActiveCampaign",
+  "description": "Manage contacts, automated marketing campaigns, and sales deals in ActiveCampaign.",
+  "icon": "/src/components/Icons/activecampaign.svg",
+  "baseUrl": "{{api_url}}/api/3",
+  "authType": "api_key",
+  "fields": [
+    {
+      "key": "api_url",
+      "label": "API URL",
+      "type": "text",
+      "required": true,
+      "placeholder": "https://youraccount.api-us1.com"
+    },
+    {
+      "key": "api_token",
+      "label": "API Token",
+      "type": "password",
+      "required": true,
+      "placeholder": "Enter ActiveCampaign API Token"
+    }
+  ],
+  "actions": [
+    {
+      "id": "list_contacts",
+      "name": "List Contacts",
+      "description": "Get all contacts from ActiveCampaign",
+      "path": "/contacts",
+      "method": "GET",
+      "headers": {
+        "Api-Token": "{{api_token}}",
+        "Accept": "application/json"
+      },
+      "queryParams": [],
+      "payloadTemplate": "",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "search": {
+            "type": "string",
+            "description": "Query string to search contacts",
+            "example": "Jane"
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Number of contacts to return",
+            "default": 20
+          }
+        }
+      },
+      "outputSchema": {
+        "contacts": [
+          {
+            "id": "101",
+            "email": "user@example.com",
+            "firstName": "Jane",
+            "lastName": "Doe",
+            "phone": "+15551234567"
+          }
+        ],
+        "meta": {
+          "total": "1"
+        }
+      }
+    },
+    {
+      "id": "create_contact",
+      "name": "Create Contact",
+      "description": "Create a new contact",
+      "path": "/contacts",
+      "method": "POST",
+      "headers": {
+        "Api-Token": "{{api_token}}",
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      "queryParams": [],
+      "payloadTemplate": "{\"contact\": {\"email\": \"{{email}}\", \"firstName\": \"{{first_name}}\", \"lastName\": \"{{last_name}}\", \"phone\": \"{{phone}}\"}}",
+      "fields": [
+        {
+          "key": "email",
+          "label": "Email Address",
+          "required": true,
+          "placeholder": "user@example.com"
+        },
+        {
+          "key": "first_name",
+          "label": "First Name",
+          "required": false,
+          "placeholder": "John"
+        },
+        {
+          "key": "last_name",
+          "label": "Last Name",
+          "required": false,
+          "placeholder": "Doe"
+        },
+        {
+          "key": "phone",
+          "label": "Phone Number",
+          "required": false,
+          "placeholder": "+1234567890"
+        }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "Email address of the contact",
+            "example": "user@example.com"
+          },
+          "firstName": {
+            "type": "string",
+            "description": "First name of the contact",
+            "example": "Jane"
+          },
+          "lastName": {
+            "type": "string",
+            "description": "Last name of the contact",
+            "example": "Doe"
+          },
+          "phone": {
+            "type": "string",
+            "description": "Phone number of the contact",
+            "example": "+15551234567"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "outputSchema": {
+        "contact": {
+          "id": "101",
+          "email": "user@example.com",
+          "firstName": "Jane",
+          "lastName": "Doe",
+          "phone": "+15551234567",
+          "cdate": "2026-08-07T10:00:00-05:00",
+          "udate": "2026-08-07T10:00:00-05:00",
+          "orgid": "0"
+        }
+      }
+    },
+    {
+      "id": "add_contact_to_list",
+      "name": "Add Contact to List",
+      "description": "Subscribe a contact to a specific list",
+      "path": "/contactLists",
+      "method": "POST",
+      "headers": {
+        "Api-Token": "{{api_token}}",
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      "queryParams": [],
+      "payloadTemplate": "{\"contactList\": {\"list\": \"{{list_id}}\", \"contact\": \"{{contact_id}}\", \"status\": 1}}",
+      "fields": [
+        {
+          "key": "list_id",
+          "label": "List ID",
+          "required": true,
+          "placeholder": "Enter List ID"
+        },
+        {
+          "key": "contact_id",
+          "label": "Contact ID",
+          "required": true,
+          "placeholder": "Enter Contact ID"
+        }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "contact": {
+            "type": "string",
+            "description": "Contact ID",
+            "example": "101"
+          },
+          "list": {
+            "type": "string",
+            "description": "List ID",
+            "example": "1"
+          },
+          "status": {
+            "type": "integer",
+            "description": "Status code (1 = Subscribed, 2 = Unsubscribed)",
+            "default": 1
+          }
+        },
+        "required": [
+          "contact",
+          "list"
+        ]
+      },
+      "outputSchema": {
+        "contactList": {
+          "contact": "101",
+          "list": "1",
+          "status": 1,
+          "id": "302",
+          "cdate": "2026-08-07T10:00:00-05:00"
+        }
+      }
+    },
+    {
+      "id": "create_deal",
+      "name": "Create Deal",
+      "description": "Create a new sales deal in ActiveCampaign",
+      "path": "/deals",
+      "method": "POST",
+      "headers": {
+        "Api-Token": "{{api_token}}",
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      "queryParams": [],
+      "payloadTemplate": "{\"deal\": {\"title\": \"{{title}}\", \"value\": {{value}}, \"currency\": \"{{currency}}\", \"pipeline\": \"{{pipeline_id}}\", \"stage\": \"{{stage_id}}\", \"contact\": \"{{contact_id}}\"}}",
+      "fields": [
+        {
+          "key": "title",
+          "label": "Deal Title",
+          "required": true,
+          "placeholder": "New Sales Deal"
+        },
+        {
+          "key": "value",
+          "label": "Deal Value",
+          "required": true,
+          "placeholder": "1000"
+        },
+        {
+          "key": "currency",
+          "label": "Currency",
+          "required": true,
+          "placeholder": "usd"
+        },
+        {
+          "key": "pipeline_id",
+          "label": "Pipeline ID",
+          "required": true,
+          "placeholder": "Enter Pipeline ID"
+        },
+        {
+          "key": "stage_id",
+          "label": "Stage ID",
+          "required": true,
+          "placeholder": "Enter Stage ID"
+        },
+        {
+          "key": "contact_id",
+          "label": "Contact ID",
+          "required": true,
+          "placeholder": "Enter Contact ID"
+        }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Title of the deal",
+            "example": "New enterprise lead"
+          },
+          "value": {
+            "type": "integer",
+            "description": "Deal value in cents or dollars",
+            "example": 500000
+          },
+          "currency": {
+            "type": "string",
+            "description": "ISO currency code",
+            "example": "usd"
+          },
+          "pipeline": {
+            "type": "string",
+            "description": "Pipeline ID",
+            "example": "1"
+          },
+          "stage": {
+            "type": "string",
+            "description": "Stage ID",
+            "example": "2"
+          }
+        },
+        "required": [
+          "title",
+          "value",
+          "currency",
+          "pipeline",
+          "stage"
+        ]
+      },
+      "outputSchema": {
+        "deal": {
+          "id": "45",
+          "title": "New enterprise lead",
+          "value": "500000",
+          "currency": "usd",
+          "pipeline": "1",
+          "stage": "2",
+          "status": 0,
+          "cdate": "2026-08-07T10:00:00-05:00"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,144 @@
+{
+  "id": "salesforce",
+  "name": "Salesforce",
+  "description": "Access Salesforce REST API to execute SOQL queries, create leads, and update accounts.",
+  "icon": "/src/components/Icons/salesforce.svg",
+  "baseUrl": "https://{{instance_url}}/services/data/v58.0",
+  "authType": "oauth2",
+  "fields": [
+    {
+      "key": "client_id",
+      "label": "Consumer Key (Client ID)",
+      "type": "text",
+      "required": true,
+      "placeholder": "Salesforce Connected App Consumer Key"
+    },
+    {
+      "key": "client_secret",
+      "label": "Consumer Secret (Client Secret)",
+      "type": "password",
+      "required": true,
+      "placeholder": "Salesforce Connected App Consumer Secret"
+    },
+    {
+      "key": "instance_url",
+      "label": "Instance URL",
+      "type": "text",
+      "required": true,
+      "placeholder": "yourcompany.my.salesforce.com"
+    },
+    {
+      "key": "environment",
+      "label": "Environment",
+      "type": "select",
+      "required": true,
+      "placeholder": "production or sandbox"
+    }
+  ],
+  "oauthConfig": {
+    "authorizeUrl": "https://login.salesforce.com/services/oauth2/authorize",
+    "tokenUrl": "https://login.salesforce.com/services/oauth2/token",
+    "defaultScopes": ["api", "refresh_token", "offline_access"]
+  },
+  "actions": [
+    {
+      "id": "soql_query",
+      "name": "SOQL Query",
+      "description": "Execute a Salesforce Object Query Language (SOQL) query",
+      "path": "/query",
+      "method": "GET",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "queryParams": [
+        { "key": "q", "value": "{{q}}" }
+      ],
+      "payloadTemplate": "",
+      "fields": [
+        { "key": "q", "label": "SOQL Query", "required": true, "placeholder": "SELECT Id, Name, Email FROM Contact" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "q": { "type": "string", "description": "SOQL query string", "example": "SELECT Id, Name, Email FROM Contact" }
+        },
+        "required": ["q"]
+      },
+      "outputSchema": {
+        "totalSize": 1,
+        "done": true,
+        "records": [
+          {
+            "attributes": {
+              "type": "Contact",
+              "url": "/services/data/v58.0/sobjects/Contact/003xxxxxx"
+            },
+            "Id": "003xxxxxx",
+            "Name": "John Doe",
+            "Email": "john@example.com"
+          }
+        ]
+      }
+    },
+    {
+      "id": "create_lead",
+      "name": "Create Lead",
+      "description": "Create a new Lead object in Salesforce",
+      "path": "/sobjects/Lead/",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "queryParams": [],
+      "payloadTemplate": "{\"LastName\": \"{{last_name}}\", \"Company\": \"{{company}}\", \"Email\": \"{{email}}\"}",
+      "fields": [
+        { "key": "last_name", "label": "Last Name", "required": true, "placeholder": "Doe" },
+        { "key": "company", "label": "Company Name", "required": true, "placeholder": "Acme Corp" },
+        { "key": "email", "label": "Email Address", "required": false, "placeholder": "john@example.com" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "last_name": { "type": "string", "description": "Lead last name", "example": "Doe" },
+          "company": { "type": "string", "description": "Company name", "example": "Acme Corp" },
+          "email": { "type": "string", "description": "Lead email address", "example": "john@example.com" }
+        },
+        "required": ["last_name", "company"]
+      },
+      "outputSchema": {
+        "id": "00Qxxxxxx",
+        "success": true,
+        "errors": []
+      }
+    },
+    {
+      "id": "update_account",
+      "name": "Update Account",
+      "description": "Update an existing Account object in Salesforce",
+      "path": "/sobjects/Account/{{account_id}}",
+      "method": "PATCH",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "queryParams": [],
+      "payloadTemplate": "{\"Name\": \"{{name}}\", \"Phone\": \"{{phone}}\"}",
+      "fields": [
+        { "key": "account_id", "label": "Account ID", "required": true, "placeholder": "001xxxxxx" },
+        { "key": "name", "label": "Account Name", "required": false, "placeholder": "New Account Name" },
+        { "key": "phone", "label": "Phone Number", "required": false, "placeholder": "+15550001111" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "account_id": { "type": "string", "description": "Salesforce Account ID", "example": "001xxxxxx" },
+          "name": { "type": "string", "description": "Account name", "example": "Acme Corp" },
+          "phone": { "type": "string", "description": "Account phone number", "example": "+15550001111" }
+        },
+        "required": ["account_id"]
+      },
+      "outputSchema": {
+        "success": true
+      }
+    }
+  ]
+}

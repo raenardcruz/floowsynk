@@ -4,6 +4,7 @@ import { useLoginStore } from './Login.hooks'
 import {
     SESSION_TOKEN_KEY,
     SESSION_EXPIRY_KEY,
+    SESSION_USER_KEY,
     ERROR_SESSION_EXTENSION,
     ERROR_USER_PASS
 } from './Login.constants';
@@ -20,6 +21,7 @@ const {
 
 const sessionToken = useStorage(SESSION_TOKEN_KEY, '');
 const sessionExpiry = useStorage(SESSION_EXPIRY_KEY, '');
+const sessionUser = useStorage(SESSION_USER_KEY, '');
 
 const loginHandler = async (usePass: boolean) => {
     const { session } = App.store;
@@ -31,6 +33,9 @@ const loginHandler = async (usePass: boolean) => {
         session.value = token;
         sessionToken.value = token;
         sessionExpiry.value = expiryDate.toISOString();
+        if (usePass && username.value) {
+            sessionUser.value = username.value;
+        }
         router.push({ path: '/' });
     } catch (err) {
         loginError.value = true;
@@ -48,5 +53,6 @@ export const loginAsGuest = () => {
     session.value = 'guest';
     sessionToken.value = 'guest';
     sessionExpiry.value = expiryDate.toISOString();
+    sessionUser.value = 'Guest';
     router.push({ path: '/' });
 }

@@ -1,2 +1,3 @@
 import ProcessTypeModal from './ProcessType/Workflow.Modal.ProcessType.vue'
-export { ProcessTypeModal }
+import { VersionHistoryModal } from './VersionHistory'
+export { ProcessTypeModal, VersionHistoryModal }

@@ -1,0 +1,164 @@
+{
+  "id": "pipedrive",
+  "name": "Pipedrive",
+  "description": "Manage sales deals, persons, contacts, and organizations in Pipedrive CRM.",
+  "icon": "/src/components/Icons/pipedrive.svg",
+  "baseUrl": "https://{{company_domain}}.pipedrive.com/v1",
+  "authType": "oauth2, apikey",
+  "fields": [
+    {
+      "key": "api_token",
+      "label": "Personal API Token",
+      "type": "password",
+      "required": false,
+      "placeholder": "40-character hexadecimal token"
+    },
+    {
+      "key": "company_domain",
+      "label": "Company Domain",
+      "type": "text",
+      "required": true,
+      "placeholder": "yourcompany (from yourcompany.pipedrive.com)"
+    },
+    {
+      "key": "access_token",
+      "label": "OAuth Access Token",
+      "type": "password",
+      "required": false,
+      "placeholder": "OAuth2 Bearer Token"
+    }
+  ],
+  "oauthConfig": {
+    "authorizeUrl": "https://oauth.pipedrive.com/oauth/authorize",
+    "tokenUrl": "https://oauth.pipedrive.com/oauth/token",
+    "defaultScopes": ["deals:full", "contacts:full"]
+  },
+  "actions": [
+    {
+      "id": "list_deals",
+      "name": "List Deals",
+      "description": "Retrieve a list of deals from Pipedrive",
+      "path": "/deals",
+      "method": "GET",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "queryParams": [
+        { "key": "limit", "value": "50" }
+      ],
+      "fields": [],
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "outputSchema": {
+        "success": true,
+        "data": [
+          {
+            "id": 1,
+            "title": "Big Contract",
+            "value": 10000,
+            "currency": "USD",
+            "status": "open",
+            "add_time": "2026-08-01 12:00:00"
+          }
+        ]
+      }
+    },
+    {
+      "id": "create_deal",
+      "name": "Create Deal",
+      "description": "Add a new deal to Pipedrive CRM",
+      "path": "/deals",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      "payloadTemplate": "{\"title\": \"{{title}}\", \"value\": \"{{value}}\", \"currency\": \"{{currency}}\"}",
+      "fields": [
+        { "key": "title", "label": "Deal Title", "required": true, "placeholder": "Acme Corp Opportunity" },
+        { "key": "value", "label": "Deal Value", "required": false, "placeholder": "5000" },
+        { "key": "currency", "label": "Currency Code", "required": false, "placeholder": "USD" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string", "description": "Title of the deal", "example": "Acme Renewal" },
+          "value": { "type": "string", "description": "Deal financial value", "example": "5000" },
+          "currency": { "type": "string", "description": "3-letter currency code", "example": "USD" }
+        },
+        "required": ["title"]
+      },
+      "outputSchema": {
+        "success": true,
+        "data": {
+          "id": 42,
+          "title": "Acme Renewal",
+          "value": 5000,
+          "currency": "USD",
+          "status": "open"
+        }
+      }
+    },
+    {
+      "id": "list_persons",
+      "name": "List Persons",
+      "description": "Retrieve contact persons from Pipedrive",
+      "path": "/persons",
+      "method": "GET",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "queryParams": [
+        { "key": "limit", "value": "50" }
+      ],
+      "fields": [],
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "outputSchema": {
+        "success": true,
+        "data": [
+          {
+            "id": 10,
+            "name": "Jane Smith",
+            "email": [{ "value": "jane@example.com", "primary": true }],
+            "phone": [{ "value": "+1234567890", "primary": true }]
+          }
+        ]
+      }
+    },
+    {
+      "id": "create_organization",
+      "name": "Create Organization",
+      "description": "Add a new organization to Pipedrive",
+      "path": "/organizations",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      "payloadTemplate": "{\"name\": \"{{name}}\"}",
+      "fields": [
+        { "key": "name", "label": "Organization Name", "required": true, "placeholder": "Enterprise Corp" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "description": "Name of the organization", "example": "Enterprise Corp" }
+        },
+        "required": ["name"]
+      },
+      "outputSchema": {
+        "success": true,
+        "data": {
+          "id": 15,
+          "name": "Enterprise Corp",
+          "add_time": "2026-08-05 14:00:00"
+        }
+      }
+    }
+  ]
+}

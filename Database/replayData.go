@@ -28,6 +28,10 @@ type ReplayData struct {
 }
 
 func (db *DatabaseConnection) CreateReplayData(data *ReplayData) (string, error) {
+	return db.CreateReplayDataEnv(data, "staging")
+}
+
+func (db *DatabaseConnection) CreateReplayDataEnv(data *ReplayData, env string) (string, error) {
 	if data == nil {
 		return "", fmt.Errorf("data is Empty")
 	}
@@ -35,22 +39,25 @@ func (db *DatabaseConnection) CreateReplayData(data *ReplayData) (string, error)
 	if data.ID == "" {
 		data.ID = uuid.NewString()
 	}
-	result := db.conn.Create(&data)
+	tableName := db.TableFor(env, "replay_data")
+	result := db.conn.Table(tableName).Create(&data)
 	if result.Error != nil {
 		return "", result.Error
 	}
 
-	// Invalidate Cache
 	ctx := context.Background()
-	DeleteCache(ctx, "replayHistoryList")
-	DeleteCache(ctx, "ReplayData:"+data.ProcessID)
+	DeleteCache(ctx, fmt.Sprintf("replayHistoryList:%s", env))
+	DeleteCache(ctx, fmt.Sprintf("ReplayData:%s:%s", env, data.ProcessID))
 
-	log.Printf("Replay Data %v added to DB", data)
-	log.Printf("SQL: %v, Rows Affected: %d", result.Statement.SQL.String(), result.RowsAffected)
+	log.Printf("Replay Data %v added to DB (%s)", data, tableName)
 	return data.ID, nil
 }
 
 func (db *DatabaseConnection) CreateBatchReplayData(dataList []ReplayData) ([]string, error) {
+	return db.CreateBatchReplayDataEnv(dataList, "staging")
+}
+
+func (db *DatabaseConnection) CreateBatchReplayDataEnv(dataList []ReplayData, env string) ([]string, error) {
 	if len(dataList) == 0 {
 		return nil, fmt.Errorf("dataList is empty")
 	}
@@ -66,6 +73,7 @@ func (db *DatabaseConnection) CreateBatchReplayData(dataList []ReplayData) ([]st
 		processIDs[dataList[i].ProcessID] = struct{}{}
 	}
 
+	tableName := db.TableFor(env, "replay_data")
 	const chunkSize = 500
 	for i := 0; i < len(dataList); i += chunkSize {
 		end := i + chunkSize
@@ -73,29 +81,30 @@ func (db *DatabaseConnection) CreateBatchReplayData(dataList []ReplayData) ([]st
 			end = len(dataList)
 		}
 		chunk := dataList[i:end]
-		result := db.conn.Create(&chunk)
+		result := db.conn.Table(tableName).Create(&chunk)
 		if result.Error != nil {
 			return nil, result.Error
 		}
-		log.Printf("Batch Replay Data chunk added to DB: %v", ids[i:end])
-		log.Printf("SQL: %v, Rows Affected: %d", result.Statement.SQL.String(), result.RowsAffected)
 	}
 
-	// Invalidate Cache
 	ctx := context.Background()
-	DeleteCache(ctx, "replayHistoryList")
+	DeleteCache(ctx, fmt.Sprintf("replayHistoryList:%s", env))
 	for pID := range processIDs {
-		DeleteCache(ctx, "ReplayData:"+pID)
+		DeleteCache(ctx, fmt.Sprintf("ReplayData:%s:%s", env, pID))
 	}
 
 	return ids, nil
 }
 
 func (db *DatabaseConnection) GetWorkflowHistory() ([]ReplayData, error) {
-	log.Print("Getting ProcessID and WorkflowID")
+	return db.GetWorkflowHistoryEnv("staging")
+}
+
+func (db *DatabaseConnection) GetWorkflowHistoryEnv(env string) ([]ReplayData, error) {
+	log.Printf("Getting ProcessID and WorkflowID for %s", env)
 	var replayData []ReplayData
 	ctx := context.Background()
-	cacheKey := "replayHistoryList"
+	cacheKey := fmt.Sprintf("replayHistoryList:%s", env)
 
 	if cachedData, found := GetFromCache(ctx, cacheKey); found {
 		var cacheData []ReplayData
@@ -104,13 +113,12 @@ func (db *DatabaseConnection) GetWorkflowHistory() ([]ReplayData, error) {
 		}
 	}
 
-	result := db.conn.Select("process_id, workflow_id, min(created_at) as created_at, MAX(CASE WHEN status = 2 THEN 2 WHEN status = 1 THEN 1 ELSE 0 END) as status").Group("process_id, workflow_id").Find(&replayData)
+	tableName := db.TableFor(env, "replay_data")
+	result := db.conn.Table(tableName).Select("process_id, workflow_id, min(created_at) as created_at, MAX(CASE WHEN status = 2 THEN 2 WHEN status = 1 THEN 1 ELSE 0 END) as status").Group("process_id, workflow_id").Order("created_at DESC").Find(&replayData)
 
 	if result.Error != nil {
 		return nil, result.Error
 	}
-
-	log.Printf("SQL: %v, Rows Affected: %d", result.Statement.SQL.String(), result.RowsAffected)
 
 	if err := SetCache(ctx, cacheKey, replayData, replayDataCacheExpiration); err != nil {
 		log.Printf("Error Setting cache for %s", cacheKey)
@@ -120,8 +128,12 @@ func (db *DatabaseConnection) GetWorkflowHistory() ([]ReplayData, error) {
 }
 
 func (db *DatabaseConnection) GetReplayDataGroupedByProcessID(processID string) ([]ReplayData, error) {
+	return db.GetReplayDataGroupedByProcessIDEnv(processID, "staging")
+}
+
+func (db *DatabaseConnection) GetReplayDataGroupedByProcessIDEnv(processID string, env string) ([]ReplayData, error) {
 	ctx := context.Background()
-	cacheKey := "ReplayData:" + processID
+	cacheKey := fmt.Sprintf("ReplayData:%s:%s", env, processID)
 	var replayData []ReplayData
 
 	if cachedData, found := GetFromCache(ctx, cacheKey); found {
@@ -131,12 +143,11 @@ func (db *DatabaseConnection) GetReplayDataGroupedByProcessID(processID string) 
 		}
 	}
 
-	result := db.conn.Where("process_id = ?", processID).Order("process_sequence ASC").Find(&replayData)
+	tableName := db.TableFor(env, "replay_data")
+	result := db.conn.Table(tableName).Where("process_id = ?", processID).Order("process_sequence ASC").Find(&replayData)
 	if result.Error != nil {
 		return nil, result.Error
 	}
-
-	log.Printf("SQL: %v, Rows Affected: %d", result.Statement.SQL.String(), result.RowsAffected)
 
 	if err := SetCache(ctx, cacheKey, replayData, replayDataCacheExpiration); err != nil {
 		log.Printf("Error Setting cache for %s", cacheKey)
@@ -147,11 +158,26 @@ func (db *DatabaseConnection) GetReplayDataGroupedByProcessID(processID string) 
 
 func (db *DatabaseConnection) Cleanup(retention int) error {
 	cutoff := time.Now().UTC().AddDate(0, 0, -retention).Unix()
-	result := db.conn.Where("created_at < ?", cutoff).Delete(&ReplayData{})
-	if err := result.Error; err != nil {
-		return err
+	for _, env := range []string{"staging", "production"} {
+		tableName := db.TableFor(env, "replay_data")
+		if err := db.conn.Table(tableName).Where("created_at < ?", cutoff).Delete(&ReplayData{}).Error; err != nil {
+			return err
+		}
 	}
-	log.Printf("SQL: %v, Rows Affected: %d", result.Statement.SQL.String(), result.RowsAffected)
-	log.Printf("Cleaned up Replay Data older than %d days", retention)
+	return nil
+}
+
+func (db *DatabaseConnection) ClearAllReplayData() error {
+	for _, env := range []string{"staging", "production"} {
+		tableName := db.TableFor(env, "replay_data")
+		db.conn.Exec(fmt.Sprintf("TRUNCATE TABLE %s;", tableName))
+	}
+	ctx := context.Background()
+	DeleteCache(ctx, "replayHistoryList:staging")
+	DeleteCache(ctx, "replayHistoryList:production")
+	if RedisClient != nil {
+		ClearCache(ctx)
+	}
+	log.Printf("All Replay Data cleared from DB and Redis Cache.")
 	return nil
 }

@@ -1,0 +1,137 @@
+{
+  "id": "postgresql",
+  "name": "PostgreSQL",
+  "description": "Execute queries, insert, and update records in PostgreSQL databases.",
+  "icon": "/src/components/Icons/postgresql.svg",
+  "baseUrl": "postgres://{{user}}:{{password}}@{{host}}:{{port}}/{{database}}",
+  "authType": "basic",
+  "fields": [
+    {
+      "key": "host",
+      "label": "Host",
+      "type": "text",
+      "required": true,
+      "placeholder": "localhost or db.example.com"
+    },
+    {
+      "key": "port",
+      "label": "Port",
+      "type": "text",
+      "required": true,
+      "placeholder": "5432"
+    },
+    {
+      "key": "database",
+      "label": "Database Name",
+      "type": "text",
+      "required": true,
+      "placeholder": "target_db"
+    },
+    {
+      "key": "user",
+      "label": "Username",
+      "type": "text",
+      "required": true,
+      "placeholder": "postgres"
+    },
+    {
+      "key": "password",
+      "label": "Password",
+      "type": "password",
+      "required": true,
+      "placeholder": "Database password"
+    },
+    {
+      "key": "ssl_mode",
+      "label": "SSL Mode",
+      "type": "text",
+      "required": false,
+      "placeholder": "disable, require, prefer"
+    }
+  ],
+  "actions": [
+    {
+      "id": "execute_query",
+      "name": "Execute SQL Query",
+      "description": "Run a parameterized SQL statement against PostgreSQL",
+      "path": "/query",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "payloadTemplate": "{\"query\": \"{{query}}\"}",
+      "fields": [
+        { "key": "query", "label": "SQL Query", "required": true, "placeholder": "SELECT * FROM users WHERE status = 'active';" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": { "type": "string", "description": "SQL query to execute", "example": "SELECT * FROM users;" }
+        },
+        "required": ["query"]
+      },
+      "outputSchema": {
+        "rows": [
+          { "id": 1, "name": "Alice", "email": "alice@example.com" }
+        ],
+        "rowCount": 1
+      }
+    },
+    {
+      "id": "insert_rows",
+      "name": "Insert Rows",
+      "description": "Insert records into a target database table",
+      "path": "/insert",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "payloadTemplate": "{\"table\": \"{{table}}\", \"rows\": {{rows}}}",
+      "fields": [
+        { "key": "table", "label": "Table Name", "required": true, "placeholder": "users" },
+        { "key": "rows", "label": "Rows JSON Array", "required": true, "placeholder": "[{\"name\": \"Bob\", \"email\": \"bob@example.com\"}]" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "table": { "type": "string", "description": "Target table name", "example": "users" },
+          "rows": { "type": "array", "description": "Array of objects representing rows", "example": [{"name": "Bob"}] }
+        },
+        "required": ["table", "rows"]
+      },
+      "outputSchema": {
+        "insertedCount": 1,
+        "status": "success"
+      }
+    },
+    {
+      "id": "update_rows",
+      "name": "Update Rows",
+      "description": "Update existing records in a database table",
+      "path": "/update",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "payloadTemplate": "{\"table\": \"{{table}}\", \"where\": \"{{where}}\", \"data\": {{data}}}",
+      "fields": [
+        { "key": "table", "label": "Table Name", "required": true, "placeholder": "users" },
+        { "key": "where", "label": "WHERE Condition", "required": true, "placeholder": "id = 1" },
+        { "key": "data", "label": "Update Data Object", "required": true, "placeholder": "{\"status\": \"active\"}" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "table": { "type": "string", "description": "Target table", "example": "users" },
+          "where": { "type": "string", "description": "SQL WHERE clause", "example": "id = 1" },
+          "data": { "type": "object", "description": "Object of columns and values to set" }
+        },
+        "required": ["table", "where", "data"]
+      },
+      "outputSchema": {
+        "updatedCount": 1,
+        "status": "success"
+      }
+    }
+  ]
+}

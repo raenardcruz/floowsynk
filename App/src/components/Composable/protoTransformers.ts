@@ -389,6 +389,9 @@ export function workflowFromObject(obj: any): Workflow {
     if (normalizedObj.isnew !== undefined) {
       msg.setIsnew(normalizedObj.isnew);
     }
+    if (normalizedObj.ismodified !== undefined) {
+      msg.setIsmodified(normalizedObj.ismodified);
+    }
     return msg;
   }
 

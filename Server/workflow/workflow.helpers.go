@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"html"
 	"html/template"
+	"io/ioutil"
 	"net/http"
 	"regexp"
 	"strings"
@@ -48,36 +49,38 @@ func (wp *WorkflowProcessor) UpdateStatus(node *proto.Node, status proto.NodeSta
 		wp.Stream.SendMsg(res)
 	}
 
-	// DB Record format
-	data, err := json.Marshal(res.Data)
-	if err != nil {
-		fmt.Printf("Error marshaling RunWorkflowResponse: %v\n", err)
-		return
-	}
-	variables, err := json.Marshal(res.Variables)
-	if err != nil {
-		fmt.Printf("Error marshaling RunWorkflowResponse: %v\n", err)
-		return
-	}
-	dbRD := DB.ReplayData{
-		ProcessID:       wp.ID,
-		WorkflowID:      wp.Workflow.Id,
-		NodeID:          res.NodeId,
-		Data:            data,
-		Variables:       variables,
-		Status:          int32(res.Status),
-		Message:         res.Message,
-		ProcessSequence: int(wp.Step),
-	}
-	rdBytes, err := json.Marshal(dbRD)
-	if err != nil {
-		fmt.Printf("Error marshaling RunWorkflowResponse: %v\n", err)
-		return
-	}
-	if wp.Producer != nil && *wp.Producer != nil {
-		kafka.SendMessage(*wp.Producer, Broker.WORKFLOW_REPLAY_DATA, wp.ID, string(rdBytes))
-	} else {
-		fmt.Printf("Warning: Kafka producer is not initialized, skipping log sending for ProcessID %s, NodeID %s\n", wp.ID, res.NodeId)
+	// DB Record format - save step to DB if it has replay data / message or is completed/failed/info
+	if includeReplayData || message != "" || status != proto.NodeStatus_RUNNING {
+		data, err := json.Marshal(res.Data)
+		if err != nil {
+			fmt.Printf("Error marshaling RunWorkflowResponse: %v\n", err)
+			return
+		}
+		variables, err := json.Marshal(res.Variables)
+		if err != nil {
+			fmt.Printf("Error marshaling RunWorkflowResponse: %v\n", err)
+			return
+		}
+		dbRD := DB.ReplayData{
+			ProcessID:       wp.ID,
+			WorkflowID:      wp.Workflow.Id,
+			NodeID:          res.NodeId,
+			Data:            data,
+			Variables:       variables,
+			Status:          int32(res.Status),
+			Message:         res.Message,
+			ProcessSequence: int(wp.Step),
+		}
+		env := DB.ResolveEnvName(wp.Workflow.Environment)
+		rdBytes, err := json.Marshal(dbRD)
+		if err == nil {
+			if wp.Producer != nil && *wp.Producer != nil {
+				kafka.SendMessage(*wp.Producer, Broker.WORKFLOW_REPLAY_DATA, wp.ID, string(rdBytes))
+			}
+			if _, err := wp.DBcon.CreateReplayDataEnv(&dbRD, env); err != nil {
+				fmt.Printf("Error saving replay data to DB (%s): %v\n", env, err)
+			}
+		}
 	}
 }
 
@@ -197,22 +200,40 @@ func (wp *WorkflowProcessor) makeRequest(url string, method string, headers []*p
 		req.Header.Add(header.Key, header.Value)
 	}
 
+	if req.Header.Get("User-Agent") == "" {
+		req.Header.Set("User-Agent", "Floowsynk-App")
+	}
+
 	resp, err := client.Do(req)
-	wp.setVariable("api.status", resp.StatusCode)
-	wp.setVariable("api.headers", resp.Header)
-	wp.setVariable("api.length", resp.ContentLength)
 	if err != nil {
 		return nil, err
 	}
 	defer resp.Body.Close()
 
-	err = json.NewDecoder(resp.Body).Decode(&body)
+	wp.setVariable("api.status", resp.StatusCode)
+	wp.setVariable("api.headers", resp.Header)
+	wp.setVariable("api.length", resp.ContentLength)
+
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
-	wp.setVariable("api.body", body)
 
-	return body, nil
+	var jsonBody interface{}
+	if err := json.Unmarshal(bodyBytes, &jsonBody); err == nil {
+		wp.setVariable("api.body", jsonBody)
+		if resp.StatusCode >= 400 {
+			return jsonBody, fmt.Errorf("HTTP request failed with status code %d", resp.StatusCode)
+		}
+		return jsonBody, nil
+	}
+
+	strBody := string(bodyBytes)
+	wp.setVariable("api.body", strBody)
+	if resp.StatusCode >= 400 {
+		return strBody, fmt.Errorf("HTTP request failed with status code %d: %s", resp.StatusCode, strBody)
+	}
+	return strBody, nil
 }
 
 func RegexReplaceAll(text, pattern, replaceText string) string {

@@ -1,0 +1,188 @@
+{
+  "id": "twilio",
+  "name": "Twilio",
+  "description": "Send SMS messages, make voice calls, and handle communications via Twilio API.",
+  "icon": "/src/components/Icons/twilio.svg",
+  "baseUrl": "https://api.twilio.com/2010-04-01",
+  "authType": "basic",
+  "fields": [
+    {
+      "key": "account_sid",
+      "label": "Account SID",
+      "type": "text",
+      "required": true,
+      "placeholder": "ACXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+    },
+    {
+      "key": "auth_token",
+      "label": "Auth Token",
+      "type": "password",
+      "required": true,
+      "placeholder": "Enter Twilio Auth Token"
+    }
+  ],
+  "actions": [
+    {
+      "id": "send_sms",
+      "name": "Send SMS",
+      "description": "Send an SMS text message to a recipient phone number",
+      "path": "/Accounts/{{account_sid}}/Messages.json",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "queryParams": [],
+      "payloadTemplate": "To={{to}}&From={{from}}&Body={{body}}",
+      "fields": [
+        {
+          "key": "to",
+          "label": "Recipient Phone Number (E.164)",
+          "required": true,
+          "placeholder": "+1234567890"
+        },
+        {
+          "key": "from",
+          "label": "Sender Phone Number",
+          "required": true,
+          "placeholder": "+10987654321"
+        },
+        {
+          "key": "body",
+          "label": "SMS Text Body",
+          "required": true,
+          "placeholder": "Enter SMS text"
+        }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "to": {
+            "type": "string",
+            "description": "Destination Phone Number (E.164 format)",
+            "example": "+15551234567"
+          },
+          "from": {
+            "type": "string",
+            "description": "Sender Twilio Phone Number",
+            "example": "+15559876543"
+          },
+          "body": {
+            "type": "string",
+            "description": "SMS text body",
+            "example": "Your verification code is 492015."
+          }
+        },
+        "required": [
+          "to",
+          "from",
+          "body"
+        ]
+      },
+      "outputSchema": {
+        "sid": "SM_YOUR_MESSAGE_SID",
+        "account_sid": "AC_YOUR_ACCOUNT_SID",
+        "to": "+15551234567",
+        "from": "+15559876543",
+        "body": "Your verification code is 492015.",
+        "status": "queued"
+      }
+    },
+    {
+      "id": "make_call",
+      "name": "Make Call",
+      "description": "Initiate an outbound phone call via Twilio",
+      "path": "/Accounts/{{account_sid}}/Calls.json",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/x-www-form-urlencoded"
+      },
+      "queryParams": [],
+      "payloadTemplate": "To={{to}}&From={{from}}&Url={{url}}",
+      "fields": [
+        {
+          "key": "to",
+          "label": "Recipient Phone Number (E.164)",
+          "required": true,
+          "placeholder": "+1234567890"
+        },
+        {
+          "key": "from",
+          "label": "Sender Phone Number",
+          "required": true,
+          "placeholder": "+10987654321"
+        },
+        {
+          "key": "url",
+          "label": "TwiML URL",
+          "required": true,
+          "placeholder": "https://demo.twilio.com/welcome/voice/"
+        }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "to": {
+            "type": "string",
+            "description": "To phone number",
+            "example": "+15551234567"
+          },
+          "from": {
+            "type": "string",
+            "description": "From Twilio number",
+            "example": "+15559876543"
+          },
+          "url": {
+            "type": "string",
+            "description": "TwiML URL",
+            "example": "https://demo.twilio.com/welcome/voice/"
+          }
+        },
+        "required": [
+          "to",
+          "from",
+          "url"
+        ]
+      },
+      "outputSchema": {
+        "sid": "CA_YOUR_CALL_SID",
+        "to": "+15551234567",
+        "from": "+15559876543",
+        "status": "queued"
+      }
+    },
+    {
+      "id": "list_messages",
+      "name": "List Messages",
+      "description": "Retrieve message logs from Twilio account",
+      "path": "/Accounts/{{account_sid}}/Messages.json",
+      "method": "GET",
+      "headers": {
+        "Accept": "application/json"
+      },
+      "queryParams": [
+        "To",
+        "From",
+        "DateSent"
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "description": "Message count",
+            "default": 20
+          }
+        }
+      },
+      "outputSchema": {
+        "messages": [
+          {
+            "sid": "SM1234567890abcdef",
+            "to": "+15551234567",
+            "status": "delivered"
+          }
+        ]
+      }
+    }
+  ]
+}

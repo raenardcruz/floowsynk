@@ -2,11 +2,12 @@
     <div class="node no-scroll nopan" :style="nodestyle"
         :class="{ 'node-selected': node.selected, 'replay-node-selected': isReplayNodeSelected, [nodestatus]: isRunning }"
         @click="clickHandler">
-        <div class="icon" :style="{ background: icon?.color }">
-            <span class="material-symbols-outlined">{{ icon?.name }}</span>
+        <div class="icon" :style="{ background: displayIcon ? '#ffffff' : icon?.color, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', border: displayIcon ? '1px solid #e5e7eb' : 'none' }">
+            <img v-if="displayIcon && (displayIcon.startsWith('/') || displayIcon.endsWith('.svg'))" :src="displayIcon" style="width: 30px; height: 30px; object-fit: contain;" alt="icon" />
+            <span v-else class="material-symbols-outlined">{{ icon?.name }}</span>
         </div>
         <div class="content">
-            <div class="label" v-if="label.length > 0">{{ label }}</div>
+            <div class="label" v-if="displayLabel.length > 0">{{ displayLabel }}</div>
             <div class="type">{{ toSentenceCase(nodetype) }}</div>
         </div>
         <Handle class="handle-input" v-if="outputsList" v-for="(input, index) in inputsList" :key="input" :id="input"
@@ -25,7 +26,7 @@
             </div>
             <div class="node-variables__caption">{{ node.id }}</div>
             <Divider />
-            <WorkflowNodeSidebarFields :nodeType="nodetype" v-model="node.data" :tabid="props.tabid" />
+            <WorkflowNodeSidebarFields :nodeType="nodetype" v-model="node.data" :tabid="props.tabid" :disabled="isRunning" />
         </div>
     </Popover>
     <Teleport :to="`#${canvasId}`">
@@ -36,7 +37,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from "vue"
+import { ref, watch, onMounted, computed } from "vue"
 import { Handle, Position, useNode } from '@vue-flow/core'
 import { SidebarCanvasFields as WorkflowNodeSidebarFields } from "@/views/Workflow/Sidebar"
 import { NodeProps } from './FloowsynkNode.types'
@@ -50,6 +51,8 @@ import { useWorkflowCanvasStore } from '@/views/Workflow/Canvas/Workflow.Canvas.
 import { onKeyStroke } from '@vueuse/core'
 import Popover from 'primevue/popover'
 import Divider from 'primevue/divider'
+import { getConnections } from '@/views/Connectors/Connectors.api'
+import { getRestUrl } from '@/components/Composable/constants'
 
 const op = ref()
 const props = defineProps<NodeProps>()
@@ -60,10 +63,67 @@ const showModal = ref(false)
 const { isRunning, hadOpenModalSidebar } = useWorkflowCanvasStore(props.tabid)
 const { nodestatus, isReplayNodeSelected } = useFloowsynkNodeWatchers(props.tabid, node, showSidebar)
 const clickHandler = (event: any) => {
-    op.value.toggle(event)
+    if (node.id !== '0') {
+        op.value.toggle(event)
+    }
     clickhandler(node, showSidebar, showModal)
 }
 let { icon, nodetype, label, outputsList, inputsList, nodestyle } = node as unknown as Node.AsObject
+
+const connectionsList = ref<any[]>([])
+const templatesList = ref<any[]>([])
+
+const fetchConnectorInfo = async () => {
+    if (nodetype === 'connector') {
+        try {
+            const connRes = await getConnections()
+            connectionsList.value = connRes.toObject().connectionsList || []
+
+            const tempRes = await fetch(`${getRestUrl()}/api/connectors/templates`)
+            if (tempRes.ok) {
+                templatesList.value = await tempRes.json()
+            }
+        } catch (err) {
+            console.error("Failed to load connector info in node:", err)
+        }
+    }
+}
+
+onMounted(() => {
+    fetchConnectorInfo()
+})
+
+const displayIcon = computed(() => {
+    if (nodetype === 'connector' && node.data && node.data.listvar) {
+        const conn = connectionsList.value.find(c => c.id === node.data.listvar)
+        if (conn) {
+            const connectorId = conn.connectorid || conn.connectorId
+            const temp = templatesList.value.find(t => t.id === connectorId)
+            if (temp && temp.icon) {
+                return temp.icon
+            }
+        }
+    }
+    return null
+})
+
+const displayLabel = computed(() => {
+    if (nodetype === 'connector' && node.data && node.data.listvar) {
+        const conn = connectionsList.value.find(c => c.id === node.data.listvar)
+        if (conn) {
+            const actionId = node.data.type
+            const connectorId = conn.connectorid || conn.connectorId
+            const temp = templatesList.value.find(t => t.id === connectorId)
+            const action = temp?.actions?.find((a: any) => a.id === actionId)
+            if (action) {
+                return `${conn.name}: ${action.name}`
+            }
+            return conn.name
+        }
+    }
+    return label || toSentenceCase(nodetype)
+})
+
 watch(isRunning, (newValue) => {
     node.draggable = !newValue
     node.deletable = !newValue

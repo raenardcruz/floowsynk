@@ -157,6 +157,19 @@ export const nodes: Node.AsObject[] = [
         outputsList: ["output"]
     },
     {
+        id: '', nodetype: 'response', label: 'Webhook Response', position: { x: 0, y: 0 },
+        groupList: [4],
+        icon: {
+            name: "reply",
+            color: "linear-gradient(135deg, var(--orange-3), var(--orange-7))" // orange
+        },
+        data: {
+            message: ""
+        },
+        inputsList: ["input"],
+        outputsList: ["output"]
+    },
+    {
         id: '', nodetype: 'getGuid', label: 'Get Guid', position: { x: 0, y: 0 },
         groupList: [1],
         icon: {
@@ -300,6 +313,22 @@ export const nodes: Node.AsObject[] = [
         },
         inputsList: ["input"],
         outputsList: ["output"]
+    },
+    {
+        id: '', nodetype: 'connector', label: '3rd Party Connector', position: { x: 0, y: 0 },
+        groupList: [4],
+        icon: {
+            name: "cable",
+            color: "linear-gradient(135deg, var(--violet-3), var(--violet-7))" // violet
+        },
+        data: {
+            listvar: "",
+            type: "",
+            payload: "{}",
+            variable: "response"
+        },
+        inputsList: ["input"],
+        outputsList: ["output"]
     }
 ]
 
@@ -340,6 +369,9 @@ const startNodesArray: Node.AsObject[] = [
         label: '',
         draggable: false,
         icon: { name: 'webhook', color: 'var(--brown-7)' }, // orange
+        data: {
+            value: ''
+        },
         inputsList: [],
         outputsList: ['output'],
         groupList: [1],

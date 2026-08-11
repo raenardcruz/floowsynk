@@ -20,15 +20,22 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	WorkflowService_GetWorkflow_FullMethodName         = "/proto.WorkflowService/GetWorkflow"
-	WorkflowService_ListWorkflows_FullMethodName       = "/proto.WorkflowService/ListWorkflows"
-	WorkflowService_UpdateWorkflow_FullMethodName      = "/proto.WorkflowService/UpdateWorkflow"
-	WorkflowService_CreateWorkflow_FullMethodName      = "/proto.WorkflowService/CreateWorkflow"
-	WorkflowService_DeleteWorkflow_FullMethodName      = "/proto.WorkflowService/DeleteWorkflow"
-	WorkflowService_QuickRun_FullMethodName            = "/proto.WorkflowService/QuickRun"
-	WorkflowService_RunWorkflowId_FullMethodName       = "/proto.WorkflowService/RunWorkflowId"
-	WorkflowService_ListWorkflowHistory_FullMethodName = "/proto.WorkflowService/ListWorkflowHistory"
-	WorkflowService_GetWorkflowHistory_FullMethodName  = "/proto.WorkflowService/GetWorkflowHistory"
+	WorkflowService_GetWorkflow_FullMethodName             = "/proto.WorkflowService/GetWorkflow"
+	WorkflowService_ListWorkflows_FullMethodName           = "/proto.WorkflowService/ListWorkflows"
+	WorkflowService_UpdateWorkflow_FullMethodName          = "/proto.WorkflowService/UpdateWorkflow"
+	WorkflowService_CreateWorkflow_FullMethodName          = "/proto.WorkflowService/CreateWorkflow"
+	WorkflowService_DeleteWorkflow_FullMethodName          = "/proto.WorkflowService/DeleteWorkflow"
+	WorkflowService_QuickRun_FullMethodName                = "/proto.WorkflowService/QuickRun"
+	WorkflowService_RunWorkflowId_FullMethodName           = "/proto.WorkflowService/RunWorkflowId"
+	WorkflowService_ListWorkflowHistory_FullMethodName     = "/proto.WorkflowService/ListWorkflowHistory"
+	WorkflowService_GetWorkflowHistory_FullMethodName      = "/proto.WorkflowService/GetWorkflowHistory"
+	WorkflowService_ListConnectorTemplates_FullMethodName  = "/proto.WorkflowService/ListConnectorTemplates"
+	WorkflowService_ListConnections_FullMethodName         = "/proto.WorkflowService/ListConnections"
+	WorkflowService_DeleteConnection_FullMethodName        = "/proto.WorkflowService/DeleteConnection"
+	WorkflowService_ListWorkflowVersions_FullMethodName    = "/proto.WorkflowService/ListWorkflowVersions"
+	WorkflowService_RestoreWorkflowVersion_FullMethodName  = "/proto.WorkflowService/RestoreWorkflowVersion"
+	WorkflowService_PublishWorkflow_FullMethodName         = "/proto.WorkflowService/PublishWorkflow"
+	WorkflowService_RevertWorkflowToStaging_FullMethodName = "/proto.WorkflowService/RevertWorkflowToStaging"
 )
 
 // WorkflowServiceClient is the client API for WorkflowService service.
@@ -42,8 +49,16 @@ type WorkflowServiceClient interface {
 	DeleteWorkflow(ctx context.Context, in *Workflow, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	QuickRun(ctx context.Context, in *Workflow, opts ...grpc.CallOption) (grpc.ServerStreamingClient[ReplayData], error)
 	RunWorkflowId(ctx context.Context, in *RunWorkflowIdRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[ReplayData], error)
-	ListWorkflowHistory(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*WorkflowHistoryList, error)
+	ListWorkflowHistory(ctx context.Context, in *ListWorkflowHistoryRequest, opts ...grpc.CallOption) (*WorkflowHistoryList, error)
 	GetWorkflowHistory(ctx context.Context, in *WorkflowHistoryRequest, opts ...grpc.CallOption) (*WorkflowHistoryResponse, error)
+	ListConnectorTemplates(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ConnectorTemplateList, error)
+	ListConnections(ctx context.Context, in *ListConnectionsRequest, opts ...grpc.CallOption) (*ConnectionList, error)
+	DeleteConnection(ctx context.Context, in *DeleteConnectionRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// Versioning (staging environment only)
+	ListWorkflowVersions(ctx context.Context, in *GetWorkflowVersionsRequest, opts ...grpc.CallOption) (*WorkflowVersionList, error)
+	RestoreWorkflowVersion(ctx context.Context, in *WorkflowVersion, opts ...grpc.CallOption) (*Workflow, error)
+	PublishWorkflow(ctx context.Context, in *PublishWorkflowRequest, opts ...grpc.CallOption) (*PublishWorkflowResponse, error)
+	RevertWorkflowToStaging(ctx context.Context, in *GetWorkflowRequest, opts ...grpc.CallOption) (*Workflow, error)
 }
 
 type workflowServiceClient struct {
@@ -142,7 +157,7 @@ func (c *workflowServiceClient) RunWorkflowId(ctx context.Context, in *RunWorkfl
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type WorkflowService_RunWorkflowIdClient = grpc.ServerStreamingClient[ReplayData]
 
-func (c *workflowServiceClient) ListWorkflowHistory(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*WorkflowHistoryList, error) {
+func (c *workflowServiceClient) ListWorkflowHistory(ctx context.Context, in *ListWorkflowHistoryRequest, opts ...grpc.CallOption) (*WorkflowHistoryList, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(WorkflowHistoryList)
 	err := c.cc.Invoke(ctx, WorkflowService_ListWorkflowHistory_FullMethodName, in, out, cOpts...)
@@ -162,6 +177,76 @@ func (c *workflowServiceClient) GetWorkflowHistory(ctx context.Context, in *Work
 	return out, nil
 }
 
+func (c *workflowServiceClient) ListConnectorTemplates(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ConnectorTemplateList, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ConnectorTemplateList)
+	err := c.cc.Invoke(ctx, WorkflowService_ListConnectorTemplates_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workflowServiceClient) ListConnections(ctx context.Context, in *ListConnectionsRequest, opts ...grpc.CallOption) (*ConnectionList, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ConnectionList)
+	err := c.cc.Invoke(ctx, WorkflowService_ListConnections_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workflowServiceClient) DeleteConnection(ctx context.Context, in *DeleteConnectionRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, WorkflowService_DeleteConnection_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workflowServiceClient) ListWorkflowVersions(ctx context.Context, in *GetWorkflowVersionsRequest, opts ...grpc.CallOption) (*WorkflowVersionList, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(WorkflowVersionList)
+	err := c.cc.Invoke(ctx, WorkflowService_ListWorkflowVersions_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workflowServiceClient) RestoreWorkflowVersion(ctx context.Context, in *WorkflowVersion, opts ...grpc.CallOption) (*Workflow, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Workflow)
+	err := c.cc.Invoke(ctx, WorkflowService_RestoreWorkflowVersion_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workflowServiceClient) PublishWorkflow(ctx context.Context, in *PublishWorkflowRequest, opts ...grpc.CallOption) (*PublishWorkflowResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(PublishWorkflowResponse)
+	err := c.cc.Invoke(ctx, WorkflowService_PublishWorkflow_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workflowServiceClient) RevertWorkflowToStaging(ctx context.Context, in *GetWorkflowRequest, opts ...grpc.CallOption) (*Workflow, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Workflow)
+	err := c.cc.Invoke(ctx, WorkflowService_RevertWorkflowToStaging_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // WorkflowServiceServer is the server API for WorkflowService service.
 // All implementations must embed UnimplementedWorkflowServiceServer
 // for forward compatibility.
@@ -173,8 +258,16 @@ type WorkflowServiceServer interface {
 	DeleteWorkflow(context.Context, *Workflow) (*emptypb.Empty, error)
 	QuickRun(*Workflow, grpc.ServerStreamingServer[ReplayData]) error
 	RunWorkflowId(*RunWorkflowIdRequest, grpc.ServerStreamingServer[ReplayData]) error
-	ListWorkflowHistory(context.Context, *emptypb.Empty) (*WorkflowHistoryList, error)
+	ListWorkflowHistory(context.Context, *ListWorkflowHistoryRequest) (*WorkflowHistoryList, error)
 	GetWorkflowHistory(context.Context, *WorkflowHistoryRequest) (*WorkflowHistoryResponse, error)
+	ListConnectorTemplates(context.Context, *emptypb.Empty) (*ConnectorTemplateList, error)
+	ListConnections(context.Context, *ListConnectionsRequest) (*ConnectionList, error)
+	DeleteConnection(context.Context, *DeleteConnectionRequest) (*emptypb.Empty, error)
+	// Versioning (staging environment only)
+	ListWorkflowVersions(context.Context, *GetWorkflowVersionsRequest) (*WorkflowVersionList, error)
+	RestoreWorkflowVersion(context.Context, *WorkflowVersion) (*Workflow, error)
+	PublishWorkflow(context.Context, *PublishWorkflowRequest) (*PublishWorkflowResponse, error)
+	RevertWorkflowToStaging(context.Context, *GetWorkflowRequest) (*Workflow, error)
 	mustEmbedUnimplementedWorkflowServiceServer()
 }
 
@@ -206,11 +299,32 @@ func (UnimplementedWorkflowServiceServer) QuickRun(*Workflow, grpc.ServerStreami
 func (UnimplementedWorkflowServiceServer) RunWorkflowId(*RunWorkflowIdRequest, grpc.ServerStreamingServer[ReplayData]) error {
 	return status.Error(codes.Unimplemented, "method RunWorkflowId not implemented")
 }
-func (UnimplementedWorkflowServiceServer) ListWorkflowHistory(context.Context, *emptypb.Empty) (*WorkflowHistoryList, error) {
+func (UnimplementedWorkflowServiceServer) ListWorkflowHistory(context.Context, *ListWorkflowHistoryRequest) (*WorkflowHistoryList, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListWorkflowHistory not implemented")
 }
 func (UnimplementedWorkflowServiceServer) GetWorkflowHistory(context.Context, *WorkflowHistoryRequest) (*WorkflowHistoryResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetWorkflowHistory not implemented")
+}
+func (UnimplementedWorkflowServiceServer) ListConnectorTemplates(context.Context, *emptypb.Empty) (*ConnectorTemplateList, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListConnectorTemplates not implemented")
+}
+func (UnimplementedWorkflowServiceServer) ListConnections(context.Context, *ListConnectionsRequest) (*ConnectionList, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListConnections not implemented")
+}
+func (UnimplementedWorkflowServiceServer) DeleteConnection(context.Context, *DeleteConnectionRequest) (*emptypb.Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteConnection not implemented")
+}
+func (UnimplementedWorkflowServiceServer) ListWorkflowVersions(context.Context, *GetWorkflowVersionsRequest) (*WorkflowVersionList, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListWorkflowVersions not implemented")
+}
+func (UnimplementedWorkflowServiceServer) RestoreWorkflowVersion(context.Context, *WorkflowVersion) (*Workflow, error) {
+	return nil, status.Error(codes.Unimplemented, "method RestoreWorkflowVersion not implemented")
+}
+func (UnimplementedWorkflowServiceServer) PublishWorkflow(context.Context, *PublishWorkflowRequest) (*PublishWorkflowResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method PublishWorkflow not implemented")
+}
+func (UnimplementedWorkflowServiceServer) RevertWorkflowToStaging(context.Context, *GetWorkflowRequest) (*Workflow, error) {
+	return nil, status.Error(codes.Unimplemented, "method RevertWorkflowToStaging not implemented")
 }
 func (UnimplementedWorkflowServiceServer) mustEmbedUnimplementedWorkflowServiceServer() {}
 func (UnimplementedWorkflowServiceServer) testEmbeddedByValue()                         {}
@@ -346,7 +460,7 @@ func _WorkflowService_RunWorkflowId_Handler(srv interface{}, stream grpc.ServerS
 type WorkflowService_RunWorkflowIdServer = grpc.ServerStreamingServer[ReplayData]
 
 func _WorkflowService_ListWorkflowHistory_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(emptypb.Empty)
+	in := new(ListWorkflowHistoryRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -358,7 +472,7 @@ func _WorkflowService_ListWorkflowHistory_Handler(srv interface{}, ctx context.C
 		FullMethod: WorkflowService_ListWorkflowHistory_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(WorkflowServiceServer).ListWorkflowHistory(ctx, req.(*emptypb.Empty))
+		return srv.(WorkflowServiceServer).ListWorkflowHistory(ctx, req.(*ListWorkflowHistoryRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -377,6 +491,132 @@ func _WorkflowService_GetWorkflowHistory_Handler(srv interface{}, ctx context.Co
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(WorkflowServiceServer).GetWorkflowHistory(ctx, req.(*WorkflowHistoryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkflowService_ListConnectorTemplates_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkflowServiceServer).ListConnectorTemplates(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkflowService_ListConnectorTemplates_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkflowServiceServer).ListConnectorTemplates(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkflowService_ListConnections_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListConnectionsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkflowServiceServer).ListConnections(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkflowService_ListConnections_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkflowServiceServer).ListConnections(ctx, req.(*ListConnectionsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkflowService_DeleteConnection_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteConnectionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkflowServiceServer).DeleteConnection(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkflowService_DeleteConnection_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkflowServiceServer).DeleteConnection(ctx, req.(*DeleteConnectionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkflowService_ListWorkflowVersions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetWorkflowVersionsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkflowServiceServer).ListWorkflowVersions(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkflowService_ListWorkflowVersions_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkflowServiceServer).ListWorkflowVersions(ctx, req.(*GetWorkflowVersionsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkflowService_RestoreWorkflowVersion_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(WorkflowVersion)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkflowServiceServer).RestoreWorkflowVersion(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkflowService_RestoreWorkflowVersion_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkflowServiceServer).RestoreWorkflowVersion(ctx, req.(*WorkflowVersion))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkflowService_PublishWorkflow_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PublishWorkflowRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkflowServiceServer).PublishWorkflow(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkflowService_PublishWorkflow_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkflowServiceServer).PublishWorkflow(ctx, req.(*PublishWorkflowRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkflowService_RevertWorkflowToStaging_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetWorkflowRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkflowServiceServer).RevertWorkflowToStaging(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkflowService_RevertWorkflowToStaging_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkflowServiceServer).RevertWorkflowToStaging(ctx, req.(*GetWorkflowRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -415,6 +655,34 @@ var WorkflowService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetWorkflowHistory",
 			Handler:    _WorkflowService_GetWorkflowHistory_Handler,
+		},
+		{
+			MethodName: "ListConnectorTemplates",
+			Handler:    _WorkflowService_ListConnectorTemplates_Handler,
+		},
+		{
+			MethodName: "ListConnections",
+			Handler:    _WorkflowService_ListConnections_Handler,
+		},
+		{
+			MethodName: "DeleteConnection",
+			Handler:    _WorkflowService_DeleteConnection_Handler,
+		},
+		{
+			MethodName: "ListWorkflowVersions",
+			Handler:    _WorkflowService_ListWorkflowVersions_Handler,
+		},
+		{
+			MethodName: "RestoreWorkflowVersion",
+			Handler:    _WorkflowService_RestoreWorkflowVersion_Handler,
+		},
+		{
+			MethodName: "PublishWorkflow",
+			Handler:    _WorkflowService_PublishWorkflow_Handler,
+		},
+		{
+			MethodName: "RevertWorkflowToStaging",
+			Handler:    _WorkflowService_RevertWorkflowToStaging_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

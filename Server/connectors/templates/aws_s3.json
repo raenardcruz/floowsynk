@@ -1,0 +1,230 @@
+{
+  "id": "aws_s3",
+  "name": "AWS S3",
+  "description": "Store and retrieve files and objects in Amazon S3 buckets.",
+  "icon": "/src/components/Icons/aws_s3.svg",
+  "baseUrl": "https://{{bucket_name}}.s3.{{region}}.amazonaws.com",
+  "authType": "custom",
+  "fields": [
+    {
+      "key": "access_key_id",
+      "label": "Access Key ID",
+      "type": "text",
+      "required": true,
+      "placeholder": "AKIA..."
+    },
+    {
+      "key": "secret_access_key",
+      "label": "Secret Access Key",
+      "type": "password",
+      "required": true,
+      "placeholder": "Enter secret access key"
+    },
+    {
+      "key": "region",
+      "label": "Region",
+      "type": "text",
+      "required": true,
+      "placeholder": "us-east-1"
+    },
+    {
+      "key": "bucket_name",
+      "label": "Bucket Name",
+      "type": "text",
+      "required": true,
+      "placeholder": "my-s3-bucket"
+    }
+  ],
+  "actions": [
+    {
+      "id": "upload_file",
+      "name": "Upload File",
+      "description": "Upload an object to S3 bucket",
+      "path": "/{{object_key}}",
+      "method": "PUT",
+      "headers": {
+        "Content-Type": "{{content_type}}"
+      },
+      "queryParams": [],
+      "payloadTemplate": "{{content}}",
+      "fields": [
+        {
+          "key": "object_key",
+          "label": "S3 Object Key / Path",
+          "required": true,
+          "placeholder": "path/to/file.txt"
+        },
+        {
+          "key": "content",
+          "label": "File Content",
+          "required": true,
+          "placeholder": "Enter object file content"
+        },
+        {
+          "key": "content_type",
+          "label": "Content Type",
+          "required": false,
+          "placeholder": "text/plain"
+        }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "bucket": {
+            "type": "string",
+            "description": "Bucket Name",
+            "example": "my-app-bucket"
+          },
+          "key": {
+            "type": "string",
+            "description": "S3 Key Path",
+            "example": "files/document.pdf"
+          },
+          "body": {
+            "type": "string",
+            "description": "File content string",
+            "example": "file content"
+          }
+        },
+        "required": [
+          "bucket",
+          "key",
+          "body"
+        ]
+      },
+      "outputSchema": {
+        "ETag": "\"68934a3e9455fa72420237eb05902327\"",
+        "Location": "https://my-app-bucket.s3.amazonaws.com/files/document.pdf",
+        "Key": "files/document.pdf",
+        "Bucket": "my-app-bucket"
+      }
+    },
+    {
+      "id": "download_file",
+      "name": "Download File",
+      "description": "Retrieve an object from S3 bucket",
+      "path": "/{{object_key}}",
+      "method": "GET",
+      "headers": {},
+      "queryParams": [],
+      "payloadTemplate": "",
+      "fields": [
+        {
+          "key": "object_key",
+          "label": "S3 Object Key / Path",
+          "required": true,
+          "placeholder": "path/to/file.txt"
+        }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "bucket": {
+            "type": "string",
+            "description": "Bucket Name",
+            "example": "my-app-bucket"
+          },
+          "key": {
+            "type": "string",
+            "description": "S3 Key Path",
+            "example": "files/document.pdf"
+          }
+        },
+        "required": [
+          "bucket",
+          "key"
+        ]
+      },
+      "outputSchema": {
+        "ContentType": "application/pdf",
+        "ContentLength": 2048,
+        "Body": "[File Binary / String Content]"
+      }
+    },
+    {
+      "id": "delete_file",
+      "name": "Delete File",
+      "description": "Delete an object from S3 bucket",
+      "path": "/{{object_key}}",
+      "method": "DELETE",
+      "headers": {},
+      "queryParams": [],
+      "payloadTemplate": "",
+      "fields": [
+        {
+          "key": "object_key",
+          "label": "S3 Object Key / Path",
+          "required": true,
+          "placeholder": "path/to/file.txt"
+        }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "bucket": {
+            "type": "string",
+            "description": "Bucket Name",
+            "example": "my-app-bucket"
+          },
+          "key": {
+            "type": "string",
+            "description": "S3 Key Path",
+            "example": "files/document.pdf"
+          }
+        },
+        "required": [
+          "bucket",
+          "key"
+        ]
+      },
+      "outputSchema": {
+        "DeleteMarker": true,
+        "VersionId": "def456"
+      }
+    },
+    {
+      "id": "list_objects",
+      "name": "List Objects",
+      "description": "List objects in S3 bucket",
+      "path": "/",
+      "method": "GET",
+      "headers": {},
+      "queryParams": [
+        {
+          "key": "list-type",
+          "value": "2"
+        }
+      ],
+      "payloadTemplate": "",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "bucket": {
+            "type": "string",
+            "description": "S3 Bucket Name",
+            "example": "my-app-uploads"
+          },
+          "prefix": {
+            "type": "string",
+            "description": "Prefix filter for keys",
+            "example": "documents/"
+          }
+        },
+        "required": [
+          "bucket"
+        ]
+      },
+      "outputSchema": {
+        "Name": "my-app-uploads",
+        "Prefix": "documents/",
+        "Contents": [
+          {
+            "Key": "documents/report.pdf",
+            "LastModified": "2026-08-07T10:00:00.000Z",
+            "Size": 1024
+          }
+        ]
+      }
+    }
+  ]
+}

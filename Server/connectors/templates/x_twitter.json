@@ -1,0 +1,170 @@
+{
+  "id": "x_twitter",
+  "name": "X (Twitter)",
+  "description": "Post tweets, search recent tweets, retrieve user timelines, and delete tweets via X API v2.",
+  "icon": "/src/components/Icons/x_twitter.svg",
+  "baseUrl": "https://api.twitter.com/2",
+  "authType": "oauth2, bearer",
+  "fields": [
+    {
+      "key": "client_id",
+      "label": "Client ID",
+      "type": "text",
+      "required": false,
+      "placeholder": "Enter OAuth 2.0 Client ID"
+    },
+    {
+      "key": "client_secret",
+      "label": "Client Secret",
+      "type": "password",
+      "required": false,
+      "placeholder": "Enter OAuth 2.0 Client Secret"
+    },
+    {
+      "key": "access_token",
+      "label": "Access Token",
+      "type": "password",
+      "required": false,
+      "placeholder": "Enter Access Token / Bearer Token"
+    },
+    {
+      "key": "bearer_token",
+      "label": "Bearer Token",
+      "type": "password",
+      "required": false,
+      "placeholder": "Enter Bearer Token"
+    }
+  ],
+  "oauthConfig": {
+    "authorizeUrl": "https://twitter.com/i/oauth2/authorize",
+    "tokenUrl": "https://api.twitter.com/2/oauth2/token",
+    "defaultScopes": ["tweet.read", "tweet.write", "users.read", "offline.access"]
+  },
+  "actions": [
+    {
+      "id": "post_tweet",
+      "name": "Post Tweet",
+      "description": "Post a new tweet via X API v2",
+      "path": "/tweets",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "payloadTemplate": "{\"text\": \"{{text}}\"}",
+      "fields": [
+        { "key": "text", "label": "Tweet Text", "required": true, "placeholder": "Hello world from FloowSynk!" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "text": { "type": "string", "description": "Text content of the tweet", "example": "Hello world!" }
+        },
+        "required": ["text"]
+      },
+      "outputSchema": {
+        "data": {
+          "id": "1445880548472328192",
+          "text": "Hello world!"
+        }
+      }
+    },
+    {
+      "id": "delete_tweet",
+      "name": "Delete Tweet",
+      "description": "Delete a tweet by Tweet ID",
+      "path": "/tweets/{{id}}",
+      "method": "DELETE",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "fields": [
+        { "key": "id", "label": "Tweet ID", "required": true, "placeholder": "1445880548472328192" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "description": "ID of the tweet to delete", "example": "1445880548472328192" }
+        },
+        "required": ["id"]
+      },
+      "outputSchema": {
+        "data": {
+          "deleted": true
+        }
+      }
+    },
+    {
+      "id": "get_user_tweets",
+      "name": "Get User Tweets",
+      "description": "Retrieve recent tweets posted by a specific user ID",
+      "path": "/users/{{id}}/tweets",
+      "method": "GET",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "queryParams": [
+        { "key": "max_results", "value": "{{max_results}}" }
+      ],
+      "fields": [
+        { "key": "id", "label": "User ID", "required": true, "placeholder": "2244994945" },
+        { "key": "max_results", "label": "Max Results", "required": false, "placeholder": "10" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "description": "User ID", "example": "2244994945" },
+          "max_results": { "type": "string", "description": "Maximum number of results to return (10-100)", "example": "10" }
+        },
+        "required": ["id"]
+      },
+      "outputSchema": {
+        "data": [
+          {
+            "id": "1445880548472328192",
+            "text": "Hello world!"
+          }
+        ],
+        "meta": {
+          "result_count": 1
+        }
+      }
+    },
+    {
+      "id": "search_recent_tweets",
+      "name": "Search Recent Tweets",
+      "description": "Search for tweets published in the last 7 days matching a query",
+      "path": "/tweets/search/recent",
+      "method": "GET",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "queryParams": [
+        { "key": "query", "value": "{{query}}" },
+        { "key": "max_results", "value": "{{max_results}}" }
+      ],
+      "fields": [
+        { "key": "query", "label": "Search Query", "required": true, "placeholder": "floowsynk OR #automation" },
+        { "key": "max_results", "label": "Max Results", "required": false, "placeholder": "10" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": { "type": "string", "description": "Search query string", "example": "floowsynk" },
+          "max_results": { "type": "string", "description": "Maximum number of results to return", "example": "10" }
+        },
+        "required": ["query"]
+      },
+      "outputSchema": {
+        "data": [
+          {
+            "id": "1445880548472328192",
+            "text": "Check out floowsynk!"
+          }
+        ],
+        "meta": {
+          "result_count": 1
+        }
+      }
+    }
+  ]
+}

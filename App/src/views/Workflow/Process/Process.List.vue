@@ -18,6 +18,7 @@
                 <div class="type">
                     <workflow-icon :type="process.type" />
                     <span class="type-text">{{ process.type }}</span>
+                    <span v-if="process.ismodified" class="modified-tag" title="Modified in Production (out of sync with Staging)">Out of Sync</span>
                 </div>
                 <div class="card-title">
                     <span>{{ process.name }}</span>
@@ -29,24 +30,30 @@
             </div>
         </div>
         <div class="run-history">
-            <Collapsible title="Run History" caption="List of all the processes that have been run"
-                v-model="showContent">
-                <div class="history-container" v-bind="containerProps">
-                    <div v-bind="wrapperProps">
-                        <Header columnstyle="repeat(3, 1fr)">
-                            <div class="header">ID</div>
-                            <div class="header">Workflow</div>
-                            <div class="header">Date</div>
-                        </Header>
-                        <Row columnstyle="repeat(3, 1fr)" v-for="(item, index) in list" :key="index"
-                            @click="historyClicked(item.data)">
-                            <div>{{ item.data.id }}</div>
-                            <div>{{ item.data.workflowname }}</div>
-                            <div>{{ item.data.rundate }}</div>
-                        </Row>
+            <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                <Collapsible title="Run History" caption="List of all the processes that have been run"
+                    v-model="showContent" style="flex: 1;">
+                    <div class="history-container" v-bind="containerProps">
+                        <div v-bind="wrapperProps">
+                            <Header columnstyle="repeat(3, 1fr)">
+                                <div class="header">ID</div>
+                                <div class="header">Workflow</div>
+                                <div class="header">Date</div>
+                            </Header>
+                            <Row columnstyle="repeat(3, 1fr)" v-for="(item, index) in list" :key="index"
+                                @click="historyClicked(item.data)">
+                                <div>{{ item.data.id }}</div>
+                                <div>{{ item.data.workflowname }}</div>
+                                <div>{{ item.data.rundate }}</div>
+                            </Row>
+                        </div>
                     </div>
-                </div>
-            </Collapsible>
+                </Collapsible>
+                <button v-if="history.length > 0" type="button" class="clear-history-btn" @click="clearHistoryAction" title="Clear All Run History">
+                    <span class="material-symbols-outlined">delete_sweep</span>
+                    <span>Clear</span>
+                </button>
+            </div>
         </div>
     </div>
     <div v-else>
@@ -56,7 +63,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { createProcess, cardClicked, initWorkflows, historyClicked } from './Process.List.helper'
+import { createProcess, cardClicked, initWorkflows, historyClicked, clearHistoryAction } from './Process.List.helper'
 import WorkflowIcon from "@/views/Workflow/Workflow.Icon.vue"
 import { useProcessListStore, useProcessListHooks } from './Process.List.hooks'
 import { useAsyncState, useVirtualList } from '@vueuse/core'

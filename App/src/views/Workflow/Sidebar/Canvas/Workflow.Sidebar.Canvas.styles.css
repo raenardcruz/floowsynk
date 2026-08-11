@@ -34,128 +34,101 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    justify-self: left;
     height: 100%;
-    width: 280px;
+    width: 290px;
     z-index: 2;
-    transition: 0.3s ease-in-out;
-    background: var(--grey-5);
-    overflow: auto;
-    padding: 20px;
-}
-.group {
-    position: relative;
-    display: flex;
-    border-top: solid 1px var(--grey-3);
-    padding: 16px;
-    justify-content: flex-start;
-    align-items: center;
-    flex-wrap: wrap;
-    flex-direction: column;
-    cursor: pointer;
-    transition: 0.3s ease-in-out;
-}
-.group:hover .name {
-    color: var(--orange-1);
-}
-.group .name {
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--grey-1);
-    transition: 0.3s ease-in-out;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(12px);
+    border-right: 1px solid #e2e8f0;
+    overflow-y: auto;
+    padding: 16px 12px;
 }
 
-.group .description {
-    font-size: 10px;
-    color: var(--grey-2);
-}
 .nodes {
-    position: relative;
     display: grid;
-    width: 100%;
-    transition: 0.5s ease-out;
-    height: fit-content;
-    grid-template-columns: repeat(2, auto);
-    grid-gap: 8px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    padding: 6px 0;
 }
-.nodes.expand {
-    max-height: 1000vh; /* Set this to a value that is enough to show your content */
-    opacity: 1;
-}
+
 .node {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 70px;
-    width: 100px;
-    border-radius: 8px;
-    background: var(--white-2);
-    box-shadow: 3px 3px 5px var(--grey-3),-3px -3px 5px var(--white-1);
-    margin-top: 8px;
+    padding: 12px 8px;
+    height: 78px;
+    border-radius: 12px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+    cursor: grab;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .node:hover {
-    box-shadow: 3px 3px 8px var(--grey-3),-3px -3px 8px var(--white-1);
-    transform: scale(1.02);
+    border-color: #818cf8;
+    background: #f8fafc;
+    box-shadow: 0 8px 16px -2px rgba(99, 102, 241, 0.15);
+    transform: translateY(-2px);
+}
+
+.node:active {
+    cursor: grabbing;
+}
+
+.node-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 6px;
+    box-shadow: 0 4px 10px rgba(99, 102, 241, 0.25);
+}
+
+.node-icon .material-symbols-outlined {
+    font-size: 18px;
 }
 
 .node .node-type {
-    font-size: 12px;
-    color: var(--grey-2);
+    font-size: 11px;
+    font-weight: 600;
+    color: #334155;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
 }
+
 .grp-icon {
-    font-size: 13px;
-    margin-right: 10px;
-}
-.expand-icon {
-    font-size: 10px;
-    margin-left: 10px;
-    transition: 0.3s ease-in-out;
-}
-.expand-icon.expand {
-    transform: rotate(90deg);
+    font-size: 15px;
+    margin-right: 8px;
+    color: #6366f1;
 }
 
 .input {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    text-align: left;
-    margin-bottom: 10px;
-    padding: 0 20px;
-}
-.input label {
-    font-size: 7px;
-    font-weight: 800;
-    text-transform: uppercase;
-}
-.input input,
-.input select {
-    border-radius: 20px;
-    padding: 5px;
-    font-size: 10px;
-    border: 0.05px solid var(--grey-4);
-    overflow: auto;
-    min-height: 32px;
-}
-.input .textbox {
-    border-radius: 20px;
-    font-size: 10px;
-    border: 0.05px solid var(--grey-4);
-    background-color: var(--white-1);
-}
-.input input:focus,
-.input select:focus,
-.input textarea:focus {
-    outline: none;
-    border: 0.05px solid var(--blue-3);
+    margin-bottom: 12px;
+    padding: 0 4px;
 }
 
-.input textarea {
-    border-radius: 5px;
-    padding: 5px;
-    font-size: 10px;
-    border: 0.05px solid var(--grey-4);
-    overflow: auto;
+.input input {
+    border-radius: 10px;
+    padding: 8px 12px;
+    font-size: 13px;
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    transition: all 0.2s ease;
+    width: 100%;
+}
+
+.input input:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
 }
