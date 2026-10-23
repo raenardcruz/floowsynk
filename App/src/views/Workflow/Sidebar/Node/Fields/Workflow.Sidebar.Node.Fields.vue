@@ -1,10 +1,83 @@
 <template>
+    <!-- Available Variables (Click to Copy / Insert) -->
+    <div v-if="!props.isNested && variables && variables.length > 0" class="variables-pill-bar">
+        <div class="variables-pill-bar__header" @click="isVariablesCollapsed = !isVariablesCollapsed">
+            <div class="variables-pill-bar__title">
+                <span class="material-symbols-outlined variables-pill-bar__icon">data_object</span>
+                <span>Available Variables (Click to Copy / Insert)</span>
+                <span class="variables-pill-bar__badge">{{ variables.length }}</span>
+            </div>
+            <span
+                class="material-symbols-outlined variables-pill-bar__chevron"
+                :class="{ 'collapsed': isVariablesCollapsed }"
+            >
+                expand_more
+            </span>
+        </div>
+        <div v-if="!isVariablesCollapsed" class="variables-pill-bar__list">
+            <button
+                v-for="v in variables"
+                :key="v"
+                type="button"
+                class="variables-pill-bar__pill"
+                :class="{ 'variables-pill-bar__pill--copied': copiedVar === v }"
+                @mousedown.prevent
+                @click="insertOrCopyVariable(v)"
+                :title="formatPillTitle(v)"
+            >
+                <span v-if="copiedVar === v" class="material-symbols-outlined variables-pill-bar__check">check</span>
+                <span>{{ formatPillLabel(v) }}</span>
+            </button>
+        </div>
+    </div>
+
     <div class="input" v-if="props.nodeType == 'subprocess'">
         <SelectInput
             :options="filteredProcesses"
             :disabled="disabled"
             label="Subprocess"
             v-model="modelValue" />
+    </div>
+    <div v-else-if="props.nodeType === 'rag' && modelValue" class="rag-config" style="display: flex; flex-direction: column; gap: 12px; padding: 4px;">
+        <div>
+            <label style="font-weight: 600; font-size: 0.85rem; color: var(--text-color); display: block; margin-bottom: 4px;">RAG Connection</label>
+            <SelectInput
+                :options="ragConnectionOptions"
+                :disabled="disabled"
+                v-model="modelValue['ragconnectionid']"
+                placeholder="Select RAG Knowledge Base" />
+        </div>
+        <div>
+            <label style="font-weight: 600; font-size: 0.85rem; color: var(--text-color); display: block; margin-bottom: 4px;">User Question / Prompt Template</label>
+            <TextCodeInput
+                v-model="modelValue['ragprompt']"
+                placeholder="e.g. {{input}} or Summarize document context for question"
+                :disabled="disabled"
+                :editorConfig="{ variables: variables, target: 'body' }" />
+        </div>
+        <div>
+            <label style="font-weight: 600; font-size: 0.85rem; color: var(--text-color); display: block; margin-bottom: 4px;">Top-K Chunks to Retrieve</label>
+            <TextCodeInput
+                v-model="modelValue['ragtopk']"
+                type="number"
+                placeholder="3"
+                :disabled="disabled" />
+        </div>
+        <div>
+            <label style="font-weight: 600; font-size: 0.85rem; color: var(--text-color); display: block; margin-bottom: 4px;">System Prompt (Optional)</label>
+            <TextCodeInput
+                v-model="modelValue['ragsystemprompt']"
+                placeholder="Custom instructions for Ollama LLM"
+                :disabled="disabled"
+                :editorConfig="{ variables: variables, target: 'body' }" />
+        </div>
+        <div>
+            <label style="font-weight: 600; font-size: 0.85rem; color: var(--text-color); display: block; margin-bottom: 4px;">Output Variable Name</label>
+            <TextCodeInput
+                v-model="modelValue['ragoutputvar']"
+                placeholder="rag_output"
+                :disabled="disabled" />
+        </div>
     </div>
     <div v-else-if="props.nodeType === 'connector' && modelValue" class="connector-config" style="display: flex; flex-direction: column; gap: 12px; padding: 4px;">
         <div>
@@ -163,14 +236,22 @@ import { MONACO_EDITOR_DATA_PROPERTIES } from './Workflow.Sidebar.Node.Fields.co
 import { Checkbox as CheckboxInput, TextCodeInput, Select as SelectInput, ListField as ListInput } from '@/components/Composable/UI/Inputs'
 import { useTab } from '@/views/Workflow'
 import { getConnections } from '@/views/Connectors/Connectors.api'
+import { getRagConnections } from '@/views/Rag/Rag.api'
 import { getRestUrl } from '@/components/Composable/constants'
 
-const props = defineProps<SidebarNodeProps>()
+interface Props extends SidebarNodeProps {
+    isNested?: boolean
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    isNested: false
+})
 const disabled = computed(() => props.disabled)
 const modelValue = defineModel<any>()
 const { tab } = useTab(props.tabid)
 
 const connectionsList = ref<any[]>([])
+const ragConnectionsList = ref<any[]>([])
 const templatesList = ref<any[]>([])
 
 const fetchConnectorData = async () => {
@@ -182,8 +263,10 @@ const fetchConnectorData = async () => {
         if (tempRes.ok) {
             templatesList.value = await tempRes.json()
         }
+
+        ragConnectionsList.value = await getRagConnections()
     } catch (err) {
-        console.error("Failed to load connector data in sidebar:", err)
+        console.error("Failed to load connector/RAG data in sidebar:", err)
     }
 }
 
@@ -194,6 +277,13 @@ onMounted(() => {
 const connectionOptions = computed(() => {
     return connectionsList.value.map(c => ({
         label: `${c.name} (${c.connectorid || c.connectorId})`,
+        value: c.id
+    }))
+})
+
+const ragConnectionOptions = computed(() => {
+    return ragConnectionsList.value.map(c => ({
+        label: `${c.name} (${c.chatmodel})`,
         value: c.id
     }))
 })
@@ -319,8 +409,73 @@ const generateRandomSecret = () => {
         .join('');
 }
 
+const isVariablesCollapsed = ref(false)
+const copiedVar = ref<string | null>(null)
+let copyTimeout: ReturnType<typeof setTimeout> | undefined = undefined
+
 const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
+    if (navigator?.clipboard?.writeText) {
+        navigator.clipboard.writeText(text).catch(() => {
+            fallbackCopy(text)
+        })
+    } else {
+        fallbackCopy(text)
+    }
+}
+
+const fallbackCopy = (text: string) => {
+    try {
+        const textArea = document.createElement('textarea')
+        textArea.value = text
+        textArea.style.position = 'fixed'
+        textArea.style.opacity = '0'
+        document.body.appendChild(textArea)
+        textArea.focus()
+        textArea.select()
+        document.execCommand('copy')
+        document.body.removeChild(textArea)
+    } catch (e) {
+        console.error('Fallback copy failed', e)
+    }
+}
+
+const insertOrCopyVariable = (varName: string) => {
+    const pillText = varName.startsWith('.') ? `{{${varName}}}` : `{{.${varName}}}`
+
+    // Attempt to insert / append into the active input or textarea if one is currently focused
+    const activeEl = document.activeElement as HTMLInputElement | HTMLTextAreaElement | null
+    if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA') && !activeEl.disabled && !activeEl.readOnly) {
+        const start = activeEl.selectionStart ?? activeEl.value.length
+        const end = activeEl.selectionEnd ?? activeEl.value.length
+        const val = activeEl.value || ''
+        activeEl.value = val.substring(0, start) + pillText + val.substring(end)
+        const nextPos = start + pillText.length
+        activeEl.setSelectionRange(nextPos, nextPos)
+        activeEl.dispatchEvent(new Event('input', { bubbles: true }))
+        activeEl.dispatchEvent(new Event('change', { bubbles: true }))
+    }
+
+    // Always copy to clipboard as well
+    copyToClipboard(pillText)
+
+    // Visual feedback
+    copiedVar.value = varName
+    if (copyTimeout) clearTimeout(copyTimeout)
+    copyTimeout = setTimeout(() => {
+        if (copiedVar.value === varName) {
+            copiedVar.value = null
+        }
+    }, 1500)
+}
+
+const formatPillLabel = (v: string) => {
+    if (copiedVar.value === v) return 'Copied!'
+    return v.startsWith('.') ? `{{${v}}}` : `{{.${v}}}`
+}
+
+const formatPillTitle = (v: string) => {
+    const text = v.startsWith('.') ? `{{${v}}}` : `{{.${v}}}`
+    return `Click to copy ${text} or insert`
 }
 
 const webhookUrl = computed(() => {
@@ -366,6 +521,7 @@ const getComponent = (key: string | number, value: any) => {
                     nodeType: props.nodeType,
                     tabid: props.tabid,
                     disabled: props.disabled,
+                    isNested: true
                 }
             }
         }
@@ -424,3 +580,105 @@ const getComponent = (key: string | number, value: any) => {
 </script>
 
 <style scoped src="./Workflow.Sidebar.Node.Fields.styles.css"></style>
+<style scoped>
+.variables-pill-bar {
+    display: flex;
+    flex-direction: column;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 6px;
+    margin-bottom: 12px;
+    overflow: hidden;
+}
+
+.variables-pill-bar__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 10px;
+    cursor: pointer;
+    user-select: none;
+    background: rgba(255, 255, 255, 0.04);
+    transition: background 0.15s ease;
+}
+
+.variables-pill-bar__header:hover {
+    background: rgba(255, 255, 255, 0.07);
+}
+
+.variables-pill-bar__title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-color, #e0e0e0);
+}
+
+.variables-pill-bar__icon {
+    font-size: 1rem;
+    color: #818cf8;
+}
+
+.variables-pill-bar__badge {
+    background: rgba(99, 102, 241, 0.2);
+    color: #a5b4fc;
+    font-size: 0.7rem;
+    padding: 1px 6px;
+    border-radius: 10px;
+    font-weight: 600;
+}
+
+.variables-pill-bar__chevron {
+    font-size: 1.1rem;
+    color: var(--text-color-secondary, #9ca3af);
+    transition: transform 0.2s ease;
+}
+
+.variables-pill-bar__chevron.collapsed {
+    transform: rotate(-90deg);
+}
+
+.variables-pill-bar__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 8px;
+    max-height: 120px;
+    overflow-y: auto;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.variables-pill-bar__pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.73rem;
+    font-family: monospace;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: var(--text-color, #e2e8f0);
+    transition: all 0.15s ease;
+    white-space: nowrap;
+}
+
+.variables-pill-bar__pill:hover {
+    background: rgba(99, 102, 241, 0.15);
+    border-color: rgba(99, 102, 241, 0.5);
+    color: #c7d2fe;
+}
+
+.variables-pill-bar__pill--copied {
+    background: rgba(34, 197, 94, 0.2) !important;
+    border-color: #22c55e !important;
+    color: #4ade80 !important;
+}
+
+.variables-pill-bar__check {
+    font-size: 0.85rem;
+    color: #4ade80;
+}
+</style>

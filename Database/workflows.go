@@ -221,6 +221,33 @@ func (db *DatabaseConnection) GetWorkflowEnv(id string, env string) (*pb.Workflo
 	return workflow, nil
 }
 
+func (db *DatabaseConnection) GetWorkflowNamesByIDs(ids []string) (map[string]string, error) {
+	return db.GetWorkflowNamesByIDsEnv(ids, "staging")
+}
+
+func (db *DatabaseConnection) GetWorkflowNamesByIDsEnv(ids []string, env string) (map[string]string, error) {
+	result := make(map[string]string)
+	if len(ids) == 0 {
+		return result, nil
+	}
+	if db == nil || db.conn == nil {
+		return nil, fmt.Errorf("database connection is nil")
+	}
+	tableName := db.TableFor(env, "workflows")
+	type workflowNameRow struct {
+		ID   string `gorm:"column:id"`
+		Name string `gorm:"column:name"`
+	}
+	var rows []workflowNameRow
+	if err := db.conn.Table(tableName).Select("id, name").Where("id IN ?", ids).Find(&rows).Error; err != nil {
+		return nil, err
+	}
+	for _, row := range rows {
+		result[row.ID] = row.Name
+	}
+	return result, nil
+}
+
 func (db *DatabaseConnection) GetWebhookWorkflow(id string) (*pb.Workflow, error) {
 	return db.GetWebhookWorkflowEnv(id, "staging")
 }

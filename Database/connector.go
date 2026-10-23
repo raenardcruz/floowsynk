@@ -67,9 +67,21 @@ func (db *DatabaseConnection) ListConnections() ([]Connection, error) {
 }
 
 func (db *DatabaseConnection) ListConnectionsEnv(env string) ([]Connection, error) {
+	return db.ListConnectionsByUserEnv("", true, env)
+}
+
+func (db *DatabaseConnection) ListConnectionsByUser(userID string, isAdmin bool) ([]Connection, error) {
+	return db.ListConnectionsByUserEnv(userID, isAdmin, "staging")
+}
+
+func (db *DatabaseConnection) ListConnectionsByUserEnv(userID string, isAdmin bool, env string) ([]Connection, error) {
 	tableName := db.TableFor(env, "connections")
 	var conns []Connection
-	err := db.conn.Table(tableName).Find(&conns).Error
+	query := db.conn.Table(tableName)
+	if !isAdmin {
+		query = query.Where("user_id = ?", userID)
+	}
+	err := query.Find(&conns).Error
 	return conns, err
 }
 
@@ -101,8 +113,20 @@ func (db *DatabaseConnection) DeleteConnection(id string) error {
 }
 
 func (db *DatabaseConnection) DeleteConnectionEnv(id string, env string) error {
+	return db.DeleteConnectionByUserEnv(id, "", true, env)
+}
+
+func (db *DatabaseConnection) DeleteConnectionByUser(id string, userID string, isAdmin bool) error {
+	return db.DeleteConnectionByUserEnv(id, userID, isAdmin, "staging")
+}
+
+func (db *DatabaseConnection) DeleteConnectionByUserEnv(id string, userID string, isAdmin bool, env string) error {
 	tableName := db.TableFor(env, "connections")
-	return db.conn.Table(tableName).Where("id = ?", id).Delete(&Connection{}).Error
+	query := db.conn.Table(tableName).Where("id = ?", id)
+	if !isAdmin {
+		query = query.Where("user_id = ?", userID)
+	}
+	return query.Delete(&Connection{}).Error
 }
 
 func (db *DatabaseConnection) RevertConnectionToStaging(id string) error {

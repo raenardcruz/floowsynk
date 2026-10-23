@@ -21,6 +21,10 @@
                     <i class="pi pi-box"></i>
                     <span>Connectors</span>
                 </router-link>
+                <router-link to="/rag" class="nav-tab-item" :class="{ active: route.path.startsWith('/rag') }">
+                    <i class="pi pi-bolt"></i>
+                    <span>RAG Knowledge</span>
+                </router-link>
             </div>
         </template>
         

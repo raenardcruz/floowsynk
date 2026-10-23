@@ -58,7 +58,7 @@ export const useWorkflowCanvasHooks = (tabId: string) => {
             tab.value.edgesList = [...newEdges]
         }
     })
-    const { commit, undo, redo, history } = useManualRefHistory(tab, { clone: true, capacity: 200 })
+    const { commit, undo, redo, history } = useManualRefHistory(tab, { clone: true, capacity: 50 })
 
     return {
         tab,

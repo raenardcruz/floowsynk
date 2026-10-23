@@ -17,7 +17,7 @@
         <div class="logic-main-content">
             <div class="logic-main-workspace">
                 <WorkflowsProcessList class="content-animation" v-show="activeTab == 'main'" />
-                <WorkflowCanvas class="content-animation" v-for="tab in tabs" :key="tab.id" v-show="activeTab == tab.id" :id="tab.id" />
+                <WorkflowCanvas class="content-animation" v-for="tab in tabs.filter(t => t.id === activeTab)" :key="tab.id" :id="tab.id" />
             </div>
         </div>
     </div>

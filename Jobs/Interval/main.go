@@ -14,13 +14,17 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-const JobToken = "6c9e5318-6e7b-452d-9e22-9f35a755bcbd"
-
-type IntervalJob struct{}
+type IntervalJob struct {
+	client wf.WorkflowServiceClient
+	sem    chan struct{}
+}
 
 var DBCon *db.DatabaseConnection
 
 func (job *IntervalJob) ProcessIntervalWorkflows() {
+	if job.sem == nil {
+		job.sem = make(chan struct{}, 50)
+	}
 	ticker := time.NewTicker(5 * time.Second)
 	defer ticker.Stop()
 	for {
@@ -39,17 +43,41 @@ func (job *IntervalJob) ProcessIntervalWorkflows() {
 }
 
 func (job *IntervalJob) processNode(workflow *wf.Workflow, envName string) {
-	ctx := metadata.AppendToOutgoingContext(context.Background(), "Authorization", JobToken)
-	node := workflow.Nodes[0]
-	interval := node.Data.GetInterval()
-	intervalType := node.Data.GetType()
-	weeks := node.Data.GetWeeks()
+	if job.sem != nil {
+		job.sem <- struct{}{}
+		defer func() { <-job.sem }()
+	}
 
-	currentDay := time.Now().Weekday()
-	if !weeks.BoolItems[int(currentDay)] {
+	if workflow == nil {
 		return
 	}
 
+	var node *wf.Node
+	for _, n := range workflow.Nodes {
+		if n != nil && n.Nodetype == "interval" {
+			node = n
+			break
+		}
+	}
+	if node == nil && len(workflow.Nodes) > 0 {
+		node = workflow.Nodes[0]
+	}
+	if node == nil || node.Data == nil {
+		return
+	}
+
+	currentDay := time.Now().Weekday()
+	weeks := node.Data.GetWeeks()
+	if weeks == nil || len(weeks.BoolItems) <= int(currentDay) || !weeks.BoolItems[int(currentDay)] {
+		return
+	}
+
+	interval := node.Data.GetInterval()
+	if interval <= 0 {
+		return
+	}
+
+	intervalType := node.Data.GetType()
 	duration := time.Duration(interval)
 	switch intervalType {
 	case "seconds":
@@ -65,6 +93,10 @@ func (job *IntervalJob) processNode(workflow *wf.Workflow, envName string) {
 		return
 	}
 
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	defer cancel()
+	ctx = metadata.AppendToOutgoingContext(ctx, "Authorization", db.AppConfig.Job_Token)
+
 	cacheKey := fmt.Sprintf("workflow:interval:%s:%s", envName, workflow.Id)
 	set, err := db.SetCacheNX(ctx, cacheKey, "running", duration)
 	if err != nil {
@@ -76,16 +108,10 @@ func (job *IntervalJob) processNode(workflow *wf.Workflow, envName string) {
 		return
 	}
 
-	log.Printf("Processing workflow %v (%s)", workflow.Id, envName)
-	grpcAddr := fmt.Sprintf("%s:%s", db.AppConfig.Server_GRPC_Host, db.AppConfig.Server_Plain_Port)
-	conn, err := grpc.NewClient(grpcAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		log.Printf("Error connecting to gRPC server: %v", err)
+	if job.client == nil {
+		log.Printf("Workflow service client not initialized for workflow %v", workflow.Id)
 		return
 	}
-	defer conn.Close()
-
-	client := wf.NewWorkflowServiceClient(conn)
 
 	envEnum := wf.Environment_PRODUCTION
 	if envName == "staging" {
@@ -93,7 +119,7 @@ func (job *IntervalJob) processNode(workflow *wf.Workflow, envName string) {
 	}
 
 	log.Printf("Executing workflow %s (%s)", workflow.Id, envName)
-	stream, err := client.RunWorkflowId(ctx, &wf.RunWorkflowIdRequest{
+	stream, err := job.client.RunWorkflowId(ctx, &wf.RunWorkflowIdRequest{
 		Id:          workflow.Id,
 		Environment: envEnum,
 	})
@@ -123,7 +149,19 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to connect to database: %v", err)
 	}
-	job := &IntervalJob{}
+
+	grpcAddr := fmt.Sprintf("%s:%s", db.AppConfig.Server_GRPC_Host, db.AppConfig.Server_Plain_Port)
+	conn, err := grpc.NewClient(grpcAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatalf("Failed to connect to gRPC server: %v", err)
+	}
+	defer conn.Close()
+
+	client := wf.NewWorkflowServiceClient(conn)
+	job := &IntervalJob{
+		client: client,
+		sem:    make(chan struct{}, 50),
+	}
 	log.Println("Starting interval workflow processor...")
 	job.ProcessIntervalWorkflows()
 }

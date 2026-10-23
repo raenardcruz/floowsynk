@@ -36,6 +36,14 @@ const (
 	WorkflowService_RestoreWorkflowVersion_FullMethodName  = "/proto.WorkflowService/RestoreWorkflowVersion"
 	WorkflowService_PublishWorkflow_FullMethodName         = "/proto.WorkflowService/PublishWorkflow"
 	WorkflowService_RevertWorkflowToStaging_FullMethodName = "/proto.WorkflowService/RevertWorkflowToStaging"
+	WorkflowService_ListRagConnections_FullMethodName      = "/proto.WorkflowService/ListRagConnections"
+	WorkflowService_CreateRagConnection_FullMethodName     = "/proto.WorkflowService/CreateRagConnection"
+	WorkflowService_UpdateRagConnection_FullMethodName     = "/proto.WorkflowService/UpdateRagConnection"
+	WorkflowService_DeleteRagConnection_FullMethodName     = "/proto.WorkflowService/DeleteRagConnection"
+	WorkflowService_ListRagDocuments_FullMethodName        = "/proto.WorkflowService/ListRagDocuments"
+	WorkflowService_UploadRagDocument_FullMethodName       = "/proto.WorkflowService/UploadRagDocument"
+	WorkflowService_DeleteRagDocument_FullMethodName       = "/proto.WorkflowService/DeleteRagDocument"
+	WorkflowService_QueryRag_FullMethodName                = "/proto.WorkflowService/QueryRag"
 )
 
 // WorkflowServiceClient is the client API for WorkflowService service.
@@ -59,6 +67,15 @@ type WorkflowServiceClient interface {
 	RestoreWorkflowVersion(ctx context.Context, in *WorkflowVersion, opts ...grpc.CallOption) (*Workflow, error)
 	PublishWorkflow(ctx context.Context, in *PublishWorkflowRequest, opts ...grpc.CallOption) (*PublishWorkflowResponse, error)
 	RevertWorkflowToStaging(ctx context.Context, in *GetWorkflowRequest, opts ...grpc.CallOption) (*Workflow, error)
+	// RAG Services
+	ListRagConnections(ctx context.Context, in *ListRagConnectionsRequest, opts ...grpc.CallOption) (*RagConnectionList, error)
+	CreateRagConnection(ctx context.Context, in *CreateRagConnectionRequest, opts ...grpc.CallOption) (*RagConnectionProto, error)
+	UpdateRagConnection(ctx context.Context, in *UpdateRagConnectionRequest, opts ...grpc.CallOption) (*RagConnectionProto, error)
+	DeleteRagConnection(ctx context.Context, in *DeleteRagConnectionRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	ListRagDocuments(ctx context.Context, in *ListRagDocumentsRequest, opts ...grpc.CallOption) (*RagDocumentList, error)
+	UploadRagDocument(ctx context.Context, in *UploadRagDocumentRequest, opts ...grpc.CallOption) (*RagDocumentProto, error)
+	DeleteRagDocument(ctx context.Context, in *DeleteRagDocumentRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	QueryRag(ctx context.Context, in *QueryRagRequest, opts ...grpc.CallOption) (*QueryRagResponse, error)
 }
 
 type workflowServiceClient struct {
@@ -247,6 +264,86 @@ func (c *workflowServiceClient) RevertWorkflowToStaging(ctx context.Context, in 
 	return out, nil
 }
 
+func (c *workflowServiceClient) ListRagConnections(ctx context.Context, in *ListRagConnectionsRequest, opts ...grpc.CallOption) (*RagConnectionList, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RagConnectionList)
+	err := c.cc.Invoke(ctx, WorkflowService_ListRagConnections_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workflowServiceClient) CreateRagConnection(ctx context.Context, in *CreateRagConnectionRequest, opts ...grpc.CallOption) (*RagConnectionProto, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RagConnectionProto)
+	err := c.cc.Invoke(ctx, WorkflowService_CreateRagConnection_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workflowServiceClient) UpdateRagConnection(ctx context.Context, in *UpdateRagConnectionRequest, opts ...grpc.CallOption) (*RagConnectionProto, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RagConnectionProto)
+	err := c.cc.Invoke(ctx, WorkflowService_UpdateRagConnection_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workflowServiceClient) DeleteRagConnection(ctx context.Context, in *DeleteRagConnectionRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, WorkflowService_DeleteRagConnection_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workflowServiceClient) ListRagDocuments(ctx context.Context, in *ListRagDocumentsRequest, opts ...grpc.CallOption) (*RagDocumentList, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RagDocumentList)
+	err := c.cc.Invoke(ctx, WorkflowService_ListRagDocuments_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workflowServiceClient) UploadRagDocument(ctx context.Context, in *UploadRagDocumentRequest, opts ...grpc.CallOption) (*RagDocumentProto, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RagDocumentProto)
+	err := c.cc.Invoke(ctx, WorkflowService_UploadRagDocument_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workflowServiceClient) DeleteRagDocument(ctx context.Context, in *DeleteRagDocumentRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, WorkflowService_DeleteRagDocument_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *workflowServiceClient) QueryRag(ctx context.Context, in *QueryRagRequest, opts ...grpc.CallOption) (*QueryRagResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(QueryRagResponse)
+	err := c.cc.Invoke(ctx, WorkflowService_QueryRag_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // WorkflowServiceServer is the server API for WorkflowService service.
 // All implementations must embed UnimplementedWorkflowServiceServer
 // for forward compatibility.
@@ -268,6 +365,15 @@ type WorkflowServiceServer interface {
 	RestoreWorkflowVersion(context.Context, *WorkflowVersion) (*Workflow, error)
 	PublishWorkflow(context.Context, *PublishWorkflowRequest) (*PublishWorkflowResponse, error)
 	RevertWorkflowToStaging(context.Context, *GetWorkflowRequest) (*Workflow, error)
+	// RAG Services
+	ListRagConnections(context.Context, *ListRagConnectionsRequest) (*RagConnectionList, error)
+	CreateRagConnection(context.Context, *CreateRagConnectionRequest) (*RagConnectionProto, error)
+	UpdateRagConnection(context.Context, *UpdateRagConnectionRequest) (*RagConnectionProto, error)
+	DeleteRagConnection(context.Context, *DeleteRagConnectionRequest) (*emptypb.Empty, error)
+	ListRagDocuments(context.Context, *ListRagDocumentsRequest) (*RagDocumentList, error)
+	UploadRagDocument(context.Context, *UploadRagDocumentRequest) (*RagDocumentProto, error)
+	DeleteRagDocument(context.Context, *DeleteRagDocumentRequest) (*emptypb.Empty, error)
+	QueryRag(context.Context, *QueryRagRequest) (*QueryRagResponse, error)
 	mustEmbedUnimplementedWorkflowServiceServer()
 }
 
@@ -325,6 +431,30 @@ func (UnimplementedWorkflowServiceServer) PublishWorkflow(context.Context, *Publ
 }
 func (UnimplementedWorkflowServiceServer) RevertWorkflowToStaging(context.Context, *GetWorkflowRequest) (*Workflow, error) {
 	return nil, status.Error(codes.Unimplemented, "method RevertWorkflowToStaging not implemented")
+}
+func (UnimplementedWorkflowServiceServer) ListRagConnections(context.Context, *ListRagConnectionsRequest) (*RagConnectionList, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListRagConnections not implemented")
+}
+func (UnimplementedWorkflowServiceServer) CreateRagConnection(context.Context, *CreateRagConnectionRequest) (*RagConnectionProto, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateRagConnection not implemented")
+}
+func (UnimplementedWorkflowServiceServer) UpdateRagConnection(context.Context, *UpdateRagConnectionRequest) (*RagConnectionProto, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateRagConnection not implemented")
+}
+func (UnimplementedWorkflowServiceServer) DeleteRagConnection(context.Context, *DeleteRagConnectionRequest) (*emptypb.Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteRagConnection not implemented")
+}
+func (UnimplementedWorkflowServiceServer) ListRagDocuments(context.Context, *ListRagDocumentsRequest) (*RagDocumentList, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListRagDocuments not implemented")
+}
+func (UnimplementedWorkflowServiceServer) UploadRagDocument(context.Context, *UploadRagDocumentRequest) (*RagDocumentProto, error) {
+	return nil, status.Error(codes.Unimplemented, "method UploadRagDocument not implemented")
+}
+func (UnimplementedWorkflowServiceServer) DeleteRagDocument(context.Context, *DeleteRagDocumentRequest) (*emptypb.Empty, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteRagDocument not implemented")
+}
+func (UnimplementedWorkflowServiceServer) QueryRag(context.Context, *QueryRagRequest) (*QueryRagResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method QueryRag not implemented")
 }
 func (UnimplementedWorkflowServiceServer) mustEmbedUnimplementedWorkflowServiceServer() {}
 func (UnimplementedWorkflowServiceServer) testEmbeddedByValue()                         {}
@@ -621,6 +751,150 @@ func _WorkflowService_RevertWorkflowToStaging_Handler(srv interface{}, ctx conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _WorkflowService_ListRagConnections_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListRagConnectionsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkflowServiceServer).ListRagConnections(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkflowService_ListRagConnections_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkflowServiceServer).ListRagConnections(ctx, req.(*ListRagConnectionsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkflowService_CreateRagConnection_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateRagConnectionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkflowServiceServer).CreateRagConnection(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkflowService_CreateRagConnection_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkflowServiceServer).CreateRagConnection(ctx, req.(*CreateRagConnectionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkflowService_UpdateRagConnection_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateRagConnectionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkflowServiceServer).UpdateRagConnection(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkflowService_UpdateRagConnection_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkflowServiceServer).UpdateRagConnection(ctx, req.(*UpdateRagConnectionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkflowService_DeleteRagConnection_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteRagConnectionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkflowServiceServer).DeleteRagConnection(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkflowService_DeleteRagConnection_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkflowServiceServer).DeleteRagConnection(ctx, req.(*DeleteRagConnectionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkflowService_ListRagDocuments_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListRagDocumentsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkflowServiceServer).ListRagDocuments(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkflowService_ListRagDocuments_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkflowServiceServer).ListRagDocuments(ctx, req.(*ListRagDocumentsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkflowService_UploadRagDocument_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UploadRagDocumentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkflowServiceServer).UploadRagDocument(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkflowService_UploadRagDocument_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkflowServiceServer).UploadRagDocument(ctx, req.(*UploadRagDocumentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkflowService_DeleteRagDocument_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteRagDocumentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkflowServiceServer).DeleteRagDocument(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkflowService_DeleteRagDocument_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkflowServiceServer).DeleteRagDocument(ctx, req.(*DeleteRagDocumentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _WorkflowService_QueryRag_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryRagRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(WorkflowServiceServer).QueryRag(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: WorkflowService_QueryRag_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(WorkflowServiceServer).QueryRag(ctx, req.(*QueryRagRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // WorkflowService_ServiceDesc is the grpc.ServiceDesc for WorkflowService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -683,6 +957,38 @@ var WorkflowService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RevertWorkflowToStaging",
 			Handler:    _WorkflowService_RevertWorkflowToStaging_Handler,
+		},
+		{
+			MethodName: "ListRagConnections",
+			Handler:    _WorkflowService_ListRagConnections_Handler,
+		},
+		{
+			MethodName: "CreateRagConnection",
+			Handler:    _WorkflowService_CreateRagConnection_Handler,
+		},
+		{
+			MethodName: "UpdateRagConnection",
+			Handler:    _WorkflowService_UpdateRagConnection_Handler,
+		},
+		{
+			MethodName: "DeleteRagConnection",
+			Handler:    _WorkflowService_DeleteRagConnection_Handler,
+		},
+		{
+			MethodName: "ListRagDocuments",
+			Handler:    _WorkflowService_ListRagDocuments_Handler,
+		},
+		{
+			MethodName: "UploadRagDocument",
+			Handler:    _WorkflowService_UploadRagDocument_Handler,
+		},
+		{
+			MethodName: "DeleteRagDocument",
+			Handler:    _WorkflowService_DeleteRagDocument_Handler,
+		},
+		{
+			MethodName: "QueryRag",
+			Handler:    _WorkflowService_QueryRag_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

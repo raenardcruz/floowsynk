@@ -188,14 +188,15 @@ func (s *WorkflowServer) RunWorkflowId(req *wf.RunWorkflowIdRequest, stream wf.W
 		return err
 	}
 	processor := workflow.WorkflowProcessor{
-		Stream:           nil,
+		ID:               uuid.NewString(),
+		Stream:           stream,
+		Workflow:         wfObj,
 		ProcessVariables: make(map[string]interface{}),
 		DBcon:            *DBCon,
-		Workflow:         wfObj,
+		Producer:         producer,
 		Step:             1,
 	}
-	processor.StartWorkflow()
-	return nil
+	return processor.StartWorkflow()
 }
 
 func (s *WorkflowServer) ListWorkflowHistory(ctx context.Context, req *wf.ListWorkflowHistoryRequest) (*wf.WorkflowHistoryList, error) {
@@ -278,12 +279,17 @@ func (s *WorkflowServer) ListConnectorTemplates(ctx context.Context, _ *emptypb.
 }
 
 func (s *WorkflowServer) ListConnections(ctx context.Context, req *wf.ListConnectionsRequest) (*wf.ConnectionList, error) {
-	_, err := getTokenFromContext(ctx)
+	token, err := getTokenFromContext(ctx)
 	if err != nil {
 		return nil, err
 	}
+	validateResults := validateToken(token)
+	if validateResults.status != http.StatusOK {
+		return nil, fmt.Errorf(validateResults.message)
+	}
 	env := getEnvironmentFromContextOrProto(ctx, req.Environment)
-	conns, err := DBCon.ListConnectionsEnv(env)
+	isAdmin := validateResults.role == "admin" || validateResults.role == UserRoleService
+	conns, err := DBCon.ListConnectionsByUserEnv(validateResults.id, isAdmin, env)
 	if err != nil {
 		return nil, err
 	}
@@ -310,12 +316,20 @@ func (s *WorkflowServer) RevertWorkflowToStaging(ctx context.Context, req *wf.Ge
 }
 
 func (s *WorkflowServer) DeleteConnection(ctx context.Context, req *wf.DeleteConnectionRequest) (*emptypb.Empty, error) {
-	_, err := getTokenFromContext(ctx)
+	token, err := getTokenFromContext(ctx)
 	if err != nil {
 		return nil, err
 	}
+	validateResults := validateToken(token)
+	if validateResults.status != http.StatusOK {
+		return nil, fmt.Errorf(validateResults.message)
+	}
+	if validateResults.role == "guest" {
+		return nil, fmt.Errorf("deleting connections is disabled in Guest Mode")
+	}
 	env := getEnvironmentFromContextOrProto(ctx, req.Environment)
-	err = DBCon.DeleteConnectionEnv(req.Id, env)
+	isAdmin := validateResults.role == "admin" || validateResults.role == UserRoleService
+	err = DBCon.DeleteConnectionByUserEnv(req.Id, validateResults.id, isAdmin, env)
 	if err != nil {
 		return nil, err
 	}
@@ -376,6 +390,96 @@ func (s *WorkflowServer) PublishWorkflow(ctx context.Context, req *wf.PublishWor
 		return nil, err
 	}
 	return resp, nil
+}
+
+// RAG WorkflowServer Endpoints
+
+func (s *WorkflowServer) ListRagConnections(ctx context.Context, req *wf.ListRagConnectionsRequest) (*wf.RagConnectionList, error) {
+	_, err := getTokenFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	env := getEnvironmentFromContextOrProto(ctx, req.Environment)
+	conns, err := ListRagConnectionsImpl(env)
+	if err != nil {
+		return nil, err
+	}
+	return &wf.RagConnectionList{Connections: conns}, nil
+}
+
+func (s *WorkflowServer) CreateRagConnection(ctx context.Context, req *wf.CreateRagConnectionRequest) (*wf.RagConnectionProto, error) {
+	_, err := getTokenFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	env := getEnvironmentFromContextOrProto(ctx, req.Environment)
+	return CreateRagConnectionImpl(req.Connection, env)
+}
+
+func (s *WorkflowServer) UpdateRagConnection(ctx context.Context, req *wf.UpdateRagConnectionRequest) (*wf.RagConnectionProto, error) {
+	_, err := getTokenFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	env := getEnvironmentFromContextOrProto(ctx, req.Environment)
+	return UpdateRagConnectionImpl(req.Connection, env)
+}
+
+func (s *WorkflowServer) DeleteRagConnection(ctx context.Context, req *wf.DeleteRagConnectionRequest) (*emptypb.Empty, error) {
+	_, err := getTokenFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	env := getEnvironmentFromContextOrProto(ctx, req.Environment)
+	err = DBCon.DeleteRagConnectionEnv(req.Id, env)
+	if err != nil {
+		return nil, err
+	}
+	return &emptypb.Empty{}, nil
+}
+
+func (s *WorkflowServer) ListRagDocuments(ctx context.Context, req *wf.ListRagDocumentsRequest) (*wf.RagDocumentList, error) {
+	_, err := getTokenFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	env := getEnvironmentFromContextOrProto(ctx, req.Environment)
+	docs, err := ListRagDocumentsImpl(req.RagConnectionId, env)
+	if err != nil {
+		return nil, err
+	}
+	return &wf.RagDocumentList{Documents: docs}, nil
+}
+
+func (s *WorkflowServer) UploadRagDocument(ctx context.Context, req *wf.UploadRagDocumentRequest) (*wf.RagDocumentProto, error) {
+	_, err := getTokenFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	env := getEnvironmentFromContextOrProto(ctx, req.Environment)
+	return UploadRagDocumentImpl(req.RagConnectionId, req.FileName, req.FileContent, env)
+}
+
+func (s *WorkflowServer) DeleteRagDocument(ctx context.Context, req *wf.DeleteRagDocumentRequest) (*emptypb.Empty, error) {
+	_, err := getTokenFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	env := getEnvironmentFromContextOrProto(ctx, req.Environment)
+	err = DBCon.DeleteRagDocumentEnv(req.Id, req.RagConnectionId, env)
+	if err != nil {
+		return nil, err
+	}
+	return &emptypb.Empty{}, nil
+}
+
+func (s *WorkflowServer) QueryRag(ctx context.Context, req *wf.QueryRagRequest) (*wf.QueryRagResponse, error) {
+	_, err := getTokenFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	env := getEnvironmentFromContextOrProto(ctx, req.Environment)
+	return QueryRagImpl(req.RagConnectionId, req.Query, req.TopK, req.SystemPrompt, env)
 }
 
 

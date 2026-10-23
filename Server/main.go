@@ -1,8 +1,10 @@
 package main
 
 import (
+	"crypto/subtle"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"log"
 	"net"
@@ -13,6 +15,7 @@ import (
 	"time"
 
 	"github.com/IBM/sarama"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/google/uuid"
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
 	"github.com/raenardcruz/floowsynk/Broker"
@@ -116,6 +119,29 @@ func setupHTTPServer(grpcServer *grpc.Server) *http.ServeMux {
 		http.DefaultServeMux.ServeHTTP(w, r)
 	})
 	return httpServer
+}
+
+func authenticateRESTRequest(r *http.Request, allowQueryToken bool, allowGuest bool) (*ValidateResults, error) {
+	token := r.Header.Get("Authorization")
+	if strings.HasPrefix(token, "Bearer ") {
+		token = strings.TrimPrefix(token, "Bearer ")
+	}
+	token = strings.TrimSpace(token)
+	if token == "" && allowQueryToken {
+		token = strings.TrimSpace(r.URL.Query().Get("token"))
+	}
+	if token == "" {
+		return nil, fmt.Errorf("missing authorization token")
+	}
+
+	validation := validateToken(token)
+	if validation.status != http.StatusOK {
+		return nil, fmt.Errorf("unauthorized: %s", validation.message)
+	}
+	if !allowGuest && (validation.role == "guest" || validation.id == "guest") {
+		return nil, fmt.Errorf("guest access not allowed")
+	}
+	return validation, nil
 }
 
 func startRESTServer() {
@@ -223,13 +249,51 @@ func runWebhookHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	bodyBytes, err := io.ReadAll(io.LimitReader(r.Body, 10*1024*1024))
+	r.Body.Close()
+	if err != nil {
+		http.Error(w, "Failed to read request body: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	var bodyData interface{}
+	if len(bodyBytes) > 0 {
+		if err := json.Unmarshal(bodyBytes, &bodyData); err != nil {
+			bodyData = string(bodyBytes)
+		}
+	} else {
+		bodyData = ""
+	}
+
+	webhookHeaders := make(map[string]string)
+	for k, v := range r.Header {
+		if len(v) > 0 {
+			webhookHeaders[k] = strings.Join(v, ", ")
+		}
+	}
+
+	webhookQuery := make(map[string]string)
+	for k, v := range r.URL.Query() {
+		if len(v) > 0 {
+			webhookQuery[k] = strings.Join(v, ", ")
+		}
+	}
+
+	initialVars := make(map[string]interface{})
+	initialVars["input"] = bodyData
+	initialVars["output"] = bodyData
+	initialVars["webhook_body"] = bodyData
+	initialVars["webhook_headers"] = webhookHeaders
+	initialVars["webhook_query"] = webhookQuery
+
 	responseChan := make(chan string, 1)
 	wp := workflow.WorkflowProcessor{
 		ID:               uuid.NewString(),
 		DBcon:            *DBCon,
 		Workflow:         workflowObj,
 		Stream:           nil,
-		ProcessVariables: make(map[string]interface{}),
+		ProcessVariables: initialVars,
+		Step:             1,
 		Producer:         producer,
 		ResponseChan:     responseChan,
 	}
@@ -260,6 +324,9 @@ func runWebhookHandler(w http.ResponseWriter, r *http.Request) {
 		if err := json.NewEncoder(w).Encode(response); err != nil {
 			http.Error(w, "Failed to encode response as JSON", http.StatusInternalServerError)
 		}
+	case <-time.After(60 * time.Second):
+		http.Error(w, "Workflow execution timed out", http.StatusGatewayTimeout)
+		return
 	}
 }
 
@@ -278,6 +345,12 @@ func corsMiddleware(h http.Handler) http.Handler {
 }
 
 func startOAuthHandler(w http.ResponseWriter, r *http.Request) {
+	validation, err := authenticateRESTRequest(r, true, false)
+	if err != nil {
+		http.Error(w, "Unauthorized: "+err.Error(), http.StatusUnauthorized)
+		return
+	}
+
 	connectorID := r.URL.Query().Get("connectorId")
 	name := r.URL.Query().Get("name")
 	if connectorID == "" || name == "" {
@@ -316,14 +389,7 @@ func startOAuthHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tokenStr := r.URL.Query().Get("token")
-	userID := "b5bd8424-fb52-4454-8102-488959a41ca8" // default admin user fallback
-	if tokenStr != "" {
-		validation := validateToken(tokenStr)
-		if validation.status == http.StatusOK && validation.id != "" && validation.id != "guest" {
-			userID = validation.id
-		}
-	}
+	userID := validation.id
 
 	// Support re-authentication: if an existing connectionId is supplied, update that record
 	// instead of creating a new one, so workflow references remain intact.
@@ -363,6 +429,18 @@ func startOAuthHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	stateClaims := jwt.MapClaims{
+		"connection_id": connectionID,
+		"user_id":       userID,
+		"exp":           time.Now().Add(15 * time.Minute).Unix(),
+	}
+	stateToken := jwt.NewWithClaims(jwt.SigningMethodHS256, stateClaims)
+	stateString, err := stateToken.SignedString(jwtKey)
+	if err != nil {
+		http.Error(w, "failed to generate oauth state: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	authURL, err := url.Parse(template.OAuthConfig.AuthorizeURL)
 	if err != nil {
 		http.Error(w, "invalid authorize url: "+err.Error(), http.StatusInternalServerError)
@@ -373,7 +451,7 @@ func startOAuthHandler(w http.ResponseWriter, r *http.Request) {
 	q.Set("client_id", clientID)
 	q.Set("redirect_uri", redirectURI)
 	q.Set("response_type", "code")
-	q.Set("state", connectionID)
+	q.Set("state", stateString)
 	if len(template.OAuthConfig.DefaultScopes) > 0 {
 		q.Set("scope", strings.Join(template.OAuthConfig.DefaultScopes, " "))
 	}
@@ -384,6 +462,10 @@ func startOAuthHandler(w http.ResponseWriter, r *http.Request) {
 
 // checkConnectionHandler calls the provider API to test if stored credentials are still valid.
 func checkConnectionHandler(w http.ResponseWriter, r *http.Request) {
+	if _, err := authenticateRESTRequest(r, false, false); err != nil {
+		http.Error(w, "Unauthorized: "+err.Error(), http.StatusUnauthorized)
+		return
+	}
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
@@ -426,6 +508,11 @@ func checkConnectionHandler(w http.ResponseWriter, r *http.Request) {
 
 // createConnectionHandler creates a non-OAuth (API Key, PAT, Token) connection record directly.
 func createConnectionHandler(w http.ResponseWriter, r *http.Request) {
+	validation, err := authenticateRESTRequest(r, false, false)
+	if err != nil {
+		http.Error(w, "Unauthorized: "+err.Error(), http.StatusUnauthorized)
+		return
+	}
 	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
@@ -461,14 +548,7 @@ func createConnectionHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userID := "b5bd8424-fb52-4454-8102-488959a41ca8" // default admin user fallback
-	tokenHeader := r.Header.Get("Authorization")
-	if tokenHeader != "" {
-		validation := validateToken(tokenHeader)
-		if validation.status == http.StatusOK && validation.id != "" && validation.id != "guest" {
-			userID = validation.id
-		}
-	}
+	userID := validation.id
 
 	connectionID := uuid.NewString()
 	newConn := db.Connection{
@@ -495,6 +575,10 @@ func createConnectionHandler(w http.ResponseWriter, r *http.Request) {
 // It decrypts the current credential blob, merges in the supplied fields, then re-encrypts,
 // so any stored tokens that the user didn't change are preserved.
 func updateConnectionHandler(w http.ResponseWriter, r *http.Request) {
+	if _, err := authenticateRESTRequest(r, false, false); err != nil {
+		http.Error(w, "Unauthorized: "+err.Error(), http.StatusUnauthorized)
+		return
+	}
 	if r.Method != http.MethodPatch {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
@@ -572,7 +656,30 @@ func oauthCallbackHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	conn, err := DBCon.GetConnection(state)
+	token, err := jwt.ParseWithClaims(state, jwt.MapClaims{}, func(token *jwt.Token) (interface{}, error) {
+		if token.Method != jwt.SigningMethodHS256 {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
+		return jwtKey, nil
+	})
+	if err != nil || !token.Valid {
+		http.Error(w, "invalid or expired state", http.StatusBadRequest)
+		return
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		http.Error(w, "invalid state claims", http.StatusBadRequest)
+		return
+	}
+
+	connectionID, ok := claims["connection_id"].(string)
+	if !ok || connectionID == "" {
+		http.Error(w, "missing connection_id in state", http.StatusBadRequest)
+		return
+	}
+
+	conn, err := DBCon.GetConnection(connectionID)
 	if err != nil {
 		http.Error(w, "invalid state (connection not found)", http.StatusBadRequest)
 		return
@@ -618,40 +725,37 @@ func oauthCallbackHandler(w http.ResponseWriter, r *http.Request) {
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
-
-	var credsJSON string
-	if err != nil || resp.StatusCode != http.StatusOK {
+	if err != nil {
 		log.Printf("Token exchange failed: %v", err)
-		mockCreds := map[string]interface{}{
-			"client_id":     clientID,
-			"client_secret": clientSecret,
-			"access_token":  "mock_access_token_" + uuid.NewString(),
-			"refresh_token": "mock_refresh_token_" + uuid.NewString(),
-			"expires_in":    3600,
-			"created_at":    time.Now().Unix(),
-		}
-		bytes, _ := json.Marshal(mockCreds)
-		credsJSON = string(bytes)
-	} else {
-		defer resp.Body.Close()
-		bodyBytes, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			http.Error(w, "failed to read response body: "+err.Error(), http.StatusInternalServerError)
-			return
-		}
-		var parsed map[string]interface{}
-		if err := json.Unmarshal(bodyBytes, &parsed); err != nil {
-			http.Error(w, "invalid response json: "+err.Error(), http.StatusInternalServerError)
-			return
-		}
-		parsed["client_id"] = clientID
-		parsed["client_secret"] = clientSecret
-		if _, ok := parsed["created_at"]; !ok {
-			parsed["created_at"] = time.Now().Unix()
-		}
-		bytes, _ := json.Marshal(parsed)
-		credsJSON = string(bytes)
+		http.Error(w, "failed to exchange code for token: "+err.Error(), http.StatusBadGateway)
+		return
 	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		bodyBytes, _ := ioutil.ReadAll(resp.Body)
+		log.Printf("Token exchange returned status %d: %s", resp.StatusCode, string(bodyBytes))
+		http.Error(w, fmt.Sprintf("token exchange failed with status %d: %s", resp.StatusCode, string(bodyBytes)), http.StatusBadGateway)
+		return
+	}
+
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		http.Error(w, "failed to read response body: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+	var parsed map[string]interface{}
+	if err := json.Unmarshal(bodyBytes, &parsed); err != nil {
+		http.Error(w, "invalid response json: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+	parsed["client_id"] = clientID
+	parsed["client_secret"] = clientSecret
+	if _, ok := parsed["created_at"]; !ok {
+		parsed["created_at"] = time.Now().Unix()
+	}
+	bytes, _ := json.Marshal(parsed)
+	credsJSON := string(bytes)
 
 	encrypted, err := crypto.Encrypt(credsJSON)
 	if err != nil {
@@ -699,6 +803,15 @@ func listConnectorTemplatesHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func clearHistoryHandler(w http.ResponseWriter, r *http.Request) {
+	validation, err := authenticateRESTRequest(r, false, false)
+	if err != nil {
+		http.Error(w, "Unauthorized: "+err.Error(), http.StatusUnauthorized)
+		return
+	}
+	if validation.role != "admin" && (validation.role == "guest" || validation.id == "") {
+		http.Error(w, "Unauthorized: admin or authenticated user required", http.StatusUnauthorized)
+		return
+	}
 	if r.Method != http.MethodPost && r.Method != http.MethodDelete {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
@@ -722,7 +835,12 @@ func publishWorkflowHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Validate the API token
 	token := r.Header.Get("Authorization")
-	if token == "" || token != db.AppConfig.Prod_API_Token {
+	if strings.HasPrefix(token, "Bearer ") {
+		token = strings.TrimPrefix(token, "Bearer ")
+	}
+	token = strings.TrimSpace(token)
+	prodToken := db.AppConfig.Prod_API_Token
+	if token == "" || prodToken == "" || subtle.ConstantTimeCompare([]byte(token), []byte(prodToken)) != 1 {
 		http.Error(w, "Unauthorized: Invalid or missing API token", http.StatusUnauthorized)
 		return
 	}
@@ -774,7 +892,12 @@ func publishConnectionHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	token := r.Header.Get("Authorization")
-	if token == "" || token != db.AppConfig.Prod_API_Token {
+	if strings.HasPrefix(token, "Bearer ") {
+		token = strings.TrimPrefix(token, "Bearer ")
+	}
+	token = strings.TrimSpace(token)
+	prodToken := db.AppConfig.Prod_API_Token
+	if token == "" || prodToken == "" || subtle.ConstantTimeCompare([]byte(token), []byte(prodToken)) != 1 {
 		http.Error(w, "Unauthorized: Invalid or missing API token", http.StatusUnauthorized)
 		return
 	}
@@ -807,6 +930,10 @@ func revertConnectionHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
+	if _, err := authenticateRESTRequest(r, false, false); err != nil {
+		http.Error(w, "Unauthorized: "+err.Error(), http.StatusUnauthorized)
+		return
+	}
 	var body struct {
 		ID string `json:"id"`
 	}
@@ -833,6 +960,10 @@ func revertConnectionHandler(w http.ResponseWriter, r *http.Request) {
 func revertWorkflowHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost && r.Method != http.MethodPatch {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	if _, err := authenticateRESTRequest(r, false, false); err != nil {
+		http.Error(w, "Unauthorized: "+err.Error(), http.StatusUnauthorized)
 		return
 	}
 	var body struct {

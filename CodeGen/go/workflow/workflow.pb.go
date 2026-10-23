@@ -1526,31 +1526,36 @@ func (x *Node) GetComputedPosition() *NodePosition {
 }
 
 type NodeData struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Name          *string                `protobuf:"bytes,1,opt,name=name,proto3,oneof" json:"name,omitempty"`
-	Value         *string                `protobuf:"bytes,2,opt,name=value,proto3,oneof" json:"value,omitempty"`
-	Expression    *string                `protobuf:"bytes,3,opt,name=expression,proto3,oneof" json:"expression,omitempty"`
-	Iteration     *int32                 `protobuf:"varint,4,opt,name=iteration,proto3,oneof" json:"iteration,omitempty"`
-	Listvar       *string                `protobuf:"bytes,5,opt,name=listvar,proto3,oneof" json:"listvar,omitempty"`
-	Limit         *int32                 `protobuf:"varint,6,opt,name=limit,proto3,oneof" json:"limit,omitempty"`
-	Url           *string                `protobuf:"bytes,7,opt,name=url,proto3,oneof" json:"url,omitempty"`
-	Method        *string                `protobuf:"bytes,8,opt,name=method,proto3,oneof" json:"method,omitempty"`
-	Headers       *NodeDataArray         `protobuf:"bytes,9,opt,name=headers,proto3,oneof" json:"headers,omitempty"`
-	Payload       *string                `protobuf:"bytes,10,opt,name=payload,proto3,oneof" json:"payload,omitempty"`
-	Variable      *string                `protobuf:"bytes,11,opt,name=variable,proto3,oneof" json:"variable,omitempty"`
-	Message       *string                `protobuf:"bytes,12,opt,name=message,proto3,oneof" json:"message,omitempty"`
-	List          *NodeDataArray         `protobuf:"bytes,13,opt,name=list,proto3,oneof" json:"list,omitempty"`
-	ListVariable  *string                `protobuf:"bytes,14,opt,name=listVariable,proto3,oneof" json:"listVariable,omitempty"`
-	Template      *string                `protobuf:"bytes,15,opt,name=template,proto3,oneof" json:"template,omitempty"`
-	Text          *string                `protobuf:"bytes,16,opt,name=text,proto3,oneof" json:"text,omitempty"`
-	Pattern       *string                `protobuf:"bytes,17,opt,name=pattern,proto3,oneof" json:"pattern,omitempty"`
-	ReplaceText   *string                `protobuf:"bytes,18,opt,name=replaceText,proto3,oneof" json:"replaceText,omitempty"`
-	SubProcessId  *string                `protobuf:"bytes,19,opt,name=subProcessId,proto3,oneof" json:"subProcessId,omitempty"`
-	Type          *string                `protobuf:"bytes,20,opt,name=type,proto3,oneof" json:"type,omitempty"`
-	Interval      *int32                 `protobuf:"varint,21,opt,name=interval,proto3,oneof" json:"interval,omitempty"`
-	Weeks         *NodeDataArray         `protobuf:"bytes,22,opt,name=weeks,proto3,oneof" json:"weeks,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	Name            *string                `protobuf:"bytes,1,opt,name=name,proto3,oneof" json:"name,omitempty"`
+	Value           *string                `protobuf:"bytes,2,opt,name=value,proto3,oneof" json:"value,omitempty"`
+	Expression      *string                `protobuf:"bytes,3,opt,name=expression,proto3,oneof" json:"expression,omitempty"`
+	Iteration       *int32                 `protobuf:"varint,4,opt,name=iteration,proto3,oneof" json:"iteration,omitempty"`
+	Listvar         *string                `protobuf:"bytes,5,opt,name=listvar,proto3,oneof" json:"listvar,omitempty"`
+	Limit           *int32                 `protobuf:"varint,6,opt,name=limit,proto3,oneof" json:"limit,omitempty"`
+	Url             *string                `protobuf:"bytes,7,opt,name=url,proto3,oneof" json:"url,omitempty"`
+	Method          *string                `protobuf:"bytes,8,opt,name=method,proto3,oneof" json:"method,omitempty"`
+	Headers         *NodeDataArray         `protobuf:"bytes,9,opt,name=headers,proto3,oneof" json:"headers,omitempty"`
+	Payload         *string                `protobuf:"bytes,10,opt,name=payload,proto3,oneof" json:"payload,omitempty"`
+	Variable        *string                `protobuf:"bytes,11,opt,name=variable,proto3,oneof" json:"variable,omitempty"`
+	Message         *string                `protobuf:"bytes,12,opt,name=message,proto3,oneof" json:"message,omitempty"`
+	List            *NodeDataArray         `protobuf:"bytes,13,opt,name=list,proto3,oneof" json:"list,omitempty"`
+	ListVariable    *string                `protobuf:"bytes,14,opt,name=listVariable,proto3,oneof" json:"listVariable,omitempty"`
+	Template        *string                `protobuf:"bytes,15,opt,name=template,proto3,oneof" json:"template,omitempty"`
+	Text            *string                `protobuf:"bytes,16,opt,name=text,proto3,oneof" json:"text,omitempty"`
+	Pattern         *string                `protobuf:"bytes,17,opt,name=pattern,proto3,oneof" json:"pattern,omitempty"`
+	ReplaceText     *string                `protobuf:"bytes,18,opt,name=replaceText,proto3,oneof" json:"replaceText,omitempty"`
+	SubProcessId    *string                `protobuf:"bytes,19,opt,name=subProcessId,proto3,oneof" json:"subProcessId,omitempty"`
+	Type            *string                `protobuf:"bytes,20,opt,name=type,proto3,oneof" json:"type,omitempty"`
+	Interval        *int32                 `protobuf:"varint,21,opt,name=interval,proto3,oneof" json:"interval,omitempty"`
+	Weeks           *NodeDataArray         `protobuf:"bytes,22,opt,name=weeks,proto3,oneof" json:"weeks,omitempty"`
+	RagConnectionId *string                `protobuf:"bytes,23,opt,name=ragConnectionId,proto3,oneof" json:"ragConnectionId,omitempty"`
+	RagPrompt       *string                `protobuf:"bytes,24,opt,name=ragPrompt,proto3,oneof" json:"ragPrompt,omitempty"`
+	RagTopK         *int32                 `protobuf:"varint,25,opt,name=ragTopK,proto3,oneof" json:"ragTopK,omitempty"`
+	RagSystemPrompt *string                `protobuf:"bytes,26,opt,name=ragSystemPrompt,proto3,oneof" json:"ragSystemPrompt,omitempty"`
+	RagOutputVar    *string                `protobuf:"bytes,27,opt,name=ragOutputVar,proto3,oneof" json:"ragOutputVar,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *NodeData) Reset() {
@@ -1735,6 +1740,41 @@ func (x *NodeData) GetWeeks() *NodeDataArray {
 		return x.Weeks
 	}
 	return nil
+}
+
+func (x *NodeData) GetRagConnectionId() string {
+	if x != nil && x.RagConnectionId != nil {
+		return *x.RagConnectionId
+	}
+	return ""
+}
+
+func (x *NodeData) GetRagPrompt() string {
+	if x != nil && x.RagPrompt != nil {
+		return *x.RagPrompt
+	}
+	return ""
+}
+
+func (x *NodeData) GetRagTopK() int32 {
+	if x != nil && x.RagTopK != nil {
+		return *x.RagTopK
+	}
+	return 0
+}
+
+func (x *NodeData) GetRagSystemPrompt() string {
+	if x != nil && x.RagSystemPrompt != nil {
+		return *x.RagSystemPrompt
+	}
+	return ""
+}
+
+func (x *NodeData) GetRagOutputVar() string {
+	if x != nil && x.RagOutputVar != nil {
+		return *x.RagOutputVar
+	}
+	return ""
 }
 
 type NodeDataArray struct {
@@ -2701,6 +2741,911 @@ func (x *DeleteConnectionRequest) GetEnvironment() Environment {
 	return Environment_PRODUCTION
 }
 
+// RAG Data Messages
+type RagConnectionProto struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Id             string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name           string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	OllamaBaseUrl  string                 `protobuf:"bytes,3,opt,name=ollamaBaseUrl,proto3" json:"ollamaBaseUrl,omitempty"`
+	EmbeddingModel string                 `protobuf:"bytes,4,opt,name=embeddingModel,proto3" json:"embeddingModel,omitempty"`
+	ChatModel      string                 `protobuf:"bytes,5,opt,name=chatModel,proto3" json:"chatModel,omitempty"`
+	Description    string                 `protobuf:"bytes,6,opt,name=description,proto3" json:"description,omitempty"`
+	CreatedAt      string                 `protobuf:"bytes,7,opt,name=createdAt,proto3" json:"createdAt,omitempty"`
+	UpdatedAt      string                 `protobuf:"bytes,8,opt,name=updatedAt,proto3" json:"updatedAt,omitempty"`
+	DocumentCount  int32                  `protobuf:"varint,9,opt,name=documentCount,proto3" json:"documentCount,omitempty"`
+	ChunkCount     int32                  `protobuf:"varint,10,opt,name=chunkCount,proto3" json:"chunkCount,omitempty"`
+	IsModified     bool                   `protobuf:"varint,11,opt,name=isModified,proto3" json:"isModified,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *RagConnectionProto) Reset() {
+	*x = RagConnectionProto{}
+	mi := &file_workflow_proto_msgTypes[34]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RagConnectionProto) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RagConnectionProto) ProtoMessage() {}
+
+func (x *RagConnectionProto) ProtoReflect() protoreflect.Message {
+	mi := &file_workflow_proto_msgTypes[34]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RagConnectionProto.ProtoReflect.Descriptor instead.
+func (*RagConnectionProto) Descriptor() ([]byte, []int) {
+	return file_workflow_proto_rawDescGZIP(), []int{34}
+}
+
+func (x *RagConnectionProto) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *RagConnectionProto) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *RagConnectionProto) GetOllamaBaseUrl() string {
+	if x != nil {
+		return x.OllamaBaseUrl
+	}
+	return ""
+}
+
+func (x *RagConnectionProto) GetEmbeddingModel() string {
+	if x != nil {
+		return x.EmbeddingModel
+	}
+	return ""
+}
+
+func (x *RagConnectionProto) GetChatModel() string {
+	if x != nil {
+		return x.ChatModel
+	}
+	return ""
+}
+
+func (x *RagConnectionProto) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *RagConnectionProto) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
+func (x *RagConnectionProto) GetUpdatedAt() string {
+	if x != nil {
+		return x.UpdatedAt
+	}
+	return ""
+}
+
+func (x *RagConnectionProto) GetDocumentCount() int32 {
+	if x != nil {
+		return x.DocumentCount
+	}
+	return 0
+}
+
+func (x *RagConnectionProto) GetChunkCount() int32 {
+	if x != nil {
+		return x.ChunkCount
+	}
+	return 0
+}
+
+func (x *RagConnectionProto) GetIsModified() bool {
+	if x != nil {
+		return x.IsModified
+	}
+	return false
+}
+
+type ListRagConnectionsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Environment   Environment            `protobuf:"varint,1,opt,name=environment,proto3,enum=proto.Environment" json:"environment,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListRagConnectionsRequest) Reset() {
+	*x = ListRagConnectionsRequest{}
+	mi := &file_workflow_proto_msgTypes[35]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListRagConnectionsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListRagConnectionsRequest) ProtoMessage() {}
+
+func (x *ListRagConnectionsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_workflow_proto_msgTypes[35]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListRagConnectionsRequest.ProtoReflect.Descriptor instead.
+func (*ListRagConnectionsRequest) Descriptor() ([]byte, []int) {
+	return file_workflow_proto_rawDescGZIP(), []int{35}
+}
+
+func (x *ListRagConnectionsRequest) GetEnvironment() Environment {
+	if x != nil {
+		return x.Environment
+	}
+	return Environment_PRODUCTION
+}
+
+type RagConnectionList struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Connections   []*RagConnectionProto  `protobuf:"bytes,1,rep,name=connections,proto3" json:"connections,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RagConnectionList) Reset() {
+	*x = RagConnectionList{}
+	mi := &file_workflow_proto_msgTypes[36]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RagConnectionList) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RagConnectionList) ProtoMessage() {}
+
+func (x *RagConnectionList) ProtoReflect() protoreflect.Message {
+	mi := &file_workflow_proto_msgTypes[36]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RagConnectionList.ProtoReflect.Descriptor instead.
+func (*RagConnectionList) Descriptor() ([]byte, []int) {
+	return file_workflow_proto_rawDescGZIP(), []int{36}
+}
+
+func (x *RagConnectionList) GetConnections() []*RagConnectionProto {
+	if x != nil {
+		return x.Connections
+	}
+	return nil
+}
+
+type CreateRagConnectionRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Connection    *RagConnectionProto    `protobuf:"bytes,1,opt,name=connection,proto3" json:"connection,omitempty"`
+	Environment   Environment            `protobuf:"varint,2,opt,name=environment,proto3,enum=proto.Environment" json:"environment,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateRagConnectionRequest) Reset() {
+	*x = CreateRagConnectionRequest{}
+	mi := &file_workflow_proto_msgTypes[37]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateRagConnectionRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateRagConnectionRequest) ProtoMessage() {}
+
+func (x *CreateRagConnectionRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_workflow_proto_msgTypes[37]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateRagConnectionRequest.ProtoReflect.Descriptor instead.
+func (*CreateRagConnectionRequest) Descriptor() ([]byte, []int) {
+	return file_workflow_proto_rawDescGZIP(), []int{37}
+}
+
+func (x *CreateRagConnectionRequest) GetConnection() *RagConnectionProto {
+	if x != nil {
+		return x.Connection
+	}
+	return nil
+}
+
+func (x *CreateRagConnectionRequest) GetEnvironment() Environment {
+	if x != nil {
+		return x.Environment
+	}
+	return Environment_PRODUCTION
+}
+
+type UpdateRagConnectionRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Connection    *RagConnectionProto    `protobuf:"bytes,1,opt,name=connection,proto3" json:"connection,omitempty"`
+	Environment   Environment            `protobuf:"varint,2,opt,name=environment,proto3,enum=proto.Environment" json:"environment,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateRagConnectionRequest) Reset() {
+	*x = UpdateRagConnectionRequest{}
+	mi := &file_workflow_proto_msgTypes[38]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateRagConnectionRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateRagConnectionRequest) ProtoMessage() {}
+
+func (x *UpdateRagConnectionRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_workflow_proto_msgTypes[38]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateRagConnectionRequest.ProtoReflect.Descriptor instead.
+func (*UpdateRagConnectionRequest) Descriptor() ([]byte, []int) {
+	return file_workflow_proto_rawDescGZIP(), []int{38}
+}
+
+func (x *UpdateRagConnectionRequest) GetConnection() *RagConnectionProto {
+	if x != nil {
+		return x.Connection
+	}
+	return nil
+}
+
+func (x *UpdateRagConnectionRequest) GetEnvironment() Environment {
+	if x != nil {
+		return x.Environment
+	}
+	return Environment_PRODUCTION
+}
+
+type DeleteRagConnectionRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Environment   Environment            `protobuf:"varint,2,opt,name=environment,proto3,enum=proto.Environment" json:"environment,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteRagConnectionRequest) Reset() {
+	*x = DeleteRagConnectionRequest{}
+	mi := &file_workflow_proto_msgTypes[39]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteRagConnectionRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteRagConnectionRequest) ProtoMessage() {}
+
+func (x *DeleteRagConnectionRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_workflow_proto_msgTypes[39]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteRagConnectionRequest.ProtoReflect.Descriptor instead.
+func (*DeleteRagConnectionRequest) Descriptor() ([]byte, []int) {
+	return file_workflow_proto_rawDescGZIP(), []int{39}
+}
+
+func (x *DeleteRagConnectionRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *DeleteRagConnectionRequest) GetEnvironment() Environment {
+	if x != nil {
+		return x.Environment
+	}
+	return Environment_PRODUCTION
+}
+
+type RagDocumentProto struct {
+	state               protoimpl.MessageState `protogen:"open.v1"`
+	Id                  string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	RagConnectionId     string                 `protobuf:"bytes,2,opt,name=ragConnectionId,proto3" json:"ragConnectionId,omitempty"`
+	FileName            string                 `protobuf:"bytes,3,opt,name=fileName,proto3" json:"fileName,omitempty"`
+	FileSize            int64                  `protobuf:"varint,4,opt,name=fileSize,proto3" json:"fileSize,omitempty"`
+	FileType            string                 `protobuf:"bytes,5,opt,name=fileType,proto3" json:"fileType,omitempty"`
+	ChunkCount          int32                  `protobuf:"varint,6,opt,name=chunkCount,proto3" json:"chunkCount,omitempty"`
+	Status              string                 `protobuf:"bytes,7,opt,name=status,proto3" json:"status,omitempty"`
+	ErrorMessage        string                 `protobuf:"bytes,8,opt,name=errorMessage,proto3" json:"errorMessage,omitempty"`
+	CreatedAt           string                 `protobuf:"bytes,9,opt,name=createdAt,proto3" json:"createdAt,omitempty"`
+	ProcessedChunkCount int32                  `protobuf:"varint,10,opt,name=processedChunkCount,proto3" json:"processedChunkCount,omitempty"`
+	TotalChunkCount     int32                  `protobuf:"varint,11,opt,name=totalChunkCount,proto3" json:"totalChunkCount,omitempty"`
+	unknownFields       protoimpl.UnknownFields
+	sizeCache           protoimpl.SizeCache
+}
+
+func (x *RagDocumentProto) Reset() {
+	*x = RagDocumentProto{}
+	mi := &file_workflow_proto_msgTypes[40]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RagDocumentProto) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RagDocumentProto) ProtoMessage() {}
+
+func (x *RagDocumentProto) ProtoReflect() protoreflect.Message {
+	mi := &file_workflow_proto_msgTypes[40]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RagDocumentProto.ProtoReflect.Descriptor instead.
+func (*RagDocumentProto) Descriptor() ([]byte, []int) {
+	return file_workflow_proto_rawDescGZIP(), []int{40}
+}
+
+func (x *RagDocumentProto) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *RagDocumentProto) GetRagConnectionId() string {
+	if x != nil {
+		return x.RagConnectionId
+	}
+	return ""
+}
+
+func (x *RagDocumentProto) GetFileName() string {
+	if x != nil {
+		return x.FileName
+	}
+	return ""
+}
+
+func (x *RagDocumentProto) GetFileSize() int64 {
+	if x != nil {
+		return x.FileSize
+	}
+	return 0
+}
+
+func (x *RagDocumentProto) GetFileType() string {
+	if x != nil {
+		return x.FileType
+	}
+	return ""
+}
+
+func (x *RagDocumentProto) GetChunkCount() int32 {
+	if x != nil {
+		return x.ChunkCount
+	}
+	return 0
+}
+
+func (x *RagDocumentProto) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *RagDocumentProto) GetErrorMessage() string {
+	if x != nil {
+		return x.ErrorMessage
+	}
+	return ""
+}
+
+func (x *RagDocumentProto) GetCreatedAt() string {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return ""
+}
+
+func (x *RagDocumentProto) GetProcessedChunkCount() int32 {
+	if x != nil {
+		return x.ProcessedChunkCount
+	}
+	return 0
+}
+
+func (x *RagDocumentProto) GetTotalChunkCount() int32 {
+	if x != nil {
+		return x.TotalChunkCount
+	}
+	return 0
+}
+
+type ListRagDocumentsRequest struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	RagConnectionId string                 `protobuf:"bytes,1,opt,name=ragConnectionId,proto3" json:"ragConnectionId,omitempty"`
+	Environment     Environment            `protobuf:"varint,2,opt,name=environment,proto3,enum=proto.Environment" json:"environment,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *ListRagDocumentsRequest) Reset() {
+	*x = ListRagDocumentsRequest{}
+	mi := &file_workflow_proto_msgTypes[41]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListRagDocumentsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListRagDocumentsRequest) ProtoMessage() {}
+
+func (x *ListRagDocumentsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_workflow_proto_msgTypes[41]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListRagDocumentsRequest.ProtoReflect.Descriptor instead.
+func (*ListRagDocumentsRequest) Descriptor() ([]byte, []int) {
+	return file_workflow_proto_rawDescGZIP(), []int{41}
+}
+
+func (x *ListRagDocumentsRequest) GetRagConnectionId() string {
+	if x != nil {
+		return x.RagConnectionId
+	}
+	return ""
+}
+
+func (x *ListRagDocumentsRequest) GetEnvironment() Environment {
+	if x != nil {
+		return x.Environment
+	}
+	return Environment_PRODUCTION
+}
+
+type RagDocumentList struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Documents     []*RagDocumentProto    `protobuf:"bytes,1,rep,name=documents,proto3" json:"documents,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RagDocumentList) Reset() {
+	*x = RagDocumentList{}
+	mi := &file_workflow_proto_msgTypes[42]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RagDocumentList) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RagDocumentList) ProtoMessage() {}
+
+func (x *RagDocumentList) ProtoReflect() protoreflect.Message {
+	mi := &file_workflow_proto_msgTypes[42]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RagDocumentList.ProtoReflect.Descriptor instead.
+func (*RagDocumentList) Descriptor() ([]byte, []int) {
+	return file_workflow_proto_rawDescGZIP(), []int{42}
+}
+
+func (x *RagDocumentList) GetDocuments() []*RagDocumentProto {
+	if x != nil {
+		return x.Documents
+	}
+	return nil
+}
+
+type UploadRagDocumentRequest struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	RagConnectionId string                 `protobuf:"bytes,1,opt,name=ragConnectionId,proto3" json:"ragConnectionId,omitempty"`
+	FileName        string                 `protobuf:"bytes,2,opt,name=fileName,proto3" json:"fileName,omitempty"`
+	FileContent     []byte                 `protobuf:"bytes,3,opt,name=fileContent,proto3" json:"fileContent,omitempty"`
+	Environment     Environment            `protobuf:"varint,4,opt,name=environment,proto3,enum=proto.Environment" json:"environment,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *UploadRagDocumentRequest) Reset() {
+	*x = UploadRagDocumentRequest{}
+	mi := &file_workflow_proto_msgTypes[43]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UploadRagDocumentRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UploadRagDocumentRequest) ProtoMessage() {}
+
+func (x *UploadRagDocumentRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_workflow_proto_msgTypes[43]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UploadRagDocumentRequest.ProtoReflect.Descriptor instead.
+func (*UploadRagDocumentRequest) Descriptor() ([]byte, []int) {
+	return file_workflow_proto_rawDescGZIP(), []int{43}
+}
+
+func (x *UploadRagDocumentRequest) GetRagConnectionId() string {
+	if x != nil {
+		return x.RagConnectionId
+	}
+	return ""
+}
+
+func (x *UploadRagDocumentRequest) GetFileName() string {
+	if x != nil {
+		return x.FileName
+	}
+	return ""
+}
+
+func (x *UploadRagDocumentRequest) GetFileContent() []byte {
+	if x != nil {
+		return x.FileContent
+	}
+	return nil
+}
+
+func (x *UploadRagDocumentRequest) GetEnvironment() Environment {
+	if x != nil {
+		return x.Environment
+	}
+	return Environment_PRODUCTION
+}
+
+type DeleteRagDocumentRequest struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	Id              string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	RagConnectionId string                 `protobuf:"bytes,2,opt,name=ragConnectionId,proto3" json:"ragConnectionId,omitempty"`
+	Environment     Environment            `protobuf:"varint,3,opt,name=environment,proto3,enum=proto.Environment" json:"environment,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *DeleteRagDocumentRequest) Reset() {
+	*x = DeleteRagDocumentRequest{}
+	mi := &file_workflow_proto_msgTypes[44]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteRagDocumentRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteRagDocumentRequest) ProtoMessage() {}
+
+func (x *DeleteRagDocumentRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_workflow_proto_msgTypes[44]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteRagDocumentRequest.ProtoReflect.Descriptor instead.
+func (*DeleteRagDocumentRequest) Descriptor() ([]byte, []int) {
+	return file_workflow_proto_rawDescGZIP(), []int{44}
+}
+
+func (x *DeleteRagDocumentRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *DeleteRagDocumentRequest) GetRagConnectionId() string {
+	if x != nil {
+		return x.RagConnectionId
+	}
+	return ""
+}
+
+func (x *DeleteRagDocumentRequest) GetEnvironment() Environment {
+	if x != nil {
+		return x.Environment
+	}
+	return Environment_PRODUCTION
+}
+
+type QueryRagRequest struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	RagConnectionId string                 `protobuf:"bytes,1,opt,name=ragConnectionId,proto3" json:"ragConnectionId,omitempty"`
+	Query           string                 `protobuf:"bytes,2,opt,name=query,proto3" json:"query,omitempty"`
+	TopK            int32                  `protobuf:"varint,3,opt,name=topK,proto3" json:"topK,omitempty"`
+	SystemPrompt    string                 `protobuf:"bytes,4,opt,name=systemPrompt,proto3" json:"systemPrompt,omitempty"`
+	Environment     Environment            `protobuf:"varint,5,opt,name=environment,proto3,enum=proto.Environment" json:"environment,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *QueryRagRequest) Reset() {
+	*x = QueryRagRequest{}
+	mi := &file_workflow_proto_msgTypes[45]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *QueryRagRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*QueryRagRequest) ProtoMessage() {}
+
+func (x *QueryRagRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_workflow_proto_msgTypes[45]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use QueryRagRequest.ProtoReflect.Descriptor instead.
+func (*QueryRagRequest) Descriptor() ([]byte, []int) {
+	return file_workflow_proto_rawDescGZIP(), []int{45}
+}
+
+func (x *QueryRagRequest) GetRagConnectionId() string {
+	if x != nil {
+		return x.RagConnectionId
+	}
+	return ""
+}
+
+func (x *QueryRagRequest) GetQuery() string {
+	if x != nil {
+		return x.Query
+	}
+	return ""
+}
+
+func (x *QueryRagRequest) GetTopK() int32 {
+	if x != nil {
+		return x.TopK
+	}
+	return 0
+}
+
+func (x *QueryRagRequest) GetSystemPrompt() string {
+	if x != nil {
+		return x.SystemPrompt
+	}
+	return ""
+}
+
+func (x *QueryRagRequest) GetEnvironment() Environment {
+	if x != nil {
+		return x.Environment
+	}
+	return Environment_PRODUCTION
+}
+
+type RagSourceChunk struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	DocumentName  string                 `protobuf:"bytes,1,opt,name=documentName,proto3" json:"documentName,omitempty"`
+	Content       string                 `protobuf:"bytes,2,opt,name=content,proto3" json:"content,omitempty"`
+	Score         float32                `protobuf:"fixed32,3,opt,name=score,proto3" json:"score,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RagSourceChunk) Reset() {
+	*x = RagSourceChunk{}
+	mi := &file_workflow_proto_msgTypes[46]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RagSourceChunk) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RagSourceChunk) ProtoMessage() {}
+
+func (x *RagSourceChunk) ProtoReflect() protoreflect.Message {
+	mi := &file_workflow_proto_msgTypes[46]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RagSourceChunk.ProtoReflect.Descriptor instead.
+func (*RagSourceChunk) Descriptor() ([]byte, []int) {
+	return file_workflow_proto_rawDescGZIP(), []int{46}
+}
+
+func (x *RagSourceChunk) GetDocumentName() string {
+	if x != nil {
+		return x.DocumentName
+	}
+	return ""
+}
+
+func (x *RagSourceChunk) GetContent() string {
+	if x != nil {
+		return x.Content
+	}
+	return ""
+}
+
+func (x *RagSourceChunk) GetScore() float32 {
+	if x != nil {
+		return x.Score
+	}
+	return 0
+}
+
+type QueryRagResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Answer        string                 `protobuf:"bytes,1,opt,name=answer,proto3" json:"answer,omitempty"`
+	Sources       []*RagSourceChunk      `protobuf:"bytes,2,rep,name=sources,proto3" json:"sources,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *QueryRagResponse) Reset() {
+	*x = QueryRagResponse{}
+	mi := &file_workflow_proto_msgTypes[47]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *QueryRagResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*QueryRagResponse) ProtoMessage() {}
+
+func (x *QueryRagResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_workflow_proto_msgTypes[47]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use QueryRagResponse.ProtoReflect.Descriptor instead.
+func (*QueryRagResponse) Descriptor() ([]byte, []int) {
+	return file_workflow_proto_rawDescGZIP(), []int{47}
+}
+
+func (x *QueryRagResponse) GetAnswer() string {
+	if x != nil {
+		return x.Answer
+	}
+	return ""
+}
+
+func (x *QueryRagResponse) GetSources() []*RagSourceChunk {
+	if x != nil {
+		return x.Sources
+	}
+	return nil
+}
+
 var File_workflow_proto protoreflect.FileDescriptor
 
 const file_workflow_proto_rawDesc = "" +
@@ -2848,7 +3793,8 @@ const file_workflow_proto_rawDesc = "" +
 	"\x05_iconB\v\n" +
 	"\t_positionB\r\n" +
 	"\v_nodestatusB\a\n" +
-	"\x05_type\"\xfb\a\n" +
+	"\x05_type\"\x97\n" +
+	"\n" +
 	"\bNodeData\x12\x17\n" +
 	"\x04name\x18\x01 \x01(\tH\x00R\x04name\x88\x01\x01\x12\x19\n" +
 	"\x05value\x18\x02 \x01(\tH\x01R\x05value\x88\x01\x01\x12#\n" +
@@ -2875,7 +3821,12 @@ const file_workflow_proto_rawDesc = "" +
 	"\fsubProcessId\x18\x13 \x01(\tH\x12R\fsubProcessId\x88\x01\x01\x12\x17\n" +
 	"\x04type\x18\x14 \x01(\tH\x13R\x04type\x88\x01\x01\x12\x1f\n" +
 	"\binterval\x18\x15 \x01(\x05H\x14R\binterval\x88\x01\x01\x12/\n" +
-	"\x05weeks\x18\x16 \x01(\v2\x14.proto.NodeDataArrayH\x15R\x05weeks\x88\x01\x01B\a\n" +
+	"\x05weeks\x18\x16 \x01(\v2\x14.proto.NodeDataArrayH\x15R\x05weeks\x88\x01\x01\x12-\n" +
+	"\x0fragConnectionId\x18\x17 \x01(\tH\x16R\x0fragConnectionId\x88\x01\x01\x12!\n" +
+	"\tragPrompt\x18\x18 \x01(\tH\x17R\tragPrompt\x88\x01\x01\x12\x1d\n" +
+	"\aragTopK\x18\x19 \x01(\x05H\x18R\aragTopK\x88\x01\x01\x12-\n" +
+	"\x0fragSystemPrompt\x18\x1a \x01(\tH\x19R\x0fragSystemPrompt\x88\x01\x01\x12'\n" +
+	"\fragOutputVar\x18\x1b \x01(\tH\x1aR\fragOutputVar\x88\x01\x01B\a\n" +
 	"\x05_nameB\b\n" +
 	"\x06_valueB\r\n" +
 	"\v_expressionB\f\n" +
@@ -2903,7 +3854,14 @@ const file_workflow_proto_rawDesc = "" +
 	"\r_subProcessIdB\a\n" +
 	"\x05_typeB\v\n" +
 	"\t_intervalB\b\n" +
-	"\x06_weeks\"\xcc\x01\n" +
+	"\x06_weeksB\x12\n" +
+	"\x10_ragConnectionIdB\f\n" +
+	"\n" +
+	"_ragPromptB\n" +
+	"\n" +
+	"\b_ragTopKB\x12\n" +
+	"\x10_ragSystemPromptB\x0f\n" +
+	"\r_ragOutputVar\"\xcc\x01\n" +
 	"\rNodeDataArray\x12(\n" +
 	"\x04type\x18\x01 \x01(\x0e2\x14.proto.ArrayDataTypeR\x04type\x125\n" +
 	"\rkeyValueItems\x18\x02 \x03(\v2\x0f.proto.KeyValueR\rkeyValueItems\x12 \n" +
@@ -2974,7 +3932,83 @@ const file_workflow_proto_rawDesc = "" +
 	"\venvironment\x18\x01 \x01(\x0e2\x12.proto.EnvironmentR\venvironment\"_\n" +
 	"\x17DeleteConnectionRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x124\n" +
-	"\venvironment\x18\x02 \x01(\x0e2\x12.proto.EnvironmentR\venvironment**\n" +
+	"\venvironment\x18\x02 \x01(\x0e2\x12.proto.EnvironmentR\venvironment\"\xe8\x02\n" +
+	"\x12RagConnectionProto\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12$\n" +
+	"\rollamaBaseUrl\x18\x03 \x01(\tR\rollamaBaseUrl\x12&\n" +
+	"\x0eembeddingModel\x18\x04 \x01(\tR\x0eembeddingModel\x12\x1c\n" +
+	"\tchatModel\x18\x05 \x01(\tR\tchatModel\x12 \n" +
+	"\vdescription\x18\x06 \x01(\tR\vdescription\x12\x1c\n" +
+	"\tcreatedAt\x18\a \x01(\tR\tcreatedAt\x12\x1c\n" +
+	"\tupdatedAt\x18\b \x01(\tR\tupdatedAt\x12$\n" +
+	"\rdocumentCount\x18\t \x01(\x05R\rdocumentCount\x12\x1e\n" +
+	"\n" +
+	"chunkCount\x18\n" +
+	" \x01(\x05R\n" +
+	"chunkCount\x12\x1e\n" +
+	"\n" +
+	"isModified\x18\v \x01(\bR\n" +
+	"isModified\"Q\n" +
+	"\x19ListRagConnectionsRequest\x124\n" +
+	"\venvironment\x18\x01 \x01(\x0e2\x12.proto.EnvironmentR\venvironment\"P\n" +
+	"\x11RagConnectionList\x12;\n" +
+	"\vconnections\x18\x01 \x03(\v2\x19.proto.RagConnectionProtoR\vconnections\"\x8d\x01\n" +
+	"\x1aCreateRagConnectionRequest\x129\n" +
+	"\n" +
+	"connection\x18\x01 \x01(\v2\x19.proto.RagConnectionProtoR\n" +
+	"connection\x124\n" +
+	"\venvironment\x18\x02 \x01(\x0e2\x12.proto.EnvironmentR\venvironment\"\x8d\x01\n" +
+	"\x1aUpdateRagConnectionRequest\x129\n" +
+	"\n" +
+	"connection\x18\x01 \x01(\v2\x19.proto.RagConnectionProtoR\n" +
+	"connection\x124\n" +
+	"\venvironment\x18\x02 \x01(\x0e2\x12.proto.EnvironmentR\venvironment\"b\n" +
+	"\x1aDeleteRagConnectionRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x124\n" +
+	"\venvironment\x18\x02 \x01(\x0e2\x12.proto.EnvironmentR\venvironment\"\xf6\x02\n" +
+	"\x10RagDocumentProto\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12(\n" +
+	"\x0fragConnectionId\x18\x02 \x01(\tR\x0fragConnectionId\x12\x1a\n" +
+	"\bfileName\x18\x03 \x01(\tR\bfileName\x12\x1a\n" +
+	"\bfileSize\x18\x04 \x01(\x03R\bfileSize\x12\x1a\n" +
+	"\bfileType\x18\x05 \x01(\tR\bfileType\x12\x1e\n" +
+	"\n" +
+	"chunkCount\x18\x06 \x01(\x05R\n" +
+	"chunkCount\x12\x16\n" +
+	"\x06status\x18\a \x01(\tR\x06status\x12\"\n" +
+	"\ferrorMessage\x18\b \x01(\tR\ferrorMessage\x12\x1c\n" +
+	"\tcreatedAt\x18\t \x01(\tR\tcreatedAt\x120\n" +
+	"\x13processedChunkCount\x18\n" +
+	" \x01(\x05R\x13processedChunkCount\x12(\n" +
+	"\x0ftotalChunkCount\x18\v \x01(\x05R\x0ftotalChunkCount\"y\n" +
+	"\x17ListRagDocumentsRequest\x12(\n" +
+	"\x0fragConnectionId\x18\x01 \x01(\tR\x0fragConnectionId\x124\n" +
+	"\venvironment\x18\x02 \x01(\x0e2\x12.proto.EnvironmentR\venvironment\"H\n" +
+	"\x0fRagDocumentList\x125\n" +
+	"\tdocuments\x18\x01 \x03(\v2\x17.proto.RagDocumentProtoR\tdocuments\"\xb8\x01\n" +
+	"\x18UploadRagDocumentRequest\x12(\n" +
+	"\x0fragConnectionId\x18\x01 \x01(\tR\x0fragConnectionId\x12\x1a\n" +
+	"\bfileName\x18\x02 \x01(\tR\bfileName\x12 \n" +
+	"\vfileContent\x18\x03 \x01(\fR\vfileContent\x124\n" +
+	"\venvironment\x18\x04 \x01(\x0e2\x12.proto.EnvironmentR\venvironment\"\x8a\x01\n" +
+	"\x18DeleteRagDocumentRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12(\n" +
+	"\x0fragConnectionId\x18\x02 \x01(\tR\x0fragConnectionId\x124\n" +
+	"\venvironment\x18\x03 \x01(\x0e2\x12.proto.EnvironmentR\venvironment\"\xbf\x01\n" +
+	"\x0fQueryRagRequest\x12(\n" +
+	"\x0fragConnectionId\x18\x01 \x01(\tR\x0fragConnectionId\x12\x14\n" +
+	"\x05query\x18\x02 \x01(\tR\x05query\x12\x12\n" +
+	"\x04topK\x18\x03 \x01(\x05R\x04topK\x12\"\n" +
+	"\fsystemPrompt\x18\x04 \x01(\tR\fsystemPrompt\x124\n" +
+	"\venvironment\x18\x05 \x01(\x0e2\x12.proto.EnvironmentR\venvironment\"d\n" +
+	"\x0eRagSourceChunk\x12\"\n" +
+	"\fdocumentName\x18\x01 \x01(\tR\fdocumentName\x12\x18\n" +
+	"\acontent\x18\x02 \x01(\tR\acontent\x12\x14\n" +
+	"\x05score\x18\x03 \x01(\x02R\x05score\"[\n" +
+	"\x10QueryRagResponse\x12\x16\n" +
+	"\x06answer\x18\x01 \x01(\tR\x06answer\x12/\n" +
+	"\asources\x18\x02 \x03(\v2\x15.proto.RagSourceChunkR\asources**\n" +
 	"\vEnvironment\x12\x0e\n" +
 	"\n" +
 	"PRODUCTION\x10\x00\x12\v\n" +
@@ -2991,7 +4025,7 @@ const file_workflow_proto_rawDesc = "" +
 	"\tCOMPLETED\x10\x01\x12\n" +
 	"\n" +
 	"\x06FAILED\x10\x02\x12\b\n" +
-	"\x04INFO\x10\x032\xe1\b\n" +
+	"\x04INFO\x10\x032\xd5\r\n" +
 	"\x0fWorkflowService\x129\n" +
 	"\vGetWorkflow\x12\x19.proto.GetWorkflowRequest\x1a\x0f.proto.Workflow\x128\n" +
 	"\rListWorkflows\x12\x12.proto.PageRequest\x1a\x13.proto.WorkflowList\x122\n" +
@@ -3008,7 +4042,15 @@ const file_workflow_proto_rawDesc = "" +
 	"\x14ListWorkflowVersions\x12!.proto.GetWorkflowVersionsRequest\x1a\x1a.proto.WorkflowVersionList\x12A\n" +
 	"\x16RestoreWorkflowVersion\x12\x16.proto.WorkflowVersion\x1a\x0f.proto.Workflow\x12P\n" +
 	"\x0fPublishWorkflow\x12\x1d.proto.PublishWorkflowRequest\x1a\x1e.proto.PublishWorkflowResponse\x12E\n" +
-	"\x17RevertWorkflowToStaging\x12\x19.proto.GetWorkflowRequest\x1a\x0f.proto.WorkflowB\tZ\a./protob\x06proto3"
+	"\x17RevertWorkflowToStaging\x12\x19.proto.GetWorkflowRequest\x1a\x0f.proto.Workflow\x12P\n" +
+	"\x12ListRagConnections\x12 .proto.ListRagConnectionsRequest\x1a\x18.proto.RagConnectionList\x12S\n" +
+	"\x13CreateRagConnection\x12!.proto.CreateRagConnectionRequest\x1a\x19.proto.RagConnectionProto\x12S\n" +
+	"\x13UpdateRagConnection\x12!.proto.UpdateRagConnectionRequest\x1a\x19.proto.RagConnectionProto\x12P\n" +
+	"\x13DeleteRagConnection\x12!.proto.DeleteRagConnectionRequest\x1a\x16.google.protobuf.Empty\x12J\n" +
+	"\x10ListRagDocuments\x12\x1e.proto.ListRagDocumentsRequest\x1a\x16.proto.RagDocumentList\x12M\n" +
+	"\x11UploadRagDocument\x12\x1f.proto.UploadRagDocumentRequest\x1a\x17.proto.RagDocumentProto\x12L\n" +
+	"\x11DeleteRagDocument\x12\x1f.proto.DeleteRagDocumentRequest\x1a\x16.google.protobuf.Empty\x12;\n" +
+	"\bQueryRag\x12\x16.proto.QueryRagRequest\x1a\x17.proto.QueryRagResponseB\tZ\a./protob\x06proto3"
 
 var (
 	file_workflow_proto_rawDescOnce sync.Once
@@ -3023,7 +4065,7 @@ func file_workflow_proto_rawDescGZIP() []byte {
 }
 
 var file_workflow_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
-var file_workflow_proto_msgTypes = make([]protoimpl.MessageInfo, 35)
+var file_workflow_proto_msgTypes = make([]protoimpl.MessageInfo, 49)
 var file_workflow_proto_goTypes = []any{
 	(Environment)(0),                   // 0: proto.Environment
 	(ArrayDataType)(0),                 // 1: proto.ArrayDataType
@@ -3062,8 +4104,22 @@ var file_workflow_proto_goTypes = []any{
 	(*ConnectionProto)(nil),            // 34: proto.ConnectionProto
 	(*ListConnectionsRequest)(nil),     // 35: proto.ListConnectionsRequest
 	(*DeleteConnectionRequest)(nil),    // 36: proto.DeleteConnectionRequest
-	nil,                                // 37: proto.ReplayData.VariablesEntry
-	(*emptypb.Empty)(nil),              // 38: google.protobuf.Empty
+	(*RagConnectionProto)(nil),         // 37: proto.RagConnectionProto
+	(*ListRagConnectionsRequest)(nil),  // 38: proto.ListRagConnectionsRequest
+	(*RagConnectionList)(nil),          // 39: proto.RagConnectionList
+	(*CreateRagConnectionRequest)(nil), // 40: proto.CreateRagConnectionRequest
+	(*UpdateRagConnectionRequest)(nil), // 41: proto.UpdateRagConnectionRequest
+	(*DeleteRagConnectionRequest)(nil), // 42: proto.DeleteRagConnectionRequest
+	(*RagDocumentProto)(nil),           // 43: proto.RagDocumentProto
+	(*ListRagDocumentsRequest)(nil),    // 44: proto.ListRagDocumentsRequest
+	(*RagDocumentList)(nil),            // 45: proto.RagDocumentList
+	(*UploadRagDocumentRequest)(nil),   // 46: proto.UploadRagDocumentRequest
+	(*DeleteRagDocumentRequest)(nil),   // 47: proto.DeleteRagDocumentRequest
+	(*QueryRagRequest)(nil),            // 48: proto.QueryRagRequest
+	(*RagSourceChunk)(nil),             // 49: proto.RagSourceChunk
+	(*QueryRagResponse)(nil),           // 50: proto.QueryRagResponse
+	nil,                                // 51: proto.ReplayData.VariablesEntry
+	(*emptypb.Empty)(nil),              // 52: google.protobuf.Empty
 }
 var file_workflow_proto_depIdxs = []int32{
 	0,  // 0: proto.RunWorkflowIdRequest.environment:type_name -> proto.Environment
@@ -3073,7 +4129,7 @@ var file_workflow_proto_depIdxs = []int32{
 	0,  // 4: proto.ListWorkflowHistoryRequest.environment:type_name -> proto.Environment
 	9,  // 5: proto.WorkflowHistoryResponse.data:type_name -> proto.ReplayData
 	21, // 6: proto.ReplayData.data:type_name -> proto.NodeData
-	37, // 7: proto.ReplayData.variables:type_name -> proto.ReplayData.VariablesEntry
+	51, // 7: proto.ReplayData.variables:type_name -> proto.ReplayData.VariablesEntry
 	2,  // 8: proto.ReplayData.status:type_name -> proto.NodeStatus
 	0,  // 9: proto.PageRequest.environment:type_name -> proto.Environment
 	0,  // 10: proto.GetWorkflowRequest.environment:type_name -> proto.Environment
@@ -3108,43 +4164,72 @@ var file_workflow_proto_depIdxs = []int32{
 	34, // 39: proto.ConnectionList.connections:type_name -> proto.ConnectionProto
 	0,  // 40: proto.ListConnectionsRequest.environment:type_name -> proto.Environment
 	0,  // 41: proto.DeleteConnectionRequest.environment:type_name -> proto.Environment
-	11, // 42: proto.WorkflowService.GetWorkflow:input_type -> proto.GetWorkflowRequest
-	10, // 43: proto.WorkflowService.ListWorkflows:input_type -> proto.PageRequest
-	13, // 44: proto.WorkflowService.UpdateWorkflow:input_type -> proto.Workflow
-	13, // 45: proto.WorkflowService.CreateWorkflow:input_type -> proto.Workflow
-	13, // 46: proto.WorkflowService.DeleteWorkflow:input_type -> proto.Workflow
-	13, // 47: proto.WorkflowService.QuickRun:input_type -> proto.Workflow
-	3,  // 48: proto.WorkflowService.RunWorkflowId:input_type -> proto.RunWorkflowIdRequest
-	7,  // 49: proto.WorkflowService.ListWorkflowHistory:input_type -> proto.ListWorkflowHistoryRequest
-	6,  // 50: proto.WorkflowService.GetWorkflowHistory:input_type -> proto.WorkflowHistoryRequest
-	38, // 51: proto.WorkflowService.ListConnectorTemplates:input_type -> google.protobuf.Empty
-	35, // 52: proto.WorkflowService.ListConnections:input_type -> proto.ListConnectionsRequest
-	36, // 53: proto.WorkflowService.DeleteConnection:input_type -> proto.DeleteConnectionRequest
-	16, // 54: proto.WorkflowService.ListWorkflowVersions:input_type -> proto.GetWorkflowVersionsRequest
-	14, // 55: proto.WorkflowService.RestoreWorkflowVersion:input_type -> proto.WorkflowVersion
-	17, // 56: proto.WorkflowService.PublishWorkflow:input_type -> proto.PublishWorkflowRequest
-	11, // 57: proto.WorkflowService.RevertWorkflowToStaging:input_type -> proto.GetWorkflowRequest
-	13, // 58: proto.WorkflowService.GetWorkflow:output_type -> proto.Workflow
-	12, // 59: proto.WorkflowService.ListWorkflows:output_type -> proto.WorkflowList
-	13, // 60: proto.WorkflowService.UpdateWorkflow:output_type -> proto.Workflow
-	13, // 61: proto.WorkflowService.CreateWorkflow:output_type -> proto.Workflow
-	38, // 62: proto.WorkflowService.DeleteWorkflow:output_type -> google.protobuf.Empty
-	9,  // 63: proto.WorkflowService.QuickRun:output_type -> proto.ReplayData
-	9,  // 64: proto.WorkflowService.RunWorkflowId:output_type -> proto.ReplayData
-	4,  // 65: proto.WorkflowService.ListWorkflowHistory:output_type -> proto.WorkflowHistoryList
-	8,  // 66: proto.WorkflowService.GetWorkflowHistory:output_type -> proto.WorkflowHistoryResponse
-	29, // 67: proto.WorkflowService.ListConnectorTemplates:output_type -> proto.ConnectorTemplateList
-	33, // 68: proto.WorkflowService.ListConnections:output_type -> proto.ConnectionList
-	38, // 69: proto.WorkflowService.DeleteConnection:output_type -> google.protobuf.Empty
-	15, // 70: proto.WorkflowService.ListWorkflowVersions:output_type -> proto.WorkflowVersionList
-	13, // 71: proto.WorkflowService.RestoreWorkflowVersion:output_type -> proto.Workflow
-	18, // 72: proto.WorkflowService.PublishWorkflow:output_type -> proto.PublishWorkflowResponse
-	13, // 73: proto.WorkflowService.RevertWorkflowToStaging:output_type -> proto.Workflow
-	58, // [58:74] is the sub-list for method output_type
-	42, // [42:58] is the sub-list for method input_type
-	42, // [42:42] is the sub-list for extension type_name
-	42, // [42:42] is the sub-list for extension extendee
-	0,  // [0:42] is the sub-list for field type_name
+	0,  // 42: proto.ListRagConnectionsRequest.environment:type_name -> proto.Environment
+	37, // 43: proto.RagConnectionList.connections:type_name -> proto.RagConnectionProto
+	37, // 44: proto.CreateRagConnectionRequest.connection:type_name -> proto.RagConnectionProto
+	0,  // 45: proto.CreateRagConnectionRequest.environment:type_name -> proto.Environment
+	37, // 46: proto.UpdateRagConnectionRequest.connection:type_name -> proto.RagConnectionProto
+	0,  // 47: proto.UpdateRagConnectionRequest.environment:type_name -> proto.Environment
+	0,  // 48: proto.DeleteRagConnectionRequest.environment:type_name -> proto.Environment
+	0,  // 49: proto.ListRagDocumentsRequest.environment:type_name -> proto.Environment
+	43, // 50: proto.RagDocumentList.documents:type_name -> proto.RagDocumentProto
+	0,  // 51: proto.UploadRagDocumentRequest.environment:type_name -> proto.Environment
+	0,  // 52: proto.DeleteRagDocumentRequest.environment:type_name -> proto.Environment
+	0,  // 53: proto.QueryRagRequest.environment:type_name -> proto.Environment
+	49, // 54: proto.QueryRagResponse.sources:type_name -> proto.RagSourceChunk
+	11, // 55: proto.WorkflowService.GetWorkflow:input_type -> proto.GetWorkflowRequest
+	10, // 56: proto.WorkflowService.ListWorkflows:input_type -> proto.PageRequest
+	13, // 57: proto.WorkflowService.UpdateWorkflow:input_type -> proto.Workflow
+	13, // 58: proto.WorkflowService.CreateWorkflow:input_type -> proto.Workflow
+	13, // 59: proto.WorkflowService.DeleteWorkflow:input_type -> proto.Workflow
+	13, // 60: proto.WorkflowService.QuickRun:input_type -> proto.Workflow
+	3,  // 61: proto.WorkflowService.RunWorkflowId:input_type -> proto.RunWorkflowIdRequest
+	7,  // 62: proto.WorkflowService.ListWorkflowHistory:input_type -> proto.ListWorkflowHistoryRequest
+	6,  // 63: proto.WorkflowService.GetWorkflowHistory:input_type -> proto.WorkflowHistoryRequest
+	52, // 64: proto.WorkflowService.ListConnectorTemplates:input_type -> google.protobuf.Empty
+	35, // 65: proto.WorkflowService.ListConnections:input_type -> proto.ListConnectionsRequest
+	36, // 66: proto.WorkflowService.DeleteConnection:input_type -> proto.DeleteConnectionRequest
+	16, // 67: proto.WorkflowService.ListWorkflowVersions:input_type -> proto.GetWorkflowVersionsRequest
+	14, // 68: proto.WorkflowService.RestoreWorkflowVersion:input_type -> proto.WorkflowVersion
+	17, // 69: proto.WorkflowService.PublishWorkflow:input_type -> proto.PublishWorkflowRequest
+	11, // 70: proto.WorkflowService.RevertWorkflowToStaging:input_type -> proto.GetWorkflowRequest
+	38, // 71: proto.WorkflowService.ListRagConnections:input_type -> proto.ListRagConnectionsRequest
+	40, // 72: proto.WorkflowService.CreateRagConnection:input_type -> proto.CreateRagConnectionRequest
+	41, // 73: proto.WorkflowService.UpdateRagConnection:input_type -> proto.UpdateRagConnectionRequest
+	42, // 74: proto.WorkflowService.DeleteRagConnection:input_type -> proto.DeleteRagConnectionRequest
+	44, // 75: proto.WorkflowService.ListRagDocuments:input_type -> proto.ListRagDocumentsRequest
+	46, // 76: proto.WorkflowService.UploadRagDocument:input_type -> proto.UploadRagDocumentRequest
+	47, // 77: proto.WorkflowService.DeleteRagDocument:input_type -> proto.DeleteRagDocumentRequest
+	48, // 78: proto.WorkflowService.QueryRag:input_type -> proto.QueryRagRequest
+	13, // 79: proto.WorkflowService.GetWorkflow:output_type -> proto.Workflow
+	12, // 80: proto.WorkflowService.ListWorkflows:output_type -> proto.WorkflowList
+	13, // 81: proto.WorkflowService.UpdateWorkflow:output_type -> proto.Workflow
+	13, // 82: proto.WorkflowService.CreateWorkflow:output_type -> proto.Workflow
+	52, // 83: proto.WorkflowService.DeleteWorkflow:output_type -> google.protobuf.Empty
+	9,  // 84: proto.WorkflowService.QuickRun:output_type -> proto.ReplayData
+	9,  // 85: proto.WorkflowService.RunWorkflowId:output_type -> proto.ReplayData
+	4,  // 86: proto.WorkflowService.ListWorkflowHistory:output_type -> proto.WorkflowHistoryList
+	8,  // 87: proto.WorkflowService.GetWorkflowHistory:output_type -> proto.WorkflowHistoryResponse
+	29, // 88: proto.WorkflowService.ListConnectorTemplates:output_type -> proto.ConnectorTemplateList
+	33, // 89: proto.WorkflowService.ListConnections:output_type -> proto.ConnectionList
+	52, // 90: proto.WorkflowService.DeleteConnection:output_type -> google.protobuf.Empty
+	15, // 91: proto.WorkflowService.ListWorkflowVersions:output_type -> proto.WorkflowVersionList
+	13, // 92: proto.WorkflowService.RestoreWorkflowVersion:output_type -> proto.Workflow
+	18, // 93: proto.WorkflowService.PublishWorkflow:output_type -> proto.PublishWorkflowResponse
+	13, // 94: proto.WorkflowService.RevertWorkflowToStaging:output_type -> proto.Workflow
+	39, // 95: proto.WorkflowService.ListRagConnections:output_type -> proto.RagConnectionList
+	37, // 96: proto.WorkflowService.CreateRagConnection:output_type -> proto.RagConnectionProto
+	37, // 97: proto.WorkflowService.UpdateRagConnection:output_type -> proto.RagConnectionProto
+	52, // 98: proto.WorkflowService.DeleteRagConnection:output_type -> google.protobuf.Empty
+	45, // 99: proto.WorkflowService.ListRagDocuments:output_type -> proto.RagDocumentList
+	43, // 100: proto.WorkflowService.UploadRagDocument:output_type -> proto.RagDocumentProto
+	52, // 101: proto.WorkflowService.DeleteRagDocument:output_type -> google.protobuf.Empty
+	50, // 102: proto.WorkflowService.QueryRag:output_type -> proto.QueryRagResponse
+	79, // [79:103] is the sub-list for method output_type
+	55, // [55:79] is the sub-list for method input_type
+	55, // [55:55] is the sub-list for extension type_name
+	55, // [55:55] is the sub-list for extension extendee
+	0,  // [0:55] is the sub-list for field type_name
 }
 
 func init() { file_workflow_proto_init() }
@@ -3162,7 +4247,7 @@ func file_workflow_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_workflow_proto_rawDesc), len(file_workflow_proto_rawDesc)),
 			NumEnums:      3,
-			NumMessages:   35,
+			NumMessages:   49,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -1,6 +1,7 @@
 package workflow
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -13,8 +14,10 @@ import (
 	"time"
 
 	proto "github.com/raenardcruz/floowsynk/CodeGen/go/workflow"
+	DB "github.com/raenardcruz/floowsynk/Database"
 	"github.com/raenardcruz/floowsynk/Server/crypto"
 	m "github.com/raenardcruz/floowsynk/Server/matheval"
+	"github.com/raenardcruz/floowsynk/Server/rag"
 )
 
 const (
@@ -54,7 +57,12 @@ func (wp *WorkflowProcessor) ConditionNodeProcess(node *proto.Node) (retVal stri
 	if expression == "" {
 		return FALSE, errors.New("condition not found")
 	}
-	if res, _ := m.EvaluateBoolean(expression); res {
+	res, evalErr := m.EvaluateBoolean(expression)
+	if evalErr != nil {
+		err = evalErr
+		return FALSE, err
+	}
+	if res {
 		return TRUE, nil
 	} else {
 		return FALSE, nil
@@ -75,24 +83,46 @@ func (wp *WorkflowProcessor) TextNodeProcess(node *proto.Node) (string, error) {
 }
 
 func (wp *WorkflowProcessor) LoopNodeProcess(node *proto.Node) (string, error) {
-	iteration := *node.Data.Iteration
+	hasLoopHandles := wp.hasLoopOrDoneEdges(node.Id)
+	loopHandle := ""
+	if hasLoopHandles {
+		loopHandle = "loop"
+	}
+
+	iteration := int32(0)
+	if node.Data != nil && node.Data.Iteration != nil {
+		iteration = *node.Data.Iteration
+	}
 	for i := 0; i < int(iteration); i++ {
 		replayNode := CopyNode(node)
 		tmpIteration := int32(i)
 		replayNode.Data.Iteration = &tmpIteration
 		wp.UpdateStatus(&replayNode, proto.NodeStatus_INFO, nil, fmt.Sprintf("Running Iteration %d of %d", i, iteration), true)
-		if err := wp.nextProcess(node.Id, ""); err != nil {
+		if err := wp.nextProcess(node.Id, loopHandle); err != nil {
 			wp.UpdateStatus(&replayNode, proto.NodeStatus_FAILED, nil, fmt.Sprintf("Error processing loop iteration %d: %v", i, err), true)
 			return "", err
 		}
 	}
 	wp.UpdateStatus(node, proto.NodeStatus_COMPLETED, nil, "Loop processed successfully", true)
+	if hasLoopHandles {
+		return "done", nil
+	}
 	return "", nil
 }
 
 func (wp *WorkflowProcessor) ForEachNodeProcess(node *proto.Node) (string, error) {
+	hasLoopHandles := wp.hasLoopOrDoneEdges(node.Id)
+	loopHandle := ""
+	if hasLoopHandles {
+		loopHandle = "loop"
+	}
+
+	if node.Data == nil || node.Data.Listvar == nil {
+		wp.UpdateStatus(node, proto.NodeStatus_FAILED, nil, "List variable is missing", true)
+		return "", errors.New("list variable is missing")
+	}
 	listvar := node.Data.Listvar
-	listitems := wp.ProcessVariables[*listvar]
+	listitems, _ := wp.getVariable(*listvar)
 
 	items, ok := listitems.([]interface{})
 	if !ok {
@@ -107,7 +137,7 @@ func (wp *WorkflowProcessor) ForEachNodeProcess(node *proto.Node) (string, error
 			replayNode.Data.Listvar = listvar
 			wp.UpdateStatus(&replayNode, proto.NodeStatus_INFO, v, fmt.Sprintf("Processing item %v in Foreach Loop", v), true)
 			wp.setVariable(OUTPUT, v)
-			if err := wp.nextProcess(node.Id, ""); err != nil {
+			if err := wp.nextProcess(node.Id, loopHandle); err != nil {
 				wp.UpdateStatus(&replayNode, proto.NodeStatus_FAILED, nil, fmt.Sprintf("Error processing item %v: %v", v, err), true)
 				return "", err
 			}
@@ -118,10 +148,23 @@ func (wp *WorkflowProcessor) ForEachNodeProcess(node *proto.Node) (string, error
 	}
 
 	wp.UpdateStatus(node, proto.NodeStatus_COMPLETED, nil, fmt.Sprintf("Foreach Loop completed for variable %s", *listvar), true)
+	if hasLoopHandles {
+		return "done", nil
+	}
 	return "", nil
 }
 
 func (wp *WorkflowProcessor) WhileNodeProcess(node *proto.Node) (string, error) {
+	hasLoopHandles := wp.hasLoopOrDoneEdges(node.Id)
+	loopHandle := ""
+	if hasLoopHandles {
+		loopHandle = "loop"
+	}
+
+	if node.Data == nil || node.Data.Expression == nil || node.Data.Limit == nil {
+		wp.UpdateStatus(node, proto.NodeStatus_FAILED, nil, "While node data missing", true)
+		return "", errors.New("while node data missing")
+	}
 	expression := wp.populateTemplate(*node.Data.Expression, nil)
 	replayNode := CopyNode(node)
 	replayNode.Data.Expression = &expression
@@ -136,7 +179,7 @@ func (wp *WorkflowProcessor) WhileNodeProcess(node *proto.Node) (string, error) 
 		iteration := int32(cur)
 		replayNode.Data.Iteration = &iteration
 		wp.UpdateStatus(&replayNode, proto.NodeStatus_INFO, nil, fmt.Sprintf("While Loop iteration %d with condition '%s'", cur, expression), true)
-		if err := wp.nextProcess(node.Id, ""); err != nil {
+		if err := wp.nextProcess(node.Id, loopHandle); err != nil {
 			wp.UpdateStatus(&replayNode, proto.NodeStatus_FAILED, nil, fmt.Sprintf("Error during While Loop iteration %d: %v", cur, err), true)
 			return "", err
 		}
@@ -149,6 +192,9 @@ func (wp *WorkflowProcessor) WhileNodeProcess(node *proto.Node) (string, error) 
 		cur++
 	}
 	wp.UpdateStatus(&replayNode, proto.NodeStatus_COMPLETED, nil, "While Loop completed successfully", true)
+	if hasLoopHandles {
+		return "done", nil
+	}
 	return "", nil
 }
 
@@ -184,19 +230,38 @@ func (wp *WorkflowProcessor) ListNodeProcess(node *proto.Node) (string, error) {
 }
 
 func (wp *WorkflowProcessor) ApiNodeProcess(node *proto.Node) (string, error) {
-	url := wp.populateTemplate(*node.Data.Url, nil)
-	method := *node.Data.Method
-	nodeDataArray := node.Data.Headers
+	url := ""
+	if node.Data != nil && node.Data.Url != nil {
+		url = wp.populateTemplate(*node.Data.Url, nil)
+	}
+	method := "GET"
+	if node.Data != nil && node.Data.Method != nil && *node.Data.Method != "" {
+		method = *node.Data.Method
+	}
 	headers := make([]*proto.KeyValue, 0)
-	headers = append(headers, nodeDataArray.KeyValueItems...)
-	payloadStr := wp.populateTemplate(*node.Data.Payload, nil)
-	variable := *node.Data.Variable
+	if node.Data != nil && node.Data.Headers != nil {
+		headers = append(headers, node.Data.Headers.KeyValueItems...)
+	}
+	payloadStr := ""
+	if node.Data != nil && node.Data.Payload != nil {
+		payloadStr = wp.populateTemplate(*node.Data.Payload, nil)
+	}
+	variable := ""
+	if node.Data != nil && node.Data.Variable != nil {
+		variable = *node.Data.Variable
+	}
 	var payload interface{}
-	json.Unmarshal([]byte(payloadStr), &payload)
+	if payloadStr != "" && method != "GET" {
+		if err := json.Unmarshal([]byte(payloadStr), &payload); err != nil {
+			payload = payloadStr
+		}
+	}
 	response, err := wp.makeRequest(url, method, headers, payload)
 	replayNode := CopyNode(node)
-	replayNode.Data.Url = &url
-	replayNode.Data.Payload = &payloadStr
+	if replayNode.Data != nil {
+		replayNode.Data.Url = &url
+		replayNode.Data.Payload = &payloadStr
+	}
 	if err != nil {
 		wp.UpdateStatus(&replayNode, proto.NodeStatus_FAILED, nil, fmt.Sprintf("Error processing API %s: %v", url, err), true)
 		return "", err
@@ -204,7 +269,9 @@ func (wp *WorkflowProcessor) ApiNodeProcess(node *proto.Node) (string, error) {
 	defer func() {
 		wp.UpdateStatus(&replayNode, proto.NodeStatus_COMPLETED, response, fmt.Sprintf("API %s processed successfully", url), true)
 	}()
-	wp.setVariable(variable, response)
+	if variable != "" {
+		wp.setVariable(variable, response)
+	}
 	return "", nil
 }
 
@@ -247,8 +314,9 @@ func (wp *WorkflowProcessor) CountNodeProcess(node *proto.Node) (string, error) 
 	varName := node.Data.Variable
 	listVar := node.Data.ListVariable
 	count := 0
-	if listVarValue, ok := wp.ProcessVariables[*listVar].([]interface{}); ok {
-		count = count + len(listVarValue)
+	listVarValue, ok := wp.getVariable(*listVar)
+	if listSlice, isSlice := listVarValue.([]interface{}); ok && isSlice {
+		count = count + len(listSlice)
 	} else {
 		wp.UpdateStatus(node, proto.NodeStatus_FAILED, nil, "List variable not found or is not a valid List", true)
 		return "", errors.New("list variable not found or is not a valid List")
@@ -263,7 +331,7 @@ func (wp *WorkflowProcessor) MapNodeProcess(node *proto.Node) (string, error) {
 	listVar := node.Data.ListVariable
 	variable := node.Data.Variable
 	templateStr := node.Data.Template
-	listVarValue, ok := wp.ProcessVariables[*listVar]
+	listVarValue, ok := wp.getVariable(*listVar)
 
 	if !ok {
 		wp.UpdateStatus(node, proto.NodeStatus_FAILED, nil, "List variable not found or is not a valid List", true)
@@ -318,7 +386,15 @@ func (wp *WorkflowProcessor) ReplaceNodeProcess(node *proto.Node) (string, error
 	pattern := wp.populateTemplate(*node.Data.Pattern, nil)
 	replaceText := wp.populateTemplate(*node.Data.ReplaceText, nil)
 	varName := node.Data.Variable
-	newText := RegexReplaceAll(text, pattern, replaceText)
+	newText, err := RegexReplaceAll(text, pattern, replaceText)
+	if err != nil {
+		replayNode := CopyNode(node)
+		replayNode.Data.Text = &text
+		replayNode.Data.Pattern = &pattern
+		replayNode.Data.ReplaceText = &replaceText
+		wp.UpdateStatus(&replayNode, proto.NodeStatus_FAILED, nil, fmt.Sprintf("Invalid regex pattern '%s': %v", pattern, err), true)
+		return "", err
+	}
 	defer func() {
 		replayNode := CopyNode(node)
 		replayNode.Data.Text = &text
@@ -334,7 +410,14 @@ func (wp *WorkflowProcessor) FindAllNodeProcess(node *proto.Node) (string, error
 	text := wp.populateTemplate(*node.Data.Text, nil)
 	pattern := wp.populateTemplate(*node.Data.Pattern, nil)
 	varName := node.Data.Variable
-	re := regexp.MustCompile(pattern)
+	re, err := regexp.Compile(pattern)
+	if err != nil {
+		replayNode := CopyNode(node)
+		replayNode.Data.Text = &text
+		replayNode.Data.Pattern = &pattern
+		wp.UpdateStatus(&replayNode, proto.NodeStatus_FAILED, nil, fmt.Sprintf("Invalid regex pattern '%s': %v", pattern, err), true)
+		return "", err
+	}
 	matches := re.FindAllString(text, -1)
 	defer func() {
 		replayNode := CopyNode(node)
@@ -359,10 +442,17 @@ func (wp *WorkflowProcessor) SubProcessNodeProcess(node *proto.Node) (string, er
 		wp.UpdateStatus(node, proto.NodeStatus_FAILED, nil, fmt.Sprintf("Error retrieving SubProcess %s: %v", *subProcessId, err), true)
 		return "", err
 	}
+	subVars := make(map[string]interface{})
+	wp.VariablesMu.RLock()
+	for k, v := range wp.ProcessVariables {
+		subVars[k] = v
+	}
+	wp.VariablesMu.RUnlock()
+
 	subProcessor := &WorkflowProcessor{
 		Stream:           wp.Stream,
 		Workflow:         workflow,
-		ProcessVariables: wp.ProcessVariables,
+		ProcessVariables: subVars,
 		DBcon:            wp.DBcon,
 		Depth:            wp.Depth + 1,
 	}
@@ -373,9 +463,11 @@ func (wp *WorkflowProcessor) SubProcessNodeProcess(node *proto.Node) (string, er
 		return "", err
 	}
 
+	subProcessor.VariablesMu.RLock()
 	for key, value := range subProcessor.ProcessVariables {
-		wp.ProcessVariables[key] = value
+		wp.setVariable(key, value)
 	}
+	subProcessor.VariablesMu.RUnlock()
 	wp.UpdateStatus(node, proto.NodeStatus_COMPLETED, nil, fmt.Sprintf("SubProcess %s completed successfully", *subProcessId), true)
 	return "", nil
 }
@@ -466,34 +558,81 @@ func (wp *WorkflowProcessor) ConnectorNodeProcess(node *proto.Node) (string, err
 	if conn.AuthType == "oauth2" {
 		createdAtVal, _ := creds["created_at"].(float64)
 		expiresInVal, _ := creds["expires_in"].(float64)
+		if createdAtVal == 0 {
+			if n, ok := creds["created_at"].(int64); ok {
+				createdAtVal = float64(n)
+			}
+		}
+		if expiresInVal == 0 {
+			if n, ok := creds["expires_in"].(int64); ok {
+				expiresInVal = float64(n)
+			}
+		}
 		if createdAtVal > 0 && expiresInVal > 0 {
 			expiryTime := time.Unix(int64(createdAtVal)+int64(expiresInVal), 0)
 			if time.Now().After(expiryTime) {
 				refreshToken, _ := creds["refresh_token"].(string)
 				if refreshToken != "" {
-					clientID, clientSecret := getConnectorCredentials(conn.ConnectorID)
-					data := url.Values{}
-					data.Set("client_id", clientID)
-					data.Set("client_secret", clientSecret)
-					data.Set("refresh_token", refreshToken)
-					data.Set("grant_type", "refresh_token")
-
-					resp, err := http.PostForm(template.OAuthConfig.TokenURL, data)
-					if err == nil && resp.StatusCode == http.StatusOK {
-						defer resp.Body.Close()
-						bodyBytes, _ := ioutil.ReadAll(resp.Body)
-						var parsed map[string]interface{}
-						if json.Unmarshal(bodyBytes, &parsed) == nil {
-							parsed["created_at"] = time.Now().Unix()
-							if _, ok := parsed["refresh_token"]; !ok {
-								parsed["refresh_token"] = refreshToken
+					acquired, lockErr := DB.SetCacheNX(context.Background(), "oauth:lock:"+conn.ID, "1", 15*time.Second)
+					if lockErr != nil || !acquired {
+						// Lock held by another concurrent worker: wait briefly and retry fetching updated connection
+						for i := 0; i < 3; i++ {
+							time.Sleep(500 * time.Millisecond)
+							if refreshedConn, err := wp.DBcon.GetConnection(connectionID); err == nil {
+								conn = refreshedConn
+								if dec, err := crypto.Decrypt(conn.Credentials); err == nil {
+									var newCreds map[string]interface{}
+									if json.Unmarshal([]byte(dec), &newCreds) == nil {
+										creds = newCreds
+										newCreated, _ := creds["created_at"].(float64)
+										newExpires, _ := creds["expires_in"].(float64)
+										if newCreated > 0 && newExpires > 0 && time.Now().Before(time.Unix(int64(newCreated)+int64(newExpires), 0)) {
+											break
+										}
+									}
+								}
 							}
-							creds = parsed
-							bytes, _ := json.Marshal(creds)
-							encrypted, _ := crypto.Encrypt(string(bytes))
-							conn.Credentials = encrypted
-							conn.UpdatedAt = time.Now()
-							wp.DBcon.SaveConnection(&conn)
+						}
+					} else {
+						defer DB.DeleteCache(context.Background(), "oauth:lock:"+conn.ID)
+
+						clientID, _ := creds["client_id"].(string)
+						clientSecret, _ := creds["client_secret"].(string)
+						if clientID == "" || clientSecret == "" {
+							fallbackClientID, fallbackClientSecret := getConnectorCredentials(conn.ConnectorID)
+							if clientID == "" {
+								clientID = fallbackClientID
+							}
+							if clientSecret == "" {
+								clientSecret = fallbackClientSecret
+							}
+						}
+						data := url.Values{}
+						data.Set("client_id", clientID)
+						data.Set("client_secret", clientSecret)
+						data.Set("refresh_token", refreshToken)
+						data.Set("grant_type", "refresh_token")
+
+						client := NewSafeHTTPClient(30 * time.Second)
+						resp, err := client.PostForm(template.OAuthConfig.TokenURL, data)
+						if err == nil && resp.StatusCode == http.StatusOK {
+							defer resp.Body.Close()
+							bodyBytes, _ := ioutil.ReadAll(resp.Body)
+							var parsed map[string]interface{}
+							if json.Unmarshal(bodyBytes, &parsed) == nil {
+								parsed["client_id"] = clientID
+								parsed["client_secret"] = clientSecret
+								parsed["created_at"] = time.Now().Unix()
+								if _, ok := parsed["refresh_token"]; !ok {
+									parsed["refresh_token"] = refreshToken
+								}
+								creds = parsed
+								bytes, _ := json.Marshal(creds)
+								encrypted, _ := crypto.Encrypt(string(bytes))
+								conn.Credentials = encrypted
+								conn.UpdatedAt = time.Now()
+								wp.DBcon.SaveConnection(&conn)
+							}
 						}
 					}
 				}
@@ -600,5 +739,55 @@ func getConnectorCredentials(connectorID string) (string, string) {
 	}
 	return clientID, clientSecret
 }
+
+func (wp *WorkflowProcessor) RagNodeProcess(node *proto.Node) (string, error) {
+	if node.Data == nil {
+		return "", errors.New("node data is nil")
+	}
+
+	ragConnID := node.Data.GetRagConnectionId()
+	promptRaw := node.Data.GetRagPrompt()
+	topK := node.Data.GetRagTopK()
+	systemPromptRaw := node.Data.GetRagSystemPrompt()
+	outputVar := node.Data.GetRagOutputVar()
+
+	if outputVar == "" {
+		outputVar = "rag_output"
+	}
+	if topK <= 0 {
+		topK = 3
+	}
+
+	prompt := wp.populateTemplate(promptRaw, nil)
+	systemPrompt := wp.populateTemplate(systemPromptRaw, nil)
+
+	env := DB.ResolveEnvName(wp.Workflow.Environment)
+	ragConn, err := wp.DBcon.GetRagConnectionEnv(ragConnID, env)
+	if err != nil {
+		replayNode := CopyNode(node)
+		wp.UpdateStatus(&replayNode, proto.NodeStatus_FAILED, nil, fmt.Sprintf("Failed to get RAG Connection %s: %v", ragConnID, err), true)
+		return "", fmt.Errorf("failed to get RAG Connection: %w", err)
+	}
+
+	answer, sources, err := rag.PerformRAGQuery(&wp.DBcon, env, ragConn, prompt, int(topK), systemPrompt)
+	replayNode := CopyNode(node)
+	replayNode.Data.RagPrompt = &prompt
+
+	if err != nil {
+		wp.UpdateStatus(&replayNode, proto.NodeStatus_FAILED, nil, fmt.Sprintf("RAG Execution Failed: %v", err), true)
+		return "", err
+	}
+
+	var sourceSummary []string
+	for _, s := range sources {
+		sourceSummary = append(sourceSummary, fmt.Sprintf("[%s (score: %.2f)]", s.DocumentName, s.Score))
+	}
+	summaryMsg := fmt.Sprintf("RAG query executed. Context retrieved from: %s", strings.Join(sourceSummary, ", "))
+
+	wp.setVariable(outputVar, answer)
+	wp.UpdateStatus(&replayNode, proto.NodeStatus_COMPLETED, answer, summaryMsg, true)
+	return "", nil
+}
+
 
 

@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"gorm.io/gorm/clause"
 )
 
 const replayDataCacheExpiration = 15 * time.Minute
@@ -25,6 +26,7 @@ type ReplayData struct {
 	Status          int32  `gorm:"omitempty"`
 	Message         string `gorm:"omitempty"`
 	CreatedAt       int64  `gorm:"omitempty"`
+	Environment     string `gorm:"-" json:"environment,omitempty"`
 }
 
 func (db *DatabaseConnection) CreateReplayData(data *ReplayData) (string, error) {
@@ -35,12 +37,17 @@ func (db *DatabaseConnection) CreateReplayDataEnv(data *ReplayData, env string) 
 	if data == nil {
 		return "", fmt.Errorf("data is Empty")
 	}
-	data.CreatedAt = time.Now().UTC().Unix()
+	if db == nil || db.conn == nil {
+		return "", fmt.Errorf("database connection is nil")
+	}
+	if data.CreatedAt == 0 {
+		data.CreatedAt = time.Now().UTC().Unix()
+	}
 	if data.ID == "" {
 		data.ID = uuid.NewString()
 	}
 	tableName := db.TableFor(env, "replay_data")
-	result := db.conn.Table(tableName).Create(&data)
+	result := db.conn.Table(tableName).Clauses(clause.OnConflict{DoNothing: true}).Create(&data)
 	if result.Error != nil {
 		return "", result.Error
 	}
@@ -61,11 +68,16 @@ func (db *DatabaseConnection) CreateBatchReplayDataEnv(dataList []ReplayData, en
 	if len(dataList) == 0 {
 		return nil, fmt.Errorf("dataList is empty")
 	}
+	if db == nil || db.conn == nil {
+		return nil, fmt.Errorf("database connection is nil")
+	}
 
 	var ids []string
 	processIDs := make(map[string]struct{})
 	for i := range dataList {
-		dataList[i].CreatedAt = time.Now().UTC().Unix()
+		if dataList[i].CreatedAt == 0 {
+			dataList[i].CreatedAt = time.Now().UTC().Unix()
+		}
 		if dataList[i].ID == "" {
 			dataList[i].ID = uuid.NewString()
 		}
@@ -81,7 +93,7 @@ func (db *DatabaseConnection) CreateBatchReplayDataEnv(dataList []ReplayData, en
 			end = len(dataList)
 		}
 		chunk := dataList[i:end]
-		result := db.conn.Table(tableName).Create(&chunk)
+		result := db.conn.Table(tableName).Clauses(clause.OnConflict{DoNothing: true}).Create(&chunk)
 		if result.Error != nil {
 			return nil, result.Error
 		}

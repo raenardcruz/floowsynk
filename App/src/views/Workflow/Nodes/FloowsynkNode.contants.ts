@@ -52,6 +52,23 @@ export const groups: Group[] = [
 
 export const nodes: Node.AsObject[] = [
     {
+        id: '', nodetype: 'rag', label: 'AI RAG Query', position: { x: 0, y: 0 },
+        groupList: [4],
+        icon: {
+            name: "psychology",
+            color: "linear-gradient(135deg, #a78bfa, #ec4899)"
+        },
+        data: {
+            ragconnectionid: "",
+            ragprompt: "{{input}}",
+            ragtopk: 3,
+            ragsystemprompt: "",
+            ragoutputvar: "rag_output"
+        },
+        inputsList: ["input"],
+        outputsList: ["output"]
+    },
+    {
         id: '', nodetype: 'setVariable', label: 'Set Variable', position: { x: 0, y: 0 },
         groupList: [1],
         icon: {

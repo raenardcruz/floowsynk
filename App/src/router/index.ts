@@ -41,6 +41,11 @@ const routes: RouteRecordRaw[] = [
         path: "connectors",
         component: () => import('@/views/Connectors')
       },
+      {
+        name: "RAG",
+        path: "rag",
+        component: () => import('@/views/Rag')
+      },
     ],
     beforeEnter: (_, __, next) => {
       if (!session.value && !checkSession()) {

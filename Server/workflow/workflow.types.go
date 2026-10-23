@@ -1,6 +1,8 @@
 package workflow
 
 import (
+	"sync"
+
 	"github.com/IBM/sarama"
 	proto "github.com/raenardcruz/floowsynk/CodeGen/go/workflow"
 	db "github.com/raenardcruz/floowsynk/Database"
@@ -21,11 +23,15 @@ type WorkflowProcessor struct {
 	Stream           GrpcWorkflowStream
 	Workflow         *proto.Workflow
 	ProcessVariables map[string]interface{}
+	VariablesMu      sync.RWMutex
 	DBcon            db.DatabaseConnection
 	Producer         *sarama.SyncProducer
 	Step             int32
 	Depth            int32
 	ResponseChan     chan string
+	ExecutedEdges    map[string]bool
+	NodeVisitCount   map[string]int
+	MaxStepLimit     int
 }
 
 type WorkflowHistory struct {

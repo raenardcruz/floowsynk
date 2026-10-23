@@ -90,7 +90,19 @@ func main() {
 
 			if len(batch) > 0 {
 				log.Printf("Flushing %d replay data to the database", len(batch))
-				DBCon.CreateBatchReplayData(batch)
+				envBatches := make(map[string][]db.ReplayData)
+				for _, rd := range batch {
+					env := strings.TrimSpace(rd.Environment)
+					if env == "" {
+						env = "staging"
+					}
+					envBatches[env] = append(envBatches[env], rd)
+				}
+				for env, envSlice := range envBatches {
+					if _, err := DBCon.CreateBatchReplayDataEnv(envSlice, env); err != nil {
+						log.Printf("Error creating batch replay data for env %s: %v", env, err)
+					}
+				}
 			}
 			timer.Reset(bufferTime)
 		}

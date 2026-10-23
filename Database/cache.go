@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/go-redis/redis/v8"
@@ -72,15 +73,31 @@ func ClearCache(ctx context.Context) error {
 	if !UseCache || RedisClient == nil {
 		return nil
 	}
-	keys, err := RedisClient.Keys(ctx, "*").Result()
-	if err != nil {
-		return fmt.Errorf("failed to get cache keys: %w", err)
-	}
 
-	for _, key := range keys {
-		err = RedisClient.Del(ctx, key).Err()
+	var cursor uint64
+	for {
+		keys, nextCursor, err := RedisClient.Scan(ctx, cursor, "*", 200).Result()
 		if err != nil {
-			log.Printf("Failed to delete cache key %s: %v", key, err)
+			return fmt.Errorf("failed to scan cache keys: %w", err)
+		}
+		cursor = nextCursor
+
+		var batchKeys []string
+		for _, key := range keys {
+			if strings.HasPrefix(key, "workflow:interval:") || strings.HasPrefix(key, "oauth:lock:") {
+				continue
+			}
+			batchKeys = append(batchKeys, key)
+		}
+
+		if len(batchKeys) > 0 {
+			if err := RedisClient.Unlink(ctx, batchKeys...).Err(); err != nil {
+				log.Printf("Failed to unlink cache keys: %v", err)
+			}
+		}
+
+		if cursor == 0 {
+			break
 		}
 	}
 
@@ -89,7 +106,7 @@ func ClearCache(ctx context.Context) error {
 }
 
 func SetCacheNX(ctx context.Context, key string, data interface{}, expiration time.Duration) (bool, error) {
-	if !UseCache {
+	if !UseCache || RedisClient == nil {
 		return true, nil
 	}
 	jsonData, err := json.Marshal(data)
@@ -104,7 +121,7 @@ func SetCacheNX(ctx context.Context, key string, data interface{}, expiration ti
 }
 
 func CacheExists(ctx context.Context, key string) (bool, error) {
-	if !UseCache {
+	if !UseCache || RedisClient == nil {
 		return false, nil
 	}
 	exists, err := RedisClient.Exists(ctx, key).Result()

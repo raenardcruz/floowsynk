@@ -10,9 +10,9 @@
             <div class="label" v-if="displayLabel.length > 0">{{ displayLabel }}</div>
             <div class="type">{{ toSentenceCase(nodetype) }}</div>
         </div>
-        <Handle class="handle-input" v-if="outputsList" v-for="(input, index) in inputsList" :key="input" :id="input"
+        <Handle class="handle-input" v-if="inputsList" v-for="(input, index) in inputsList" :key="input" :id="input"
             :data-output="input" type="target" :position="Position.Left"
-            :style="{ top: `${(100 / (outputsList.length + 1)) * (index + 1)}%` }" />
+            :style="{ top: `${(100 / (inputsList.length + 1)) * (index + 1)}%` }" />
         <Handle class="handle-output" v-if="outputsList" v-for="(output, index) in outputsList" :key="output"
             :id="output" :data-output="output" type="source" :position="Position.Right"
             :style="{ top: `${(100 / (outputsList.length + 1)) * (index + 1)}%` }" />
@@ -51,8 +51,7 @@ import { useWorkflowCanvasStore } from '@/views/Workflow/Canvas/Workflow.Canvas.
 import { onKeyStroke } from '@vueuse/core'
 import Popover from 'primevue/popover'
 import Divider from 'primevue/divider'
-import { getConnections } from '@/views/Connectors/Connectors.api'
-import { getRestUrl } from '@/components/Composable/constants'
+import { useConnectorCatalog } from '@/views/Connectors/Connectors.api'
 
 const op = ref()
 const props = defineProps<NodeProps>()
@@ -70,27 +69,12 @@ const clickHandler = (event: any) => {
 }
 let { icon, nodetype, label, outputsList, inputsList, nodestyle } = node as unknown as Node.AsObject
 
-const connectionsList = ref<any[]>([])
-const templatesList = ref<any[]>([])
-
-const fetchConnectorInfo = async () => {
-    if (nodetype === 'connector') {
-        try {
-            const connRes = await getConnections()
-            connectionsList.value = connRes.toObject().connectionsList || []
-
-            const tempRes = await fetch(`${getRestUrl()}/api/connectors/templates`)
-            if (tempRes.ok) {
-                templatesList.value = await tempRes.json()
-            }
-        } catch (err) {
-            console.error("Failed to load connector info in node:", err)
-        }
-    }
-}
+const { connectionsList, templatesList, fetchConnectorCatalog } = useConnectorCatalog()
 
 onMounted(() => {
-    fetchConnectorInfo()
+    if (nodetype === 'connector') {
+        fetchConnectorCatalog()
+    }
 })
 
 const displayIcon = computed(() => {
@@ -134,6 +118,9 @@ watch(node, (newValue) => {
         nodetype = (newValue as unknown as Node.AsObject).nodetype
         icon = (newValue as unknown as Node.AsObject).icon
         nodestyle = (newValue as unknown as Node.AsObject).nodestyle
+        if (nodetype === 'connector') {
+            fetchConnectorCatalog()
+        }
     }
 })
 watch([showModal, showModal], ([newShowModal, newShowSidebar]) => {

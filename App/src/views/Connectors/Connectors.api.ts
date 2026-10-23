@@ -6,6 +6,7 @@ import {
 } from 'proto/workflow/workflow_pb'
 import { Empty } from 'google-protobuf/google/protobuf/empty_pb'
 import { getApiUrl, getRestUrl } from '@/components/Composable/constants'
+import { ref } from 'vue'
 
 const getHeaders = () => ({
     'Authorization': `${localStorage.getItem("sessionToken") || ''}`
@@ -20,6 +21,44 @@ export const getConnectorTemplates = async (): Promise<any[]> => {
 export const getConnections = async (): Promise<ConnectionList> => {
     const client = new WorkflowServicePromiseClient(getApiUrl())
     return await client.listConnections(new ListConnectionsRequest(), getHeaders())
+}
+
+const connectionsList = ref<any[]>([])
+const templatesList = ref<any[]>([])
+let isCatalogLoaded = false
+let inFlightCatalogPromise: Promise<void> | null = null
+
+export const fetchConnectorCatalog = async (force = false): Promise<void> => {
+    if (!force && isCatalogLoaded) {
+        return
+    }
+    if (inFlightCatalogPromise) {
+        return inFlightCatalogPromise
+    }
+    inFlightCatalogPromise = (async () => {
+        try {
+            const [connRes, templates] = await Promise.all([
+                getConnections(),
+                getConnectorTemplates()
+            ])
+            connectionsList.value = connRes.toObject().connectionsList || []
+            templatesList.value = templates || []
+            isCatalogLoaded = true
+        } catch (err) {
+            console.error("Failed to load connector catalog:", err)
+        } finally {
+            inFlightCatalogPromise = null
+        }
+    })()
+    return inFlightCatalogPromise
+}
+
+export const useConnectorCatalog = () => {
+    return {
+        connectionsList,
+        templatesList,
+        fetchConnectorCatalog
+    }
 }
 
 export const deleteConnection = async (id: string): Promise<Empty> => {

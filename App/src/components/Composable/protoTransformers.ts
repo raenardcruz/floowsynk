@@ -331,14 +331,6 @@ export function edgeFromObject(obj: any): Edge {
     if (normalizedObj.animated !== undefined) {
       msg.setAnimated(normalizedObj.animated);
     }
-    if (normalizedObj.sourcenode !== undefined) {
-      const sourceNode = nodeFromObject(normalizedObj.sourcenode);
-      msg.setSourcenode(sourceNode);
-    }
-    if (normalizedObj.targetnode !== undefined) {
-      const targetNode = nodeFromObject(normalizedObj.targetnode);
-      msg.setTargetnode(targetNode);
-    }
     if (normalizedObj.sourcehandle !== undefined) {
       msg.setSourcehandle(normalizedObj.sourcehandle);
     }

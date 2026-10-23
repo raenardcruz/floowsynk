@@ -1,0 +1,56 @@
+# Binaries and build artifacts
+Server/Server
+Server/floowsynk_server
+floowsynk_server
+Jobs/Interval/Interval
+Jobs/Consumer/Consumer
+Jobs/ClearCache/ClearCache
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Go workspace
+go.work
+go.work.sum
+
+# Node and frontend build outputs
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# OS metadata
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE / Editor files
+.idea/
+*.swp
+*.swo
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# AI audit & remediation task files
+audit_remediation_task.json
+audit_remediation_tasks.json
+audit_remediation_*.json

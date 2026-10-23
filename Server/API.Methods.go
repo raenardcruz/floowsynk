@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"crypto/subtle"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -11,9 +12,11 @@ import (
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/google/uuid"
 	wf "github.com/raenardcruz/floowsynk/CodeGen/go/workflow"
 	DB "github.com/raenardcruz/floowsynk/Database"
 	"github.com/raenardcruz/floowsynk/Server/crypto"
+	"github.com/raenardcruz/floowsynk/Server/rag"
 	"google.golang.org/grpc/metadata"
 )
 
@@ -53,7 +56,7 @@ func validateToken(tokenString string) *ValidateResults {
 			status:   http.StatusOK,
 		}
 	}
-	if tokenString == DB.AppConfig.Job_Token {
+	if DB.AppConfig.Job_Token != "" && subtle.ConstantTimeCompare([]byte(tokenString), []byte(DB.AppConfig.Job_Token)) == 1 {
 		return &ValidateResults{
 			id:       "",
 			username: "job",
@@ -62,6 +65,9 @@ func validateToken(tokenString string) *ValidateResults {
 		}
 	}
 	token, err := jwt.ParseWithClaims(tokenString, jwt.MapClaims{}, func(token *jwt.Token) (interface{}, error) {
+		if token.Method != jwt.SigningMethodHS256 {
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+		}
 		return jwtKey, nil
 	})
 	if err != nil {
@@ -69,10 +75,13 @@ func validateToken(tokenString string) *ValidateResults {
 	}
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		id, _ := claims["id"].(string)
+		username, _ := claims["username"].(string)
+		role, _ := claims["role"].(string)
 		return &ValidateResults{
-			id:       claims["id"].(string),
-			username: claims["username"].(string),
-			role:     claims["role"].(string),
+			id:       id,
+			username: username,
+			role:     role,
 			status:   http.StatusOK,
 		}
 	}
@@ -156,16 +165,30 @@ func ListWorkflowHistoryImpl(env string) (*wf.WorkflowHistoryList, error) {
 		return nil, err
 	}
 
-	var hl []*wf.WorkflowHistory
+	workflowIDMap := make(map[string]bool)
+	var workflowIDs []string
 	for _, data := range history {
-		w, err := DBCon.GetWorkflowEnv(data.WorkflowID, env)
-		if err != nil {
+		if data.WorkflowID != "" && !workflowIDMap[data.WorkflowID] {
+			workflowIDMap[data.WorkflowID] = true
+			workflowIDs = append(workflowIDs, data.WorkflowID)
+		}
+	}
+
+	namesMap, err := DBCon.GetWorkflowNamesByIDsEnv(workflowIDs, env)
+	if err != nil {
+		return nil, err
+	}
+
+	hl := make([]*wf.WorkflowHistory, 0, len(history))
+	for _, data := range history {
+		name, exists := namesMap[data.WorkflowID]
+		if !exists {
 			continue
 		}
 		hl = append(hl, &wf.WorkflowHistory{
 			Id:           data.ProcessID,
 			WorkflowId:   data.WorkflowID,
-			WorkflowName: w.Name,
+			WorkflowName: name,
 			RunDate:      time.Unix(data.CreatedAt, 0).Format("Jan 02, 2006"),
 			Status:       wf.NodeStatus(data.Status),
 		})
@@ -387,6 +410,237 @@ func PublishConnectionToRemoteServer(connID string) error {
 		return fmt.Errorf("production server returned status %d: %s", resp.StatusCode, string(bodyBytes))
 	}
 	return nil
+}
+
+// RAG API Implementation Methods
+
+func ListRagConnectionsImpl(env string) ([]*wf.RagConnectionProto, error) {
+	dbConns, err := DBCon.ListRagConnectionsEnv(env)
+	if err != nil {
+		return nil, err
+	}
+
+	var result []*wf.RagConnectionProto
+	for _, c := range dbConns {
+		docCount, _ := DBCon.GetRagDocumentCountEnv(c.ID, env)
+		chunkCount, _ := DBCon.GetRagChunkCountEnv(c.ID, env)
+		result = append(result, &wf.RagConnectionProto{
+			Id:             c.ID,
+			Name:           c.Name,
+			OllamaBaseUrl:  c.OllamaBaseURL,
+			EmbeddingModel: c.EmbeddingModel,
+			ChatModel:      c.ChatModel,
+			Description:    c.Description,
+			CreatedAt:      c.CreatedAt.Format(time.RFC3339),
+			UpdatedAt:      c.UpdatedAt.Format(time.RFC3339),
+			DocumentCount:  int32(docCount),
+			ChunkCount:     int32(chunkCount),
+			IsModified:     c.IsModified,
+		})
+	}
+	return result, nil
+}
+
+func CreateRagConnectionImpl(req *wf.RagConnectionProto, env string) (*wf.RagConnectionProto, error) {
+	id := req.Id
+	if id == "" {
+		id = uuid.New().String()
+	}
+	ollamaURL := req.OllamaBaseUrl
+	if ollamaURL == "" {
+		ollamaURL = "http://localhost:11434"
+	}
+	embedModel := req.EmbeddingModel
+	if embedModel == "" {
+		embedModel = "nomic-embed-text"
+	}
+	chatModel := req.ChatModel
+	if chatModel == "" {
+		chatModel = "gemma4"
+	}
+
+	now := time.Now()
+	conn := DB.RagConnection{
+		ID:             id,
+		Name:           req.Name,
+		OllamaBaseURL:  ollamaURL,
+		EmbeddingModel: embedModel,
+		ChatModel:      chatModel,
+		Description:    req.Description,
+		CreatedAt:      now,
+		UpdatedAt:      now,
+		IsModified:     false,
+	}
+
+	if err := DBCon.AddRagConnectionEnv(conn, env); err != nil {
+		return nil, err
+	}
+
+	return &wf.RagConnectionProto{
+		Id:             conn.ID,
+		Name:           conn.Name,
+		OllamaBaseUrl:  conn.OllamaBaseURL,
+		EmbeddingModel: conn.EmbeddingModel,
+		ChatModel:      conn.ChatModel,
+		Description:    conn.Description,
+		CreatedAt:      conn.CreatedAt.Format(time.RFC3339),
+		UpdatedAt:      conn.UpdatedAt.Format(time.RFC3339),
+		DocumentCount:  0,
+		ChunkCount:     0,
+		IsModified:     false,
+	}, nil
+}
+
+func UpdateRagConnectionImpl(req *wf.RagConnectionProto, env string) (*wf.RagConnectionProto, error) {
+	conn, err := DBCon.GetRagConnectionEnv(req.Id, env)
+	if err != nil {
+		return nil, fmt.Errorf("RAG connection not found: %w", err)
+	}
+
+	if req.Name != "" {
+		conn.Name = req.Name
+	}
+	if req.OllamaBaseUrl != "" {
+		conn.OllamaBaseURL = req.OllamaBaseUrl
+	}
+	if req.EmbeddingModel != "" {
+		conn.EmbeddingModel = req.EmbeddingModel
+	}
+	if req.ChatModel != "" {
+		conn.ChatModel = req.ChatModel
+	}
+	if req.Description != "" {
+		conn.Description = req.Description
+	}
+	conn.UpdatedAt = time.Now()
+
+	if err := DBCon.SaveRagConnectionEnv(&conn, env); err != nil {
+		return nil, err
+	}
+
+	docCount, _ := DBCon.GetRagDocumentCountEnv(conn.ID, env)
+	chunkCount, _ := DBCon.GetRagChunkCountEnv(conn.ID, env)
+
+	return &wf.RagConnectionProto{
+		Id:             conn.ID,
+		Name:           conn.Name,
+		OllamaBaseUrl:  conn.OllamaBaseURL,
+		EmbeddingModel: conn.EmbeddingModel,
+		ChatModel:      conn.ChatModel,
+		Description:    conn.Description,
+		CreatedAt:      conn.CreatedAt.Format(time.RFC3339),
+		UpdatedAt:      conn.UpdatedAt.Format(time.RFC3339),
+		DocumentCount:  int32(docCount),
+		ChunkCount:     int32(chunkCount),
+		IsModified:     conn.IsModified,
+	}, nil
+}
+
+func ListRagDocumentsImpl(ragConnID string, env string) ([]*wf.RagDocumentProto, error) {
+	docs, err := DBCon.ListRagDocumentsEnv(ragConnID, env)
+	if err != nil {
+		return nil, err
+	}
+
+	var result []*wf.RagDocumentProto
+	for _, d := range docs {
+		result = append(result, &wf.RagDocumentProto{
+			Id:                  d.ID,
+			RagConnectionId:     d.RagConnectionID,
+			FileName:            d.FileName,
+			FileSize:            d.FileSize,
+			FileType:            d.FileType,
+			ChunkCount:          int32(d.ChunkCount),
+			Status:              d.Status,
+			ErrorMessage:        d.ErrorMessage,
+			CreatedAt:           d.CreatedAt.Format(time.RFC3339),
+			ProcessedChunkCount: int32(d.ProcessedChunkCount),
+			TotalChunkCount:     int32(d.TotalChunkCount),
+		})
+	}
+	return result, nil
+}
+
+func UploadRagDocumentImpl(ragConnID string, fileName string, fileContent []byte, env string) (*wf.RagDocumentProto, error) {
+	ragConn, err := DBCon.GetRagConnectionEnv(ragConnID, env)
+	if err != nil {
+		return nil, fmt.Errorf("RAG connection not found: %w", err)
+	}
+
+	docID := uuid.New().String()
+	fileType := "txt"
+	if parts := strings.Split(fileName, "."); len(parts) > 1 {
+		fileType = strings.ToLower(parts[len(parts)-1])
+	}
+
+	doc := DB.RagDocument{
+		ID:                  docID,
+		RagConnectionID:     ragConnID,
+		FileName:            fileName,
+		FileSize:            int64(len(fileContent)),
+		FileType:            fileType,
+		ChunkCount:          0,
+		ProcessedChunkCount: 0,
+		TotalChunkCount:     0,
+		Status:              "PROCESSING",
+		ErrorMessage:        "",
+		CreatedAt:           time.Now(),
+	}
+
+	if err := DBCon.AddRagDocumentEnv(doc, env); err != nil {
+		return nil, fmt.Errorf("failed to create document record: %w", err)
+	}
+
+	// Synchronously process & index document chunks via Ollama
+	go func() {
+		if err := rag.ProcessAndIndexDocument(DBCon, env, ragConn, doc, fileContent); err != nil {
+			log.Printf("Error processing RAG document %s: %v", fileName, err)
+		}
+	}()
+
+	return &wf.RagDocumentProto{
+		Id:                  doc.ID,
+		RagConnectionId:     doc.RagConnectionID,
+		FileName:            doc.FileName,
+		FileSize:            doc.FileSize,
+		FileType:            doc.FileType,
+		ChunkCount:          0,
+		ProcessedChunkCount: 0,
+		TotalChunkCount:     0,
+		Status:              "PROCESSING",
+		ErrorMessage:        "",
+		CreatedAt:           doc.CreatedAt.Format(time.RFC3339),
+	}, nil
+}
+
+func QueryRagImpl(ragConnID string, query string, topK int32, systemPrompt string, env string) (*wf.QueryRagResponse, error) {
+	ragConn, err := DBCon.GetRagConnectionEnv(ragConnID, env)
+	if err != nil {
+		return nil, fmt.Errorf("RAG connection not found: %w", err)
+	}
+
+	if topK <= 0 {
+		topK = 3
+	}
+
+	answer, sources, err := rag.PerformRAGQuery(DBCon, env, ragConn, query, int(topK), systemPrompt)
+	if err != nil {
+		return nil, fmt.Errorf("RAG query processing failed: %w", err)
+	}
+
+	var protoSources []*wf.RagSourceChunk
+	for _, sc := range sources {
+		protoSources = append(protoSources, &wf.RagSourceChunk{
+			DocumentName: sc.DocumentName,
+			Content:      sc.Chunk.Content,
+			Score:        sc.Score,
+		})
+	}
+
+	return &wf.QueryRagResponse{
+		Answer:  answer,
+		Sources: protoSources,
+	}, nil
 }
 
 

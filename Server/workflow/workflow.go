@@ -2,6 +2,7 @@ package workflow
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"time"
 
@@ -31,6 +32,7 @@ const (
 	subprocessType  = "subprocess"
 	responseType    = "response"
 	connectorType   = "connector"
+	ragType         = "rag"
 )
 
 const (
@@ -43,16 +45,90 @@ const (
 
 func (wp *WorkflowProcessor) StartWorkflow() (err error) {
 	start := time.Now()
-	wp.ProcessVariables = make(map[string]interface{})
-	wp.ProcessVariables[INPUT] = ""
-	wp.ProcessVariables[OUTPUT] = ""
-	wp.Process("0")
+	if wp.ProcessVariables == nil {
+		wp.ProcessVariables = make(map[string]interface{})
+	}
+	if wp.ExecutedEdges == nil {
+		wp.ExecutedEdges = make(map[string]bool)
+	}
+	if wp.NodeVisitCount == nil {
+		wp.NodeVisitCount = make(map[string]int)
+	}
+	if wp.MaxStepLimit <= 0 {
+		wp.MaxStepLimit = 10000
+	}
+	if _, ok := wp.ProcessVariables[INPUT]; !ok {
+		wp.ProcessVariables[INPUT] = ""
+	}
+	if _, ok := wp.ProcessVariables[OUTPUT]; !ok {
+		if inVal, exists := wp.ProcessVariables[INPUT]; exists && inVal != "" {
+			wp.ProcessVariables[OUTPUT] = inVal
+		} else {
+			wp.ProcessVariables[OUTPUT] = ""
+		}
+	}
+
+	if wp.Workflow == nil || len(wp.Workflow.Nodes) == 0 {
+		return nil
+	}
+
+	startNodeId := "0"
+	if _, exist := getNodeById(wp.Workflow.Nodes, "0"); !exist {
+		targetMap := make(map[string]bool)
+		for _, edge := range wp.Workflow.Edges {
+			targetMap[edge.Target] = true
+		}
+		found := false
+		for _, node := range wp.Workflow.Nodes {
+			if !targetMap[node.Id] {
+				startNodeId = node.Id
+				found = true
+				break
+			}
+		}
+		if !found {
+			startNodeId = wp.Workflow.Nodes[0].Id
+		}
+	}
+
+	err = wp.Process(startNodeId)
 	duration := time.Since(start)
 	log.Default().Printf("Workflow %s completed in %s", wp.Workflow.Id, duration)
-	return nil
+	return err
+}
+
+func (wp *WorkflowProcessor) hasLoopOrDoneEdges(nodeId string) bool {
+	if wp.Workflow == nil {
+		return false
+	}
+	for _, edge := range wp.Workflow.Edges {
+		if edge.Source == nodeId && (edge.Sourcehandle == "loop" || edge.Sourcehandle == "done") {
+			return true
+		}
+	}
+	return false
 }
 
 func (wp *WorkflowProcessor) Process(nodeId string) (err error) {
+	if !wp.isJoinReady(nodeId) {
+		return nil
+	}
+
+	if wp.NodeVisitCount == nil {
+		wp.NodeVisitCount = make(map[string]int)
+	}
+	wp.NodeVisitCount[nodeId]++
+	if wp.MaxStepLimit > 0 && wp.NodeVisitCount[nodeId] > wp.MaxStepLimit {
+		return fmt.Errorf("node %s exceeded max execution limit of %d (cycle detected)", nodeId, wp.MaxStepLimit)
+	}
+
+	nonLoopIncoming := wp.getNonLoopIncomingEdges(nodeId)
+	if len(nonLoopIncoming) > 1 {
+		for _, inEdge := range nonLoopIncoming {
+			delete(wp.ExecutedEdges, getEdgeKey(inEdge))
+		}
+	}
+
 	wp.ProcessVariables[INPUT] = wp.ProcessVariables[OUTPUT]
 	sourceHandle := ""
 	node, exist := getNodeById(wp.Workflow.Nodes, nodeId)
@@ -84,6 +160,7 @@ func (wp *WorkflowProcessor) Process(nodeId string) (err error) {
 		subprocessType:  wp.SubProcessNodeProcess,
 		responseType:    wp.ResponseNodeProcess,
 		connectorType:   wp.ConnectorNodeProcess,
+		ragType:         wp.RagNodeProcess,
 	}
 
 	processFunc, ok := nodeProcessors[node.Nodetype]
@@ -91,18 +168,16 @@ func (wp *WorkflowProcessor) Process(nodeId string) (err error) {
 		return errors.New("unknown node type")
 	}
 
-	if node.Nodetype == conditionType {
-		if sourceHandle, err = processFunc(node); err != nil {
-			return err
-		}
-	} else {
-		if sourceHandle, err = processFunc(node); err != nil {
-			return err
-		}
+	if sourceHandle, err = processFunc(node); err != nil {
+		return err
 	}
 
-	wp.nextProcess(nodeId, sourceHandle)
-	return nil
+	isLoop := node.Nodetype == loopType || node.Nodetype == forEachType || node.Nodetype == whileType
+	if isLoop && sourceHandle == "" {
+		return nil
+	}
+
+	return wp.nextProcess(nodeId, sourceHandle)
 }
 
 func (wp *WorkflowProcessor) ConditionNodeProcessWrapper(node *proto.Node) (string, error) {

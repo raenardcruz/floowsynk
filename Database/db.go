@@ -200,6 +200,18 @@ func (db *DatabaseConnection) MigrateAndSeedDatabase() error {
 			log.Fatalf("Error migrating replay_data_%s: %v", env, err)
 			return err
 		}
+		if err := db.conn.Table("rag_connections_" + env).AutoMigrate(&RagConnection{}); err != nil {
+			log.Fatalf("Error migrating rag_connections_%s: %v", env, err)
+			return err
+		}
+		if err := db.conn.Table("rag_documents_" + env).AutoMigrate(&RagDocument{}); err != nil {
+			log.Fatalf("Error migrating rag_documents_%s: %v", env, err)
+			return err
+		}
+		if err := db.conn.Table("rag_chunks_" + env).AutoMigrate(&RagChunk{}); err != nil {
+			log.Fatalf("Error migrating rag_chunks_%s: %v", env, err)
+			return err
+		}
 	}
 
 	models := []interface{}{

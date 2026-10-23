@@ -17,5 +17,10 @@ export const apps = [
         "name": "Connectors",
         "icon": connection,
         "path": "/connectors"
+    },
+    {
+        "name": "RAG Knowledge",
+        "icon": connection,
+        "path": "/rag"
     }
 ]

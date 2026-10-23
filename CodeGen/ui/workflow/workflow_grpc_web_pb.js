@@ -1042,5 +1042,493 @@ proto.proto.WorkflowServicePromiseClient.prototype.revertWorkflowToStaging =
 };
 
 
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.proto.ListRagConnectionsRequest,
+ *   !proto.proto.RagConnectionList>}
+ */
+const methodDescriptor_WorkflowService_ListRagConnections = new grpc.web.MethodDescriptor(
+  '/proto.WorkflowService/ListRagConnections',
+  grpc.web.MethodType.UNARY,
+  proto.proto.ListRagConnectionsRequest,
+  proto.proto.RagConnectionList,
+  /**
+   * @param {!proto.proto.ListRagConnectionsRequest} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.proto.RagConnectionList.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.proto.ListRagConnectionsRequest} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.RpcError, ?proto.proto.RagConnectionList)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.proto.RagConnectionList>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.proto.WorkflowServiceClient.prototype.listRagConnections =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/proto.WorkflowService/ListRagConnections',
+      request,
+      metadata || {},
+      methodDescriptor_WorkflowService_ListRagConnections,
+      callback);
+};
+
+
+/**
+ * @param {!proto.proto.ListRagConnectionsRequest} request The
+ *     request proto
+ * @param {?Object<string, string>=} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.proto.RagConnectionList>}
+ *     Promise that resolves to the response
+ */
+proto.proto.WorkflowServicePromiseClient.prototype.listRagConnections =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/proto.WorkflowService/ListRagConnections',
+      request,
+      metadata || {},
+      methodDescriptor_WorkflowService_ListRagConnections);
+};
+
+
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.proto.CreateRagConnectionRequest,
+ *   !proto.proto.RagConnectionProto>}
+ */
+const methodDescriptor_WorkflowService_CreateRagConnection = new grpc.web.MethodDescriptor(
+  '/proto.WorkflowService/CreateRagConnection',
+  grpc.web.MethodType.UNARY,
+  proto.proto.CreateRagConnectionRequest,
+  proto.proto.RagConnectionProto,
+  /**
+   * @param {!proto.proto.CreateRagConnectionRequest} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.proto.RagConnectionProto.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.proto.CreateRagConnectionRequest} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.RpcError, ?proto.proto.RagConnectionProto)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.proto.RagConnectionProto>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.proto.WorkflowServiceClient.prototype.createRagConnection =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/proto.WorkflowService/CreateRagConnection',
+      request,
+      metadata || {},
+      methodDescriptor_WorkflowService_CreateRagConnection,
+      callback);
+};
+
+
+/**
+ * @param {!proto.proto.CreateRagConnectionRequest} request The
+ *     request proto
+ * @param {?Object<string, string>=} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.proto.RagConnectionProto>}
+ *     Promise that resolves to the response
+ */
+proto.proto.WorkflowServicePromiseClient.prototype.createRagConnection =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/proto.WorkflowService/CreateRagConnection',
+      request,
+      metadata || {},
+      methodDescriptor_WorkflowService_CreateRagConnection);
+};
+
+
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.proto.UpdateRagConnectionRequest,
+ *   !proto.proto.RagConnectionProto>}
+ */
+const methodDescriptor_WorkflowService_UpdateRagConnection = new grpc.web.MethodDescriptor(
+  '/proto.WorkflowService/UpdateRagConnection',
+  grpc.web.MethodType.UNARY,
+  proto.proto.UpdateRagConnectionRequest,
+  proto.proto.RagConnectionProto,
+  /**
+   * @param {!proto.proto.UpdateRagConnectionRequest} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.proto.RagConnectionProto.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.proto.UpdateRagConnectionRequest} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.RpcError, ?proto.proto.RagConnectionProto)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.proto.RagConnectionProto>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.proto.WorkflowServiceClient.prototype.updateRagConnection =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/proto.WorkflowService/UpdateRagConnection',
+      request,
+      metadata || {},
+      methodDescriptor_WorkflowService_UpdateRagConnection,
+      callback);
+};
+
+
+/**
+ * @param {!proto.proto.UpdateRagConnectionRequest} request The
+ *     request proto
+ * @param {?Object<string, string>=} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.proto.RagConnectionProto>}
+ *     Promise that resolves to the response
+ */
+proto.proto.WorkflowServicePromiseClient.prototype.updateRagConnection =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/proto.WorkflowService/UpdateRagConnection',
+      request,
+      metadata || {},
+      methodDescriptor_WorkflowService_UpdateRagConnection);
+};
+
+
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.proto.DeleteRagConnectionRequest,
+ *   !proto.google.protobuf.Empty>}
+ */
+const methodDescriptor_WorkflowService_DeleteRagConnection = new grpc.web.MethodDescriptor(
+  '/proto.WorkflowService/DeleteRagConnection',
+  grpc.web.MethodType.UNARY,
+  proto.proto.DeleteRagConnectionRequest,
+  google_protobuf_empty_pb.Empty,
+  /**
+   * @param {!proto.proto.DeleteRagConnectionRequest} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  google_protobuf_empty_pb.Empty.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.proto.DeleteRagConnectionRequest} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.RpcError, ?proto.google.protobuf.Empty)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.google.protobuf.Empty>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.proto.WorkflowServiceClient.prototype.deleteRagConnection =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/proto.WorkflowService/DeleteRagConnection',
+      request,
+      metadata || {},
+      methodDescriptor_WorkflowService_DeleteRagConnection,
+      callback);
+};
+
+
+/**
+ * @param {!proto.proto.DeleteRagConnectionRequest} request The
+ *     request proto
+ * @param {?Object<string, string>=} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.google.protobuf.Empty>}
+ *     Promise that resolves to the response
+ */
+proto.proto.WorkflowServicePromiseClient.prototype.deleteRagConnection =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/proto.WorkflowService/DeleteRagConnection',
+      request,
+      metadata || {},
+      methodDescriptor_WorkflowService_DeleteRagConnection);
+};
+
+
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.proto.ListRagDocumentsRequest,
+ *   !proto.proto.RagDocumentList>}
+ */
+const methodDescriptor_WorkflowService_ListRagDocuments = new grpc.web.MethodDescriptor(
+  '/proto.WorkflowService/ListRagDocuments',
+  grpc.web.MethodType.UNARY,
+  proto.proto.ListRagDocumentsRequest,
+  proto.proto.RagDocumentList,
+  /**
+   * @param {!proto.proto.ListRagDocumentsRequest} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.proto.RagDocumentList.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.proto.ListRagDocumentsRequest} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.RpcError, ?proto.proto.RagDocumentList)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.proto.RagDocumentList>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.proto.WorkflowServiceClient.prototype.listRagDocuments =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/proto.WorkflowService/ListRagDocuments',
+      request,
+      metadata || {},
+      methodDescriptor_WorkflowService_ListRagDocuments,
+      callback);
+};
+
+
+/**
+ * @param {!proto.proto.ListRagDocumentsRequest} request The
+ *     request proto
+ * @param {?Object<string, string>=} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.proto.RagDocumentList>}
+ *     Promise that resolves to the response
+ */
+proto.proto.WorkflowServicePromiseClient.prototype.listRagDocuments =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/proto.WorkflowService/ListRagDocuments',
+      request,
+      metadata || {},
+      methodDescriptor_WorkflowService_ListRagDocuments);
+};
+
+
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.proto.UploadRagDocumentRequest,
+ *   !proto.proto.RagDocumentProto>}
+ */
+const methodDescriptor_WorkflowService_UploadRagDocument = new grpc.web.MethodDescriptor(
+  '/proto.WorkflowService/UploadRagDocument',
+  grpc.web.MethodType.UNARY,
+  proto.proto.UploadRagDocumentRequest,
+  proto.proto.RagDocumentProto,
+  /**
+   * @param {!proto.proto.UploadRagDocumentRequest} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.proto.RagDocumentProto.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.proto.UploadRagDocumentRequest} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.RpcError, ?proto.proto.RagDocumentProto)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.proto.RagDocumentProto>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.proto.WorkflowServiceClient.prototype.uploadRagDocument =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/proto.WorkflowService/UploadRagDocument',
+      request,
+      metadata || {},
+      methodDescriptor_WorkflowService_UploadRagDocument,
+      callback);
+};
+
+
+/**
+ * @param {!proto.proto.UploadRagDocumentRequest} request The
+ *     request proto
+ * @param {?Object<string, string>=} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.proto.RagDocumentProto>}
+ *     Promise that resolves to the response
+ */
+proto.proto.WorkflowServicePromiseClient.prototype.uploadRagDocument =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/proto.WorkflowService/UploadRagDocument',
+      request,
+      metadata || {},
+      methodDescriptor_WorkflowService_UploadRagDocument);
+};
+
+
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.proto.DeleteRagDocumentRequest,
+ *   !proto.google.protobuf.Empty>}
+ */
+const methodDescriptor_WorkflowService_DeleteRagDocument = new grpc.web.MethodDescriptor(
+  '/proto.WorkflowService/DeleteRagDocument',
+  grpc.web.MethodType.UNARY,
+  proto.proto.DeleteRagDocumentRequest,
+  google_protobuf_empty_pb.Empty,
+  /**
+   * @param {!proto.proto.DeleteRagDocumentRequest} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  google_protobuf_empty_pb.Empty.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.proto.DeleteRagDocumentRequest} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.RpcError, ?proto.google.protobuf.Empty)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.google.protobuf.Empty>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.proto.WorkflowServiceClient.prototype.deleteRagDocument =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/proto.WorkflowService/DeleteRagDocument',
+      request,
+      metadata || {},
+      methodDescriptor_WorkflowService_DeleteRagDocument,
+      callback);
+};
+
+
+/**
+ * @param {!proto.proto.DeleteRagDocumentRequest} request The
+ *     request proto
+ * @param {?Object<string, string>=} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.google.protobuf.Empty>}
+ *     Promise that resolves to the response
+ */
+proto.proto.WorkflowServicePromiseClient.prototype.deleteRagDocument =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/proto.WorkflowService/DeleteRagDocument',
+      request,
+      metadata || {},
+      methodDescriptor_WorkflowService_DeleteRagDocument);
+};
+
+
+/**
+ * @const
+ * @type {!grpc.web.MethodDescriptor<
+ *   !proto.proto.QueryRagRequest,
+ *   !proto.proto.QueryRagResponse>}
+ */
+const methodDescriptor_WorkflowService_QueryRag = new grpc.web.MethodDescriptor(
+  '/proto.WorkflowService/QueryRag',
+  grpc.web.MethodType.UNARY,
+  proto.proto.QueryRagRequest,
+  proto.proto.QueryRagResponse,
+  /**
+   * @param {!proto.proto.QueryRagRequest} request
+   * @return {!Uint8Array}
+   */
+  function(request) {
+    return request.serializeBinary();
+  },
+  proto.proto.QueryRagResponse.deserializeBinary
+);
+
+
+/**
+ * @param {!proto.proto.QueryRagRequest} request The
+ *     request proto
+ * @param {?Object<string, string>} metadata User defined
+ *     call metadata
+ * @param {function(?grpc.web.RpcError, ?proto.proto.QueryRagResponse)}
+ *     callback The callback function(error, response)
+ * @return {!grpc.web.ClientReadableStream<!proto.proto.QueryRagResponse>|undefined}
+ *     The XHR Node Readable Stream
+ */
+proto.proto.WorkflowServiceClient.prototype.queryRag =
+    function(request, metadata, callback) {
+  return this.client_.rpcCall(this.hostname_ +
+      '/proto.WorkflowService/QueryRag',
+      request,
+      metadata || {},
+      methodDescriptor_WorkflowService_QueryRag,
+      callback);
+};
+
+
+/**
+ * @param {!proto.proto.QueryRagRequest} request The
+ *     request proto
+ * @param {?Object<string, string>=} metadata User defined
+ *     call metadata
+ * @return {!Promise<!proto.proto.QueryRagResponse>}
+ *     Promise that resolves to the response
+ */
+proto.proto.WorkflowServicePromiseClient.prototype.queryRag =
+    function(request, metadata) {
+  return this.client_.unaryCall(this.hostname_ +
+      '/proto.WorkflowService/QueryRag',
+      request,
+      metadata || {},
+      methodDescriptor_WorkflowService_QueryRag);
+};
+
+
 module.exports = proto.proto;
 

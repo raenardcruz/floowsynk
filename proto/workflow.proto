@@ -192,6 +192,11 @@ message NodeData {
     optional string type = 20;
     optional int32 interval = 21;
     optional NodeDataArray weeks = 22;
+    optional string ragConnectionId = 23;
+    optional string ragPrompt = 24;
+    optional int32 ragTopK = 25;
+    optional string ragSystemPrompt = 26;
+    optional string ragOutputVar = 27;
 }
 
 message NodeDataArray {
@@ -292,6 +297,99 @@ message DeleteConnectionRequest {
     Environment environment = 2;
 }
 
+// RAG Data Messages
+message RagConnectionProto {
+    string id = 1;
+    string name = 2;
+    string ollamaBaseUrl = 3;
+    string embeddingModel = 4;
+    string chatModel = 5;
+    string description = 6;
+    string createdAt = 7;
+    string updatedAt = 8;
+    int32 documentCount = 9;
+    int32 chunkCount = 10;
+    bool isModified = 11;
+}
+
+message ListRagConnectionsRequest {
+    Environment environment = 1;
+}
+
+message RagConnectionList {
+    repeated RagConnectionProto connections = 1;
+}
+
+message CreateRagConnectionRequest {
+    RagConnectionProto connection = 1;
+    Environment environment = 2;
+}
+
+message UpdateRagConnectionRequest {
+    RagConnectionProto connection = 1;
+    Environment environment = 2;
+}
+
+message DeleteRagConnectionRequest {
+    string id = 1;
+    Environment environment = 2;
+}
+
+message RagDocumentProto {
+    string id = 1;
+    string ragConnectionId = 2;
+    string fileName = 3;
+    int64 fileSize = 4;
+    string fileType = 5;
+    int32 chunkCount = 6;
+    string status = 7;
+    string errorMessage = 8;
+    string createdAt = 9;
+    int32 processedChunkCount = 10;
+    int32 totalChunkCount = 11;
+}
+
+message ListRagDocumentsRequest {
+    string ragConnectionId = 1;
+    Environment environment = 2;
+}
+
+message RagDocumentList {
+    repeated RagDocumentProto documents = 1;
+}
+
+message UploadRagDocumentRequest {
+    string ragConnectionId = 1;
+    string fileName = 2;
+    bytes fileContent = 3;
+    Environment environment = 4;
+}
+
+message DeleteRagDocumentRequest {
+    string id = 1;
+    string ragConnectionId = 2;
+    Environment environment = 3;
+}
+
+message QueryRagRequest {
+    string ragConnectionId = 1;
+    string query = 2;
+    int32 topK = 3;
+    string systemPrompt = 4;
+    Environment environment = 5;
+}
+
+message RagSourceChunk {
+    string documentName = 1;
+    string content = 2;
+    float score = 3;
+}
+
+message QueryRagResponse {
+    string answer = 1;
+    repeated RagSourceChunk sources = 2;
+}
+
 service WorkflowService {
     rpc GetWorkflow(GetWorkflowRequest) returns (Workflow);
     rpc ListWorkflows(PageRequest) returns (WorkflowList);
@@ -310,4 +408,14 @@ service WorkflowService {
     rpc RestoreWorkflowVersion(WorkflowVersion) returns (Workflow);
     rpc PublishWorkflow(PublishWorkflowRequest) returns (PublishWorkflowResponse);
     rpc RevertWorkflowToStaging(GetWorkflowRequest) returns (Workflow);
+
+    // RAG Services
+    rpc ListRagConnections(ListRagConnectionsRequest) returns (RagConnectionList);
+    rpc CreateRagConnection(CreateRagConnectionRequest) returns (RagConnectionProto);
+    rpc UpdateRagConnection(UpdateRagConnectionRequest) returns (RagConnectionProto);
+    rpc DeleteRagConnection(DeleteRagConnectionRequest) returns (google.protobuf.Empty);
+    rpc ListRagDocuments(ListRagDocumentsRequest) returns (RagDocumentList);
+    rpc UploadRagDocument(UploadRagDocumentRequest) returns (RagDocumentProto);
+    rpc DeleteRagDocument(DeleteRagDocumentRequest) returns (google.protobuf.Empty);
+    rpc QueryRag(QueryRagRequest) returns (QueryRagResponse);
 }

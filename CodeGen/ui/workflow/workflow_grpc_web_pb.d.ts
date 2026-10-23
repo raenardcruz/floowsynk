@@ -117,6 +117,62 @@ export class WorkflowServiceClient {
                response: workflow_pb.Workflow) => void
   ): grpcWeb.ClientReadableStream<workflow_pb.Workflow>;
 
+  listRagConnections(
+    request: workflow_pb.ListRagConnectionsRequest,
+    metadata: grpcWeb.Metadata | undefined,
+    callback: (err: grpcWeb.RpcError,
+               response: workflow_pb.RagConnectionList) => void
+  ): grpcWeb.ClientReadableStream<workflow_pb.RagConnectionList>;
+
+  createRagConnection(
+    request: workflow_pb.CreateRagConnectionRequest,
+    metadata: grpcWeb.Metadata | undefined,
+    callback: (err: grpcWeb.RpcError,
+               response: workflow_pb.RagConnectionProto) => void
+  ): grpcWeb.ClientReadableStream<workflow_pb.RagConnectionProto>;
+
+  updateRagConnection(
+    request: workflow_pb.UpdateRagConnectionRequest,
+    metadata: grpcWeb.Metadata | undefined,
+    callback: (err: grpcWeb.RpcError,
+               response: workflow_pb.RagConnectionProto) => void
+  ): grpcWeb.ClientReadableStream<workflow_pb.RagConnectionProto>;
+
+  deleteRagConnection(
+    request: workflow_pb.DeleteRagConnectionRequest,
+    metadata: grpcWeb.Metadata | undefined,
+    callback: (err: grpcWeb.RpcError,
+               response: google_protobuf_empty_pb.Empty) => void
+  ): grpcWeb.ClientReadableStream<google_protobuf_empty_pb.Empty>;
+
+  listRagDocuments(
+    request: workflow_pb.ListRagDocumentsRequest,
+    metadata: grpcWeb.Metadata | undefined,
+    callback: (err: grpcWeb.RpcError,
+               response: workflow_pb.RagDocumentList) => void
+  ): grpcWeb.ClientReadableStream<workflow_pb.RagDocumentList>;
+
+  uploadRagDocument(
+    request: workflow_pb.UploadRagDocumentRequest,
+    metadata: grpcWeb.Metadata | undefined,
+    callback: (err: grpcWeb.RpcError,
+               response: workflow_pb.RagDocumentProto) => void
+  ): grpcWeb.ClientReadableStream<workflow_pb.RagDocumentProto>;
+
+  deleteRagDocument(
+    request: workflow_pb.DeleteRagDocumentRequest,
+    metadata: grpcWeb.Metadata | undefined,
+    callback: (err: grpcWeb.RpcError,
+               response: google_protobuf_empty_pb.Empty) => void
+  ): grpcWeb.ClientReadableStream<google_protobuf_empty_pb.Empty>;
+
+  queryRag(
+    request: workflow_pb.QueryRagRequest,
+    metadata: grpcWeb.Metadata | undefined,
+    callback: (err: grpcWeb.RpcError,
+               response: workflow_pb.QueryRagResponse) => void
+  ): grpcWeb.ClientReadableStream<workflow_pb.QueryRagResponse>;
+
 }
 
 export class WorkflowServicePromiseClient {
@@ -203,6 +259,46 @@ export class WorkflowServicePromiseClient {
     request: workflow_pb.GetWorkflowRequest,
     metadata?: grpcWeb.Metadata
   ): Promise<workflow_pb.Workflow>;
+
+  listRagConnections(
+    request: workflow_pb.ListRagConnectionsRequest,
+    metadata?: grpcWeb.Metadata
+  ): Promise<workflow_pb.RagConnectionList>;
+
+  createRagConnection(
+    request: workflow_pb.CreateRagConnectionRequest,
+    metadata?: grpcWeb.Metadata
+  ): Promise<workflow_pb.RagConnectionProto>;
+
+  updateRagConnection(
+    request: workflow_pb.UpdateRagConnectionRequest,
+    metadata?: grpcWeb.Metadata
+  ): Promise<workflow_pb.RagConnectionProto>;
+
+  deleteRagConnection(
+    request: workflow_pb.DeleteRagConnectionRequest,
+    metadata?: grpcWeb.Metadata
+  ): Promise<google_protobuf_empty_pb.Empty>;
+
+  listRagDocuments(
+    request: workflow_pb.ListRagDocumentsRequest,
+    metadata?: grpcWeb.Metadata
+  ): Promise<workflow_pb.RagDocumentList>;
+
+  uploadRagDocument(
+    request: workflow_pb.UploadRagDocumentRequest,
+    metadata?: grpcWeb.Metadata
+  ): Promise<workflow_pb.RagDocumentProto>;
+
+  deleteRagDocument(
+    request: workflow_pb.DeleteRagDocumentRequest,
+    metadata?: grpcWeb.Metadata
+  ): Promise<google_protobuf_empty_pb.Empty>;
+
+  queryRag(
+    request: workflow_pb.QueryRagRequest,
+    metadata?: grpcWeb.Metadata
+  ): Promise<workflow_pb.QueryRagResponse>;
 
 }
 

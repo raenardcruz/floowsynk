@@ -46,15 +46,13 @@ export const useWorkflowCanvasControlButtonActions = (props: WorkflowCanvasProps
         const updatedObj = resp.toObject()
         if (getSelectedEnvironment() === 'production') {
           tab.value.ismodified = true
+          await initWorkflows()
         } else if (updatedObj && typeof updatedObj.ismodified === 'boolean') {
           tab.value.ismodified = updatedObj.ismodified
         }
       }
       console.log("Saved process:", tab.value)
       toast.add({severity:'success', summary: 'Success', detail: 'Workflow saved successfully', life: 3000});
-      if (getSelectedEnvironment() === 'production') {
-        window.location.reload()
-      }
     }
     catch (error) {
       toast.add({severity:'error', summary: 'Error', detail: 'Failed to save workflow' + error, life: 3000});

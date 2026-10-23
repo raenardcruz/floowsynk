@@ -810,6 +810,31 @@ export class NodeData extends jspb.Message {
   hasWeeks(): boolean;
   clearWeeks(): NodeData;
 
+  getRagconnectionid(): string;
+  setRagconnectionid(value: string): NodeData;
+  hasRagconnectionid(): boolean;
+  clearRagconnectionid(): NodeData;
+
+  getRagprompt(): string;
+  setRagprompt(value: string): NodeData;
+  hasRagprompt(): boolean;
+  clearRagprompt(): NodeData;
+
+  getRagtopk(): number;
+  setRagtopk(value: number): NodeData;
+  hasRagtopk(): boolean;
+  clearRagtopk(): NodeData;
+
+  getRagsystemprompt(): string;
+  setRagsystemprompt(value: string): NodeData;
+  hasRagsystemprompt(): boolean;
+  clearRagsystemprompt(): NodeData;
+
+  getRagoutputvar(): string;
+  setRagoutputvar(value: string): NodeData;
+  hasRagoutputvar(): boolean;
+  clearRagoutputvar(): NodeData;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): NodeData.AsObject;
   static toObject(includeInstance: boolean, msg: NodeData): NodeData.AsObject;
@@ -842,6 +867,11 @@ export namespace NodeData {
     type?: string;
     interval?: number;
     weeks?: NodeDataArray.AsObject;
+    ragconnectionid?: string;
+    ragprompt?: string;
+    ragtopk?: number;
+    ragsystemprompt?: string;
+    ragoutputvar?: string;
   };
 
   export enum NameCase {
@@ -952,6 +982,31 @@ export namespace NodeData {
   export enum WeeksCase {
     _WEEKS_NOT_SET = 0,
     WEEKS = 22,
+  }
+
+  export enum RagconnectionidCase {
+    _RAGCONNECTIONID_NOT_SET = 0,
+    RAGCONNECTIONID = 23,
+  }
+
+  export enum RagpromptCase {
+    _RAGPROMPT_NOT_SET = 0,
+    RAGPROMPT = 24,
+  }
+
+  export enum RagtopkCase {
+    _RAGTOPK_NOT_SET = 0,
+    RAGTOPK = 25,
+  }
+
+  export enum RagsystempromptCase {
+    _RAGSYSTEMPROMPT_NOT_SET = 0,
+    RAGSYSTEMPROMPT = 26,
+  }
+
+  export enum RagoutputvarCase {
+    _RAGOUTPUTVAR_NOT_SET = 0,
+    RAGOUTPUTVAR = 27,
   }
 }
 
@@ -1401,6 +1456,414 @@ export namespace DeleteConnectionRequest {
   export type AsObject = {
     id: string;
     environment: Environment;
+  };
+}
+
+export class RagConnectionProto extends jspb.Message {
+  getId(): string;
+  setId(value: string): RagConnectionProto;
+
+  getName(): string;
+  setName(value: string): RagConnectionProto;
+
+  getOllamabaseurl(): string;
+  setOllamabaseurl(value: string): RagConnectionProto;
+
+  getEmbeddingmodel(): string;
+  setEmbeddingmodel(value: string): RagConnectionProto;
+
+  getChatmodel(): string;
+  setChatmodel(value: string): RagConnectionProto;
+
+  getDescription(): string;
+  setDescription(value: string): RagConnectionProto;
+
+  getCreatedat(): string;
+  setCreatedat(value: string): RagConnectionProto;
+
+  getUpdatedat(): string;
+  setUpdatedat(value: string): RagConnectionProto;
+
+  getDocumentcount(): number;
+  setDocumentcount(value: number): RagConnectionProto;
+
+  getChunkcount(): number;
+  setChunkcount(value: number): RagConnectionProto;
+
+  getIsmodified(): boolean;
+  setIsmodified(value: boolean): RagConnectionProto;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): RagConnectionProto.AsObject;
+  static toObject(includeInstance: boolean, msg: RagConnectionProto): RagConnectionProto.AsObject;
+  static serializeBinaryToWriter(message: RagConnectionProto, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): RagConnectionProto;
+  static deserializeBinaryFromReader(message: RagConnectionProto, reader: jspb.BinaryReader): RagConnectionProto;
+}
+
+export namespace RagConnectionProto {
+  export type AsObject = {
+    id: string;
+    name: string;
+    ollamabaseurl: string;
+    embeddingmodel: string;
+    chatmodel: string;
+    description: string;
+    createdat: string;
+    updatedat: string;
+    documentcount: number;
+    chunkcount: number;
+    ismodified: boolean;
+  };
+}
+
+export class ListRagConnectionsRequest extends jspb.Message {
+  getEnvironment(): Environment;
+  setEnvironment(value: Environment): ListRagConnectionsRequest;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ListRagConnectionsRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: ListRagConnectionsRequest): ListRagConnectionsRequest.AsObject;
+  static serializeBinaryToWriter(message: ListRagConnectionsRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ListRagConnectionsRequest;
+  static deserializeBinaryFromReader(message: ListRagConnectionsRequest, reader: jspb.BinaryReader): ListRagConnectionsRequest;
+}
+
+export namespace ListRagConnectionsRequest {
+  export type AsObject = {
+    environment: Environment;
+  };
+}
+
+export class RagConnectionList extends jspb.Message {
+  getConnectionsList(): Array<RagConnectionProto>;
+  setConnectionsList(value: Array<RagConnectionProto>): RagConnectionList;
+  clearConnectionsList(): RagConnectionList;
+  addConnections(value?: RagConnectionProto, index?: number): RagConnectionProto;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): RagConnectionList.AsObject;
+  static toObject(includeInstance: boolean, msg: RagConnectionList): RagConnectionList.AsObject;
+  static serializeBinaryToWriter(message: RagConnectionList, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): RagConnectionList;
+  static deserializeBinaryFromReader(message: RagConnectionList, reader: jspb.BinaryReader): RagConnectionList;
+}
+
+export namespace RagConnectionList {
+  export type AsObject = {
+    connectionsList: Array<RagConnectionProto.AsObject>;
+  };
+}
+
+export class CreateRagConnectionRequest extends jspb.Message {
+  getConnection(): RagConnectionProto | undefined;
+  setConnection(value?: RagConnectionProto): CreateRagConnectionRequest;
+  hasConnection(): boolean;
+  clearConnection(): CreateRagConnectionRequest;
+
+  getEnvironment(): Environment;
+  setEnvironment(value: Environment): CreateRagConnectionRequest;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): CreateRagConnectionRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: CreateRagConnectionRequest): CreateRagConnectionRequest.AsObject;
+  static serializeBinaryToWriter(message: CreateRagConnectionRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): CreateRagConnectionRequest;
+  static deserializeBinaryFromReader(message: CreateRagConnectionRequest, reader: jspb.BinaryReader): CreateRagConnectionRequest;
+}
+
+export namespace CreateRagConnectionRequest {
+  export type AsObject = {
+    connection?: RagConnectionProto.AsObject;
+    environment: Environment;
+  };
+}
+
+export class UpdateRagConnectionRequest extends jspb.Message {
+  getConnection(): RagConnectionProto | undefined;
+  setConnection(value?: RagConnectionProto): UpdateRagConnectionRequest;
+  hasConnection(): boolean;
+  clearConnection(): UpdateRagConnectionRequest;
+
+  getEnvironment(): Environment;
+  setEnvironment(value: Environment): UpdateRagConnectionRequest;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): UpdateRagConnectionRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: UpdateRagConnectionRequest): UpdateRagConnectionRequest.AsObject;
+  static serializeBinaryToWriter(message: UpdateRagConnectionRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): UpdateRagConnectionRequest;
+  static deserializeBinaryFromReader(message: UpdateRagConnectionRequest, reader: jspb.BinaryReader): UpdateRagConnectionRequest;
+}
+
+export namespace UpdateRagConnectionRequest {
+  export type AsObject = {
+    connection?: RagConnectionProto.AsObject;
+    environment: Environment;
+  };
+}
+
+export class DeleteRagConnectionRequest extends jspb.Message {
+  getId(): string;
+  setId(value: string): DeleteRagConnectionRequest;
+
+  getEnvironment(): Environment;
+  setEnvironment(value: Environment): DeleteRagConnectionRequest;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): DeleteRagConnectionRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: DeleteRagConnectionRequest): DeleteRagConnectionRequest.AsObject;
+  static serializeBinaryToWriter(message: DeleteRagConnectionRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): DeleteRagConnectionRequest;
+  static deserializeBinaryFromReader(message: DeleteRagConnectionRequest, reader: jspb.BinaryReader): DeleteRagConnectionRequest;
+}
+
+export namespace DeleteRagConnectionRequest {
+  export type AsObject = {
+    id: string;
+    environment: Environment;
+  };
+}
+
+export class RagDocumentProto extends jspb.Message {
+  getId(): string;
+  setId(value: string): RagDocumentProto;
+
+  getRagconnectionid(): string;
+  setRagconnectionid(value: string): RagDocumentProto;
+
+  getFilename(): string;
+  setFilename(value: string): RagDocumentProto;
+
+  getFilesize(): number;
+  setFilesize(value: number): RagDocumentProto;
+
+  getFiletype(): string;
+  setFiletype(value: string): RagDocumentProto;
+
+  getChunkcount(): number;
+  setChunkcount(value: number): RagDocumentProto;
+
+  getStatus(): string;
+  setStatus(value: string): RagDocumentProto;
+
+  getErrormessage(): string;
+  setErrormessage(value: string): RagDocumentProto;
+
+  getCreatedat(): string;
+  setCreatedat(value: string): RagDocumentProto;
+
+  getProcessedchunkcount(): number;
+  setProcessedchunkcount(value: number): RagDocumentProto;
+
+  getTotalchunkcount(): number;
+  setTotalchunkcount(value: number): RagDocumentProto;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): RagDocumentProto.AsObject;
+  static toObject(includeInstance: boolean, msg: RagDocumentProto): RagDocumentProto.AsObject;
+  static serializeBinaryToWriter(message: RagDocumentProto, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): RagDocumentProto;
+  static deserializeBinaryFromReader(message: RagDocumentProto, reader: jspb.BinaryReader): RagDocumentProto;
+}
+
+export namespace RagDocumentProto {
+  export type AsObject = {
+    id: string;
+    ragconnectionid: string;
+    filename: string;
+    filesize: number;
+    filetype: string;
+    chunkcount: number;
+    status: string;
+    errormessage: string;
+    createdat: string;
+    processedchunkcount: number;
+    totalchunkcount: number;
+  };
+}
+
+export class ListRagDocumentsRequest extends jspb.Message {
+  getRagconnectionid(): string;
+  setRagconnectionid(value: string): ListRagDocumentsRequest;
+
+  getEnvironment(): Environment;
+  setEnvironment(value: Environment): ListRagDocumentsRequest;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ListRagDocumentsRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: ListRagDocumentsRequest): ListRagDocumentsRequest.AsObject;
+  static serializeBinaryToWriter(message: ListRagDocumentsRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ListRagDocumentsRequest;
+  static deserializeBinaryFromReader(message: ListRagDocumentsRequest, reader: jspb.BinaryReader): ListRagDocumentsRequest;
+}
+
+export namespace ListRagDocumentsRequest {
+  export type AsObject = {
+    ragconnectionid: string;
+    environment: Environment;
+  };
+}
+
+export class RagDocumentList extends jspb.Message {
+  getDocumentsList(): Array<RagDocumentProto>;
+  setDocumentsList(value: Array<RagDocumentProto>): RagDocumentList;
+  clearDocumentsList(): RagDocumentList;
+  addDocuments(value?: RagDocumentProto, index?: number): RagDocumentProto;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): RagDocumentList.AsObject;
+  static toObject(includeInstance: boolean, msg: RagDocumentList): RagDocumentList.AsObject;
+  static serializeBinaryToWriter(message: RagDocumentList, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): RagDocumentList;
+  static deserializeBinaryFromReader(message: RagDocumentList, reader: jspb.BinaryReader): RagDocumentList;
+}
+
+export namespace RagDocumentList {
+  export type AsObject = {
+    documentsList: Array<RagDocumentProto.AsObject>;
+  };
+}
+
+export class UploadRagDocumentRequest extends jspb.Message {
+  getRagconnectionid(): string;
+  setRagconnectionid(value: string): UploadRagDocumentRequest;
+
+  getFilename(): string;
+  setFilename(value: string): UploadRagDocumentRequest;
+
+  getFilecontent(): Uint8Array | string;
+  getFilecontent_asU8(): Uint8Array;
+  getFilecontent_asB64(): string;
+  setFilecontent(value: Uint8Array | string): UploadRagDocumentRequest;
+
+  getEnvironment(): Environment;
+  setEnvironment(value: Environment): UploadRagDocumentRequest;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): UploadRagDocumentRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: UploadRagDocumentRequest): UploadRagDocumentRequest.AsObject;
+  static serializeBinaryToWriter(message: UploadRagDocumentRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): UploadRagDocumentRequest;
+  static deserializeBinaryFromReader(message: UploadRagDocumentRequest, reader: jspb.BinaryReader): UploadRagDocumentRequest;
+}
+
+export namespace UploadRagDocumentRequest {
+  export type AsObject = {
+    ragconnectionid: string;
+    filename: string;
+    filecontent: Uint8Array | string;
+    environment: Environment;
+  };
+}
+
+export class DeleteRagDocumentRequest extends jspb.Message {
+  getId(): string;
+  setId(value: string): DeleteRagDocumentRequest;
+
+  getRagconnectionid(): string;
+  setRagconnectionid(value: string): DeleteRagDocumentRequest;
+
+  getEnvironment(): Environment;
+  setEnvironment(value: Environment): DeleteRagDocumentRequest;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): DeleteRagDocumentRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: DeleteRagDocumentRequest): DeleteRagDocumentRequest.AsObject;
+  static serializeBinaryToWriter(message: DeleteRagDocumentRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): DeleteRagDocumentRequest;
+  static deserializeBinaryFromReader(message: DeleteRagDocumentRequest, reader: jspb.BinaryReader): DeleteRagDocumentRequest;
+}
+
+export namespace DeleteRagDocumentRequest {
+  export type AsObject = {
+    id: string;
+    ragconnectionid: string;
+    environment: Environment;
+  };
+}
+
+export class QueryRagRequest extends jspb.Message {
+  getRagconnectionid(): string;
+  setRagconnectionid(value: string): QueryRagRequest;
+
+  getQuery(): string;
+  setQuery(value: string): QueryRagRequest;
+
+  getTopk(): number;
+  setTopk(value: number): QueryRagRequest;
+
+  getSystemprompt(): string;
+  setSystemprompt(value: string): QueryRagRequest;
+
+  getEnvironment(): Environment;
+  setEnvironment(value: Environment): QueryRagRequest;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): QueryRagRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: QueryRagRequest): QueryRagRequest.AsObject;
+  static serializeBinaryToWriter(message: QueryRagRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): QueryRagRequest;
+  static deserializeBinaryFromReader(message: QueryRagRequest, reader: jspb.BinaryReader): QueryRagRequest;
+}
+
+export namespace QueryRagRequest {
+  export type AsObject = {
+    ragconnectionid: string;
+    query: string;
+    topk: number;
+    systemprompt: string;
+    environment: Environment;
+  };
+}
+
+export class RagSourceChunk extends jspb.Message {
+  getDocumentname(): string;
+  setDocumentname(value: string): RagSourceChunk;
+
+  getContent(): string;
+  setContent(value: string): RagSourceChunk;
+
+  getScore(): number;
+  setScore(value: number): RagSourceChunk;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): RagSourceChunk.AsObject;
+  static toObject(includeInstance: boolean, msg: RagSourceChunk): RagSourceChunk.AsObject;
+  static serializeBinaryToWriter(message: RagSourceChunk, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): RagSourceChunk;
+  static deserializeBinaryFromReader(message: RagSourceChunk, reader: jspb.BinaryReader): RagSourceChunk;
+}
+
+export namespace RagSourceChunk {
+  export type AsObject = {
+    documentname: string;
+    content: string;
+    score: number;
+  };
+}
+
+export class QueryRagResponse extends jspb.Message {
+  getAnswer(): string;
+  setAnswer(value: string): QueryRagResponse;
+
+  getSourcesList(): Array<RagSourceChunk>;
+  setSourcesList(value: Array<RagSourceChunk>): QueryRagResponse;
+  clearSourcesList(): QueryRagResponse;
+  addSources(value?: RagSourceChunk, index?: number): RagSourceChunk;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): QueryRagResponse.AsObject;
+  static toObject(includeInstance: boolean, msg: QueryRagResponse): QueryRagResponse.AsObject;
+  static serializeBinaryToWriter(message: QueryRagResponse, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): QueryRagResponse;
+  static deserializeBinaryFromReader(message: QueryRagResponse, reader: jspb.BinaryReader): QueryRagResponse;
+}
+
+export namespace QueryRagResponse {
+  export type AsObject = {
+    answer: string;
+    sourcesList: Array<RagSourceChunk.AsObject>;
   };
 }
 
