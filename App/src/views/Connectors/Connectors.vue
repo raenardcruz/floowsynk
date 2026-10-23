@@ -34,7 +34,11 @@
         </div>
       </div>
 
-      <div v-if="connections.length === 0" class="empty-state">
+      <div v-if="isLoadingData" class="connections-grid">
+        <div class="skeleton-shimmer" style="height: 140px; border-radius: 14px;" v-for="i in 3" :key="i"></div>
+      </div>
+
+      <div v-else-if="connections.length === 0" class="empty-state">
         <div class="empty-icon"><i class="pi pi-share-alt"></i></div>
         <h3>No active connections</h3>
         <p>Pick a connector from the gallery below to set up your first integration.</p>
@@ -357,6 +361,8 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useToast } from 'primevue/usetoast'
+import { useConfirm } from 'primevue/useconfirm'
 import {
   getConnectorTemplates,
   getConnections,
@@ -369,6 +375,10 @@ import {
 import Modal from '@/components/Composable/UI/Modal'
 import { getRestUrl } from '@/components/Composable/constants'
 import { TextInput, PasswordInput } from '@/components/Composable/UI/Inputs'
+
+const toast = useToast()
+const confirm = useConfirm()
+const isLoadingData = ref(true)
 
 interface ConnectorFieldProto {
   key: string
@@ -695,15 +705,22 @@ const loadData = async () => {
   }
 }
 
-const handleRevert = async (id: string) => {
-  if (!confirm('Revert this connection to its staging copy? Any direct modifications in production will be removed.')) return
-  try {
-    await revertConnection(id)
-    await loadData()
-    alert('Connection successfully reverted to staging copy.')
-  } catch (err: any) {
-    alert('Failed to revert connection: ' + (err as Error).message)
-  }
+const handleRevert = (id: string) => {
+  confirm.require({
+    message: 'Revert this connection to its staging copy? Any direct modifications in production will be removed.',
+    header: 'Revert Connection',
+    icon: 'pi pi-exclamation-triangle',
+    acceptClass: 'p-button-danger',
+    accept: async () => {
+      try {
+        await revertConnection(id)
+        await loadData()
+        toast.add({ severity: 'success', summary: 'Reverted', detail: 'Connection reverted to staging copy.', life: 3000 })
+      } catch (err: any) {
+        toast.add({ severity: 'error', summary: 'Revert Failed', detail: (err as Error).message, life: 4000 })
+      }
+    }
+  })
 }
 
 const checkAllStatuses = async () => {
@@ -891,22 +908,34 @@ const handleReAuth = () => {
 const route = useRoute()
 const router = useRouter()
 
-const handleDelete = async (id: string) => {
-  if (confirm('Are you sure you want to disconnect?')) {
-    try {
-      await deleteConnection(id)
-      await loadData()
-    } catch (err) {
-      console.error('Failed to delete connection:', err)
+const handleDelete = (id: string) => {
+  confirm.require({
+    message: 'Are you sure you want to disconnect this integration?',
+    header: 'Disconnect Connector',
+    icon: 'pi pi-exclamation-triangle',
+    acceptClass: 'p-button-danger',
+    accept: async () => {
+      try {
+        await deleteConnection(id)
+        toast.add({ severity: 'info', summary: 'Disconnected', detail: 'Connection removed.', life: 3000 })
+        await loadData()
+      } catch (err) {
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to delete connection.', life: 4000 })
+        console.error('Failed to delete connection:', err)
+      }
     }
-  }
+  })
 }
 
 // ─── Mount ────────────────────────────────────────────────────────────────────
 onMounted(async () => {
-  await loadData()
-  // Start credential checks in the background after data is loaded
-  checkAllStatuses()
+  isLoadingData.value = true
+  try {
+    await loadData()
+    checkAllStatuses()
+  } finally {
+    isLoadingData.value = false
+  }
 
   const code = route.query.code as string
   const state = route.query.state as string
@@ -917,12 +946,12 @@ onMounted(async () => {
         throw new Error(await response.text())
       }
       router.replace({ query: {} })
-      alert('Connection successfully added!')
+      toast.add({ severity: 'success', summary: 'Connected', detail: 'Connection successfully added!', life: 3000 })
       await loadData()
       checkAllStatuses()
     } catch (err) {
       console.error('Failed to authenticate connector:', err)
-      alert('Failed to authenticate: ' + err)
+      toast.add({ severity: 'error', summary: 'Auth Failed', detail: 'Failed to authenticate: ' + err, life: 5000 })
     }
   }
 })

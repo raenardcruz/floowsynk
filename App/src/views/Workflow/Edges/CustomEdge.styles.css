@@ -1,22 +1,32 @@
+.edge-btn-wrapper {
+    opacity: 0.25;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.edge-btn-wrapper:hover {
+    opacity: 1;
+    transform: scale(1.15);
+}
 button {
     position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
-    color: var(--red-6);
-    border: none;
+    color: #ef4444;
+    border: 1px solid var(--border-subtle);
     cursor: pointer;
-    transition: all 0.3s ease-in-out;
-    width: 15px;
-    height: 15px;
-    border-radius: 90px;
-    background: var(--wihte-1);
+    transition: all 0.2s ease-in-out;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--surface-elevated);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
     padding: 0px;
 }
 button:hover {
-    transform: scale(1.2);
-    background: var(--white-1);
+    background: #ef4444;
+    color: #ffffff;
+    border-color: #ef4444;
 }
 button span {
-    font-size: 20px;
+    font-size: 14px;
 }

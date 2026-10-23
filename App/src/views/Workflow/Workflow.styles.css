@@ -5,7 +5,7 @@
     height: calc(100vh - 65px);
     width: 100%;
     padding: 0;
-    background: #f8fafc;
+    background: var(--surface-bg);
 }
 
 .logic-main .logic-main-content {
@@ -17,8 +17,9 @@
     height: 100%;
     width: 100%;
     padding: 0;
-    border-top: 1px solid rgba(226, 232, 240, 0.8);
+    border-top: 1px solid var(--border-subtle);
     overflow: hidden;
+    background: var(--surface-bg);
 }
 
 .logic-main .logic-main-content .logic-main-workspace {
@@ -36,9 +37,9 @@
     display: flex;
     align-items: flex-end;
     gap: 6px;
-    background: rgba(241, 245, 249, 0.7);
+    background: var(--surface-subtle);
     backdrop-filter: blur(8px);
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid var(--border-subtle);
 }
 
 .tabs .tab {
@@ -50,25 +51,25 @@
     height: 36px;
     font-size: 13px;
     font-weight: 600;
-    color: #64748b;
-    border: 1px solid #e2e8f0;
+    color: var(--text-muted);
+    border: 1px solid var(--border-subtle);
     border-bottom: none;
     cursor: pointer;
-    background: #ffffff;
+    background: var(--surface-card);
     border-top-right-radius: 10px;
     border-top-left-radius: 10px;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .tabs .tab:hover {
-    color: #334155;
-    background: #f8fafc;
+    color: var(--text-main);
+    background: var(--surface-elevated);
 }
 
 .tabs .tab.nav-active {
-    background: #ffffff;
+    background: var(--surface-elevated);
     color: #4f46e5;
-    border-color: #cbd5e1;
+    border-color: var(--border-subtle);
     box-shadow: 0 -2px 10px rgba(79, 70, 229, 0.08);
 }
 

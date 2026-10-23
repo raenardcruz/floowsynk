@@ -45,6 +45,10 @@
                     </div>
                     <span class="user-name">{{ userName }}</span>
                 </div>
+                <!-- Theme Mode Toggle -->
+                <button type="button" class="theme-toggle-btn" @click="toggleTheme" :title="`Theme: ${themeMode} (click to switch)`">
+                    <span class="material-symbols-outlined">{{ isDark ? 'dark_mode' : 'light_mode' }}</span>
+                </button>
                 <div class="logout" @click="logout" title="Log Out">
                     <span class="material-symbols-outlined">logout</span>
                 </div>
@@ -70,9 +74,11 @@ import { useRoute } from 'vue-router'
 import { ref } from 'vue'
 import { useStorage } from '@vueuse/core'
 import { SESSION_USER_KEY } from '@/views/Login/Login.constants'
+import { useTheme } from '@/components/Composable/UI/composables/useTheme'
 
 const route = useRoute()
 const userName = useStorage(SESSION_USER_KEY, 'Guest')
+const { isDark, toggleTheme, themeMode } = useTheme()
 const currentEnv = ref<'staging' | 'production'>(
     (localStorage.getItem('app_environment') as 'staging' | 'production') || 'staging'
 )

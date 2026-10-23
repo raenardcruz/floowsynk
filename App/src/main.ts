@@ -38,6 +38,11 @@ if (!jspb.BinaryReader.prototype.readPackableBoolInto) {
         }
     };
 }
+import 'primeicons/primeicons.css'
+import '@vue-flow/core/dist/style.css'
+import '@vue-flow/core/dist/theme-default.css'
+import '@vue-flow/controls/dist/style.css'
+import '@vue-flow/minimap/dist/style.css'
 import './style.css'
 import App from './App.vue'
 import router from './router'
@@ -45,13 +50,14 @@ import PrimeVue from 'primevue/config'
 import Aura from '@primeuix/themes/aura';
 import Tooltip from 'primevue/tooltip';
 import ToastService from 'primevue/toastservice';
+import ConfirmationService from 'primevue/confirmationservice';
 
 // PrimeVue theme integration is now handled directly in primevue.config.ts
 
 const app = createApp(App)
 app.use(router)
 app.use(PrimeVue, { 
-  ripple: false, 
+  ripple: true, 
   theme: {
     preset: Aura,
     options: {
@@ -64,5 +70,6 @@ app.use(PrimeVue, {
   }
 })
 app.use(ToastService)
+app.use(ConfirmationService)
 app.directive('tooltip', Tooltip);
 app.mount('#app')

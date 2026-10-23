@@ -1,37 +1,47 @@
 <template>
-    <div class="logo">
-        <logo />
-    </div>
-    <div class="login-container fade-in-top">
-        <div class="bg-1">
-            <div class="bg-2">
-                <div class="login-card">
-                    <h1>Login</h1>
-                    <br>
-                    <form @submit.prevent="handleLogin">
-                        <TextInput id="username" class="form-item" v-model="username" label="User Name" placeholder="Enter your username" />
-                        <PasswordInput id="password" class="form-item" v-model="password" label="Password" placeholder="Enter your password" toggleMask />
-                        <div v-if="loginError" class="tooltip">{{ loginErrorMessage }}</div>
-                        <div class="btn-grp">
-                            <button>Register</button>
-                            <button type="submit">Login</button>
-                        </div>
-                        <button type="button" @click="handleGuestLogin" class="guest-btn">Use as Guest</button>
-                        <Divider />
-                        <div class="forgot-password">
-                            <a href="#">Forgot password?</a>
-                        </div>
-                        <div class="other-login">
-                            <p>Or login with:</p>
-                            <button>
+    <div class="login-wrapper">
+        <div class="logo-bar">
+            <logo />
+        </div>
+        <div class="login-container fade-in-top">
+            <div class="login-card glass-card">
+                <div class="card-header">
+                    <h1 class="login-title">Welcome Back</h1>
+                    <p class="login-subtitle">Sign in to access your FloowSynk workspace</p>
+                </div>
+                <form @submit.prevent="handleLogin" class="login-form">
+                    <TextInput id="username" class="form-item" v-model="username" label="Username" placeholder="Enter your username" />
+                    <PasswordInput id="password" class="form-item" v-model="password" label="Password" placeholder="Enter your password" toggleMask />
+                    <div v-if="loginError" class="login-error-pill">
+                        <span class="material-symbols-outlined error-icon">error</span>
+                        <span>{{ loginErrorMessage }}</span>
+                    </div>
+                    <div class="btn-grp">
+                        <button type="button" class="btn-register" @click="handleLogin">Register</button>
+                        <button type="submit" class="btn-submit">Sign In</button>
+                    </div>
+                    <button type="button" @click="handleGuestLogin" class="guest-btn">
+                        <span class="material-symbols-outlined">person</span>
+                        <span>Continue as Guest</span>
+                    </button>
+                    <Divider align="center">
+                        <span class="divider-text">OR</span>
+                    </Divider>
+                    <div class="other-login">
+                        <p class="other-login-label">Sign in with social provider</p>
+                        <div class="social-btns">
+                            <button type="button" class="social-btn" title="Sign in with Google">
                                 <img src="/src/components/Icons/google.svg" alt="Google" />
                             </button>
-                            <button>
+                            <button type="button" class="social-btn" title="Sign in with Facebook">
                                 <img src="/src/components/Icons/facebook.svg" alt="Facebook" />
                             </button>
                         </div>
-                    </form>
-                </div>
+                    </div>
+                    <div class="forgot-password">
+                        <a href="#">Forgot password?</a>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

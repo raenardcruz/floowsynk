@@ -54,11 +54,11 @@
                         <ControlButton title="Reset Transform" @click="resetTransform">
                             <span class="material-symbols-outlined">refresh</span>
                         </ControlButton>
-                        <ControlButton title="Delete" v-if="!isRunning">
-                            <span class="material-symbols-outlined" @click="removeProcess()">delete</span>
+                        <ControlButton title="Delete" v-if="!isRunning" @click="removeProcess">
+                            <span class="material-symbols-outlined">delete</span>
                         </ControlButton>
-                        <ControlButton title="Save" v-if="!isRunning">
-                            <span class="material-symbols-outlined" @click="saveProcess()">save</span>
+                        <ControlButton title="Save" v-if="!isRunning" @click="saveProcess">
+                            <span class="material-symbols-outlined">save</span>
                         </ControlButton>
                         <!-- Version History button (staging only) -->
                         <ControlButton title="Version History" v-if="!isRunning && !isProduction" @click="showVersionHistory = true">
@@ -68,13 +68,13 @@
                         <ControlButton title="Revert to Staging Copy" v-if="!isRunning && tab.ismodified" style="background: #f97316; color: #ffffff;" @click="handleRevertWorkflow">
                             <span class="material-symbols-outlined">restart_alt</span>
                         </ControlButton>
-                        <ControlButton title="Run" style="background: var(--green-2); color: var(--white-1);"
-                            v-if="!isRunning">
-                            <span class="material-symbols-outlined" @click="runProcess()">play_arrow</span>
+                        <ControlButton title="Run" style="background: var(--green-6); color: #ffffff;"
+                            v-if="!isRunning" @click="runProcess">
+                            <span class="material-symbols-outlined">play_arrow</span>
                         </ControlButton>
-                        <ControlButton title="Exit Run Mode" style="background: var(--red-2); color: var(--white-1);"
-                            v-else>
-                            <span class="material-symbols-outlined" @click="exitRunMode()">close</span>
+                        <ControlButton title="Exit Run Mode" style="background: var(--red-6); color: #ffffff;"
+                            v-else @click="exitRunMode">
+                            <span class="material-symbols-outlined">close</span>
                         </ControlButton>
                     </Controls>
                     <template #node-default="nodeProps">
@@ -84,9 +84,37 @@
                         <CustomEdge v-bind="edgeProps" :tabId="tab.id" />
                     </template>
                 </VueFlow>
-                <div class="replaysteps" v-if="showReplayData && isRunning">
-                    <ReplaySteps :tabId="tab.id" />
-                </div>
+                <!-- Slide-over Right Node Inspector Drawer -->
+                <transition name="drawer-slide-right">
+                    <div class="node-inspector-drawer glass-card" v-if="activeInspectorNode">
+                        <div class="inspector-header">
+                            <div class="inspector-title-group">
+                                <span class="material-symbols-outlined inspector-icon">settings</span>
+                                <div>
+                                    <div class="inspector-title">{{ activeInspectorNode.data?.name || activeInspectorNode.label || toSentenceCase(activeInspectorNode.nodetype) }}</div>
+                                    <div class="inspector-id">ID: {{ activeInspectorNode.id }}</div>
+                                </div>
+                            </div>
+                            <button type="button" class="inspector-close-btn" @click="activeInspectorNodeId = null">
+                                <span class="material-symbols-outlined">close</span>
+                            </button>
+                        </div>
+                        <div class="inspector-body">
+                            <WorkflowNodeSidebarFields
+                                :nodeType="activeInspectorNode.nodetype"
+                                v-model="activeInspectorNode.data"
+                                :tabid="tab.id"
+                                :disabled="isRunning"
+                            />
+                        </div>
+                    </div>
+                </transition>
+
+                <transition name="drawer-slide-up">
+                    <div class="replaysteps" v-if="showReplayData && isRunning">
+                        <ReplaySteps :tabId="tab.id" />
+                    </div>
+                </transition>
             </div>
         </div>
         <!-- Version History modal (staging only) -->
@@ -113,7 +141,8 @@ import { WorkflowCanvasProps } from './Workflow.Canvas.types'
 import { useWorkflowCanvasHooks, useWorkflowCanvasStore } from './Workflow.Canvas.hooks'
 import { useWorkflowCanvasVueFlowEvents } from './VueFlowEvents/Workflow.Canvas.VueFlowEvents'
 import { useWorkflowCanvasControlButtonActions } from './ButtonActions/Workflow.Canvas.ButtonActions'
-import { SidebarCanvas } from '@/views/Workflow/Sidebar'
+import { SidebarCanvas, SidebarCanvasFields as WorkflowNodeSidebarFields } from '@/views/Workflow/Sidebar'
+import { toSentenceCase } from '@/components/Composable/Utilities'
 import { Modal } from '@/components/Composable/UI/Modal'
 import { ProcessTypeModal, VersionHistoryModal } from '@/views/Workflow/Modal'
 import { MiniMap } from '@vue-flow/minimap'
@@ -124,7 +153,11 @@ import { useWorkflowCanvasHelperMethods } from './Helper/Workflow.Canvas.Helper'
 import CustomEdge from '@/views/Workflow/Edges/CustomEdge.vue'
 import ReplaySteps from '../ReplaySteps'
 import Tag from 'primevue/tag'
+import { useToast } from 'primevue/usetoast'
+import { useConfirm } from 'primevue/useconfirm'
 
+const toast = useToast()
+const confirm = useConfirm()
 const props = defineProps<WorkflowCanvasProps>()
 const { tab, canvasId, node, edge } = useWorkflowCanvasHooks(props.id)
 const show = ref(false)
@@ -140,26 +173,40 @@ const { resetTransform, removeProcess, saveProcess, runProcess, exitRunMode } = 
 const {
     showReplayData,
     isRunning,
+    activeInspectorNodeId,
 } = useWorkflowCanvasStore(props.id)
 
+const activeInspectorNode = computed(() => {
+    if (!activeInspectorNodeId.value || activeInspectorNodeId.value === '0') return null
+    return (node.value as any[]).find(n => n.id === activeInspectorNodeId.value) || null
+})
+
 const onVersionRestored = () => {
-    // Reload the workflow from the server after a version restore
-    window.location.reload()
+    toast.add({ severity: 'success', summary: 'Restored', detail: 'Workflow version restored successfully.', life: 3000 })
+    setTimeout(() => window.location.reload(), 400)
 }
 
-const handleRevertWorkflow = async () => {
-    if (!confirm('Revert this production workflow? Any changes done directly on production will be discarded.')) return
-    try {
-        const res = await revertWorkflowToStaging(tab.value.id)
-        if (res && res.workflow) {
-            tab.value.ismodified = res.workflow.ismodified || res.workflow.isModified || false
-        } else {
-            tab.value.ismodified = false
+const handleRevertWorkflow = () => {
+    confirm.require({
+        message: 'Revert this production workflow? Any changes done directly on production will be discarded.',
+        header: 'Revert to Staging Copy',
+        icon: 'pi pi-exclamation-triangle',
+        acceptClass: 'p-button-danger',
+        accept: async () => {
+            try {
+                const res = await revertWorkflowToStaging(tab.value.id)
+                if (res && res.workflow) {
+                    tab.value.ismodified = res.workflow.ismodified || res.workflow.isModified || false
+                } else {
+                    tab.value.ismodified = false
+                }
+                toast.add({ severity: 'info', summary: 'Reverted', detail: 'Workflow reverted to staging copy.', life: 3000 })
+                setTimeout(() => window.location.reload(), 400)
+            } catch (err: any) {
+                toast.add({ severity: 'error', summary: 'Revert Failed', detail: (err as Error).message, life: 5000 })
+            }
         }
-        window.location.reload()
-    } catch (err: any) {
-        alert('Failed to revert workflow: ' + (err as Error).message)
-    }
+    })
 }
 </script>
 

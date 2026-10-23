@@ -42,7 +42,6 @@ import { Handle, Position, useNode } from '@vue-flow/core'
 import { SidebarCanvasFields as WorkflowNodeSidebarFields } from "@/views/Workflow/Sidebar"
 import { NodeProps } from './FloowsynkNode.types'
 import { useFloowsynkNodeHooks, useFloowsynkNodeWatchers } from './FloowsynkNode.hooks'
-import { clickhandler } from './FloowsynkNode.helper'
 import { Node } from 'proto/workflow/workflow_pb'
 import { toSentenceCase } from "@/components/Composable/Utilities"
 import ProcessTypeModal from '@/views/Workflow/Modal/ProcessType/Workflow.Modal.ProcessType.vue'
@@ -59,13 +58,15 @@ const { node } = useNode()
 const { canvasId } = useFloowsynkNodeHooks(props.tabid)
 const showSidebar = ref(false)
 const showModal = ref(false)
-const { isRunning, hadOpenModalSidebar } = useWorkflowCanvasStore(props.tabid)
+const { isRunning, hadOpenModalSidebar, activeInspectorNodeId } = useWorkflowCanvasStore(props.tabid)
 const { nodestatus, isReplayNodeSelected } = useFloowsynkNodeWatchers(props.tabid, node, showSidebar)
-const clickHandler = (event: any) => {
-    if (node.id !== '0') {
-        op.value.toggle(event)
+const clickHandler = () => {
+    if (node.id === '0') {
+        showModal.value = true
+    } else {
+        activeInspectorNodeId.value = node.id
+        showSidebar.value = true
     }
-    clickhandler(node, showSidebar, showModal)
 }
 let { icon, nodetype, label, outputsList, inputsList, nodestyle } = node as unknown as Node.AsObject
 
@@ -123,12 +124,15 @@ watch(node, (newValue) => {
         }
     }
 })
-watch([showModal, showModal], ([newShowModal, newShowSidebar]) => {
+watch([showModal, showSidebar], ([newShowModal, newShowSidebar]) => {
     hadOpenModalSidebar.value = newShowSidebar || newShowModal
 })
 onKeyStroke('Escape', () => {
     showSidebar.value = false
     showModal.value = false
+    if (activeInspectorNodeId.value === node.id) {
+        activeInspectorNodeId.value = null
+    }
 })
 </script>
 

@@ -84,152 +84,160 @@
     </div>
 
     <!-- Create / Edit Modal -->
-    <div v-if="showModal" class="modal-overlay" @click.self="showModal = false">
-      <div class="modal-card">
-        <div class="modal-header">
-          <h2 class="modal-title">{{ isEditing ? 'Edit RAG Connection' : 'New RAG Connection' }}</h2>
-          <button class="close-btn" @click="showModal = false"><i class="pi pi-times"></i></button>
-        </div>
+    <transition name="modal-pop">
+      <div v-if="showModal" class="modal-overlay" @click.self="showModal = false">
+        <div class="modal-card">
+          <div class="modal-header">
+            <h2 class="modal-title">{{ isEditing ? 'Edit RAG Connection' : 'New RAG Connection' }}</h2>
+            <button class="close-btn" @click="showModal = false"><i class="pi pi-times"></i></button>
+          </div>
 
-        <div class="form-group">
-          <label class="form-label">Connection Name</label>
-          <input type="text" v-model="form.name" class="form-input" placeholder="e.g. Customer Support Knowledge Base" />
-        </div>
+          <div class="form-group">
+            <label class="form-label">Connection Name</label>
+            <input type="text" v-model="form.name" class="form-input" placeholder="e.g. Customer Support Knowledge Base" />
+          </div>
 
-        <div class="form-group">
-          <label class="form-label">Ollama Base URL</label>
-          <input type="text" v-model="form.ollamaBaseUrl" class="form-input" placeholder="http://localhost:11434" />
-        </div>
+          <div class="form-group">
+            <label class="form-label">Ollama Base URL</label>
+            <input type="text" v-model="form.ollamaBaseUrl" class="form-input" placeholder="http://localhost:11434" />
+          </div>
 
-        <div class="form-group">
-          <label class="form-label">Embedding Model</label>
-          <input type="text" v-model="form.embeddingModel" class="form-input" placeholder="nomic-embed-text" />
-        </div>
+          <div class="form-group">
+            <label class="form-label">Embedding Model</label>
+            <input type="text" v-model="form.embeddingModel" class="form-input" placeholder="nomic-embed-text" />
+          </div>
 
-        <div class="form-group">
-          <label class="form-label">Chat LLM Model</label>
-          <input type="text" v-model="form.chatModel" class="form-input" placeholder="gemma4" />
-        </div>
+          <div class="form-group">
+            <label class="form-label">Chat LLM Model</label>
+            <input type="text" v-model="form.chatModel" class="form-input" placeholder="gemma4" />
+          </div>
 
-        <div class="form-group">
-          <label class="form-label">Description</label>
-          <textarea v-model="form.description" class="form-textarea" rows="3" placeholder="Brief description of the documents indexed in this connection..."></textarea>
-        </div>
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <textarea v-model="form.description" class="form-textarea" rows="3" placeholder="Brief description of the documents indexed in this connection..."></textarea>
+          </div>
 
-        <div class="modal-footer">
-          <button class="btn btn-secondary" @click="showModal = false">Cancel</button>
-          <button class="btn btn-primary" :disabled="saving" @click="handleSave">
-            <i v-if="saving" class="pi pi-spin pi-spinner"></i>
-            {{ isEditing ? 'Save Changes' : 'Create Connection' }}
-          </button>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" @click="showModal = false">Cancel</button>
+            <button class="btn btn-primary" :disabled="saving" @click="handleSave">
+              <i v-if="saving" class="pi pi-spin pi-spinner"></i>
+              {{ isEditing ? 'Save Changes' : 'Create Connection' }}
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </transition>
 
     <!-- Documents Modal -->
-    <div v-if="showDocsModal" class="modal-overlay" @click.self="showDocsModal = false">
-      <div class="modal-card" style="width: 680px;">
-        <div class="modal-header">
-          <h2 class="modal-title">Documents - {{ selectedConn?.name }}</h2>
-          <button class="close-btn" @click="showDocsModal = false"><i class="pi pi-times"></i></button>
-        </div>
+    <transition name="modal-pop">
+      <div v-if="showDocsModal" class="modal-overlay" @click.self="showDocsModal = false">
+        <div class="modal-card" style="width: 680px;">
+          <div class="modal-header">
+            <h2 class="modal-title">Documents - {{ selectedConn?.name }}</h2>
+            <button class="close-btn" @click="showDocsModal = false"><i class="pi pi-times"></i></button>
+          </div>
 
-        <div class="form-group" style="margin-bottom: 20px;">
-          <input type="file" ref="fileInputRef" style="display: none;" @change="handleFileUpload" accept=".txt,.md,.json,.csv,.pdf" />
-          <button class="btn btn-primary" :disabled="uploading" @click="$refs.fileInputRef.click()">
-            <i v-if="uploading" class="pi pi-spin pi-spinner"></i>
-            <i v-else class="pi pi-upload"></i> Upload Document (.txt, .md, .json, .csv)
-          </button>
-        </div>
+          <div class="form-group" style="margin-bottom: 20px;">
+            <input type="file" ref="fileInputRef" style="display: none;" @change="handleFileUpload" accept=".txt,.md,.json,.csv,.pdf" />
+            <button class="btn btn-primary" :disabled="uploading" @click="$refs.fileInputRef.click()">
+              <i v-if="uploading" class="pi pi-spin pi-spinner"></i>
+              <i v-else class="pi pi-upload"></i> Upload Document (.txt, .md, .json, .csv)
+            </button>
+          </div>
 
-        <div v-if="docsLoading" style="text-align: center; padding: 20px;">
-          <i class="pi pi-spin pi-spinner" style="font-size: 24px;"></i>
-        </div>
+          <div v-if="docsLoading" style="text-align: center; padding: 20px;">
+            <i class="pi pi-spin pi-spinner" style="font-size: 24px;"></i>
+          </div>
 
-        <div v-else-if="documents.length === 0" style="text-align: center; color: #9ca3af; padding: 30px;">
-          No documents uploaded yet.
-        </div>
+          <div v-else-if="documents.length === 0" style="text-align: center; color: var(--text-muted); padding: 30px;">
+            No documents uploaded yet.
+          </div>
 
-        <div v-else class="docs-list" style="max-height: 360px; overflow-y: auto;">
-          <div v-for="doc in documents" :key="doc.id" class="doc-item" style="display: flex; flex-direction: column; align-items: stretch; gap: 8px;">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <div>
-                <div style="font-weight: 600; color: #f3f4f6;">{{ doc.filename }}</div>
-                <div style="font-size: 12px; color: #9ca3af;">
-                  {{ (doc.filesize / 1024).toFixed(1) }} KB · {{ doc.status === 'PROCESSING' ? (doc.processedchunkcount || 0) : doc.chunkcount }} chunks
+          <div v-else class="docs-list" style="max-height: 360px; overflow-y: auto;">
+            <div v-for="doc in documents" :key="doc.id" class="doc-item" style="display: flex; flex-direction: column; align-items: stretch; gap: 8px;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                  <div style="font-weight: 600; color: var(--text-main);">{{ doc.filename }}</div>
+                  <div style="font-size: 12px; color: var(--text-muted);">
+                    {{ (doc.filesize / 1024).toFixed(1) }} KB · {{ doc.status === 'PROCESSING' ? (doc.processedchunkcount || 0) : doc.chunkcount }} chunks
+                  </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                  <span class="badge-status" :class="{
+                    'badge-ready': doc.status === 'READY',
+                    'badge-processing': doc.status === 'PROCESSING',
+                    'badge-failed': doc.status === 'FAILED'
+                  }">{{ doc.status }}</span>
+                  <button class="btn btn-danger" style="padding: 6px 10px;" @click="handleDeleteDoc(doc.id)">
+                    <i class="pi pi-trash"></i>
+                  </button>
                 </div>
               </div>
-              <div style="display: flex; align-items: center; gap: 12px;">
-                <span class="badge-status" :class="{
-                  'badge-ready': doc.status === 'READY',
-                  'badge-processing': doc.status === 'PROCESSING',
-                  'badge-failed': doc.status === 'FAILED'
-                }">{{ doc.status }}</span>
-                <button class="btn btn-danger" style="padding: 6px 10px;" @click="handleDeleteDoc(doc.id)">
-                  <i class="pi pi-trash"></i>
-                </button>
-              </div>
-            </div>
 
-            <!-- Real-time Progress Bar for Embeddings -->
-            <div v-if="doc.status === 'PROCESSING'" style="margin-top: 4px;">
-              <div style="display: flex; justify-content: space-between; font-size: 11px; color: #facc15; margin-bottom: 4px; font-weight: 600;">
-                <span><i class="pi pi-spin pi-spinner"></i> Generating Embeddings...</span>
-                <span>{{ doc.processedchunkcount || 0 }} / {{ doc.totalchunkcount || '?' }} chunks ({{ Math.min(100, Math.round(((doc.processedchunkcount || 0) / (doc.totalchunkcount || 1)) * 100)) }}%)</span>
-              </div>
-              <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
-                <div :style="{ width: Math.min(100, Math.round(((doc.processedchunkcount || 0) / (doc.totalchunkcount || 1)) * 100)) + '%' }" style="height: 100%; background: linear-gradient(90deg, #eab308, #4ade80); transition: width 0.3s ease;"></div>
+              <!-- Real-time Progress Bar for Embeddings -->
+              <div v-if="doc.status === 'PROCESSING'" style="margin-top: 4px;">
+                <div style="display: flex; justify-content: space-between; font-size: 11px; color: #facc15; margin-bottom: 4px; font-weight: 600;">
+                  <span><i class="pi pi-spin pi-spinner"></i> Generating Embeddings...</span>
+                  <span>{{ doc.processedchunkcount || 0 }} / {{ doc.totalchunkcount || '?' }} chunks ({{ Math.min(100, Math.round(((doc.processedchunkcount || 0) / (doc.totalchunkcount || 1)) * 100)) }}%)</span>
+                </div>
+                <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
+                  <div :style="{ width: Math.min(100, Math.round(((doc.processedchunkcount || 0) / (doc.totalchunkcount || 1)) * 100)) + '%' }" style="height: 100%; background: linear-gradient(90deg, #eab308, #4ade80); transition: width 0.3s ease;"></div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </transition>
 
     <!-- Chatbot Drawer -->
-    <div v-if="showChatDrawer" class="chat-drawer">
-      <div class="chat-header">
-        <div class="chat-title-group">
-          <i class="pi pi-comments" style="font-size: 20px; color: #ec4899;"></i>
-          <div>
-            <div style="font-weight: 700; color: #ffffff;">{{ activeChatConn?.name }}</div>
-            <div style="font-size: 11px; color: #a78bfa;">Ollama RAG Playground</div>
+    <transition name="drawer-slide-right">
+      <div v-if="showChatDrawer" class="chat-drawer">
+        <div class="chat-header">
+          <div class="chat-title-group">
+            <i class="pi pi-comments" style="font-size: 20px; color: #ec4899;"></i>
+            <div>
+              <div style="font-weight: 700; color: var(--text-main);">{{ activeChatConn?.name }}</div>
+              <div style="font-size: 11px; color: #a78bfa;">Ollama RAG Playground</div>
+            </div>
           </div>
-        </div>
-        <button class="close-btn" @click="showChatDrawer = false"><i class="pi pi-times"></i></button>
-      </div>
-
-      <div class="chat-messages" ref="chatScrollRef">
-        <div v-if="chatMessages.length === 0" style="text-align: center; color: #9ca3af; margin-top: 40px;">
-          <i class="pi pi-bot" style="font-size: 36px; margin-bottom: 12px; color: #818cf8;"></i>
-          <p>Ask any question related to the documents uploaded in this connection!</p>
+          <button class="close-btn" @click="showChatDrawer = false"><i class="pi pi-times"></i></button>
         </div>
 
-        <div v-for="(msg, idx) in chatMessages" :key="idx"
-             class="chat-bubble" :class="msg.role === 'user' ? 'chat-bubble-user' : 'chat-bubble-bot'">
-          <div>{{ msg.content }}</div>
-          <div v-if="msg.sources && msg.sources.length > 0" class="source-chips">
-            <strong>Sources retrieved:</strong>
-            <div v-for="(s, sIdx) in msg.sources" :key="sIdx" style="margin-top: 4px;">
-              📄 {{ s.documentname }} (score: {{ (s.score * 100).toFixed(1) }}%)
+        <div class="chat-messages" ref="chatScrollRef">
+          <div v-if="chatMessages.length === 0" style="text-align: center; color: var(--text-muted); margin-top: 40px;">
+            <i class="pi pi-bot" style="font-size: 36px; margin-bottom: 12px; color: #818cf8;"></i>
+            <p>Ask any question related to the documents uploaded in this connection!</p>
+          </div>
+
+          <div v-for="(msg, idx) in chatMessages" :key="idx"
+               class="chat-bubble" :class="msg.role === 'user' ? 'chat-bubble-user' : 'chat-bubble-bot'">
+            <div>{{ msg.content }}</div>
+            <div v-if="msg.sources && msg.sources.length > 0" class="source-chips">
+              <strong>Sources retrieved:</strong>
+              <div v-for="(s, sIdx) in msg.sources" :key="sIdx" style="margin-top: 4px;">
+                📄 {{ s.documentname }} (score: {{ (s.score * 100).toFixed(1) }}%)
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div class="chat-input-row">
-        <input type="text" v-model="chatInput" @keyup.enter="sendChatMessage" placeholder="Ask a question..." :disabled="chatSending" />
-        <button class="btn btn-chatbot" :disabled="chatSending || !chatInput.trim()" @click="sendChatMessage">
-          <i v-if="chatSending" class="pi pi-spin pi-spinner"></i>
-          <i v-else class="pi pi-send"></i>
-        </button>
+        <div class="chat-input-row">
+          <input type="text" v-model="chatInput" @keyup.enter="sendChatMessage" placeholder="Ask a question..." :disabled="chatSending" />
+          <button class="btn btn-chatbot" :disabled="chatSending || !chatInput.trim()" @click="sendChatMessage">
+            <i v-if="chatSending" class="pi pi-spin pi-spinner"></i>
+            <i v-else class="pi pi-send"></i>
+          </button>
+        </div>
       </div>
-    </div>
+    </transition>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, nextTick } from 'vue'
+import { useToast } from 'primevue/usetoast'
+import { useConfirm } from 'primevue/useconfirm'
 import {
   getRagConnections,
   createRagConnection,
@@ -241,6 +249,8 @@ import {
   queryRag
 } from './Rag.api'
 
+const toast = useToast()
+const confirm = useConfirm()
 const connections = ref<any[]>([])
 const loading = ref(true)
 
@@ -320,6 +330,7 @@ const handleSave = async () => {
         form.value.chatModel,
         form.value.description
       )
+      toast.add({ severity: 'success', summary: 'Updated', detail: 'RAG connection updated successfully.', life: 3000 })
     } else {
       await createRagConnection(
         form.value.name,
@@ -328,24 +339,33 @@ const handleSave = async () => {
         form.value.chatModel,
         form.value.description
       )
+      toast.add({ severity: 'success', summary: 'Created', detail: 'RAG connection created successfully.', life: 3000 })
     }
     showModal.value = false
     await loadConnections()
   } catch (err) {
-    alert(`Error saving RAG connection: ${err}`)
+    toast.add({ severity: 'error', summary: 'Error', detail: `Error saving RAG connection: ${err}`, life: 4000 })
   } finally {
     saving.value = false
   }
 }
 
-const handleDelete = async (id: string) => {
-  if (!confirm('Are you sure you want to delete this RAG connection and all indexed document vectors?')) return
-  try {
-    await deleteRagConnection(id)
-    await loadConnections()
-  } catch (err) {
-    alert(`Failed to delete connection: ${err}`)
-  }
+const handleDelete = (id: string) => {
+  confirm.require({
+    message: 'Are you sure you want to delete this RAG connection and all indexed document vectors?',
+    header: 'Delete RAG Connection',
+    icon: 'pi pi-exclamation-triangle',
+    acceptClass: 'p-button-danger',
+    accept: async () => {
+      try {
+        await deleteRagConnection(id)
+        toast.add({ severity: 'info', summary: 'Deleted', detail: 'RAG connection removed.', life: 3000 })
+        await loadConnections()
+      } catch (err) {
+        toast.add({ severity: 'error', summary: 'Delete Failed', detail: String(err), life: 4000 })
+      }
+    }
+  })
 }
 
 let docsPollTimer: any = null
@@ -406,7 +426,7 @@ const handleFileUpload = async (event: any) => {
     startDocsPolling()
     await loadConnections()
   } catch (err) {
-    alert(`Upload failed: ${err}`)
+    toast.add({ severity: 'error', summary: 'Upload Failed', detail: String(err), life: 4000 })
   } finally {
     uploading.value = false
     if (fileInputRef.value) fileInputRef.value.value = ''
@@ -417,10 +437,11 @@ const handleDeleteDoc = async (docId: string) => {
   if (!selectedConn.value) return
   try {
     await deleteRagDocument(docId, selectedConn.value.id)
+    toast.add({ severity: 'info', summary: 'Deleted', detail: 'Document removed from knowledge base.', life: 3000 })
     documents.value = await getRagDocuments(selectedConn.value.id)
     await loadConnections()
   } catch (err) {
-    alert(`Failed to delete document: ${err}`)
+    toast.add({ severity: 'error', summary: 'Delete Failed', detail: String(err), life: 4000 })
   }
 }
 

@@ -29,7 +29,8 @@
           </span>
         </div>
         <div class="stat-body">
-          <div class="stat-value">{{ stats.total }}</div>
+          <div v-if="loading" class="skeleton-shimmer" style="height: 32px; width: 60px; margin-bottom: 6px;"></div>
+          <div v-else class="stat-value">{{ stats.total }}</div>
           <div class="stat-label">Total Workflow Runs</div>
         </div>
       </div>
@@ -45,7 +46,8 @@
           </span>
         </div>
         <div class="stat-body">
-          <div class="stat-value text-green-500">{{ stats.successRate }}%</div>
+          <div v-if="loading" class="skeleton-shimmer" style="height: 32px; width: 80px; margin-bottom: 6px;"></div>
+          <div v-else class="stat-value text-green-500">{{ stats.successRate }}%</div>
           <div class="stat-label">Execution Success Rate</div>
         </div>
       </div>
@@ -62,7 +64,8 @@
           </span>
         </div>
         <div class="stat-body">
-          <div class="stat-value text-red-500">{{ stats.failed }}</div>
+          <div v-if="loading" class="skeleton-shimmer" style="height: 32px; width: 50px; margin-bottom: 6px;"></div>
+          <div v-else class="stat-value text-red-500">{{ stats.failed }}</div>
           <div class="stat-label">Execution Failures</div>
         </div>
       </div>
@@ -79,7 +82,8 @@
           </span>
         </div>
         <div class="stat-body">
-          <div class="stat-value">{{ activeWorkflowsCount }}</div>
+          <div v-if="loading" class="skeleton-shimmer" style="height: 32px; width: 50px; margin-bottom: 6px;"></div>
+          <div v-else class="stat-value">{{ activeWorkflowsCount }}</div>
           <div class="stat-label">Active Workflows</div>
         </div>
       </div>
@@ -555,14 +559,14 @@ onMounted(() => {
 .stat-value {
   font-size: 28px;
   font-weight: 800;
-  color: #0f172a;
+  color: var(--text-main);
   line-height: 1.1;
   margin-bottom: 4px;
 }
 
 .stat-label {
   font-size: 13px;
-  color: #64748b;
+  color: var(--text-muted);
   font-weight: 500;
 }
 
@@ -594,7 +598,7 @@ onMounted(() => {
 .panel-title {
   font-size: 16px;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--text-main);
 }
 
 .panel-subtitle {

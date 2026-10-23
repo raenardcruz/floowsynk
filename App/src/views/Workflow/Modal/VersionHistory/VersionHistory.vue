@@ -1,6 +1,7 @@
 <template>
-    <div class="version-history-overlay" v-if="visible" @click.self="close">
-        <div class="version-history-panel">
+    <transition name="drawer-slide-right">
+        <div class="version-history-overlay" v-if="visible" @click.self="close">
+            <div class="version-history-panel">
             <!-- Header -->
             <div class="vh-header">
                 <div class="vh-header-left">
@@ -99,31 +100,34 @@
                     </div>
                 </div>
             </div>
+            </div>
         </div>
-    </div>
+    </transition>
 
     <!-- Confirm Publish Dialog -->
-    <div class="vh-confirm-overlay" v-if="confirmPublish" @click.self="confirmPublish = null">
-        <div class="vh-confirm-dialog">
-            <div class="vh-confirm-icon">
-                <span class="material-symbols-outlined">rocket_launch</span>
-            </div>
-            <h3>Publish to Production?</h3>
-            <p>
-                You are about to publish
-                <strong>{{ confirmPublish.label || 'the current workflow' }}</strong>
-                to the <span class="prod-badge">PRODUCTION</span> environment.
-                This will overwrite the live production data.
-            </p>
-            <div class="vh-confirm-actions">
-                <button class="vh-btn-cancel" @click="confirmPublish = null">Cancel</button>
-                <button class="vh-btn-confirm" @click="executePublish">
-                    <span class="material-symbols-outlined">check</span>
-                    Yes, Publish
-                </button>
+    <transition name="modal-pop">
+        <div class="vh-confirm-overlay" v-if="confirmPublish" @click.self="confirmPublish = null">
+            <div class="vh-confirm-dialog">
+                <div class="vh-confirm-icon">
+                    <span class="material-symbols-outlined">rocket_launch</span>
+                </div>
+                <h3>Publish to Production?</h3>
+                <p>
+                    You are about to publish
+                    <strong>{{ confirmPublish.label || 'the current workflow' }}</strong>
+                    to the <span class="prod-badge">PRODUCTION</span> environment.
+                    This will overwrite the live production data.
+                </p>
+                <div class="vh-confirm-actions">
+                    <button class="vh-btn-cancel" @click="confirmPublish = null">Cancel</button>
+                    <button class="vh-btn-confirm" @click="executePublish">
+                        <span class="material-symbols-outlined">check</span>
+                        Yes, Publish
+                    </button>
+                </div>
             </div>
         </div>
-    </div>
+    </transition>
 </template>
 
 <script setup lang="ts">
@@ -198,15 +202,18 @@ const saveLabel = (version: VersionObj) => {
     editingId.value = null
 }
 
+import { useToast } from 'primevue/usetoast'
+const toast = useToast()
+
 const handleRestore = async (version: VersionObj) => {
-    if (!confirm(`Restore to "${version.label || `v${version.versionNum}`}"? The current workflow will be replaced.`)) return
     isRestoring.value = true
     try {
         await restoreWorkflowVersion(version)
+        toast.add({ severity: 'success', summary: 'Restored', detail: `Restored to ${version.label || `v${version.versionNum}`}`, life: 3000 })
         emit('restored')
         close()
     } catch (err) {
-        alert('Failed to restore version. Please try again.')
+        toast.add({ severity: 'error', summary: 'Restore Failed', detail: 'Could not restore version.', life: 4000 })
         console.error(err)
     } finally {
         isRestoring.value = false
@@ -230,14 +237,14 @@ const executePublish = async () => {
         const resp = await publishWorkflow(props.workflowId, versionId)
         const result = resp as any
         if (result.getSuccess()) {
-            alert(`✅ ${result.getMessage()}`)
+            toast.add({ severity: 'success', summary: 'Published', detail: result.getMessage() || 'Published successfully.', life: 3000 })
             await loadVersions()
             emit('restored')
         } else {
-            alert(`❌ Publish failed: ${result.getMessage()}`)
+            toast.add({ severity: 'error', summary: 'Publish Failed', detail: result.getMessage() || 'Publish failed.', life: 5000 })
         }
     } catch (err) {
-        alert('Failed to publish. Please try again.')
+        toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to publish. Please try again.', life: 4000 })
         console.error(err)
     } finally {
         isPublishing.value = false

@@ -5,9 +5,9 @@
             pointerEvents: 'all',
             position: 'absolute',
             transform: `translate(-50%, -50%) translate(${path[1]}px,${path[2]}px)`,
-        }" class="nodrag nopan">
+        }" class="nodrag nopan edge-btn-wrapper">
             <button @click="removeEdges(id)" v-if="!isRunning">
-                <span class="material-symbols-outlined">cancel</span>
+                <span class="material-symbols-outlined">close</span>
             </button>
         </div>
     </EdgeLabelRenderer>

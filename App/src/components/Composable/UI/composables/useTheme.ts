@@ -1,5 +1,5 @@
 import { computed, ref, watch, readonly } from 'vue'
-import { usePreferredDark, useStorage } from '@vueuse/core'
+import { useStorage } from '@vueuse/core'
 import type { ThemeMode, ThemeConfig } from '../types'
 
 /**
@@ -7,16 +7,13 @@ import type { ThemeMode, ThemeConfig } from '../types'
  * Provides theme switching, persistence, and CSS custom property management
  */
 export function useTheme() {
-  // Detect user's preferred color scheme
-  const prefersDark = usePreferredDark()
+  // Persist theme preference in localStorage - default to light theme
+  const themeMode = useStorage<ThemeMode>('floowsynk-theme', 'light')
   
-  // Persist theme preference in localStorage
-  const themeMode = useStorage<ThemeMode>('floowsynk-theme', 'auto')
-  
-  // Compute the actual theme based on mode and system preference
+  // Compute the actual theme based on mode
   const currentTheme = computed(() => {
     if (themeMode.value === 'auto') {
-      return prefersDark.value ? 'dark' : 'light'
+      return 'light'
     }
     return themeMode.value
   })

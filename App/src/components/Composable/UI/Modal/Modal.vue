@@ -93,8 +93,8 @@ const props = withDefaults(defineProps<ModalWrapperProps>(), {
   height: '90%',
   minWidth: '300px',
   minHeight: '100px',
-  fontcolor: 'var(--grey-2)',
-  bgcolor: 'var(--grey-3)'
+  fontcolor: 'var(--text-main)',
+  bgcolor: 'transparent'
 })
 
 // Emits
@@ -277,29 +277,39 @@ defineExpose({
 
 /* PrimeVue Dialog customizations */
 :deep(.p-dialog) {
-  border-radius: 10px;
-  box-shadow: 4px 4px 8px var(--grey-2);
-  backdrop-filter: blur(4px);
+  border-radius: 16px;
+  background: var(--surface-card);
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  overflow: hidden;
 }
 
 :deep(.p-dialog-header) {
-  border-bottom: 1px solid var(--grey-4);
+  border-bottom: 1px solid var(--border-subtle);
   padding: 1.25rem;
+  background: transparent;
+  color: var(--text-main);
 }
 
 :deep(.p-dialog-content) {
-  padding: 0.625rem;
+  padding: 1rem;
   overflow: auto;
+  background: transparent;
+  color: var(--text-main);
 }
 
 :deep(.p-dialog-footer) {
   padding: 1.25rem;
-  border-top: 1px solid var(--grey-4);
+  border-top: 1px solid var(--border-subtle);
+  background: transparent;
 }
 
 :deep(.p-dialog-mask) {
   background: var(--black-translucent-2);
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 /* Maintain original modal sizing */

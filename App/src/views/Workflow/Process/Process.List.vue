@@ -1,37 +1,55 @@
 <template>
     <div class="gallery-box" v-if="!isLoading">
-        <div class="page-title">Process Gallery</div>
-        <div class="page-info">
-            <span>Showing</span>
-            <span style="color: #3990C5">10</span>
-            <span>out of 30 Processes</span>
+        <div class="gallery-header">
+            <div>
+                <h1 class="page-title">Process Gallery</h1>
+                <p class="page-info">
+                    Showing <span class="count-badge">{{ filteredProcesses.length }}</span> of {{ processes.length }} Workflows
+                </p>
+            </div>
+            <div class="gallery-search">
+                <span class="material-symbols-outlined search-icon">search</span>
+                <input class="search-input" v-model="search" placeholder="Search processes by name or tag..." />
+                <span v-if="search" class="material-symbols-outlined clear-icon" @click="search = ''">close</span>
+            </div>
         </div>
-        <div class="gallery-search">
-            <TextInput v-model="search" placeholder="Search" />
-        </div>
+
         <div class="cards-gallery">
-            <div class="create" @click="createProcess">
-                <img src="/src/components/Icons/add.svg" alt="add" />
+            <div class="create-card hover-lift" @click="createProcess">
+                <div class="create-icon-wrapper">
+                    <span class="material-symbols-outlined">add</span>
+                </div>
+                <div class="create-text">
+                    <div class="create-title">New Workflow</div>
+                    <div class="create-sub">Build from scratch</div>
+                </div>
             </div>
-            <div class="card" v-for="process in filteredProcesses" :key="process.id" :class="process.type"
+            <div class="card glass-card hover-lift" v-for="process in filteredProcesses" :key="process.id" :class="process.type"
                 @click="cardClicked($event, process)">
-                <div class="type">
-                    <workflow-icon :type="process.type" />
-                    <span class="type-text">{{ process.type }}</span>
-                    <span v-if="process.ismodified" class="modified-tag" title="Modified in Production (out of sync with Staging)">Out of Sync</span>
+                <div class="card-top">
+                    <div class="type-badge" :class="'type-badge--' + process.type">
+                        <workflow-icon :type="process.type" />
+                        <span class="type-text">{{ process.type }}</span>
+                    </div>
+                    <span v-if="process.ismodified" class="modified-tag" title="Modified in Production (out of sync with Staging)">
+                        <span class="material-symbols-outlined">sync_problem</span> Out of Sync
+                    </span>
                 </div>
-                <div class="card-title">
-                    <span>{{ process.name }}</span>
+                <div class="card-body">
+                    <div class="card-title">{{ process.name || 'Untitled Process' }}</div>
+                    <div class="card-description">{{ process.description || 'No description provided' }}</div>
                 </div>
-                <div class="card-description">{{ process.description }}</div>
-                <div class="tags">
-                    <div class="tag" v-for="tab in process.tagsList">{{ tab }}</div>
+                <div class="card-footer" v-if="process.tagsList && process.tagsList.length">
+                    <div class="tag-pill" v-for="tag in process.tagsList.filter(t => t !== 'No Tags')" :key="tag">
+                        #{{ tag }}
+                    </div>
                 </div>
             </div>
         </div>
+
         <div class="run-history">
             <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-                <Collapsible title="Run History" caption="List of all the processes that have been run"
+                <Collapsible title="Execution History" caption="Past execution runs and replays across workflows"
                     v-model="showContent" style="flex: 1;">
                     <div class="history-container" v-bind="containerProps">
                         <div v-bind="wrapperProps">
@@ -56,8 +74,12 @@
             </div>
         </div>
     </div>
-    <div v-else>
-        <Loading text="Please wait while we fetch your data" />
+    <div class="gallery-skeleton-container" v-else>
+        <div class="skeleton-shimmer" style="height: 40px; width: 240px; margin-bottom: 12px;"></div>
+        <div class="skeleton-shimmer" style="height: 20px; width: 160px; margin-bottom: 24px;"></div>
+        <div class="cards-gallery">
+            <div class="skeleton-shimmer" style="height: 160px; width: 280px; border-radius: 16px;" v-for="i in 6" :key="i"></div>
+        </div>
     </div>
 </template>
 
@@ -69,10 +91,8 @@ import { useProcessListStore, useProcessListHooks } from './Process.List.hooks'
 import { useAsyncState, useVirtualList } from '@vueuse/core'
 import { Headers as Header, Row } from '@/components/Composable/UI/Table'
 import { Collapsible } from '@/components/Composable/UI/Collapsible'
-import Loading from '@/components/Composable/UI/Loading'
-import { TextInput } from '@/components/Composable/UI/Inputs'
 
-const { search, history } = useProcessListStore()
+const { search, history, processes } = useProcessListStore()
 const { filteredProcesses } = useProcessListHooks()
 const { isLoading } = useAsyncState(initWorkflows, null)
 const showContent = ref(true)

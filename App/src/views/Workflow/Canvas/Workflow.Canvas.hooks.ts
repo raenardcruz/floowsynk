@@ -23,6 +23,7 @@ export const useWorkflowCanvasStore = (tabId: string) => {
             replayData: ref<ReplayData.AsObject[]>([]),
             selectedReplayData: ref<number>(0),
             showReplayData: ref(false),
+            activeInspectorNodeId: ref<string | null>(null),
             hadOpenModalSidebar,
         }
     }

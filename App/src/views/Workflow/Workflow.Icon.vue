@@ -1,14 +1,14 @@
 <template>
- <span style="color: #14BF47; margin-right: 10px;" class="material-symbols-outlined"
+ <span style="color: #10b981;" class="material-symbols-outlined icon-symbol"
     v-if="props.type == 'defaultnode' || props.type == 'default'">flag_circle</span>
-<span style="color: #09a6d6; margin-right: 10px;" class="material-symbols-outlined"
+<span style="color: #06b6d4;" class="material-symbols-outlined icon-symbol"
     v-else-if="props.type == 'interval'">schedule</span>
-<span style="color: #b86a11; margin-right: 10px;" class="material-symbols-outlined"
+<span style="color: #f59e0b;" class="material-symbols-outlined icon-symbol"
     v-else-if="props.type == 'webhook'">webhook</span>
-<span style="color: #A3245B; margin-right: 10px;" class="material-symbols-outlined"
+<span style="color: #ec4899;" class="material-symbols-outlined icon-symbol"
     v-else-if="props.type == 'events'">event</span>
-<span class="material-symbols-outlined" style="color: #84ab86; margin-right: 10px;"
-    v-else-if="props.type == 'default'">
+<span class="material-symbols-outlined icon-symbol" style="color: #8b5cf6;"
+    v-else>
     radio_button_unchecked
 </span>
 </template>
