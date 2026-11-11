@@ -1,153 +1,197 @@
 # 🌊 Floowsynk
 
-Floowsynk is a high-performance **Workflow Automation & Orchestration Platform** designed to streamline complex business processes. It combines a powerful Go backend with a modern Vue.js frontend to provide a seamless experience for building, monitoring, and managing automated workflows.
+**Floowsynk** is a high-performance **Workflow Automation & Orchestration Platform** built for mission-critical business automation, data pipelines, and AI agent integration. Powered by an ultra-fast Go engine and an intuitive Vue 3 canvas, Floowsynk delivers enterprise-grade scalability, isolated staging-to-production lifecycle management, sandboxed scripting, and native AI integration via the Model Context Protocol (MCP).
+
+---
+
+## ⚡ Highlights & Key Features
+
+- **🚀 High-Throughput DAG Execution Engine**:
+  - Zero-allocation template parsing fast-path and thread-safe LRU template compilation cache.
+  - Asynchronous Kafka batch logging (`500-item flusher`), eliminating database and Redis write bottlenecks during high-concurrency spikes.
+  - Cycle detection & recursion guards (`MaxStepLimit`), automatic parallel diamond fan-in resolution (`isJoinReady`), and 10MB variable payload size caps.
+  - Built-in SSRF protection blocking access to private and metadata IP subnets (`10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`, `127.0.0.0/8`, `169.254.0.0/16`).
+
+- **🎨 Modern Workflow Canvas & UX Ergonomics**:
+  - **Pin Data**: Freeze intermediate node outputs directly in the sidebar to simulate downstream steps without triggering live third-party APIs or consuming credits.
+  - **Sticky Notes & Visual Groups**: Organize canvas architecture with color-coded markdown notes and bounding group containers.
+  - **Drag-and-Drop Variable Pills**: Draggable and fuzzy-searchable workflow variables for fast reference insertion into templates and expressions.
+
+- **💻 Sandboxed JavaScript Code Node (Goja VM)**:
+  - Secure in-process ECMAScript 5.1+ execution with access to `$input`, `$vars`, `console.log`, and top-level `return` expressions.
+  - Strict 5-second execution timeout guard preventing infinite loops (`while(true) {}`) from stalling the engine.
+
+- **🤖 Model Context Protocol (MCP) Server**:
+  - Native JSON-RPC 2.0 MCP server allowing AI assistants (Claude Desktop, Cursor, Antigravity, custom LLM agents) to discover, inspect, and trigger workflows.
+  - Dual access: HTTP endpoint at `/api/mcp` and Stdio CLI runner (`make mcp-stdio`).
+
+- **🔌 31+ Out-of-the-Box Integrations**:
+  - **Modern Stack & AI**: Linear, Supabase, Resend, Sentry, Pinecone, Anthropic (Claude), OpenAI, Google Gemini, RAG Vector Search.
+  - **Enterprise & SaaS**: GitHub, GitLab, Slack, Discord, Notion, Jira, Asana, ClickUp, HubSpot, Salesforce, Stripe, Twilio, SendGrid, Google Drive, Google Sheets, Google Calendar, Airtable, PostgreSQL, MongoDB, and more.
+
+- **🛡️ Single-Server Staging & Production Isolation**:
+  - Complete data isolation in a single running server instance via physical table separation (`_staging` vs `_production`) and dynamic URL routing (`/staging/*` vs `/*`).
+  - One-click workflow promotion and instant rollbacks with version history snapshots.
 
 ---
 
 ## 🛠 Technology Stack
 
-Floowsynk is built with a modern, scalable stack focusing on performance and developer experience:
-
 ### **Frontend**
-- **Framework**: [Vue.js 3](https://vuejs.org/) (Composition API) — Provides a reactive, component-based UI for the workflow builder.
-- **Build Tool**: [Vite](https://vitejs.dev/) — Fast development server and optimized production builds.
-- **UI Library**: [PrimeVue](https://primevue.org/) — Comprehensive suite of UI components for dashboard and settings.
-- **Orchestration Canvas**: [Vue Flow](https://vueflow.dev/) — Interactive graph engine for designing workflow nodes and edges.
-- **Styling**: Vanilla CSS & PrimeVue Themes — Tailored, premium design system.
-- **Language**: [TypeScript](https://www.typescriptlang.org/) — Type-safe frontend logic.
+- **Framework**: [Vue.js 3](https://vuejs.org/) (Composition API, `<script setup>`)
+- **Build Tool**: [Vite](https://vitejs.dev/) with TypeScript
+- **UI Components**: [PrimeVue](https://primevue.org/) tailored design system
+- **Canvas Engine**: [Vue Flow](https://vueflow.dev/) for interactive node graphs
+- **Code Editor**: [Monaco Editor](https://microsoft.github.io/monaco-editor/) for JavaScript and template authoring
 
 ### **Backend**
-- **Language**: [Go (Golang) 1.23+](https://go.dev/) — High-concurrency engine for executing workflow steps and managing state.
-- **API (Primary)**: [gRPC](https://grpc.io/) & [gRPC-Web](https://github.com/improbable-eng/grpc-web) — Type-safe, high-performance communication between the dashboard (UI) and the backend.
-- **REST Gateway**: [net/http](https://pkg.go.dev/net/http) — Specialized REST endpoints for **Webhooks**, allowing external systems to trigger workflows via standard HTTP POST.
-- **Database (ORM)**: [GORM](https://gorm.io/) with **PostgreSQL 15** — Persistent storage for:
-    - **Users**: Account profiles and authentication details.
-    - **Workflows**: JSON-serialized workflow definitions, steps, and versions.
-    - **Replay Data**: Comprehensive historical records of every workflow execution (Run History).
-    - **Features**: Application-wide feature flags and configurations.
-- **Caching**: [Redis](https://redis.io/) — Low-latency storage for temporary workflow states, performance caching, and session management.
-- **Event Streaming**: [Apache Kafka](https://kafka.apache.org/) — Message broker used to queue workflow jobs; enables decoupled, scalable processing via the `Jobs/` workers.
-
----
-
-## 🛠 Protobuf & gRPC Requirements
-
-To modify and regenerate the API layer, you must have the **Protocol Buffer Compiler (`protoc`)** installed along with the following specific plugins:
-
-| Requirement | Purpose |
-| :--- | :--- |
-| **`protoc` (v3+)** | The core protobuf compiler. |
-| **`protoc-gen-go`** | Generates Go message structures from `.proto` files. |
-| **`protoc-gen-go-grpc`** | Generates Go gRPC service interfaces and clients. |
-| **`protoc-gen-grpc-web`** | Generates gRPC-Web client code for the TypeScript frontend. |
-
-> [!NOTE]
-> These are automatically configured when running `make setup` on macOS (via Homebrew) or Linux (via apt-get).
-
-### **Infrastructure & DevOps**
-- **Containerization**: [Docker](https://www.docker.com/) & [Docker Compose](https://docs.docker.com/compose/)
-- **Automation**: `Makefile` for streamlined local development
+- **Language**: [Go (Golang) 1.23+ / 1.26](https://go.dev/)
+- **Primary API**: [gRPC](https://grpc.io/) & [gRPC-Web](https://github.com/improbable-eng/grpc-web)
+- **REST Gateway**: Webhook receiver, cURL exporter, OAuth2 flow handlers, and `/api/mcp`
+- **Scripting Sandbox**: [Goja](https://github.com/dop251/goja) ECMAScript runtime
+- **Database (ORM)**: [GORM](https://gorm.io/) with **PostgreSQL 15**
+- **Cache**: [Redis 7](https://redis.io/)
+- **Streaming & Log Ingestion**: [Apache Kafka](https://kafka.apache.org/)
 
 ---
 
 ## 🏗 Project Architecture
 
-The repository is organized into distinct, specialized components:
+```
+floowsynk/
+├── App/                 # Vue 3 + Vite frontend application
+│   └── src/views/Workflow/
+│       ├── Canvas/      # Vue Flow interactive canvas & controls
+│       ├── Nodes/       # Node definitions, sticky notes, visual groups
+│       └── Sidebar/     # Node field editors, Pin Data, variable pill bar
+├── Server/              # Unified Go backend server
+│   ├── workflow/        # Graph engine, node processors, connectors & templates
+│   ├── mcp/             # Model Context Protocol (MCP) JSON-RPC 2.0 server & CLI
+│   ├── connectors/      # Connector JSON templates & auth schemas
+│   ├── matheval/        # Safe arithmetic and boolean expression evaluator
+│   └── crypto/          # AES encryption for stored third-party credentials
+├── Jobs/                # Asynchronous background workers
+│   ├── Consumer/        # Kafka consumer for batched replay data insertion
+│   ├── Interval/        # Schedule interval trigger processor
+│   └── ClearCache/      # Internal workflow cache cleaner
+├── Broker/              # Apache Kafka producer & topic definitions
+├── Database/            # PostgreSQL GORM models, migrations, and seeding
+├── proto/               # Protocol Buffer definitions (workflow.proto, login.proto)
+└── CodeGen/             # Generated gRPC code (Go & TypeScript)
+```
 
-| Component | Description |
-| :--- | :--- |
-| **`App/`** | Vue 3 frontend application (Dashboard, Canvas, Tools). |
-| **`Server/`** | Go backend serving gRPC and REST APIs. |
-| **`Jobs/`** | Background workers (Kafka Consumers, Interval Processors, Cache Cleaners). |
-| **`Broker/`** | Kafka integration and messaging logic. |
-| **`Database/`** | GORM models, migrations, and database connection logic. |
-| **`proto/`** | Protocol Buffer definitions for API contracts. |
-| **`CodeGen/`** | Auto-generated gRPC code for both Go and TypeScript. |
+---
+
+## 🧩 Node Catalog
+
+| Category | Node Types | Purpose |
+| :--- | :--- | :--- |
+| **Triggers & Input** | `webhook`, `interval`, `rag` | Receive external HTTP webhooks, run cron/intervals, query RAG vector knowledge bases |
+| **Logic & Control** | `condition`, `while`, `loop`, `foreach`, `subprocess` | Dynamic branching, iterative processing, child workflow delegation |
+| **Data Transformation** | `setVariable`, `text`, `math`, `map`, `replace`, `findAll`, `count`, `getGuid` | Transform payloads, evaluate expressions, extract regex patterns, generate UUIDs |
+| **Custom Scripting** | `code` (JavaScript) | Sandboxed JavaScript computation with `$input`, `$vars`, and timeout protection |
+| **Connectivity** | `api`, `connector` (31+ services) | REST API requests and native pre-authenticated connectors |
+| **Canvas & Notes** | `stickyNote`, `visualGroup` | Workflow documentation, color notes, and bounding subsystem containers |
+| **Output & Visualization** | `response`, `log` | Webhook HTTP responses and live replay audit logs |
+
+---
+
+## 🤖 Model Context Protocol (MCP) Integration
+
+Floowsynk exposes its workflow orchestration engine to external AI agents via the standard [Model Context Protocol (MCP)](https://modelcontextprotocol.io/).
+
+### Supported MCP Tools
+1. `floowsynk_list_workflows`: List workflows with node counts, status, and environment.
+2. `floowsynk_get_workflow`: Inspect node structure, parameters, and triggers by workflow ID.
+3. `floowsynk_execute_workflow`: Trigger workflow execution with a custom JSON input payload.
+4. `floowsynk_list_connectors`: Discover active connectors and action templates.
+
+### Connecting Claude Desktop or Cursor (Stdio Mode)
+Add the following to your MCP client configuration (e.g. `claude_desktop_config.json`):
+
+```json
+{
+  "mcpServers": {
+    "floowsynk": {
+      "command": "go",
+      "args": ["run", "Server/mcp/cmd/main.go"],
+      "cwd": "/path/to/floowsynk"
+    }
+  }
+}
+```
+
+Or connect via the HTTP JSON-RPC endpoint at:
+`http://localhost:8091/api/mcp`
 
 ---
 
 ## 🚀 Getting Started (Local Development)
 
-Follow these steps to set up Floowsynk in your local environment.
-
-### **1. Prerequisites**
-Ensure you have the following installed:
+### 1. Prerequisites
 - **Go 1.23+**
 - **Node.js (v20+) & npm**
 - **Docker & Docker Compose**
-- **Protobuf Compiler (`protoc`)** (Automatically installed via `make setup` on macOS/Linux)
+- **Protobuf Compiler (`protoc`)** (installed automatically via `make setup`)
 
-### **2. One-Click Setup**
-Run the following command to install all dependencies and initialize the database containers:
+### 2. Quick Setup
+Run the unified setup command to configure dependencies, install protoc plugins, and spin up Docker containers:
 ```bash
 make setup
 ```
 
-### **3. Running the Services**
+### 3. Launching Services
+Run the following in separate terminal tabs:
 
-You can start the different components using separate `make` commands. It is recommended to run them in multiple terminal windows/tabs:
+```bash
+# 1. Start Docker dependencies (PostgreSQL, Redis, Kafka)
+make start-docker
 
-- **Start Infrastructure** (Postgres, Redis, Kafka):
-  ```bash
-  make start-docker
-  ```
+# 2. Start the unified Go backend (gRPC :8090, REST :8091, Plain gRPC :50051)
+make start-server
 
-- **Start Backend API**:
-  ```bash
-  make start-server
-  ```
+# 3. Start the frontend UI (Vite dev server at http://localhost:3000)
+make start-ui
 
-- **Start Frontend UI**:
-  ```bash
-  make start-ui
-  ```
+# 4. Start the Kafka background log consumer
+make job-consumer
 
-- **Start Workers** (Required for workflow execution):
-  ```bash
-  # Start the job consumer (Kafka-driven)
-  make job-consumer
+# 5. Start the Interval job runner (optional for scheduled workflows)
+make job-interval
+```
 
-  # Start the interval processor (Time-driven)
-  make job-interval
-  ```
+### 4. Running Test Suites
+Run all backend test suites (workflows, template caching, Goja sandbox, MCP server, connectors, math eval):
+```bash
+make test
+```
+
+Build and test frontend TypeScript/Vue compilation:
+```bash
+npm --prefix App run build
+```
 
 ---
 
-## 🐳 Deployment & Environment Architecture
+## 🐳 Unified Staging & Production Architecture
 
-Floowsynk uses a **single unified server architecture** and a single configuration file (`Server/.env`) to run both Staging and Production workloads seamlessly:
+Floowsynk operates a **single unified server architecture** configured through `Server/.env`:
 
-1. **URL Routing**:
-   - **Production Endpoints**: `<baseurl>/<route>` (e.g. `http://localhost:8091/api/webhook/<id>`)
-   - **Staging Endpoints**: `<baseurl>/staging/<route>` (e.g. `http://localhost:8091/staging/api/webhook/<id>`)
+1. **Routing**:
+   - Production routes: `http://localhost:8091/api/webhook/<workflow_id>`
+   - Staging routes: `http://localhost:8091/staging/api/webhook/<workflow_id>`
 2. **Database Isolation**:
-   - Staging data is stored in `workflows_staging`, `connections_staging`, `workflow_versions_staging`, `replay_data_staging`.
-   - Production data is stored in `workflows_production`, `connections_production`, `workflow_versions_production`, `replay_data_production`.
-3. **Environment Switcher**:
-   - The UI header features a dropdown selector to switch between STAGING and PRODUCTION instantly.
-
----
-
-## ⚙️ Environment Configuration
-
-All environment variables are managed via a single configuration file located at `Server/.env`.
-
-> [!TIP]
-> Make sure to configure your `DB_USER`, `DB_PASSWORD`, and `KAFKA_BROKERS` accordingly if you are not using the default Docker setup.
-
----
-
-## 💡 Development Tips
-
-- **Generate Protos**: If you modify `.proto` files, run `make proto` to update the generated code in both frontend and backend.
-- **Troubleshooting**: If you encounter connection issues with Kafka or Postgres, verify the container status with `docker ps`.
-- **Cleaning Cache**: Use `make job-clearcache` to purge internal workflow caches.
+   - Staging tables: `workflows_staging`, `connections_staging`, `replay_data_staging`
+   - Production tables: `workflows_production`, `connections_production`, `replay_data_production`
+3. **Publishing**:
+   - Build and test workflows in **STAGING** mode.
+   - Use the **History (Clock)** modal to create snapshots and click **Publish** to promote the workflow to live production.
 
 ---
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please ensure that you update tests and documentation when adding new features or fixing bugs.
+Contributions are welcome! Please ensure all Go unit tests (`make test`) and frontend builds (`npm --prefix App run build`) pass before opening a pull request.
 
 ---
 

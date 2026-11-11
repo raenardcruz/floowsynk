@@ -1,14 +1,43 @@
-# Local Setup Guide
+# 🚀 Floowsynk Local Setup & Operations Guide
 
-This guide explains how to set up and run Floowsynk dependencies (PostgreSQL, Redis, and Kafka) manually using Docker, and configure the Go server to run locally.
+This guide covers complete instructions for installing, configuring, testing, and operating Floowsynk in your local development environment or production-like containerized deployment.
 
-## Prerequisite: Docker Containers
+---
 
-Ensure Docker is installed and running on your system. Run the following commands to start the required services.
+## 📋 1. Prerequisites
 
-### 1. PostgreSQL
-Run a PostgreSQL 15 container. You only need to launch the container; the application will automatically create the database and tables if they do not exist.
+Before setting up Floowsynk, ensure you have the following installed on your host machine:
 
+- **Go (Golang)**: `1.23+` (Go 1.26 recommended)
+- **Node.js**: `v20+` & `npm`
+- **Docker & Docker Compose**: Docker 24+ with Compose v2
+- **Protocol Buffer Compiler (`protoc`)**:
+  - Automatically installed via `make setup` on macOS (via Homebrew) or Linux (via `apt-get`).
+
+---
+
+## ⚡ 2. Automated One-Click Setup
+
+The simplest way to install all dependencies, Protobuf plugins, Node packages, and launch Docker infrastructure:
+
+```bash
+make setup
+```
+
+This single command will:
+1. Detect your OS (macOS or Linux) and install `protobuf`.
+2. Install Go plugins: `protoc-gen-go` and `protoc-gen-go-grpc`.
+3. Install frontend npm dependencies in `App/`.
+4. Run `go mod tidy` for backend Go dependencies.
+5. Spin up PostgreSQL 15, Redis 7, and Apache Kafka via Docker Compose.
+
+---
+
+## 🐳 3. Manual Container Setup (Alternative to `make setup`)
+
+If you prefer launching containers individually, run the following:
+
+### 3.1 PostgreSQL 15
 ```bash
 docker run -d \
   --name local-postgres \
@@ -18,9 +47,7 @@ docker run -d \
   postgres:15
 ```
 
-### 2. Redis
-Run a Redis container exposed on port `6379`.
-
+### 3.2 Redis 7
 ```bash
 docker run -d \
   --name local-redis \
@@ -28,9 +55,7 @@ docker run -d \
   redis:7-alpine
 ```
 
-### 3. Kafka
-Run a single-node Kafka instance using CP-Kafka:
-
+### 3.3 Apache Kafka (Confluent Platform)
 ```bash
 docker run -d \
   --name local-kafka \
@@ -52,32 +77,35 @@ docker run -d \
 
 ---
 
-## Configuration (`.env`)
+## ⚙️ 4. Environment Configuration (`Server/.env`)
 
-Floowsynk uses a **single unified environment configuration** located at `Server/.env`. A single backend server handles both Staging and Production workloads seamlessly using separate physical database tables (`workflows_staging` vs `workflows_production`).
+Floowsynk uses a single unified configuration file located at `Server/.env`. Both Staging and Production workloads, the main server, and background workers share this file.
 
 Create or update `Server/.env`:
 
 ```env
+# Database Configuration (PostgreSQL 15)
 DB_HOST=localhost
 DB_PORT=5432
 DB_USER=root
 DB_PASSWORD=floowsynk
 DB_NAME=floowsynk
 
+# In-Memory Cache (Redis 7)
 REDIS_HOST=localhost
 REDIS_PORT=6379
 REDIS_PASSWORD=
 REDIS_DB=0
 
+# Message Broker (Apache Kafka)
 KAFKA_BROKERS=localhost:9092
 
-# Server Ports
+# Server Networking & Ports
 SERVER_GRPC_PORT=8090
 SERVER_REST_PORT=8091
 SERVER_PLAIN_GRPC_PORT=50051
 
-# Security and Credentials
+# Security & Secrets
 JOB_TOKEN=6c9e5318-6e7b-452d-9e22-9f35a755bcbd
 APP_ADMIN_USERNAME=admin
 APP_ADMIN_PASSWORD=floowsynk
@@ -85,124 +113,197 @@ JWT_SECRET=secret_key
 CRYPTO_KEY=HGD86teHeCb3Gl7Q
 ```
 
-### Environment Variable Explanations
+### Variable Reference
 
-| Variable | Description |
-| --- | --- |
-| **`DB_HOST`** | Hostname or IP of the PostgreSQL instance (`localhost` for local run, `host.docker.internal` for Docker). |
-| **`DB_PORT`** | Port number PostgreSQL is listening on (`5432`). |
-| **`DB_USER`** | Username used to connect to PostgreSQL (`root`). |
-| **`DB_PASSWORD`** | Password used to connect to PostgreSQL (`floowsynk`). |
-| **`DB_NAME`** | Target database name. |
-| **`REDIS_HOST`** | Hostname or IP of the Redis instance (`localhost` or `host.docker.internal`). |
-| **`REDIS_PORT`** | Port number Redis is listening on (`6379`). |
-| **`REDIS_PASSWORD`** | Authentication password for Redis (empty by default). |
-| **`REDIS_DB`** | Logical database index in Redis (`0` by default). |
-| **`KAFKA_BROKERS`** | Comma-separated list of Kafka broker addresses (`localhost:9092`). |
-| **`SERVER_GRPC_PORT`** | Port number where the gRPC-Web wrapper server runs (`8090`). |
-| **`SERVER_REST_PORT`** | Port number for the HTTP REST API server (`8091`). |
-| **`SERVER_PLAIN_GRPC_PORT`** | Raw gRPC port used for internal service-to-service communication (`50051`). |
-| **`JOB_TOKEN`** | Shared secret key authorizing internal background jobs (e.g. `Interval` job). |
-| **`APP_ADMIN_USERNAME`** | Seed administrator account username (`admin`). |
-| **`APP_ADMIN_PASSWORD`** | Seed administrator account password (`floowsynk`). |
-| **`JWT_SECRET`** | Secret key used to sign and verify user JWT sessions. |
-| **`CRYPTO_KEY`** | Encryption key used to encrypt/decrypt sensitive workflow credentials. |
+| Variable | Default | Purpose |
+| :--- | :--- | :--- |
+| `DB_HOST` | `localhost` | PostgreSQL host (`host.docker.internal` in container). |
+| `DB_PORT` | `5432` | PostgreSQL port. |
+| `DB_USER` / `DB_PASSWORD` | `root` / `floowsynk` | Database access credentials. |
+| `DB_NAME` | `floowsynk` | Target database name (auto-migrated on startup). |
+| `REDIS_HOST` / `REDIS_PORT` | `localhost:6379` | Redis instance for session state and fast caching. |
+| `KAFKA_BROKERS` | `localhost:9092` | Broker address for decoupled Replay log batching. |
+| `SERVER_GRPC_PORT` | `8090` | gRPC-Web port for frontend canvas communication. |
+| `SERVER_REST_PORT` | `8091` | REST gateway for Webhooks, OAuth2, and `/api/mcp`. |
+| `SERVER_PLAIN_GRPC_PORT` | `50051` | Plain gRPC port for internal worker jobs. |
+| `JOB_TOKEN` | *UUID* | Shared authentication secret authorizing worker jobs. |
+| `APP_ADMIN_USERNAME` / `_PASSWORD` | `admin` / `floowsynk` | Default initial admin account. |
+| `JWT_SECRET` | *string* | Secret key for signing user session tokens. |
+| `CRYPTO_KEY` | *16/32 char* | AES-GCM key encrypting stored connector credentials. |
 
 ---
 
-## Running the Application
+## 🏃 5. Running the Application
 
-### 1. Build and Run Unified Server
-You can run the unified server and background workers locally or via Docker Compose.
+### Option A: Running Services Locally
 
-#### Option A: Run Locally
-The application automatically creates database tables (`workflows_staging`, `workflows_production`, etc.) and seeds initial admin users on boot.
+Start the services across separate terminal tabs:
 
-1. **Start the unified backend server:**
-   ```bash
-   make start-server
-   ```
-   Or manually:
-   ```bash
-   cd Server
-   go run .
-   ```
+```bash
+# 1. Start Docker Infrastructure
+make start-docker
 
-2. **Start the Kafka consumer job:**
-   ```bash
-   make job-consumer
-   ```
-   Or manually:
-   ```bash
-   go run Jobs/Consumer/main.go
-   ```
+# 2. Start Unified Backend Server
+make start-server
+# (Server listens on gRPC :8090, REST :8091, Plain gRPC :50051)
 
-3. **Start the Interval processor job:**
-   ```bash
-   make job-interval
-   ```
-   Or manually:
-   ```bash
-   go run Jobs/Interval/main.go
-   ```
+# 3. Start Frontend Development UI
+make start-ui
+# (App opens at http://localhost:3000)
 
-#### Option B: Build and Deploy using Docker Compose
-To run the server and jobs inside containerized services using a single Compose configuration:
+# 4. Start Background Kafka Consumer (Replay Log Flusher)
+make job-consumer
+
+# 5. Start Scheduled Interval Job (Optional, for recurring workflows)
+make job-interval
+```
+
+### Option B: Full Container Deployment via Docker Compose
+
+To run the entire platform containerized:
 
 ```bash
 make deploy-docker
 ```
+
 Or manually:
 ```bash
 docker compose up --build -d
 ```
 
-This command builds and deploys:
-- `floowsynk-server` (Unified Backend server listening on `:8090` / `:8091`)
-- `floowsynk-consumer` (Kafka replay consumer job)
-- `floowsynk-interval` (Timer interval trigger job)
-- `floowsynk-app` (Frontend UI at `http://localhost:3000`)
+Services started:
+- `floowsynk-server`: Unified Go backend
+- `floowsynk-consumer`: Kafka Replay consumer
+- `floowsynk-interval`: Timer interval trigger runner
+- `floowsynk-app`: Nginx-served frontend bundle on `http://localhost:3000`
 
 ---
 
-### 2. Run Front-end App
-Start the Vite development server:
+## 🧪 6. Testing & Quality Verification
 
+Run all unit and integration tests across the Go backend:
 ```bash
-make start-ui
-```
-Or manually:
-```bash
-cd App
-npm install
-npm run dev
+make test
 ```
 
----
+This verifies:
+- Workflow DAG execution, cycle detection, parallel diamond fan-in resolution.
+- LRU template compilation caching & zero-allocation fast-paths.
+- Sandboxed JavaScript Code Node (Goja VM) and execution timeout enforcement.
+- Model Context Protocol (MCP) tool registrations and JSON-RPC dispatching.
+- Safe HTTP Client & SSRF protection against private subnets.
+- 31+ Connector template validations, credential checks, and response transformers.
 
-## Unified Staging & Production Architecture
-
-Floowsynk simplifies environment management by running both **Staging** and **Production** on a single unified server instance.
-
-### URL Routing Structure
-- **Production Endpoints**: Base URL (e.g. `http://localhost:8091/api/webhook/<workflow_id>`)
-- **Staging Endpoints**: `<baseurl>/staging/<route>` (e.g. `http://localhost:8091/staging/api/webhook/<workflow_id>`)
-
-### Header Environment Switcher
-In the frontend header, use the dropdown selector to instantly toggle between **STAGING** and **PRODUCTION**. The app automatically targets the appropriate endpoints and displays environment-isolated data.
-
-### Database Table Isolation
-- **Staging tables**: `workflows_staging`, `workflow_versions_staging`, `connections_staging`, `replay_data_staging`
-- **Production tables**: `workflows_production`, `workflow_versions_production`, `connections_production`, `replay_data_production`
+Verify frontend TypeScript and Vue SFC builds:
+```bash
+npm --prefix App run build
+```
 
 ---
 
-## Publishing Workflows
+## 🤖 7. Model Context Protocol (MCP) Setup
 
-To publish a workflow from Staging to Production:
-1. Select **STAGING** in the header dropdown.
-2. Edit and save your workflow.
-3. Open the workflow canvas → click the **History** button (clock icon).
-4. Select a version snapshot (or current live staging state) and click **Publish**.
-5. The workflow snapshot is automatically promoted to `workflows_production` and `connections_production`.
-6. Switch the header dropdown to **PRODUCTION** to view your published live workflow!
+Floowsynk includes a native **Model Context Protocol (MCP)** server, enabling AI tools (such as Claude Desktop, Cursor, and Antigravity) to manage and trigger workflows autonomously.
+
+### 7.1 Stdio Mode (Recommended for Local AI IDEs)
+You can connect AI desktop clients directly to the Stdio runner without exposing network ports.
+
+#### Claude Desktop Setup
+Add the following to your `claude_desktop_config.json`:
+- **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+
+```json
+{
+  "mcpServers": {
+    "floowsynk": {
+      "command": "go",
+      "args": ["run", "Server/mcp/cmd/main.go"],
+      "cwd": "/absolute/path/to/floowsynk"
+    }
+  }
+}
+```
+
+#### Cursor IDE Setup
+In `.cursor/mcp.json`:
+```json
+{
+  "mcpServers": {
+    "floowsynk": {
+      "command": "go",
+      "args": ["run", "Server/mcp/cmd/main.go"],
+      "cwd": "${workspaceFolder}"
+    }
+  }
+}
+```
+
+### 7.2 HTTP JSON-RPC Mode
+Alternatively, remote AI agents can send standard JSON-RPC 2.0 requests to:
+```
+POST http://localhost:8091/api/mcp
+```
+
+### Available MCP Tools:
+- `floowsynk_list_workflows`: Discover available workflows and execution states.
+- `floowsynk_get_workflow`: Inspect node layouts, connection types, and trigger parameters.
+- `floowsynk_execute_workflow`: Execute a workflow synchronously with custom input arguments.
+- `floowsynk_list_connectors`: Enumerate available third-party connectors and templates.
+
+---
+
+## 🎨 8. Canvas Features & Development Ergonomics
+
+### 8.1 Isolated "Pin Data" Mocking
+- Select any node on the canvas.
+- In the right sidebar, expand the **Pinned Mock Output** panel.
+- Click **Pin Data** and provide a JSON mock payload (or click **Use Last Run**).
+- When running the workflow, the engine immediately yields this mock data to downstream nodes, allowing you to iterate on complex downstream logic without triggering paid APIs or side effects.
+
+### 8.2 Sandboxed JavaScript Code Node
+- Add a **Code (JavaScript)** node from Group 1 (Utility) or Group 3 (Data Transformation).
+- Write custom scripts using modern JavaScript (ES5.1+).
+- Access input via `$input` or `input`, workflow variables via `$vars`, and output logs via `console.log(...)`.
+- Return any primitive, object, or array:
+  ```javascript
+  const items = Array.isArray($input) ? $input : [$input];
+  return items.map(item => ({
+    ...item,
+    processedAt: new Date().toISOString()
+  }));
+  ```
+
+### 8.3 Canvas Documentation (Sticky Notes & Visual Groups)
+- Add **Sticky Notes** for architecture annotations and team to-dos.
+- Add **Visual Group** boxes to visually segment microservices, integrations, and subsystem zones on the canvas.
+
+---
+
+## 🛡️ 9. Staging & Production Deployment Lifecycle
+
+Floowsynk's **single unified server architecture** enforces strict database isolation between staging experiments and live production workloads:
+
+1. **Routing**:
+   - Production webhooks & triggers: `http://localhost:8091/api/webhook/<workflow_id>`
+   - Staging webhooks & triggers: `http://localhost:8091/staging/api/webhook/<workflow_id>`
+2. **Table Separation**:
+   - `workflows_staging`, `connections_staging`, `replay_data_staging`
+   - `workflows_production`, `connections_production`, `replay_data_production`
+3. **Promotion Workflow**:
+   - Build and test in **STAGING** mode.
+   - Open the workflow canvas → click **History (Clock icon)**.
+   - Select a snapshot and click **Publish**.
+   - The workflow snapshot is automatically promoted to production tables.
+   - Switch the top header dropdown to **PRODUCTION** to view your live deployed workflow!
+
+---
+
+## ❓ 10. Common Troubleshooting
+
+| Issue | Cause | Resolution |
+| :--- | :--- | :--- |
+| `Failed to connect to database: dial tcp [::1]:5432: connect: connection refused` | PostgreSQL container is not running | Run `make start-docker` or verify with `docker ps`. |
+| `Warning: Failed to initialize broker. Continuing without Kafka.` | Kafka container not running or starting up | Replay logging will safely fall back to synchronous direct database writes. Start Kafka via `make start-docker`. |
+| `protoc: command not found` | Protobuf compiler not installed in PATH | Run `make setup` or install via `brew install protobuf` (macOS) / `apt-get install protobuf-compiler` (Linux). |
+| `execution timeout: script exceeded maximum allowed execution time` | JavaScript Code node took >5s | Check your code for infinite loops or expensive recursions. |

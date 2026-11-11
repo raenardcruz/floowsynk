@@ -1,0 +1,13 @@
+.git
+.github
+.vscode
+.kiro
+.agents
+*.log
+ClearCache
+Consumer
+Interval
+floowsynk_server
+App/node_modules
+App/dist
+Server/floowsynk_server

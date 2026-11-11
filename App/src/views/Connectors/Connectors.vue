@@ -94,7 +94,7 @@
               </div>
             </div>
           </div>
-          <div class="connection-actions">
+          <div class="connection-actions" v-if="!isGuest">
             <button v-if="conn.ismodified" class="btn btn-warning" @click="handleRevert(conn.id)" title="Revert connection to staging copy">
               <i class="pi pi-refresh"></i> Sync/Revert
             </button>
@@ -164,7 +164,7 @@
           </div>
           <h3 class="template-title">{{ temp.name }}</h3>
           <p class="template-desc">{{ temp.description }}</p>
-          <button class="btn btn-primary" @click="openConnectModal(temp)">Connect</button>
+          <button class="btn btn-primary" v-if="!isGuest" @click="openConnectModal(temp)">Connect</button>
         </div>
       </div>
     </div>
@@ -378,6 +378,7 @@ import { TextInput, PasswordInput } from '@/components/Composable/UI/Inputs'
 
 const toast = useToast()
 const confirm = useConfirm()
+const isGuest = computed(() => localStorage.getItem('sessionToken') === 'guest')
 const isLoadingData = ref(true)
 
 interface ConnectorFieldProto {
@@ -670,11 +671,17 @@ const filteredFields = computed(() => {
       return key.includes('client') || key.includes('app_id') || key.includes('oauth')
     })
   } else {
-    // Show fields relevant to API Key / PAT / Token (e.g. access_token, api_key, secret, token)
-    return fields.filter((f: any) => {
-      const key = f.key.toLowerCase()
-      return key.includes('token') || key.includes('key') || key.includes('secret') || key.includes('pat') || key.includes('auth') || key.includes('sid')
-    })
+    // If the template has OAuth2 support, filter out OAuth-specific fields
+    const authTypeStr = ((selectedTemplate.value as any).authtype || (selectedTemplate.value as any).authType || '').toLowerCase()
+    const hasOAuth = authTypeStr.includes('oauth')
+    if (hasOAuth) {
+      return fields.filter((f: any) => {
+        const key = f.key.toLowerCase()
+        return !key.includes('client_id') && !key.includes('client_secret') && !key.includes('oauth')
+      })
+    }
+    // Non-OAuth connectors: show all configured fields (host, base_url, api_key, etc.)
+    return fields
   }
 })
 
@@ -706,6 +713,7 @@ const loadData = async () => {
 }
 
 const handleRevert = (id: string) => {
+  if (isGuest.value) return
   confirm.require({
     message: 'Revert this connection to its staging copy? Any direct modifications in production will be removed.',
     header: 'Revert Connection',
@@ -757,6 +765,7 @@ const getTemplateByConnectorId = (connectorId: string): ConnectorProtoTemplate |
 
 // ─── Modal: Add mode ──────────────────────────────────────────────────────────
 const openConnectModal = (template: ConnectorProtoTemplate) => {
+  if (isGuest.value) return
   isEditMode.value = false
   editingConnectionId.value = null
   selectedTemplate.value = template
@@ -776,6 +785,7 @@ const openConnectModal = (template: ConnectorProtoTemplate) => {
 
 // ─── Modal: Edit mode ─────────────────────────────────────────────────────────
 const openEditModal = (conn: ConnectionProto) => {
+  if (isGuest.value) return
   const template = getTemplateByConnectorId(conn.connectorid)
   if (!template) return
   isEditMode.value = true
@@ -797,6 +807,7 @@ const openEditModal = (conn: ConnectionProto) => {
 
 // ─── Modal: Save (contextual) ─────────────────────────────────────────────────
 const handleModalSave = async () => {
+  if (isGuest.value) return
   if (!selectedTemplate.value || !newConnectionName.value) return
 
   if (isEditMode.value && editingConnectionId.value) {
@@ -909,6 +920,7 @@ const route = useRoute()
 const router = useRouter()
 
 const handleDelete = (id: string) => {
+  if (isGuest.value) return
   confirm.require({
     message: 'Are you sure you want to disconnect this integration?',
     header: 'Disconnect Connector',

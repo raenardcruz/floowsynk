@@ -6170,7 +6170,8 @@ ragconnectionid: (f = jspb.Message.getField(msg, 23)) == null ? undefined : f,
 ragprompt: (f = jspb.Message.getField(msg, 24)) == null ? undefined : f,
 ragtopk: (f = jspb.Message.getField(msg, 25)) == null ? undefined : f,
 ragsystemprompt: (f = jspb.Message.getField(msg, 26)) == null ? undefined : f,
-ragoutputvar: (f = jspb.Message.getField(msg, 27)) == null ? undefined : f
+ragoutputvar: (f = jspb.Message.getField(msg, 27)) == null ? undefined : f,
+ragllmconnectionid: (f = jspb.Message.getField(msg, 28)) == null ? undefined : f
   };
 
   if (includeInstance) {
@@ -6317,6 +6318,10 @@ proto.proto.NodeData.deserializeBinaryFromReader = function(msg, reader) {
     case 27:
       var value = /** @type {string} */ (reader.readStringRequireUtf8());
       msg.setRagoutputvar(value);
+      break;
+    case 28:
+      var value = /** @type {string} */ (reader.readStringRequireUtf8());
+      msg.setRagllmconnectionid(value);
       break;
     default:
       reader.skipField();
@@ -6536,6 +6541,13 @@ proto.proto.NodeData.serializeBinaryToWriter = function(message, writer) {
   if (f != null) {
     writer.writeString(
       27,
+      f
+    );
+  }
+  f = /** @type {string} */ (jspb.Message.getField(message, 28));
+  if (f != null) {
+    writer.writeString(
+      28,
       f
     );
   }
@@ -7514,6 +7526,42 @@ proto.proto.NodeData.prototype.clearRagoutputvar = function() {
  */
 proto.proto.NodeData.prototype.hasRagoutputvar = function() {
   return jspb.Message.getField(this, 27) != null;
+};
+
+
+/**
+ * optional string ragLlmConnectionId = 28;
+ * @return {string}
+ */
+proto.proto.NodeData.prototype.getRagllmconnectionid = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 28, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.proto.NodeData} returns this
+ */
+proto.proto.NodeData.prototype.setRagllmconnectionid = function(value) {
+  return jspb.Message.setField(this, 28, value);
+};
+
+
+/**
+ * Clears the field making it undefined.
+ * @return {!proto.proto.NodeData} returns this
+ */
+proto.proto.NodeData.prototype.clearRagllmconnectionid = function() {
+  return jspb.Message.setField(this, 28, undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.proto.NodeData.prototype.hasRagllmconnectionid = function() {
+  return jspb.Message.getField(this, 28) != null;
 };
 
 
@@ -10918,7 +10966,8 @@ createdat: jspb.Message.getFieldWithDefault(msg, 7, ""),
 updatedat: jspb.Message.getFieldWithDefault(msg, 8, ""),
 documentcount: jspb.Message.getFieldWithDefault(msg, 9, 0),
 chunkcount: jspb.Message.getFieldWithDefault(msg, 10, 0),
-ismodified: jspb.Message.getBooleanFieldWithDefault(msg, 11, false)
+ismodified: jspb.Message.getBooleanFieldWithDefault(msg, 11, false),
+llmconnectionid: (f = jspb.Message.getField(msg, 12)) == null ? undefined : f
   };
 
   if (includeInstance) {
@@ -10998,6 +11047,10 @@ proto.proto.RagConnectionProto.deserializeBinaryFromReader = function(msg, reade
     case 11:
       var value = /** @type {boolean} */ (reader.readBool());
       msg.setIsmodified(value);
+      break;
+    case 12:
+      var value = /** @type {string} */ (reader.readStringRequireUtf8());
+      msg.setLlmconnectionid(value);
       break;
     default:
       reader.skipField();
@@ -11102,6 +11155,13 @@ proto.proto.RagConnectionProto.serializeBinaryToWriter = function(message, write
   if (f) {
     writer.writeBool(
       11,
+      f
+    );
+  }
+  f = /** @type {string} */ (jspb.Message.getField(message, 12));
+  if (f != null) {
+    writer.writeString(
+      12,
       f
     );
   }
@@ -11303,6 +11363,42 @@ proto.proto.RagConnectionProto.prototype.getIsmodified = function() {
  */
 proto.proto.RagConnectionProto.prototype.setIsmodified = function(value) {
   return jspb.Message.setProto3BooleanField(this, 11, value);
+};
+
+
+/**
+ * optional string llmConnectionId = 12;
+ * @return {string}
+ */
+proto.proto.RagConnectionProto.prototype.getLlmconnectionid = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 12, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.proto.RagConnectionProto} returns this
+ */
+proto.proto.RagConnectionProto.prototype.setLlmconnectionid = function(value) {
+  return jspb.Message.setField(this, 12, value);
+};
+
+
+/**
+ * Clears the field making it undefined.
+ * @return {!proto.proto.RagConnectionProto} returns this
+ */
+proto.proto.RagConnectionProto.prototype.clearLlmconnectionid = function() {
+  return jspb.Message.setField(this, 12, undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.proto.RagConnectionProto.prototype.hasLlmconnectionid = function() {
+  return jspb.Message.getField(this, 12) != null;
 };
 
 
@@ -13338,7 +13434,8 @@ ragconnectionid: jspb.Message.getFieldWithDefault(msg, 1, ""),
 query: jspb.Message.getFieldWithDefault(msg, 2, ""),
 topk: jspb.Message.getFieldWithDefault(msg, 3, 0),
 systemprompt: jspb.Message.getFieldWithDefault(msg, 4, ""),
-environment: jspb.Message.getFieldWithDefault(msg, 5, 0)
+environment: jspb.Message.getFieldWithDefault(msg, 5, 0),
+llmconnectionid: (f = jspb.Message.getField(msg, 6)) == null ? undefined : f
   };
 
   if (includeInstance) {
@@ -13394,6 +13491,10 @@ proto.proto.QueryRagRequest.deserializeBinaryFromReader = function(msg, reader) 
     case 5:
       var value = /** @type {!proto.proto.Environment} */ (reader.readEnum());
       msg.setEnvironment(value);
+      break;
+    case 6:
+      var value = /** @type {string} */ (reader.readStringRequireUtf8());
+      msg.setLlmconnectionid(value);
       break;
     default:
       reader.skipField();
@@ -13456,6 +13557,13 @@ proto.proto.QueryRagRequest.serializeBinaryToWriter = function(message, writer) 
   if (f !== 0.0) {
     writer.writeEnum(
       5,
+      f
+    );
+  }
+  f = /** @type {string} */ (jspb.Message.getField(message, 6));
+  if (f != null) {
+    writer.writeString(
+      6,
       f
     );
   }
@@ -13549,6 +13657,42 @@ proto.proto.QueryRagRequest.prototype.getEnvironment = function() {
  */
 proto.proto.QueryRagRequest.prototype.setEnvironment = function(value) {
   return jspb.Message.setProto3EnumField(this, 5, value);
+};
+
+
+/**
+ * optional string llmConnectionId = 6;
+ * @return {string}
+ */
+proto.proto.QueryRagRequest.prototype.getLlmconnectionid = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 6, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.proto.QueryRagRequest} returns this
+ */
+proto.proto.QueryRagRequest.prototype.setLlmconnectionid = function(value) {
+  return jspb.Message.setField(this, 6, value);
+};
+
+
+/**
+ * Clears the field making it undefined.
+ * @return {!proto.proto.QueryRagRequest} returns this
+ */
+proto.proto.QueryRagRequest.prototype.clearLlmconnectionid = function() {
+  return jspb.Message.setField(this, 6, undefined);
+};
+
+
+/**
+ * Returns whether this field is set.
+ * @return {boolean}
+ */
+proto.proto.QueryRagRequest.prototype.hasLlmconnectionid = function() {
+  return jspb.Message.getField(this, 6) != null;
 };
 
 

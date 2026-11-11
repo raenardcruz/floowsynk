@@ -2,8 +2,13 @@ import { GraphNode } from '@vue-flow/core'
 import { Ref, computed, watch } from 'vue'
 import { useWorkflowCanvasStore } from '@/views/Workflow/Canvas'
 
+export const getCanvasElementId = (tabId: string): string => {
+    const sanitized = (tabId || 'floowsynk').replace(/[^a-zA-Z0-9_-]/g, '-')
+    return `canvas-${sanitized}`
+}
+
 export const useFloowsynkNodeHooks = (tabId: string) => {
-    const canvasId = btoa(tabId)
+    const canvasId = getCanvasElementId(tabId)
 
     return {
         canvasId

@@ -47,10 +47,68 @@ export const groups: Group[] = [
         icon: "output",
         name: "Output",
         description: "Output nodes are used for testing visualization. These nodes are not executed in deployed process.",
+    },
+    {
+        id: 8,
+        icon: "edit_note",
+        name: "Canvas & Notes",
+        description: "Annotations, sticky notes, and visual grouping boxes to organize workflow architecture.",
     }
 ]
 
 export const nodes: Node.AsObject[] = [
+    {
+        id: '', nodetype: 'stickyNote', label: 'Sticky Note', position: { x: 0, y: 0 },
+        groupList: [8],
+        icon: {
+            name: "edit_note",
+            color: "linear-gradient(135deg, #f59e0b, #d97706)"
+        },
+        data: {
+            name: "Note",
+            message: "Add workflow documentation, annotations, or todo items...",
+            template: "#fef08a"
+        },
+        dimensions: {
+            width: 240,
+            height: 180
+        },
+        inputsList: [],
+        outputsList: []
+    },
+    {
+        id: '', nodetype: 'visualGroup', label: 'Visual Group', position: { x: 0, y: 0 },
+        groupList: [8],
+        icon: {
+            name: "select_all",
+            color: "linear-gradient(135deg, #6366f1, #3b82f6)"
+        },
+        data: {
+            name: "Subsystem Zone",
+            message: "Describe the purpose of this group of nodes...",
+            template: "rgba(99, 102, 241, 0.08)"
+        },
+        dimensions: {
+            width: 380,
+            height: 240
+        },
+        inputsList: [],
+        outputsList: []
+    },
+    {
+        id: '', nodetype: 'code', label: 'Code (JavaScript)', position: { x: 0, y: 0 },
+        groupList: [1, 3],
+        icon: {
+            name: "code",
+            color: "linear-gradient(135deg, #f59e0b, #ef4444)"
+        },
+        data: {
+            value: "// Process $input and return output\nconst items = Array.isArray($input) ? $input : [$input];\nreturn items.map(item => ({\n  ...item,\n  processedAt: new Date().toISOString()\n}));",
+            variable: "code_output"
+        },
+        inputsList: ["input"],
+        outputsList: ["output"]
+    },
     {
         id: '', nodetype: 'rag', label: 'AI RAG Query', position: { x: 0, y: 0 },
         groupList: [4],
@@ -60,10 +118,15 @@ export const nodes: Node.AsObject[] = [
         },
         data: {
             ragconnectionid: "",
+            ragConnectionId: "",
             ragprompt: "{{input}}",
+            ragPrompt: "{{input}}",
             ragtopk: 3,
+            ragTopK: 3,
             ragsystemprompt: "",
-            ragoutputvar: "rag_output"
+            ragSystemPrompt: "",
+            ragoutputvar: "rag_output",
+            ragOutputVar: "rag_output"
         },
         inputsList: ["input"],
         outputsList: ["output"]

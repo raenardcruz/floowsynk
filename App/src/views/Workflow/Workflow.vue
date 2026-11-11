@@ -5,7 +5,7 @@
                 @click="activeTab = 'main'">
                 Processes
             </div>
-            <div class="tab" v-for="tab in tabs" :key="tab.id"
+            <div class="tab" v-for="tab in tabs.filter(t => !t.id?.startsWith('help-'))" :key="tab.id"
                 :class="{ 'nav-active': activeTab == tab.id }"
                 @click="activeTab = tab.id">
                 {{ tab.name }}
@@ -17,7 +17,7 @@
         <div class="logic-main-content">
             <div class="logic-main-workspace">
                 <WorkflowsProcessList class="content-animation" v-show="activeTab == 'main'" />
-                <WorkflowCanvas class="content-animation" v-for="tab in tabs.filter(t => t.id === activeTab)" :key="tab.id" :id="tab.id" />
+                <WorkflowCanvas class="content-animation" v-for="tab in tabs.filter(t => t.id === activeTab && !t.id?.startsWith('help-'))" :key="tab.id" :id="tab.id" />
             </div>
         </div>
     </div>

@@ -1,6 +1,7 @@
 import dashboard from "@/components/Icons/dashboard.svg";
 import workflow from "@/components/Icons/workflow.svg";
 import connection from "@/components/Icons/connection.svg";
+import help from "@/components/Icons/help.svg";
 
 export const apps = [
     {
@@ -22,5 +23,10 @@ export const apps = [
         "name": "RAG Knowledge",
         "icon": connection,
         "path": "/rag"
+    },
+    {
+        "name": "Help & Guide",
+        "icon": help,
+        "path": "/help"
     }
 ]

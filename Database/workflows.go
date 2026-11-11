@@ -103,7 +103,7 @@ func (db *DatabaseConnection) GetWorkflows(limit, offset int) (*pb.WorkflowList,
 func (db *DatabaseConnection) GetWorkflowsEnv(limit, offset int, env string) (*pb.WorkflowList, error) {
 	tableName := db.TableFor(env, "workflows")
 	var workflows []Workflow
-	if err := db.conn.Table(tableName).Where("source_workflow_id = '' OR source_workflow_id IS NULL").Limit(limit).Offset(offset).Find(&workflows).Error; err != nil {
+	if err := db.conn.Table(tableName).Where("(source_workflow_id = '' OR source_workflow_id IS NULL) AND id NOT LIKE 'test-%'").Limit(limit).Offset(offset).Find(&workflows).Error; err != nil {
 		log.Printf("Error querying workflows from %s: %v", tableName, err)
 		return nil, err
 	}
@@ -513,8 +513,6 @@ func (db *DatabaseConnection) RevertWorkflowToStaging(workflowID string) (*pb.Wo
 		return nil, fmt.Errorf("failed to delete duplicate workflow record: %w", res.Error)
 	}
 	log.Printf("RevertWorkflowToStaging deleted %d duplicate record(s) for targetID %s (workflowID %s)", res.RowsAffected, targetID, workflowID)
-
-	db.conn.Exec(fmt.Sprintf("UPDATE %s SET is_modified = false WHERE id = ? OR id = ?", prodTable), targetID, workflowID)
 
 	DeleteCache(ctx, fmt.Sprintf("workflow:production:%s", targetID))
 	DeleteCache(ctx, fmt.Sprintf("workflow:staging:%s", targetID))

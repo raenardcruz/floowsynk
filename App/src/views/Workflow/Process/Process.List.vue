@@ -15,7 +15,7 @@
         </div>
 
         <div class="cards-gallery">
-            <div class="create-card hover-lift" @click="createProcess">
+            <div v-if="!isGuest" class="create-card hover-lift" @click="createProcess">
                 <div class="create-icon-wrapper">
                     <span class="material-symbols-outlined">add</span>
                 </div>
@@ -67,7 +67,7 @@
                         </div>
                     </div>
                 </Collapsible>
-                <button v-if="history.length > 0" type="button" class="clear-history-btn" @click="clearHistoryAction" title="Clear All Run History">
+                <button v-if="history.length > 0 && !isGuest" type="button" class="clear-history-btn" @click="clearHistoryAction" title="Clear All Run History">
                     <span class="material-symbols-outlined">delete_sweep</span>
                     <span>Clear</span>
                 </button>
@@ -84,7 +84,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { createProcess, cardClicked, initWorkflows, historyClicked, clearHistoryAction } from './Process.List.helper'
 import WorkflowIcon from "@/views/Workflow/Workflow.Icon.vue"
 import { useProcessListStore, useProcessListHooks } from './Process.List.hooks'
@@ -92,6 +92,7 @@ import { useAsyncState, useVirtualList } from '@vueuse/core'
 import { Headers as Header, Row } from '@/components/Composable/UI/Table'
 import { Collapsible } from '@/components/Composable/UI/Collapsible'
 
+const isGuest = computed(() => localStorage.getItem('sessionToken') === 'guest')
 const { search, history, processes } = useProcessListStore()
 const { filteredProcesses } = useProcessListHooks()
 const { isLoading } = useAsyncState(initWorkflows, null)

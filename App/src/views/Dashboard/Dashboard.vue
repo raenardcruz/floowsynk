@@ -11,7 +11,7 @@
         <p class="banner-subtitle">Real-time stats, system health diagnostics, and active integrations.</p>
       </div>
       <div class="banner-actions">
-        <Button label="New Workflow" icon="pi pi-plus" class="p-button-gradient" @click="$router.push('/workflow')" />
+        <Button v-if="!isGuest" label="New Workflow" icon="pi pi-plus" class="p-button-gradient" @click="$router.push('/workflow')" />
         <Button label="Connectors Gallery" icon="pi pi-box" class="p-button-glass" @click="$router.push('/connectors')" />
       </div>
     </div>
@@ -231,7 +231,7 @@
           <div v-if="workflowsList.length === 0" class="empty-side-state">
             <i class="pi pi-sitemap"></i>
             <p>No active workflows found</p>
-            <button class="btn-sm-primary mt-2" @click="$router.push('/workflow')">Create One</button>
+            <button v-if="!isGuest" class="btn-sm-primary mt-2" @click="$router.push('/workflow')">Create One</button>
           </div>
         </div>
       </div>
@@ -248,6 +248,7 @@ import Button from 'primevue/button';
 import { listWorkflowRunHistory, getAllWorkflows } from '@/views/Workflow/Process/Process.List.api';
 import { NodeStatus } from 'proto/workflow/workflow_pb';
 
+const isGuest = computed(() => localStorage.getItem('sessionToken') === 'guest');
 const loading = ref(true);
 const history = ref<any[]>([]);
 const workflowsList = ref<any[]>([]);

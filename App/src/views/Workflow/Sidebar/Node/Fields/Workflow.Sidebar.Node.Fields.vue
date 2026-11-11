@@ -1,11 +1,11 @@
 <template>
-    <!-- Available Variables (Click to Copy / Insert) -->
+    <!-- Available Variables (Drag or Click to Insert) -->
     <div v-if="!props.isNested && variables && variables.length > 0" class="variables-pill-bar">
         <div class="variables-pill-bar__header" @click="isVariablesCollapsed = !isVariablesCollapsed">
             <div class="variables-pill-bar__title">
                 <span class="material-symbols-outlined variables-pill-bar__icon">data_object</span>
-                <span>Available Variables (Click to Copy / Insert)</span>
-                <span class="variables-pill-bar__badge">{{ variables.length }}</span>
+                <span>Available Variables (Drag or Click)</span>
+                <span class="variables-pill-bar__badge">{{ filteredVariables.length }}</span>
             </div>
             <span
                 class="material-symbols-outlined variables-pill-bar__chevron"
@@ -14,20 +14,83 @@
                 expand_more
             </span>
         </div>
+        <div v-if="!isVariablesCollapsed" class="variables-pill-bar__search-box" @click.stop>
+            <input
+                type="text"
+                v-model="variableFilter"
+                placeholder="Search variables (e.g. input, name)..."
+                class="variables-pill-bar__search-input"
+            />
+            <span v-if="variableFilter" class="material-symbols-outlined variables-pill-bar__clear" @click="variableFilter = ''">close</span>
+        </div>
         <div v-if="!isVariablesCollapsed" class="variables-pill-bar__list">
             <button
-                v-for="v in variables"
+                v-for="v in filteredVariables"
                 :key="v"
                 type="button"
                 class="variables-pill-bar__pill"
                 :class="{ 'variables-pill-bar__pill--copied': copiedVar === v }"
+                :draggable="true"
+                @dragstart="onVariableDragStart($event, v)"
                 @mousedown.prevent
                 @click="insertOrCopyVariable(v)"
                 :title="formatPillTitle(v)"
             >
+                <span class="material-symbols-outlined variables-pill-bar__drag-handle">drag_indicator</span>
                 <span v-if="copiedVar === v" class="material-symbols-outlined variables-pill-bar__check">check</span>
                 <span>{{ formatPillLabel(v) }}</span>
             </button>
+        </div>
+    </div>
+
+    <!-- Pinned Mock Output Panel -->
+    <div v-if="!props.isNested && modelValue" class="pinned-data-panel">
+        <div class="pinned-data-panel__header" @click="isPinCollapsed = !isPinCollapsed">
+            <div class="pinned-data-panel__title">
+                <span class="material-symbols-outlined pinned-data-panel__icon" :class="{ 'pinned-active': isPinnedActive }">push_pin</span>
+                <span>Pinned Mock Output</span>
+                <span v-if="isPinnedActive" class="pinned-data-panel__badge">ACTIVE</span>
+            </div>
+            <div class="pinned-data-panel__actions" @click.stop>
+                <button
+                    type="button"
+                    class="pinned-toggle-btn"
+                    :class="{ 'pinned-toggle-btn--active': isPinnedActive }"
+                    @click="togglePinData"
+                >
+                    {{ isPinnedActive ? 'Pinned' : 'Pin Data' }}
+                </button>
+                <span
+                    class="material-symbols-outlined variables-pill-bar__chevron"
+                    :class="{ 'collapsed': isPinCollapsed }"
+                    @click="isPinCollapsed = !isPinCollapsed"
+                >
+                    expand_more
+                </span>
+            </div>
+        </div>
+        <div v-if="!isPinCollapsed && isPinnedActive" class="pinned-data-panel__body">
+            <div class="pinned-data-notice">
+                <span class="material-symbols-outlined">info</span>
+                <span>When pinned, execution returns this mock output and skips live API calls.</span>
+            </div>
+            <div class="pinned-data-controls">
+                <button type="button" class="pinned-btn" @click="formatPinnedJson" title="Prettify JSON">
+                    <span class="material-symbols-outlined">code</span> Format JSON
+                </button>
+                <button type="button" class="pinned-btn" @click="pinLastRunData" title="Capture from Last Run" v-if="hasLastRunData">
+                    <span class="material-symbols-outlined">history</span> Use Last Run
+                </button>
+                <button type="button" class="pinned-btn pinned-btn--danger" @click="clearPinnedData" title="Clear Pin">
+                    <span class="material-symbols-outlined">delete</span> Clear
+                </button>
+            </div>
+            <textarea
+                class="pinned-data-textarea"
+                v-model="modelValue['pinneddata']"
+                placeholder='e.g. {"status": "success", "user": {"id": 123, "name": "Jane Doe"}}'
+                rows="4"
+            ></textarea>
         </div>
     </div>
 
@@ -40,12 +103,30 @@
     </div>
     <div v-else-if="props.nodeType === 'rag' && modelValue" class="rag-config" style="display: flex; flex-direction: column; gap: 12px; padding: 4px;">
         <div>
-            <label style="font-weight: 600; font-size: 0.85rem; color: var(--text-color); display: block; margin-bottom: 4px;">RAG Connection</label>
+            <label style="font-weight: 600; font-size: 0.85rem; color: var(--text-color); display: block; margin-bottom: 4px;">RAG Connection (Ollama)</label>
             <SelectInput
                 :options="ragConnectionOptions"
                 :disabled="disabled"
-                v-model="modelValue['ragconnectionid']"
+                :modelValue="modelValue['ragconnectionid'] || modelValue['ragConnectionId'] || ''"
+                @update:modelValue="(val: any) => { modelValue['ragconnectionid'] = val; modelValue['ragConnectionId'] = val; }"
                 placeholder="Select RAG Knowledge Base" />
+            <div v-if="selectedRagConn" style="font-size: 0.78rem; padding: 8px 10px; background: rgba(99, 102, 241, 0.08); border-radius: 8px; border: 1px solid rgba(99, 102, 241, 0.2); color: var(--text-color); margin-top: 4px;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 2px;">
+                    <span><strong>Provider:</strong> Ollama</span>
+                    <span style="opacity: 0.8;">{{ selectedRagConn.documentcount || 0 }} docs ({{ selectedRagConn.chunkcount || 0 }} chunks)</span>
+                </div>
+                <div><strong>Chat LLM:</strong> <code>{{ selectedRagConn.chatmodel }}</code></div>
+                <div><strong>Embedding:</strong> <code>{{ selectedRagConn.embeddingmodel }}</code></div>
+            </div>
+        </div>
+        <div>
+            <label style="font-weight: 600; font-size: 0.85rem; color: var(--text-color); display: block; margin-bottom: 4px;">LLM Summarizer Connection (Optional)</label>
+            <SelectInput
+                :options="ragLlmConnectionOptions"
+                :disabled="disabled"
+                :modelValue="modelValue['ragllmconnectionid'] || modelValue['ragLlmConnectionId'] || ''"
+                @update:modelValue="(val: any) => { modelValue['ragllmconnectionid'] = val; modelValue['ragLlmConnectionId'] = val; }"
+                placeholder="Default (Ollama Knowledge Base)" />
         </div>
         <div>
             <label style="font-weight: 600; font-size: 0.85rem; color: var(--text-color); display: block; margin-bottom: 4px;">User Question / Prompt Template</label>
@@ -211,6 +292,37 @@
             </div>
         </div>
     </div>
+    <div v-else-if="props.nodeType === 'code' && modelValue" class="code-node-config" style="display: flex; flex-direction: column; gap: 12px; padding: 4px;">
+        <div style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: 6px; padding: 10px; font-size: 0.8rem; color: #fbbf24; line-height: 1.4;">
+            <div style="font-weight: 600; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
+                <span class="material-symbols-outlined" style="font-size: 1rem;">code</span>
+                <span>JavaScript Sandbox (Goja)</span>
+            </div>
+            <div>
+                • <code>$input</code> / <code>input</code>: Previous node output<br>
+                • <code>$vars</code> / <code>variables</code>: Process variables<br>
+                • <code>console.log(...)</code>: Captured into execution logs<br>
+                • Return any value (e.g. <code>return items.map(...)</code>)
+            </div>
+        </div>
+        <div>
+            <label style="font-weight: 600; font-size: 0.85rem; color: var(--text-color); display: block; margin-bottom: 4px;">Script</label>
+            <TextCodeInput
+                v-model="modelValue['value']"
+                :disabled="disabled"
+                placeholder="// Enter JavaScript here..."
+                :editorConfig="{ variables: variables, target: 'body' }"
+            />
+        </div>
+        <div>
+            <label style="font-weight: 600; font-size: 0.85rem; color: var(--text-color); display: block; margin-bottom: 4px;">Output Variable Name (Optional)</label>
+            <TextCodeInput
+                v-model="modelValue['variable']"
+                placeholder="e.g. code_output"
+                :disabled="disabled"
+            />
+        </div>
+    </div>
     <template v-for="(value, key) in modelValue" :key="key" v-else-if="modelValue && typeof modelValue === 'object'">
         <div v-if="value != null" style="margin-top: 8px;">
             <component :is="getComponent(key, value)?.component" v-bind="getComponent(key, value)?.props" v-model="modelValue[key]" />
@@ -238,6 +350,7 @@ import { useTab } from '@/views/Workflow'
 import { getConnections } from '@/views/Connectors/Connectors.api'
 import { getRagConnections } from '@/views/Rag/Rag.api'
 import { getRestUrl } from '@/components/Composable/constants'
+import { useWorkflowCanvasStore } from '@/views/Workflow/Canvas/Workflow.Canvas.hooks'
 
 interface Props extends SidebarNodeProps {
     isNested?: boolean
@@ -265,6 +378,16 @@ const fetchConnectorData = async () => {
         }
 
         ragConnectionsList.value = await getRagConnections()
+        if (props.nodeType === 'rag' && modelValue.value) {
+            if (!modelValue.value['ragconnectionid'] && modelValue.value['ragConnectionId']) {
+                modelValue.value['ragconnectionid'] = modelValue.value['ragConnectionId']
+            }
+            if (!modelValue.value['ragconnectionid'] && ragConnectionsList.value.length === 1) {
+                const singleId = ragConnectionsList.value[0].id
+                modelValue.value['ragconnectionid'] = singleId
+                modelValue.value['ragConnectionId'] = singleId
+            }
+        }
     } catch (err) {
         console.error("Failed to load connector/RAG data in sidebar:", err)
     }
@@ -287,6 +410,36 @@ const ragConnectionOptions = computed(() => {
         value: c.id
     }))
 })
+
+const ragLlmConnectionOptions = computed(() => {
+    const list = [{ label: 'Default (Ollama Knowledge Base)', value: '' }]
+    const llmConns = connectionsList.value
+        .filter(c => ['google_gemini', 'ollama', 'openai', 'anthropic'].includes((c.connectorid || c.connectorId || '').toLowerCase()))
+        .map(c => ({
+            label: `${c.name} (${c.connectorid || c.connectorId})`,
+            value: c.id
+        }))
+    return [...list, ...llmConns]
+})
+
+const selectedRagConn = computed(() => {
+    const val = modelValue.value
+    if (!val) return null
+    const id = val['ragconnectionid'] || val['ragConnectionId']
+    if (!id) return null
+    return ragConnectionsList.value.find(c => c.id === id) || null
+})
+
+// Auto-select first Ollama RAG connection if none is selected
+watch(ragConnectionsList, (conns) => {
+    if (props.nodeType === 'rag' && modelValue.value && conns.length > 0) {
+        const currentId = modelValue.value['ragconnectionid'] || modelValue.value['ragConnectionId']
+        if (!currentId) {
+            modelValue.value['ragconnectionid'] = conns[0].id
+            modelValue.value['ragConnectionId'] = conns[0].id
+        }
+    }
+}, { immediate: true })
 
 const actionOptions = computed(() => {
     const val = modelValue.value
@@ -488,6 +641,72 @@ const curlCommand = computed(() => {
     return `curl -X POST \\\n  -H "Content-Type: application/json" \\\n  ${header}${webhookUrl.value}`;
 })
 const { filteredProcesses: rawProcesses, variables } = useSidebarNodeHooks(props.tabid)
+const variableFilter = ref('')
+const filteredVariables = computed(() => {
+    if (!variables.value) return []
+    if (!variableFilter.value.trim()) return variables.value
+    const q = variableFilter.value.toLowerCase().trim()
+    return variables.value.filter(v => v.toLowerCase().includes(q))
+})
+
+const onVariableDragStart = (event: DragEvent, varName: string) => {
+    const pillText = varName.startsWith('.') ? `{{${varName}}}` : `{{.${varName}}}`
+    if (event.dataTransfer) {
+        event.dataTransfer.setData('text/plain', pillText)
+        event.dataTransfer.effectAllowed = 'copy'
+    }
+}
+
+// Pinned Data State & Methods
+const isPinCollapsed = ref(false)
+const isPinnedActive = computed(() => {
+    if (!modelValue.value) return false
+    return Boolean(modelValue.value['pinneddata'] || (modelValue.value['value'] && String(modelValue.value['value']).startsWith('__PINNED__:')))
+})
+
+const togglePinData = () => {
+    if (!modelValue.value) return
+    if (isPinnedActive.value) {
+        clearPinnedData()
+    } else {
+        modelValue.value['pinneddata'] = '{\n  "status": "success",\n  "mock": true\n}'
+        isPinCollapsed.value = false
+    }
+}
+
+const clearPinnedData = () => {
+    if (!modelValue.value) return
+    delete modelValue.value['pinneddata']
+    if (modelValue.value['value'] && String(modelValue.value['value']).startsWith('__PINNED__:')) {
+        modelValue.value['value'] = ''
+    }
+}
+
+const formatPinnedJson = () => {
+    if (!modelValue.value || !modelValue.value['pinneddata']) return
+    try {
+        const parsed = JSON.parse(modelValue.value['pinneddata'])
+        modelValue.value['pinneddata'] = JSON.stringify(parsed, null, 2)
+    } catch {
+        // keep as is
+    }
+}
+
+const { replayData } = useWorkflowCanvasStore(props.tabid)
+const hasLastRunData = computed(() => {
+    if (!replayData?.value || replayData.value.length === 0) return false
+    return true
+})
+
+const pinLastRunData = () => {
+    if (!modelValue.value || !replayData?.value) return
+    const lastRun = replayData.value[replayData.value.length - 1]
+    if (lastRun && lastRun.variables) {
+        modelValue.value['pinneddata'] = JSON.stringify(lastRun.variables, null, 2)
+        isPinCollapsed.value = false
+    }
+}
+
 const filteredProcesses = rawProcesses.value.map((process: any) => ({
     label: process.name,
     value: process.id
@@ -693,5 +912,197 @@ const getComponent = (key: string | number, value: any) => {
 }
 [data-theme="dark"] .variables-pill-bar__check {
     color: #4ade80;
+}
+
+/* Variable Filter Search Input */
+.variables-pill-bar__search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding: 6px 10px;
+    background: var(--surface-elevated);
+    border-bottom: 1px solid var(--border-subtle);
+}
+
+.variables-pill-bar__search-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    font-size: 0.75rem;
+    color: var(--text-main);
+    outline: none;
+}
+
+.variables-pill-bar__clear {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    cursor: pointer;
+}
+
+.variables-pill-bar__drag-handle {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    opacity: 0.6;
+}
+
+/* Pinned Data Panel */
+.pinned-data-panel {
+    display: flex;
+    flex-direction: column;
+    background: var(--surface-subtle);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    margin-bottom: 14px;
+    overflow: hidden;
+}
+
+.pinned-data-panel__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    cursor: pointer;
+    user-select: none;
+    background: var(--surface-subtle);
+    border-bottom: 1px solid var(--border-subtle);
+    transition: background 0.15s ease;
+}
+
+.pinned-data-panel__header:hover {
+    background: var(--surface-elevated);
+}
+
+.pinned-data-panel__title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-main);
+}
+
+.pinned-data-panel__icon {
+    font-size: 1.1rem;
+    color: var(--text-muted);
+}
+
+.pinned-data-panel__icon.pinned-active {
+    color: #f59e0b;
+}
+
+.pinned-data-panel__badge {
+    background: rgba(245, 158, 11, 0.2);
+    color: #d97706;
+    font-size: 0.65rem;
+    padding: 2px 6px;
+    border-radius: 8px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+}
+
+.pinned-data-panel__actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pinned-toggle-btn {
+    padding: 3px 10px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    border-radius: 6px;
+    border: 1px solid var(--border-subtle);
+    background: var(--surface-elevated);
+    color: var(--text-main);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.pinned-toggle-btn:hover {
+    border-color: #f59e0b;
+    color: #f59e0b;
+}
+
+.pinned-toggle-btn--active {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: #ffffff;
+    border-color: transparent;
+}
+
+.pinned-data-panel__body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px;
+}
+
+.pinned-data-notice {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.72rem;
+    color: #b45309;
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    padding: 6px 8px;
+    border-radius: 6px;
+}
+
+.pinned-data-notice .material-symbols-outlined {
+    font-size: 0.95rem;
+    flex-shrink: 0;
+}
+
+.pinned-data-controls {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.pinned-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    font-size: 0.7rem;
+    font-weight: 500;
+    border-radius: 5px;
+    border: 1px solid var(--border-subtle);
+    background: var(--surface-elevated);
+    color: var(--text-main);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.pinned-btn:hover {
+    border-color: #6366f1;
+    color: #4f46e5;
+}
+
+.pinned-btn .material-symbols-outlined {
+    font-size: 0.85rem;
+}
+
+.pinned-btn--danger:hover {
+    border-color: #ef4444;
+    color: #ef4444;
+}
+
+.pinned-data-textarea {
+    width: 100%;
+    font-family: monospace;
+    font-size: 0.75rem;
+    background: var(--surface-elevated);
+    color: var(--text-main);
+    border: 1px solid var(--border-subtle);
+    border-radius: 6px;
+    padding: 8px;
+    line-height: 1.4;
+    outline: none;
+    resize: vertical;
+}
+
+.pinned-data-textarea:focus {
+    border-color: #f59e0b;
 }
 </style>

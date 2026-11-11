@@ -89,6 +89,18 @@ func TransformConnectorResponse(connectorID string, actionID string, rawResponse
 		return TransformZendeskResponse(actionID, rawResponse)
 	case "zoom":
 		return TransformZoomResponse(actionID, rawResponse)
+	case "linear":
+		return TransformLinearResponse(actionID, rawResponse)
+	case "supabase":
+		return TransformSupabaseResponse(actionID, rawResponse)
+	case "resend":
+		return TransformResendResponse(actionID, rawResponse)
+	case "sentry":
+		return TransformSentryResponse(actionID, rawResponse)
+	case "pinecone":
+		return TransformPineconeResponse(actionID, rawResponse)
+	case "ollama":
+		return TransformOllamaResponse(actionID, rawResponse)
 	default:
 		return rawResponse
 	}
@@ -180,6 +192,18 @@ func CheckConnectorConnection(connectorID string, creds map[string]string) (bool
 		return CheckZendeskConnection(creds)
 	case "zoom":
 		return CheckZoomConnection(creds)
+	case "linear":
+		return CheckLinearConnection(creds)
+	case "supabase":
+		return CheckSupabaseConnection(creds)
+	case "resend":
+		return CheckResendConnection(creds)
+	case "sentry":
+		return CheckSentryConnection(creds)
+	case "pinecone":
+		return CheckPineconeConnection(creds)
+	case "ollama":
+		return CheckOllamaConnection(creds)
 	default:
 		return false, "Unsupported or unknown connector ID"
 	}

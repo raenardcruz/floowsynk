@@ -425,17 +425,18 @@ func ListRagConnectionsImpl(env string) ([]*wf.RagConnectionProto, error) {
 		docCount, _ := DBCon.GetRagDocumentCountEnv(c.ID, env)
 		chunkCount, _ := DBCon.GetRagChunkCountEnv(c.ID, env)
 		result = append(result, &wf.RagConnectionProto{
-			Id:             c.ID,
-			Name:           c.Name,
-			OllamaBaseUrl:  c.OllamaBaseURL,
-			EmbeddingModel: c.EmbeddingModel,
-			ChatModel:      c.ChatModel,
-			Description:    c.Description,
-			CreatedAt:      c.CreatedAt.Format(time.RFC3339),
-			UpdatedAt:      c.UpdatedAt.Format(time.RFC3339),
-			DocumentCount:  int32(docCount),
-			ChunkCount:     int32(chunkCount),
-			IsModified:     c.IsModified,
+			Id:              c.ID,
+			Name:            c.Name,
+			OllamaBaseUrl:   c.OllamaBaseURL,
+			EmbeddingModel:  c.EmbeddingModel,
+			ChatModel:       c.ChatModel,
+			Description:     c.Description,
+			CreatedAt:       c.CreatedAt.Format(time.RFC3339),
+			UpdatedAt:       c.UpdatedAt.Format(time.RFC3339),
+			DocumentCount:   int32(docCount),
+			ChunkCount:      int32(chunkCount),
+			IsModified:      c.IsModified,
+			LlmConnectionId: &c.LLMConnectionID,
 		})
 	}
 	return result, nil
@@ -446,10 +447,7 @@ func CreateRagConnectionImpl(req *wf.RagConnectionProto, env string) (*wf.RagCon
 	if id == "" {
 		id = uuid.New().String()
 	}
-	ollamaURL := req.OllamaBaseUrl
-	if ollamaURL == "" {
-		ollamaURL = "http://localhost:11434"
-	}
+	ollamaURL := rag.NormalizeOllamaURL(req.OllamaBaseUrl)
 	embedModel := req.EmbeddingModel
 	if embedModel == "" {
 		embedModel = "nomic-embed-text"
@@ -459,17 +457,19 @@ func CreateRagConnectionImpl(req *wf.RagConnectionProto, env string) (*wf.RagCon
 		chatModel = "gemma4"
 	}
 
+	llmConnID := req.GetLlmConnectionId()
 	now := time.Now()
 	conn := DB.RagConnection{
-		ID:             id,
-		Name:           req.Name,
-		OllamaBaseURL:  ollamaURL,
-		EmbeddingModel: embedModel,
-		ChatModel:      chatModel,
-		Description:    req.Description,
-		CreatedAt:      now,
-		UpdatedAt:      now,
-		IsModified:     false,
+		ID:              id,
+		Name:            req.Name,
+		OllamaBaseURL:   ollamaURL,
+		EmbeddingModel:  embedModel,
+		ChatModel:       chatModel,
+		Description:     req.Description,
+		CreatedAt:       now,
+		UpdatedAt:       now,
+		IsModified:      false,
+		LLMConnectionID: llmConnID,
 	}
 
 	if err := DBCon.AddRagConnectionEnv(conn, env); err != nil {
@@ -477,17 +477,18 @@ func CreateRagConnectionImpl(req *wf.RagConnectionProto, env string) (*wf.RagCon
 	}
 
 	return &wf.RagConnectionProto{
-		Id:             conn.ID,
-		Name:           conn.Name,
-		OllamaBaseUrl:  conn.OllamaBaseURL,
-		EmbeddingModel: conn.EmbeddingModel,
-		ChatModel:      conn.ChatModel,
-		Description:    conn.Description,
-		CreatedAt:      conn.CreatedAt.Format(time.RFC3339),
-		UpdatedAt:      conn.UpdatedAt.Format(time.RFC3339),
-		DocumentCount:  0,
-		ChunkCount:     0,
-		IsModified:     false,
+		Id:              conn.ID,
+		Name:            conn.Name,
+		OllamaBaseUrl:   conn.OllamaBaseURL,
+		EmbeddingModel:  conn.EmbeddingModel,
+		ChatModel:       conn.ChatModel,
+		Description:     conn.Description,
+		CreatedAt:       conn.CreatedAt.Format(time.RFC3339),
+		UpdatedAt:       conn.UpdatedAt.Format(time.RFC3339),
+		DocumentCount:   0,
+		ChunkCount:      0,
+		IsModified:      false,
+		LlmConnectionId: &conn.LLMConnectionID,
 	}, nil
 }
 
@@ -501,7 +502,7 @@ func UpdateRagConnectionImpl(req *wf.RagConnectionProto, env string) (*wf.RagCon
 		conn.Name = req.Name
 	}
 	if req.OllamaBaseUrl != "" {
-		conn.OllamaBaseURL = req.OllamaBaseUrl
+		conn.OllamaBaseURL = rag.NormalizeOllamaURL(req.OllamaBaseUrl)
 	}
 	if req.EmbeddingModel != "" {
 		conn.EmbeddingModel = req.EmbeddingModel
@@ -511,6 +512,9 @@ func UpdateRagConnectionImpl(req *wf.RagConnectionProto, env string) (*wf.RagCon
 	}
 	if req.Description != "" {
 		conn.Description = req.Description
+	}
+	if req.LlmConnectionId != nil {
+		conn.LLMConnectionID = req.GetLlmConnectionId()
 	}
 	conn.UpdatedAt = time.Now()
 
@@ -522,17 +526,18 @@ func UpdateRagConnectionImpl(req *wf.RagConnectionProto, env string) (*wf.RagCon
 	chunkCount, _ := DBCon.GetRagChunkCountEnv(conn.ID, env)
 
 	return &wf.RagConnectionProto{
-		Id:             conn.ID,
-		Name:           conn.Name,
-		OllamaBaseUrl:  conn.OllamaBaseURL,
-		EmbeddingModel: conn.EmbeddingModel,
-		ChatModel:      conn.ChatModel,
-		Description:    conn.Description,
-		CreatedAt:      conn.CreatedAt.Format(time.RFC3339),
-		UpdatedAt:      conn.UpdatedAt.Format(time.RFC3339),
-		DocumentCount:  int32(docCount),
-		ChunkCount:     int32(chunkCount),
-		IsModified:     conn.IsModified,
+		Id:              conn.ID,
+		Name:            conn.Name,
+		OllamaBaseUrl:   conn.OllamaBaseURL,
+		EmbeddingModel:  conn.EmbeddingModel,
+		ChatModel:       conn.ChatModel,
+		Description:     conn.Description,
+		CreatedAt:       conn.CreatedAt.Format(time.RFC3339),
+		UpdatedAt:       conn.UpdatedAt.Format(time.RFC3339),
+		DocumentCount:   int32(docCount),
+		ChunkCount:      int32(chunkCount),
+		IsModified:      conn.IsModified,
+		LlmConnectionId: &conn.LLMConnectionID,
 	}, nil
 }
 
@@ -613,7 +618,7 @@ func UploadRagDocumentImpl(ragConnID string, fileName string, fileContent []byte
 	}, nil
 }
 
-func QueryRagImpl(ragConnID string, query string, topK int32, systemPrompt string, env string) (*wf.QueryRagResponse, error) {
+func QueryRagImpl(ragConnID string, query string, topK int32, systemPrompt string, env string, llmConnID string) (*wf.QueryRagResponse, error) {
 	ragConn, err := DBCon.GetRagConnectionEnv(ragConnID, env)
 	if err != nil {
 		return nil, fmt.Errorf("RAG connection not found: %w", err)
@@ -623,7 +628,7 @@ func QueryRagImpl(ragConnID string, query string, topK int32, systemPrompt strin
 		topK = 3
 	}
 
-	answer, sources, err := rag.PerformRAGQuery(DBCon, env, ragConn, query, int(topK), systemPrompt)
+	answer, sources, err := rag.PerformRAGQuery(DBCon, env, ragConn, query, int(topK), systemPrompt, llmConnID)
 	if err != nil {
 		return nil, fmt.Errorf("RAG query processing failed: %w", err)
 	}

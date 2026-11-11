@@ -18,6 +18,6 @@ export const newProcess = (): Workflow.AsObject => {
         ismodified: false,
         publishedversionid: '',
         publishedversionnum: 0,
-        environment: Environment.PRODUCTION
+        environment: Environment.STAGING
     }
 }

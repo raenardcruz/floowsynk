@@ -20,15 +20,11 @@
                         <button type="button" class="btn-register" @click="handleLogin">Register</button>
                         <button type="submit" class="btn-submit">Sign In</button>
                     </div>
-                    <button type="button" @click="handleGuestLogin" class="guest-btn">
-                        <span class="material-symbols-outlined">person</span>
-                        <span>Continue as Guest</span>
-                    </button>
                     <Divider align="center">
                         <span class="divider-text">OR</span>
                     </Divider>
                     <div class="other-login">
-                        <p class="other-login-label">Sign in with social provider</p>
+                        <!-- <p class="other-login-label">Sign in with social provider</p>
                         <div class="social-btns">
                             <button type="button" class="social-btn" title="Sign in with Google">
                                 <img src="/src/components/Icons/google.svg" alt="Google" />
@@ -36,7 +32,11 @@
                             <button type="button" class="social-btn" title="Sign in with Facebook">
                                 <img src="/src/components/Icons/facebook.svg" alt="Facebook" />
                             </button>
-                        </div>
+                        </div> -->
+                        <button type="button" @click="handleGuestLogin" class="guest-btn">
+                            <span class="material-symbols-outlined">person</span>
+                            <span>Continue as Guest</span>
+                        </button>
                     </div>
                     <div class="forgot-password">
                         <a href="#">Forgot password?</a>

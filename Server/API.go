@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -9,6 +10,7 @@ import (
 	"github.com/google/uuid"
 	lg "github.com/raenardcruz/floowsynk/CodeGen/go/login"
 	wf "github.com/raenardcruz/floowsynk/CodeGen/go/workflow"
+	db "github.com/raenardcruz/floowsynk/Database"
 	"github.com/raenardcruz/floowsynk/Server/workflow"
 	"google.golang.org/grpc/metadata"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
@@ -57,7 +59,7 @@ func (s *WorkflowServer) GetWorkflow(ctx context.Context, req *wf.GetWorkflowReq
 	}
 	validateResults := validateToken(token)
 	if validateResults.status != http.StatusOK {
-		return nil, fmt.Errorf(validateResults.message)
+		return nil, errors.New(validateResults.message)
 	}
 	env := getEnvironmentFromContextOrProto(ctx, req.Environment)
 	workflow, err = GetWorkflow(req.Id, env)
@@ -74,7 +76,7 @@ func (s *WorkflowServer) ListWorkflows(ctx context.Context, req *wf.PageRequest)
 	}
 	validateResults := validateToken(token)
 	if validateResults.status != http.StatusOK {
-		return nil, fmt.Errorf(validateResults.message)
+		return nil, errors.New(validateResults.message)
 	}
 	env := getEnvironmentFromContextOrProto(ctx, req.Environment)
 	wl, err = ListWorkflows(req.Offset, req.Limit, env)
@@ -91,7 +93,7 @@ func (s *WorkflowServer) UpdateWorkflow(ctx context.Context, req *wf.Workflow) (
 	}
 	validateResults := validateToken(token)
 	if validateResults.status != http.StatusOK {
-		return nil, fmt.Errorf(validateResults.message)
+		return nil, errors.New(validateResults.message)
 	}
 	if validateResults.role == "guest" {
 		return nil, fmt.Errorf("saving or modifying workflows is disabled in Guest Mode")
@@ -112,7 +114,7 @@ func (s *WorkflowServer) CreateWorkflow(ctx context.Context, req *wf.Workflow) (
 	}
 	validateResults := validateToken(token)
 	if validateResults.status != http.StatusOK {
-		return nil, fmt.Errorf(validateResults.message)
+		return nil, errors.New(validateResults.message)
 	}
 	if validateResults.role == "guest" {
 		return nil, fmt.Errorf("saving or modifying workflows is disabled in Guest Mode")
@@ -134,7 +136,7 @@ func (s *WorkflowServer) DeleteWorkflow(ctx context.Context, req *wf.Workflow) (
 	}
 	validateResults := validateToken(token)
 	if validateResults.status != http.StatusOK {
-		return nil, fmt.Errorf(validateResults.message)
+		return nil, errors.New(validateResults.message)
 	}
 	if validateResults.role == "guest" {
 		return nil, fmt.Errorf("saving or modifying workflows is disabled in Guest Mode")
@@ -154,7 +156,11 @@ func (s *WorkflowServer) QuickRun(req *wf.Workflow, stream wf.WorkflowService_Qu
 	}
 	validateResults := validateToken(token)
 	if validateResults.status != http.StatusOK {
-		return fmt.Errorf(validateResults.message)
+		return errors.New(validateResults.message)
+	}
+	envStr := getEnvironmentFromContextOrProto(ctx, req.Environment)
+	if envStr == "staging" || (req.Environment == wf.Environment_PRODUCTION && db.AppConfig.App_Environment == "staging") {
+		req.Environment = wf.Environment_STAGING
 	}
 	processor := workflow.WorkflowProcessor{
 		ID:               uuid.NewString(),
@@ -180,7 +186,7 @@ func (s *WorkflowServer) RunWorkflowId(req *wf.RunWorkflowIdRequest, stream wf.W
 	}
 	validateResults := validateToken(token)
 	if validateResults.status != http.StatusOK {
-		return fmt.Errorf(validateResults.message)
+		return errors.New(validateResults.message)
 	}
 	env := getEnvironmentFromContextOrProto(ctx, req.Environment)
 	wfObj, err := GetWorkflow(req.Id, env)
@@ -206,7 +212,7 @@ func (s *WorkflowServer) ListWorkflowHistory(ctx context.Context, req *wf.ListWo
 	}
 	validateResults := validateToken(token)
 	if validateResults.status != http.StatusOK {
-		return nil, fmt.Errorf(validateResults.message)
+		return nil, errors.New(validateResults.message)
 	}
 	env := getEnvironmentFromContextOrProto(ctx, req.Environment)
 	wh, err := ListWorkflowHistoryImpl(env)
@@ -224,7 +230,7 @@ func (s *WorkflowServer) GetWorkflowHistory(ctx context.Context, req *wf.Workflo
 	}
 	validateResults := validateToken(token)
 	if validateResults.status != http.StatusOK {
-		return nil, fmt.Errorf(validateResults.message)
+		return nil, errors.New(validateResults.message)
 	}
 
 	env := getEnvironmentFromContextOrProto(ctx, req.Environment)
@@ -285,7 +291,7 @@ func (s *WorkflowServer) ListConnections(ctx context.Context, req *wf.ListConnec
 	}
 	validateResults := validateToken(token)
 	if validateResults.status != http.StatusOK {
-		return nil, fmt.Errorf(validateResults.message)
+		return nil, errors.New(validateResults.message)
 	}
 	env := getEnvironmentFromContextOrProto(ctx, req.Environment)
 	isAdmin := validateResults.role == "admin" || validateResults.role == UserRoleService
@@ -308,9 +314,16 @@ func (s *WorkflowServer) ListConnections(ctx context.Context, req *wf.ListConnec
 }
 
 func (s *WorkflowServer) RevertWorkflowToStaging(ctx context.Context, req *wf.GetWorkflowRequest) (*wf.Workflow, error) {
-	_, err := getTokenFromContext(ctx)
+	token, err := getTokenFromContext(ctx)
 	if err != nil {
 		return nil, err
+	}
+	validateResults := validateToken(token)
+	if validateResults.status != http.StatusOK {
+		return nil, errors.New(validateResults.message)
+	}
+	if validateResults.role == "guest" {
+		return nil, fmt.Errorf("reverting workflows is disabled in Guest Mode")
 	}
 	return DBCon.RevertWorkflowToStaging(req.Id)
 }
@@ -322,7 +335,7 @@ func (s *WorkflowServer) DeleteConnection(ctx context.Context, req *wf.DeleteCon
 	}
 	validateResults := validateToken(token)
 	if validateResults.status != http.StatusOK {
-		return nil, fmt.Errorf(validateResults.message)
+		return nil, errors.New(validateResults.message)
 	}
 	if validateResults.role == "guest" {
 		return nil, fmt.Errorf("deleting connections is disabled in Guest Mode")
@@ -343,7 +356,7 @@ func (s *WorkflowServer) ListWorkflowVersions(ctx context.Context, req *wf.GetWo
 	}
 	validateResults := validateToken(token)
 	if validateResults.status != http.StatusOK {
-		return nil, fmt.Errorf(validateResults.message)
+		return nil, errors.New(validateResults.message)
 	}
 	env := getEnvironmentFromContextOrProto(ctx, req.Environment)
 	versions, err := ListWorkflowVersionsImpl(req.WorkflowId, env)
@@ -360,7 +373,7 @@ func (s *WorkflowServer) RestoreWorkflowVersion(ctx context.Context, req *wf.Wor
 	}
 	validateResults := validateToken(token)
 	if validateResults.status != http.StatusOK {
-		return nil, fmt.Errorf(validateResults.message)
+		return nil, errors.New(validateResults.message)
 	}
 	if validateResults.role == "guest" {
 		return nil, fmt.Errorf("restoring workflow versions is disabled in Guest Mode")
@@ -380,7 +393,7 @@ func (s *WorkflowServer) PublishWorkflow(ctx context.Context, req *wf.PublishWor
 	}
 	validateResults := validateToken(token)
 	if validateResults.status != http.StatusOK {
-		return nil, fmt.Errorf(validateResults.message)
+		return nil, errors.New(validateResults.message)
 	}
 	if validateResults.role == "guest" {
 		return nil, fmt.Errorf("publishing workflows is disabled in Guest Mode")
@@ -408,27 +421,48 @@ func (s *WorkflowServer) ListRagConnections(ctx context.Context, req *wf.ListRag
 }
 
 func (s *WorkflowServer) CreateRagConnection(ctx context.Context, req *wf.CreateRagConnectionRequest) (*wf.RagConnectionProto, error) {
-	_, err := getTokenFromContext(ctx)
+	token, err := getTokenFromContext(ctx)
 	if err != nil {
 		return nil, err
+	}
+	validateResults := validateToken(token)
+	if validateResults.status != http.StatusOK {
+		return nil, errors.New(validateResults.message)
+	}
+	if validateResults.role == "guest" {
+		return nil, fmt.Errorf("creating RAG connections is disabled in Guest Mode")
 	}
 	env := getEnvironmentFromContextOrProto(ctx, req.Environment)
 	return CreateRagConnectionImpl(req.Connection, env)
 }
 
 func (s *WorkflowServer) UpdateRagConnection(ctx context.Context, req *wf.UpdateRagConnectionRequest) (*wf.RagConnectionProto, error) {
-	_, err := getTokenFromContext(ctx)
+	token, err := getTokenFromContext(ctx)
 	if err != nil {
 		return nil, err
+	}
+	validateResults := validateToken(token)
+	if validateResults.status != http.StatusOK {
+		return nil, errors.New(validateResults.message)
+	}
+	if validateResults.role == "guest" {
+		return nil, fmt.Errorf("updating RAG connections is disabled in Guest Mode")
 	}
 	env := getEnvironmentFromContextOrProto(ctx, req.Environment)
 	return UpdateRagConnectionImpl(req.Connection, env)
 }
 
 func (s *WorkflowServer) DeleteRagConnection(ctx context.Context, req *wf.DeleteRagConnectionRequest) (*emptypb.Empty, error) {
-	_, err := getTokenFromContext(ctx)
+	token, err := getTokenFromContext(ctx)
 	if err != nil {
 		return nil, err
+	}
+	validateResults := validateToken(token)
+	if validateResults.status != http.StatusOK {
+		return nil, errors.New(validateResults.message)
+	}
+	if validateResults.role == "guest" {
+		return nil, fmt.Errorf("deleting RAG connections is disabled in Guest Mode")
 	}
 	env := getEnvironmentFromContextOrProto(ctx, req.Environment)
 	err = DBCon.DeleteRagConnectionEnv(req.Id, env)
@@ -439,9 +473,13 @@ func (s *WorkflowServer) DeleteRagConnection(ctx context.Context, req *wf.Delete
 }
 
 func (s *WorkflowServer) ListRagDocuments(ctx context.Context, req *wf.ListRagDocumentsRequest) (*wf.RagDocumentList, error) {
-	_, err := getTokenFromContext(ctx)
+	token, err := getTokenFromContext(ctx)
 	if err != nil {
 		return nil, err
+	}
+	validateResults := validateToken(token)
+	if validateResults.status != http.StatusOK {
+		return nil, errors.New(validateResults.message)
 	}
 	env := getEnvironmentFromContextOrProto(ctx, req.Environment)
 	docs, err := ListRagDocumentsImpl(req.RagConnectionId, env)
@@ -452,18 +490,32 @@ func (s *WorkflowServer) ListRagDocuments(ctx context.Context, req *wf.ListRagDo
 }
 
 func (s *WorkflowServer) UploadRagDocument(ctx context.Context, req *wf.UploadRagDocumentRequest) (*wf.RagDocumentProto, error) {
-	_, err := getTokenFromContext(ctx)
+	token, err := getTokenFromContext(ctx)
 	if err != nil {
 		return nil, err
+	}
+	validateResults := validateToken(token)
+	if validateResults.status != http.StatusOK {
+		return nil, errors.New(validateResults.message)
+	}
+	if validateResults.role == "guest" {
+		return nil, fmt.Errorf("uploading RAG documents is disabled in Guest Mode")
 	}
 	env := getEnvironmentFromContextOrProto(ctx, req.Environment)
 	return UploadRagDocumentImpl(req.RagConnectionId, req.FileName, req.FileContent, env)
 }
 
 func (s *WorkflowServer) DeleteRagDocument(ctx context.Context, req *wf.DeleteRagDocumentRequest) (*emptypb.Empty, error) {
-	_, err := getTokenFromContext(ctx)
+	token, err := getTokenFromContext(ctx)
 	if err != nil {
 		return nil, err
+	}
+	validateResults := validateToken(token)
+	if validateResults.status != http.StatusOK {
+		return nil, errors.New(validateResults.message)
+	}
+	if validateResults.role == "guest" {
+		return nil, fmt.Errorf("deleting RAG documents is disabled in Guest Mode")
 	}
 	env := getEnvironmentFromContextOrProto(ctx, req.Environment)
 	err = DBCon.DeleteRagDocumentEnv(req.Id, req.RagConnectionId, env)
@@ -479,7 +531,7 @@ func (s *WorkflowServer) QueryRag(ctx context.Context, req *wf.QueryRagRequest) 
 		return nil, err
 	}
 	env := getEnvironmentFromContextOrProto(ctx, req.Environment)
-	return QueryRagImpl(req.RagConnectionId, req.Query, req.TopK, req.SystemPrompt, env)
+	return QueryRagImpl(req.RagConnectionId, req.Query, req.TopK, req.SystemPrompt, env, req.GetLlmConnectionId())
 }
 
 

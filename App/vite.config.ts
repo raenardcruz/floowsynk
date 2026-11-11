@@ -47,6 +47,7 @@ export default defineConfig({
     preserveSymlinks: true,
     alias: {
       '@': '/src',
+      'monaco-editor': 'monaco-editor/esm/vs/editor/editor.api.js',
     }
   },
   build: {
@@ -116,6 +117,11 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     globals: true,
-    setupFiles: ['./src/test-setup.ts']
+    setupFiles: ['./src/test-setup.ts'],
+    server: {
+      deps: {
+        inline: ['proto', 'google-protobuf', 'grpc-web']
+      }
+    }
   }
 })

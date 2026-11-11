@@ -5,6 +5,13 @@
 # OS Detection
 UNAME_S := $(shell uname -s)
 
+# Ensure common paths (Homebrew, Docker, etc.) are available in PATH
+export PATH := /opt/homebrew/bin:/usr/local/bin:$(PATH)
+
+# Docker binary discovery (ensures compatibility with macOS / GNU Make 3.81 fast path)
+DOCKER         ?= $(shell export PATH="/opt/homebrew/bin:/usr/local/bin:$$PATH"; command -v docker 2>/dev/null || echo "/usr/local/bin/docker")
+DOCKER_COMPOSE ?= $(DOCKER) compose
+
 # Directories & Path Configurations
 APP_DIR        = App
 SERVER_DIR     = Server
@@ -17,7 +24,7 @@ PROTO_GEN_DIR  = './CodeGen'
         start-server \
         start-ui \
         job-interval job-consumer job-clearcache \
-        deploy-docker stop-docker down-docker
+        deploy-docker docker-build build-docker start-docker docker-up docker-down stop-docker down-docker
 
 # Default target
 all: build
@@ -70,7 +77,7 @@ setup:
 	fi; \
 	if [ "$$SKIP_DOCKER" != "true" ]; then \
 		echo "🐳 Setting up Docker..."; \
-		docker compose up -d; \
+		$(DOCKER_COMPOSE) up -d; \
 	else \
 		echo "⏩ Skipping Docker setup as requested."; \
 	fi
@@ -115,8 +122,13 @@ build:
 	@cd $(APP_DIR) && npm run build
 	@echo "✅ Build completed."
 
+# Run backend test suites
+test:
+	@echo "🧪 Running backend test suites..."
+	@cd $(SERVER_DIR) && go test -v ./workflow/... ./mcp/... ./matheval/...
+
 # ==============================================================================
-# Backend Server Commands
+# Backend Server & MCP Commands
 # ==============================================================================
 
 # Run backend server locally (handles both Staging & Production dynamically)
@@ -124,6 +136,11 @@ start-server:
 	@echo "🚀 Starting server..."
 	@cd $(SERVER_DIR) && go run .
 	@echo "✅ Server is running."
+
+# Run MCP server in Stdio mode for AI agent integration (Claude Desktop, Cursor)
+mcp-stdio:
+	@echo "🤖 Starting FloowSynk MCP Server (Stdio)..."
+	@cd $(SERVER_DIR) && go run mcp/cmd/main.go
 
 # ==============================================================================
 # Frontend UI Commands
@@ -161,16 +178,33 @@ job-clearcache:
 # Docker & Container Deployment Commands
 # ==============================================================================
 
+# Build Docker images using Docker Compose
+docker-build:
+	@echo "🐳 Building Docker images via Docker Compose..."
+	$(DOCKER_COMPOSE) build
+	@echo "✅ Docker images built successfully."
+
+build-docker: docker-build
+
 # Deploy containers using Docker Compose
 deploy-docker:
 	@echo "🐳 Deploying environment via Docker..."
-	docker compose up --build -d
+	$(DOCKER_COMPOSE) up --build -d
 	@echo "✅ Environment deployed."
+
+# Start existing Docker containers (or spin up dependencies)
+start-docker:
+	@echo "🐳 Starting Docker containers..."
+	$(DOCKER_COMPOSE) up -d
+	@echo "✅ Docker containers started."
+
+docker-up: start-docker
 
 # Stop Docker containers
 stop-docker:
 	@echo "🐳 Stopping Docker containers..."
-	docker compose down
+	$(DOCKER_COMPOSE) down
 	@echo "✅ Docker containers stopped."
 
 down-docker: stop-docker
+docker-down: stop-docker

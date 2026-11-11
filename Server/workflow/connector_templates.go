@@ -56,6 +56,7 @@ func LoadConnectorTemplates(dirPath string) error {
 	candidatePaths := []string{
 		dirPath,
 		filepath.Join("Server", dirPath),
+		filepath.Join("..", dirPath),
 	}
 
 	var files []string

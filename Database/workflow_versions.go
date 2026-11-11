@@ -181,7 +181,6 @@ func (db *DatabaseConnection) SaveRemotePublishedWorkflow(workflow *pb.Workflow)
 				"updated_by":  workflow.UpdatedBy,
 				"tags":        pq.StringArray(workflow.Tags),
 				"updated_at":  now,
-				"is_modified": false,
 			}).Error
 		if err != nil {
 			return fmt.Errorf("failed to update production workflow: %w", err)

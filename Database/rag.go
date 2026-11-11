@@ -1,6 +1,8 @@
 package DB
 
 import (
+	"fmt"
+	"strings"
 	"time"
 )
 
@@ -14,6 +16,7 @@ type RagConnection struct {
 	CreatedAt      time.Time `json:"createdAt"`
 	UpdatedAt      time.Time `json:"updatedAt"`
 	IsModified     bool      `gorm:"default:false;column:is_modified" json:"isModified"`
+	LLMConnectionID string   `gorm:"type:varchar(100)" json:"llmConnectionId"`
 }
 
 type RagDocument struct {
@@ -54,12 +57,19 @@ func (db *DatabaseConnection) SaveRagConnectionEnv(conn *RagConnection, env stri
 }
 
 func (db *DatabaseConnection) GetRagConnectionEnv(id string, env string) (RagConnection, error) {
+	if strings.TrimSpace(id) == "" {
+		return RagConnection{}, fmt.Errorf("rag connection id is empty")
+	}
 	tableName := db.TableFor(env, "rag_connections")
 	var conn RagConnection
 	err := db.conn.Table(tableName).Where("id = ?", id).First(&conn).Error
-	if err != nil && env == "staging" {
-		prodTable := db.TableFor("production", "rag_connections")
-		if errProd := db.conn.Table(prodTable).Where("id = ?", id).First(&conn).Error; errProd == nil {
+	if err != nil {
+		otherEnv := "production"
+		if env == "production" {
+			otherEnv = "staging"
+		}
+		otherTable := db.TableFor(otherEnv, "rag_connections")
+		if errOther := db.conn.Table(otherTable).Where("id = ?", id).First(&conn).Error; errOther == nil {
 			return conn, nil
 		}
 	}
@@ -70,6 +80,17 @@ func (db *DatabaseConnection) ListRagConnectionsEnv(env string) ([]RagConnection
 	tableName := db.TableFor(env, "rag_connections")
 	var conns []RagConnection
 	err := db.conn.Table(tableName).Find(&conns).Error
+	if (err != nil || len(conns) == 0) {
+		otherEnv := "production"
+		if env == "production" {
+			otherEnv = "staging"
+		}
+		otherTable := db.TableFor(otherEnv, "rag_connections")
+		var otherConns []RagConnection
+		if errOther := db.conn.Table(otherTable).Find(&otherConns).Error; errOther == nil && len(otherConns) > 0 {
+			return otherConns, nil
+		}
+	}
 	return conns, err
 }
 
@@ -99,6 +120,17 @@ func (db *DatabaseConnection) ListRagDocumentsEnv(ragConnID string, env string) 
 	tableName := db.TableFor(env, "rag_documents")
 	var docs []RagDocument
 	err := db.conn.Table(tableName).Where("rag_connection_id = ?", ragConnID).Order("created_at desc").Find(&docs).Error
+	if (err != nil || len(docs) == 0) {
+		otherEnv := "production"
+		if env == "production" {
+			otherEnv = "staging"
+		}
+		otherTable := db.TableFor(otherEnv, "rag_documents")
+		var otherDocs []RagDocument
+		if errOther := db.conn.Table(otherTable).Where("rag_connection_id = ?", ragConnID).Order("created_at desc").Find(&otherDocs).Error; errOther == nil && len(otherDocs) > 0 {
+			return otherDocs, nil
+		}
+	}
 	return docs, err
 }
 
@@ -106,6 +138,17 @@ func (db *DatabaseConnection) GetRagDocumentCountEnv(ragConnID string, env strin
 	tableName := db.TableFor(env, "rag_documents")
 	var count int64
 	err := db.conn.Table(tableName).Where("rag_connection_id = ?", ragConnID).Count(&count).Error
+	if (err != nil || count == 0) {
+		otherEnv := "production"
+		if env == "production" {
+			otherEnv = "staging"
+		}
+		otherTable := db.TableFor(otherEnv, "rag_documents")
+		var otherCount int64
+		if errOther := db.conn.Table(otherTable).Where("rag_connection_id = ?", ragConnID).Count(&otherCount).Error; errOther == nil && otherCount > 0 {
+			return otherCount, nil
+		}
+	}
 	return count, err
 }
 
@@ -130,6 +173,17 @@ func (db *DatabaseConnection) ListRagChunksEnv(ragConnID string, env string) ([]
 	tableName := db.TableFor(env, "rag_chunks")
 	var chunks []RagChunk
 	err := db.conn.Table(tableName).Where("rag_connection_id = ?", ragConnID).Find(&chunks).Error
+	if (err != nil || len(chunks) == 0) {
+		otherEnv := "production"
+		if env == "production" {
+			otherEnv = "staging"
+		}
+		otherTable := db.TableFor(otherEnv, "rag_chunks")
+		var otherChunks []RagChunk
+		if errOther := db.conn.Table(otherTable).Where("rag_connection_id = ?", ragConnID).Find(&otherChunks).Error; errOther == nil && len(otherChunks) > 0 {
+			return otherChunks, nil
+		}
+	}
 	return chunks, err
 }
 

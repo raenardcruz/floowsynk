@@ -197,6 +197,7 @@ message NodeData {
     optional int32 ragTopK = 25;
     optional string ragSystemPrompt = 26;
     optional string ragOutputVar = 27;
+    optional string ragLlmConnectionId = 28;
 }
 
 message NodeDataArray {
@@ -310,6 +311,7 @@ message RagConnectionProto {
     int32 documentCount = 9;
     int32 chunkCount = 10;
     bool isModified = 11;
+    optional string llmConnectionId = 12;
 }
 
 message ListRagConnectionsRequest {
@@ -377,6 +379,7 @@ message QueryRagRequest {
     int32 topK = 3;
     string systemPrompt = 4;
     Environment environment = 5;
+    optional string llmConnectionId = 6;
 }
 
 message RagSourceChunk {

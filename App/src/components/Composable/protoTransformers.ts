@@ -232,6 +232,21 @@ export function nodeDataFromObject(obj: any): NodeData {
       const nodeDataArray = nodeDataArrayFromObject(normalizedObj.weeks);
       msg.setWeeks(nodeDataArray);
     }
+    if (normalizedObj.ragconnectionid !== undefined && normalizedObj.ragconnectionid !== null) {
+      msg.setRagconnectionid(String(normalizedObj.ragconnectionid));
+    }
+    if (normalizedObj.ragprompt !== undefined && normalizedObj.ragprompt !== null) {
+      msg.setRagprompt(String(normalizedObj.ragprompt));
+    }
+    if (normalizedObj.ragtopk !== undefined && normalizedObj.ragtopk !== null && normalizedObj.ragtopk !== '') {
+      msg.setRagtopk(Number(normalizedObj.ragtopk));
+    }
+    if (normalizedObj.ragsystemprompt !== undefined && normalizedObj.ragsystemprompt !== null) {
+      msg.setRagsystemprompt(String(normalizedObj.ragsystemprompt));
+    }
+    if (normalizedObj.ragoutputvar !== undefined && normalizedObj.ragoutputvar !== null) {
+      msg.setRagoutputvar(String(normalizedObj.ragoutputvar));
+    }
     return msg;
   }
 
@@ -280,9 +295,17 @@ export function nodeFromObject(obj: any): Node {
     if (normalizedObj.type !== undefined) {
       msg.setType(normalizedObj.type);
     }
-    if (normalizedObj.dimensions !== undefined) {
+    if (normalizedObj.dimensions !== undefined && (normalizedObj.dimensions.width || normalizedObj.dimensions.height)) {
       const dimensions = nodeDimensionsFromObject(normalizedObj.dimensions);
       msg.setDimensions(dimensions);
+    } else if (normalizedObj.style && (normalizedObj.style.width || normalizedObj.style.height)) {
+      const dims = {
+        width: typeof normalizedObj.style.width === 'number' ? normalizedObj.style.width : parseFloat(normalizedObj.style.width) || 0,
+        height: typeof normalizedObj.style.height === 'number' ? normalizedObj.style.height : parseFloat(normalizedObj.style.height) || 0,
+      };
+      if (dims.width || dims.height) {
+        msg.setDimensions(nodeDimensionsFromObject(dims));
+      }
     }
     if (normalizedObj.handlebounds !== undefined) {
       const handleBounds = nodeHandleBoundsFromObject(normalizedObj.handlebounds);
@@ -383,6 +406,9 @@ export function workflowFromObject(obj: any): Workflow {
     }
     if (normalizedObj.ismodified !== undefined) {
       msg.setIsmodified(normalizedObj.ismodified);
+    }
+    if (normalizedObj.environment !== undefined) {
+      msg.setEnvironment(normalizedObj.environment);
     }
     return msg;
   }

@@ -17,7 +17,7 @@
             </div>
 
             <!-- Publish Current Banner -->
-            <div class="vh-publish-banner">
+            <div class="vh-publish-banner" v-if="!isGuest">
                 <div class="vh-publish-info">
                     <span class="material-symbols-outlined">rocket_launch</span>
                     <span>Push current live workflow to <strong>Production</strong></span>
@@ -63,9 +63,9 @@
                                     placeholder="Enter label..."
                                     autofocus
                                 />
-                                <span v-else class="vh-version-label" @dblclick="startEdit(version)">
+                                <span v-else class="vh-version-label" @dblclick="!isGuest && startEdit(version)">
                                     {{ version.label || `v${version.versionNum}` }}
-                                    <span class="material-symbols-outlined vh-edit-icon" title="Edit label">edit</span>
+                                    <span v-if="!isGuest" class="material-symbols-outlined vh-edit-icon" title="Edit label">edit</span>
                                 </span>
                                 <div class="vh-version-details">
                                     <span class="material-symbols-outlined detail-icon">schedule</span>
@@ -76,7 +76,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="vh-version-actions">
+                        <div class="vh-version-actions" v-if="!isGuest">
                             <button
                                 class="vh-action-btn vh-publish-version-btn"
                                 @click="handlePublishVersion(version)"
@@ -131,8 +131,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, nextTick } from 'vue'
+import { ref, watch, nextTick, computed } from 'vue'
 import { listWorkflowVersions, restoreWorkflowVersion, publishWorkflow } from '../../Canvas/Workflow.Canvas.versions.api'
+
+const isGuest = computed(() => localStorage.getItem('sessionToken') === 'guest')
 
 const props = defineProps<{
     visible: boolean
@@ -190,12 +192,17 @@ watch(() => props.visible, (val) => {
 })
 
 const startEdit = (version: VersionObj) => {
+    if (isGuest.value) return
     editingId.value = version.id
     editingLabel.value = version.label || `v${version.versionNum}`
     nextTick(() => labelInput.value?.focus())
 }
 
 const saveLabel = (version: VersionObj) => {
+    if (isGuest.value) {
+        editingId.value = null
+        return
+    }
     if (editingLabel.value.trim()) {
         version.label = editingLabel.value.trim()
     }
@@ -206,6 +213,7 @@ import { useToast } from 'primevue/usetoast'
 const toast = useToast()
 
 const handleRestore = async (version: VersionObj) => {
+    if (isGuest.value) return
     isRestoring.value = true
     try {
         await restoreWorkflowVersion(version)
@@ -221,14 +229,17 @@ const handleRestore = async (version: VersionObj) => {
 }
 
 const handlePublishVersion = (version: VersionObj) => {
+    if (isGuest.value) return
     confirmPublish.value = { label: version.label || `v${version.versionNum}`, versionId: version.id }
 }
 
 const handlePublishCurrent = () => {
+    if (isGuest.value) return
     confirmPublish.value = { label: 'current live workflow', versionId: '' }
 }
 
 const executePublish = async () => {
+    if (isGuest.value) return
     if (!confirmPublish.value) return
     isPublishing.value = true
     const { versionId } = confirmPublish.value

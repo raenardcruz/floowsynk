@@ -259,3 +259,201 @@
   font-size: 12px;
   color: var(--grey-4);
 }
+
+/* Pinned Node Styles */
+.node.node-is-pinned {
+  border-color: #f59e0b !important;
+  box-shadow: 0 4px 16px -2px rgba(245, 158, 11, 0.25), 0 2px 6px -2px rgba(0, 0, 0, 0.04);
+}
+
+.node-pinned-badge {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #ffffff;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  padding: 2px 6px;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(217, 119, 6, 0.3);
+  z-index: 10;
+  pointer-events: auto;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.node-pinned-badge:hover {
+  transform: scale(1.08);
+}
+
+.node-pinned-badge .material-symbols-outlined {
+  font-size: 11px;
+}
+
+/* Sticky Note Node */
+.sticky-note-node {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  min-width: 180px;
+  min-height: 120px;
+  padding: 12px;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px -3px rgba(0, 0, 0, 0.12), 0 2px 6px -1px rgba(0, 0, 0, 0.06);
+  color: #1e293b;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  transition: box-shadow 0.2s ease;
+  overflow: visible;
+}
+
+.sticky-note-node:hover {
+  box-shadow: 0 12px 24px -4px rgba(0, 0, 0, 0.16);
+}
+
+.sticky-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  padding-bottom: 6px;
+}
+
+.sticky-icon {
+  font-size: 18px;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.sticky-title-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  font-weight: 700;
+  font-size: 13px;
+  color: inherit;
+  outline: none;
+}
+
+.sticky-palette {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.sticky-color-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.sticky-color-dot:hover,
+.sticky-color-dot.active {
+  transform: scale(1.3);
+  box-shadow: 0 0 0 1px #000000;
+}
+
+.sticky-textarea {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: none;
+  font-size: 12px;
+  line-height: 1.45;
+  color: inherit;
+  resize: none;
+  outline: none;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+/* Visual Group Node */
+.visual-group-node {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  min-width: 240px;
+  min-height: 140px;
+  padding: 16px;
+  border-radius: 16px;
+  border: 2px dashed #818cf8;
+  background: rgba(99, 102, 241, 0.06);
+  backdrop-filter: blur(4px);
+  transition: border-color 0.2s ease;
+  overflow: visible;
+}
+
+.visual-group-node:hover {
+  border-color: #6366f1;
+}
+
+.visual-group-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.visual-group-icon {
+  font-size: 20px;
+  color: #6366f1;
+}
+
+.visual-group-title {
+  background: transparent;
+  border: none;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text-main, #1e293b);
+  outline: none;
+  width: 100%;
+}
+
+.visual-group-desc {
+  background: transparent;
+  border: none;
+  font-size: 12px;
+  color: var(--text-muted, #64748b);
+  outline: none;
+  width: 100%;
+}
+
+/* Resizer Controls */
+:deep(.vue-flow__resize-control) {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.sticky-note-node:hover :deep(.vue-flow__resize-control),
+.sticky-note-node.node-selected :deep(.vue-flow__resize-control),
+.visual-group-node:hover :deep(.vue-flow__resize-control),
+.visual-group-node.node-selected :deep(.vue-flow__resize-control) {
+  opacity: 1;
+}
+
+:deep(.vue-flow__resize-control.handle) {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  border: 1.5px solid #ffffff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+  z-index: 10;
+}
+
+:deep(.vue-flow__resize-control.line) {
+  border-width: 1.5px !important;
+}

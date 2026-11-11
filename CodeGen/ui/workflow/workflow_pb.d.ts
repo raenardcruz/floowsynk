@@ -4,6 +4,8 @@ import * as google_protobuf_empty_pb from 'google-protobuf/google/protobuf/empty
 
 
 export class RunWorkflowIdRequest extends jspb.Message {
+  constructor();
+  constructor(opt_data?: RunWorkflowIdRequest.AsObject);
   getId(): string;
   setId(value: string): RunWorkflowIdRequest;
 
@@ -26,6 +28,8 @@ export namespace RunWorkflowIdRequest {
 }
 
 export class WorkflowHistoryList extends jspb.Message {
+  constructor();
+  constructor(opt_data?: WorkflowHistoryList.AsObject);
   getHistoryList(): Array<WorkflowHistory>;
   setHistoryList(value: Array<WorkflowHistory>): WorkflowHistoryList;
   clearHistoryList(): WorkflowHistoryList;
@@ -46,6 +50,8 @@ export namespace WorkflowHistoryList {
 }
 
 export class WorkflowHistory extends jspb.Message {
+  constructor();
+  constructor(opt_data?: WorkflowHistory.AsObject);
   getId(): string;
   setId(value: string): WorkflowHistory;
 
@@ -80,6 +86,8 @@ export namespace WorkflowHistory {
 }
 
 export class WorkflowHistoryRequest extends jspb.Message {
+  constructor();
+  constructor(opt_data?: WorkflowHistoryRequest.AsObject);
   getId(): string;
   setId(value: string): WorkflowHistoryRequest;
 
@@ -102,6 +110,8 @@ export namespace WorkflowHistoryRequest {
 }
 
 export class ListWorkflowHistoryRequest extends jspb.Message {
+  constructor();
+  constructor(opt_data?: ListWorkflowHistoryRequest.AsObject);
   getEnvironment(): Environment;
   setEnvironment(value: Environment): ListWorkflowHistoryRequest;
 
@@ -120,6 +130,8 @@ export namespace ListWorkflowHistoryRequest {
 }
 
 export class WorkflowHistoryResponse extends jspb.Message {
+  constructor();
+  constructor(opt_data?: WorkflowHistoryResponse.AsObject);
   getDataList(): Array<ReplayData>;
   setDataList(value: Array<ReplayData>): WorkflowHistoryResponse;
   clearDataList(): WorkflowHistoryResponse;
@@ -140,6 +152,8 @@ export namespace WorkflowHistoryResponse {
 }
 
 export class ReplayData extends jspb.Message {
+  constructor();
+  constructor(opt_data?: ReplayData.AsObject);
   getNodeid(): string;
   setNodeid(value: string): ReplayData;
 
@@ -176,6 +190,8 @@ export namespace ReplayData {
 }
 
 export class PageRequest extends jspb.Message {
+  constructor();
+  constructor(opt_data?: PageRequest.AsObject);
   getLimit(): number;
   setLimit(value: number): PageRequest;
 
@@ -202,6 +218,8 @@ export namespace PageRequest {
 }
 
 export class GetWorkflowRequest extends jspb.Message {
+  constructor();
+  constructor(opt_data?: GetWorkflowRequest.AsObject);
   getId(): string;
   setId(value: string): GetWorkflowRequest;
 
@@ -224,6 +242,8 @@ export namespace GetWorkflowRequest {
 }
 
 export class WorkflowList extends jspb.Message {
+  constructor();
+  constructor(opt_data?: WorkflowList.AsObject);
   getTotal(): number;
   setTotal(value: number): WorkflowList;
 
@@ -248,6 +268,8 @@ export namespace WorkflowList {
 }
 
 export class Workflow extends jspb.Message {
+  constructor();
+  constructor(opt_data?: Workflow.AsObject);
   getId(): string;
   setId(value: string): Workflow;
 
@@ -339,6 +361,8 @@ export namespace Workflow {
 }
 
 export class WorkflowVersion extends jspb.Message {
+  constructor();
+  constructor(opt_data?: WorkflowVersion.AsObject);
   getId(): string;
   setId(value: string): WorkflowVersion;
 
@@ -393,6 +417,8 @@ export namespace WorkflowVersion {
 }
 
 export class WorkflowVersionList extends jspb.Message {
+  constructor();
+  constructor(opt_data?: WorkflowVersionList.AsObject);
   getVersionsList(): Array<WorkflowVersion>;
   setVersionsList(value: Array<WorkflowVersion>): WorkflowVersionList;
   clearVersionsList(): WorkflowVersionList;
@@ -413,6 +439,8 @@ export namespace WorkflowVersionList {
 }
 
 export class GetWorkflowVersionsRequest extends jspb.Message {
+  constructor();
+  constructor(opt_data?: GetWorkflowVersionsRequest.AsObject);
   getWorkflowid(): string;
   setWorkflowid(value: string): GetWorkflowVersionsRequest;
 
@@ -435,6 +463,8 @@ export namespace GetWorkflowVersionsRequest {
 }
 
 export class PublishWorkflowRequest extends jspb.Message {
+  constructor();
+  constructor(opt_data?: PublishWorkflowRequest.AsObject);
   getWorkflowid(): string;
   setWorkflowid(value: string): PublishWorkflowRequest;
 
@@ -461,6 +491,8 @@ export namespace PublishWorkflowRequest {
 }
 
 export class PublishWorkflowResponse extends jspb.Message {
+  constructor();
+  constructor(opt_data?: PublishWorkflowResponse.AsObject);
   getSuccess(): boolean;
   setSuccess(value: boolean): PublishWorkflowResponse;
 
@@ -483,6 +515,8 @@ export namespace PublishWorkflowResponse {
 }
 
 export class Edge extends jspb.Message {
+  constructor();
+  constructor(opt_data?: Edge.AsObject);
   getId(): string;
   setId(value: string): Edge;
 
@@ -561,6 +595,8 @@ export namespace Edge {
 }
 
 export class Node extends jspb.Message {
+  constructor();
+  constructor(opt_data?: Node.AsObject);
   getId(): string;
   setId(value: string): Node;
 
@@ -700,6 +736,8 @@ export namespace Node {
 }
 
 export class NodeData extends jspb.Message {
+  constructor();
+  constructor(opt_data?: NodeData.AsObject);
   getName(): string;
   setName(value: string): NodeData;
   hasName(): boolean;
@@ -835,6 +873,11 @@ export class NodeData extends jspb.Message {
   hasRagoutputvar(): boolean;
   clearRagoutputvar(): NodeData;
 
+  getRagllmconnectionid(): string;
+  setRagllmconnectionid(value: string): NodeData;
+  hasRagllmconnectionid(): boolean;
+  clearRagllmconnectionid(): NodeData;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): NodeData.AsObject;
   static toObject(includeInstance: boolean, msg: NodeData): NodeData.AsObject;
@@ -872,6 +915,7 @@ export namespace NodeData {
     ragtopk?: number;
     ragsystemprompt?: string;
     ragoutputvar?: string;
+    ragllmconnectionid?: string;
   };
 
   export enum NameCase {
@@ -1008,9 +1052,16 @@ export namespace NodeData {
     _RAGOUTPUTVAR_NOT_SET = 0,
     RAGOUTPUTVAR = 27,
   }
+
+  export enum RagllmconnectionidCase {
+    _RAGLLMCONNECTIONID_NOT_SET = 0,
+    RAGLLMCONNECTIONID = 28,
+  }
 }
 
 export class NodeDataArray extends jspb.Message {
+  constructor();
+  constructor(opt_data?: NodeDataArray.AsObject);
   getType(): ArrayDataType;
   setType(value: ArrayDataType): NodeDataArray;
 
@@ -1053,6 +1104,8 @@ export namespace NodeDataArray {
 }
 
 export class NodeIcon extends jspb.Message {
+  constructor();
+  constructor(opt_data?: NodeIcon.AsObject);
   getName(): string;
   setName(value: string): NodeIcon;
 
@@ -1075,6 +1128,8 @@ export namespace NodeIcon {
 }
 
 export class NodeDimensions extends jspb.Message {
+  constructor();
+  constructor(opt_data?: NodeDimensions.AsObject);
   getWidth(): number;
   setWidth(value: number): NodeDimensions;
 
@@ -1097,6 +1152,8 @@ export namespace NodeDimensions {
 }
 
 export class NodePosition extends jspb.Message {
+  constructor();
+  constructor(opt_data?: NodePosition.AsObject);
   getX(): number;
   setX(value: number): NodePosition;
 
@@ -1130,6 +1187,8 @@ export namespace NodePosition {
 }
 
 export class KeyValue extends jspb.Message {
+  constructor();
+  constructor(opt_data?: KeyValue.AsObject);
   getKey(): string;
   setKey(value: string): KeyValue;
 
@@ -1152,6 +1211,8 @@ export namespace KeyValue {
 }
 
 export class NodeHandleBounds extends jspb.Message {
+  constructor();
+  constructor(opt_data?: NodeHandleBounds.AsObject);
   getSourceList(): Array<Handle>;
   setSourceList(value: Array<Handle>): NodeHandleBounds;
   clearSourceList(): NodeHandleBounds;
@@ -1178,6 +1239,8 @@ export namespace NodeHandleBounds {
 }
 
 export class Handle extends jspb.Message {
+  constructor();
+  constructor(opt_data?: Handle.AsObject);
   getX(): number;
   setX(value: number): Handle;
 
@@ -1224,6 +1287,8 @@ export namespace Handle {
 }
 
 export class ConnectorTemplateList extends jspb.Message {
+  constructor();
+  constructor(opt_data?: ConnectorTemplateList.AsObject);
   getTemplatesList(): Array<ConnectorProtoTemplate>;
   setTemplatesList(value: Array<ConnectorProtoTemplate>): ConnectorTemplateList;
   clearTemplatesList(): ConnectorTemplateList;
@@ -1244,6 +1309,8 @@ export namespace ConnectorTemplateList {
 }
 
 export class ConnectorFieldProto extends jspb.Message {
+  constructor();
+  constructor(opt_data?: ConnectorFieldProto.AsObject);
   getKey(): string;
   setKey(value: string): ConnectorFieldProto;
 
@@ -1278,6 +1345,8 @@ export namespace ConnectorFieldProto {
 }
 
 export class ConnectorActionProto extends jspb.Message {
+  constructor();
+  constructor(opt_data?: ConnectorActionProto.AsObject);
   getId(): string;
   setId(value: string): ConnectorActionProto;
 
@@ -1312,6 +1381,8 @@ export namespace ConnectorActionProto {
 }
 
 export class ConnectorProtoTemplate extends jspb.Message {
+  constructor();
+  constructor(opt_data?: ConnectorProtoTemplate.AsObject);
   getId(): string;
   setId(value: string): ConnectorProtoTemplate;
 
@@ -1362,6 +1433,8 @@ export namespace ConnectorProtoTemplate {
 }
 
 export class ConnectionList extends jspb.Message {
+  constructor();
+  constructor(opt_data?: ConnectionList.AsObject);
   getConnectionsList(): Array<ConnectionProto>;
   setConnectionsList(value: Array<ConnectionProto>): ConnectionList;
   clearConnectionsList(): ConnectionList;
@@ -1382,6 +1455,8 @@ export namespace ConnectionList {
 }
 
 export class ConnectionProto extends jspb.Message {
+  constructor();
+  constructor(opt_data?: ConnectionProto.AsObject);
   getId(): string;
   setId(value: string): ConnectionProto;
 
@@ -1420,6 +1495,8 @@ export namespace ConnectionProto {
 }
 
 export class ListConnectionsRequest extends jspb.Message {
+  constructor();
+  constructor(opt_data?: ListConnectionsRequest.AsObject);
   getEnvironment(): Environment;
   setEnvironment(value: Environment): ListConnectionsRequest;
 
@@ -1438,6 +1515,8 @@ export namespace ListConnectionsRequest {
 }
 
 export class DeleteConnectionRequest extends jspb.Message {
+  constructor();
+  constructor(opt_data?: DeleteConnectionRequest.AsObject);
   getId(): string;
   setId(value: string): DeleteConnectionRequest;
 
@@ -1460,6 +1539,8 @@ export namespace DeleteConnectionRequest {
 }
 
 export class RagConnectionProto extends jspb.Message {
+  constructor();
+  constructor(opt_data?: RagConnectionProto.AsObject);
   getId(): string;
   setId(value: string): RagConnectionProto;
 
@@ -1493,6 +1574,11 @@ export class RagConnectionProto extends jspb.Message {
   getIsmodified(): boolean;
   setIsmodified(value: boolean): RagConnectionProto;
 
+  getLlmconnectionid(): string;
+  setLlmconnectionid(value: string): RagConnectionProto;
+  hasLlmconnectionid(): boolean;
+  clearLlmconnectionid(): RagConnectionProto;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): RagConnectionProto.AsObject;
   static toObject(includeInstance: boolean, msg: RagConnectionProto): RagConnectionProto.AsObject;
@@ -1514,10 +1600,18 @@ export namespace RagConnectionProto {
     documentcount: number;
     chunkcount: number;
     ismodified: boolean;
+    llmconnectionid?: string;
   };
+
+  export enum LlmconnectionidCase {
+    _LLMCONNECTIONID_NOT_SET = 0,
+    LLMCONNECTIONID = 12,
+  }
 }
 
 export class ListRagConnectionsRequest extends jspb.Message {
+  constructor();
+  constructor(opt_data?: ListRagConnectionsRequest.AsObject);
   getEnvironment(): Environment;
   setEnvironment(value: Environment): ListRagConnectionsRequest;
 
@@ -1536,6 +1630,8 @@ export namespace ListRagConnectionsRequest {
 }
 
 export class RagConnectionList extends jspb.Message {
+  constructor();
+  constructor(opt_data?: RagConnectionList.AsObject);
   getConnectionsList(): Array<RagConnectionProto>;
   setConnectionsList(value: Array<RagConnectionProto>): RagConnectionList;
   clearConnectionsList(): RagConnectionList;
@@ -1556,6 +1652,8 @@ export namespace RagConnectionList {
 }
 
 export class CreateRagConnectionRequest extends jspb.Message {
+  constructor();
+  constructor(opt_data?: CreateRagConnectionRequest.AsObject);
   getConnection(): RagConnectionProto | undefined;
   setConnection(value?: RagConnectionProto): CreateRagConnectionRequest;
   hasConnection(): boolean;
@@ -1580,6 +1678,8 @@ export namespace CreateRagConnectionRequest {
 }
 
 export class UpdateRagConnectionRequest extends jspb.Message {
+  constructor();
+  constructor(opt_data?: UpdateRagConnectionRequest.AsObject);
   getConnection(): RagConnectionProto | undefined;
   setConnection(value?: RagConnectionProto): UpdateRagConnectionRequest;
   hasConnection(): boolean;
@@ -1604,6 +1704,8 @@ export namespace UpdateRagConnectionRequest {
 }
 
 export class DeleteRagConnectionRequest extends jspb.Message {
+  constructor();
+  constructor(opt_data?: DeleteRagConnectionRequest.AsObject);
   getId(): string;
   setId(value: string): DeleteRagConnectionRequest;
 
@@ -1626,6 +1728,8 @@ export namespace DeleteRagConnectionRequest {
 }
 
 export class RagDocumentProto extends jspb.Message {
+  constructor();
+  constructor(opt_data?: RagDocumentProto.AsObject);
   getId(): string;
   setId(value: string): RagDocumentProto;
 
@@ -1684,6 +1788,8 @@ export namespace RagDocumentProto {
 }
 
 export class ListRagDocumentsRequest extends jspb.Message {
+  constructor();
+  constructor(opt_data?: ListRagDocumentsRequest.AsObject);
   getRagconnectionid(): string;
   setRagconnectionid(value: string): ListRagDocumentsRequest;
 
@@ -1706,6 +1812,8 @@ export namespace ListRagDocumentsRequest {
 }
 
 export class RagDocumentList extends jspb.Message {
+  constructor();
+  constructor(opt_data?: RagDocumentList.AsObject);
   getDocumentsList(): Array<RagDocumentProto>;
   setDocumentsList(value: Array<RagDocumentProto>): RagDocumentList;
   clearDocumentsList(): RagDocumentList;
@@ -1726,6 +1834,8 @@ export namespace RagDocumentList {
 }
 
 export class UploadRagDocumentRequest extends jspb.Message {
+  constructor();
+  constructor(opt_data?: UploadRagDocumentRequest.AsObject);
   getRagconnectionid(): string;
   setRagconnectionid(value: string): UploadRagDocumentRequest;
 
@@ -1758,6 +1868,8 @@ export namespace UploadRagDocumentRequest {
 }
 
 export class DeleteRagDocumentRequest extends jspb.Message {
+  constructor();
+  constructor(opt_data?: DeleteRagDocumentRequest.AsObject);
   getId(): string;
   setId(value: string): DeleteRagDocumentRequest;
 
@@ -1784,6 +1896,8 @@ export namespace DeleteRagDocumentRequest {
 }
 
 export class QueryRagRequest extends jspb.Message {
+  constructor();
+  constructor(opt_data?: QueryRagRequest.AsObject);
   getRagconnectionid(): string;
   setRagconnectionid(value: string): QueryRagRequest;
 
@@ -1798,6 +1912,11 @@ export class QueryRagRequest extends jspb.Message {
 
   getEnvironment(): Environment;
   setEnvironment(value: Environment): QueryRagRequest;
+
+  getLlmconnectionid(): string;
+  setLlmconnectionid(value: string): QueryRagRequest;
+  hasLlmconnectionid(): boolean;
+  clearLlmconnectionid(): QueryRagRequest;
 
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): QueryRagRequest.AsObject;
@@ -1814,10 +1933,18 @@ export namespace QueryRagRequest {
     topk: number;
     systemprompt: string;
     environment: Environment;
+    llmconnectionid?: string;
   };
+
+  export enum LlmconnectionidCase {
+    _LLMCONNECTIONID_NOT_SET = 0,
+    LLMCONNECTIONID = 6,
+  }
 }
 
 export class RagSourceChunk extends jspb.Message {
+  constructor();
+  constructor(opt_data?: RagSourceChunk.AsObject);
   getDocumentname(): string;
   setDocumentname(value: string): RagSourceChunk;
 
@@ -1844,6 +1971,8 @@ export namespace RagSourceChunk {
 }
 
 export class QueryRagResponse extends jspb.Message {
+  constructor();
+  constructor(opt_data?: QueryRagResponse.AsObject);
   getAnswer(): string;
   setAnswer(value: string): QueryRagResponse;
 

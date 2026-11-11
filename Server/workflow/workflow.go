@@ -1,9 +1,11 @@
 package workflow
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
+	"strings"
 	"time"
 
 	proto "github.com/raenardcruz/floowsynk/CodeGen/go/workflow"
@@ -33,6 +35,9 @@ const (
 	responseType    = "response"
 	connectorType   = "connector"
 	ragType         = "rag"
+	stickyNoteType  = "stickyNote"
+	visualGroupType = "visualGroup"
+	codeType        = "code"
 )
 
 const (
@@ -109,6 +114,49 @@ func (wp *WorkflowProcessor) hasLoopOrDoneEdges(nodeId string) bool {
 	return false
 }
 
+func isNodePinned(node *proto.Node) bool {
+	if node == nil {
+		return false
+	}
+	if node.Nodestyle != nil && strings.Contains(*node.Nodestyle, "__PINNED__:") {
+		return true
+	}
+	if node.Data != nil {
+		if node.Data.Value != nil && strings.HasPrefix(*node.Data.Value, "__PINNED__:") {
+			return true
+		}
+		if node.Data.Payload != nil && strings.HasPrefix(*node.Data.Payload, "__PINNED__:") {
+			return true
+		}
+		if node.Data.Template != nil && strings.HasPrefix(*node.Data.Template, "__PINNED__:") {
+			return true
+		}
+	}
+	return false
+}
+
+func getPinnedData(node *proto.Node) interface{} {
+	var raw string
+	if node.Nodestyle != nil && strings.Contains(*node.Nodestyle, "__PINNED__:") {
+		idx := strings.Index(*node.Nodestyle, "__PINNED__:")
+		raw = (*node.Nodestyle)[idx+len("__PINNED__:"):]
+	} else if node.Data != nil {
+		if node.Data.Value != nil && strings.HasPrefix(*node.Data.Value, "__PINNED__:") {
+			raw = strings.TrimPrefix(*node.Data.Value, "__PINNED__:")
+		} else if node.Data.Payload != nil && strings.HasPrefix(*node.Data.Payload, "__PINNED__:") {
+			raw = strings.TrimPrefix(*node.Data.Payload, "__PINNED__:")
+		} else if node.Data.Template != nil && strings.HasPrefix(*node.Data.Template, "__PINNED__:") {
+			raw = strings.TrimPrefix(*node.Data.Template, "__PINNED__:")
+		}
+	}
+	raw = strings.TrimSpace(raw)
+	var parsed interface{}
+	if err := json.Unmarshal([]byte(raw), &parsed); err == nil {
+		return parsed
+	}
+	return raw
+}
+
 func (wp *WorkflowProcessor) Process(nodeId string) (err error) {
 	if !wp.isJoinReady(nodeId) {
 		return nil
@@ -137,11 +185,20 @@ func (wp *WorkflowProcessor) Process(nodeId string) (err error) {
 		return nil
 	}
 
+	// Pinned data check: if the node has pinned mock output, bypass execution
+	if isNodePinned(node) {
+		pinnedVal := getPinnedData(node)
+		wp.UpdateStatus(node, proto.NodeStatus_COMPLETED, pinnedVal, "Using pinned mock output", true)
+		return wp.nextProcess(nodeId, "")
+	}
+
 	nodeProcessors := map[string]func(*proto.Node) (string, error){
 		defaultnodeType: wp.DefaultNodeProcess,
 		intervalType:    wp.DefaultNodeProcess,
 		webhookType:     wp.DefaultNodeProcess,
 		eventsType:      wp.DefaultNodeProcess,
+		stickyNoteType:  wp.DefaultNodeProcess,
+		visualGroupType: wp.DefaultNodeProcess,
 		setVariabletype: wp.SetVariableNodeProcess,
 		textType:        wp.TextNodeProcess,
 		conditionType:   wp.ConditionNodeProcessWrapper,
@@ -161,6 +218,7 @@ func (wp *WorkflowProcessor) Process(nodeId string) (err error) {
 		responseType:    wp.ResponseNodeProcess,
 		connectorType:   wp.ConnectorNodeProcess,
 		ragType:         wp.RagNodeProcess,
+		codeType:        wp.CodeNodeProcess,
 	}
 
 	processFunc, ok := nodeProcessors[node.Nodetype]

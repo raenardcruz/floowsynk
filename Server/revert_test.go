@@ -23,7 +23,9 @@ func TestRevertWorkflowHandler_MethodNotAllowed(t *testing.T) {
 }
 
 func TestRevertWorkflowHandler_MissingID(t *testing.T) {
+	token := generateToken("b5bd8424-fb52-4454-8102-488959a41ca8", "admin", "admin", 9999999999)
 	req := httptest.NewRequest(http.MethodPost, "/api/workflow/revert", bytes.NewReader([]byte("{}")))
+	req.Header.Set("Authorization", token)
 	rec := httptest.NewRecorder()
 
 	revertWorkflowHandler(rec, req)
@@ -43,6 +45,16 @@ func TestRevertWorkflow_SameDBFlow(t *testing.T) {
 	db.AppConfig = &db.Config{App_Environment: "staging"}
 
 	wfID := "test-wf-" + uuid.NewString()
+	origEnv := db.AppConfig.App_Environment
+	t.Cleanup(func() {
+		db.AppConfig.App_Environment = origEnv
+		_ = DBCon.DeleteWorkflowEnv(wfID, "staging")
+		_ = DBCon.DeleteWorkflowEnv(wfID, "production")
+		testDB.GetConn().Table("workflow_versions_staging").Where("workflow_id = ?", wfID).Delete(&db.WorkflowVersion{})
+		testDB.GetConn().Table("workflow_versions_production").Where("workflow_id = ?", wfID).Delete(&db.WorkflowVersion{})
+		testDB.GetConn().Table("workflows_production").Where("source_workflow_id = ? OR id = ?", wfID, wfID).Delete(&db.Workflow{})
+		testDB.GetConn().Table("workflows_staging").Where("source_workflow_id = ? OR id = ?", wfID, wfID).Delete(&db.Workflow{})
+	})
 
 	// 1. Create a staging workflow
 	stagingWF := &wf.Workflow{
@@ -52,6 +64,7 @@ func TestRevertWorkflow_SameDBFlow(t *testing.T) {
 		Description: "Staging description",
 		Nodes:       []*wf.Node{{Id: "node-1"}},
 		Edges:       []*wf.Edge{},
+		Environment: wf.Environment_STAGING,
 	}
 	_, err = DBCon.CreateWorkflow(stagingWF)
 	if err != nil {
@@ -82,7 +95,7 @@ func TestRevertWorkflow_SameDBFlow(t *testing.T) {
 	}
 
 	// Verify it is modified
-	fetched, err := DBCon.GetWorkflow(wfID)
+	fetched, err := DBCon.GetWorkflowEnv(wfID, "production")
 	if err != nil {
 		t.Fatalf("failed to get modified workflow: %v", err)
 	}
@@ -120,6 +133,16 @@ func TestRevertWorkflow_UsingDraftID(t *testing.T) {
 	db.AppConfig = &db.Config{App_Environment: "staging"}
 
 	wfID := "test-wf-draft-" + uuid.NewString()
+	origEnv := db.AppConfig.App_Environment
+	t.Cleanup(func() {
+		db.AppConfig.App_Environment = origEnv
+		_ = DBCon.DeleteWorkflowEnv(wfID, "staging")
+		_ = DBCon.DeleteWorkflowEnv(wfID, "production")
+		testDB.GetConn().Table("workflow_versions_staging").Where("workflow_id = ?", wfID).Delete(&db.WorkflowVersion{})
+		testDB.GetConn().Table("workflow_versions_production").Where("workflow_id = ?", wfID).Delete(&db.WorkflowVersion{})
+		testDB.GetConn().Table("workflows_production").Where("source_workflow_id = ? OR id = ?", wfID, wfID).Delete(&db.Workflow{})
+		testDB.GetConn().Table("workflows_staging").Where("source_workflow_id = ? OR id = ?", wfID, wfID).Delete(&db.Workflow{})
+	})
 
 	stagingWF := &wf.Workflow{
 		Id:          wfID,
@@ -128,6 +151,7 @@ func TestRevertWorkflow_UsingDraftID(t *testing.T) {
 		Description: "Base description",
 		Nodes:       []*wf.Node{{Id: "node-1"}},
 		Edges:       []*wf.Edge{},
+		Environment: wf.Environment_STAGING,
 	}
 	_, err = DBCon.CreateWorkflow(stagingWF)
 	if err != nil {
@@ -153,7 +177,7 @@ func TestRevertWorkflow_UsingDraftID(t *testing.T) {
 
 	// Find the draft record ID directly in DB
 	var draftRec db.Workflow
-	err = testDB.GetConn().First(&draftRec, "source_workflow_id = ? AND environment = ?", wfID, "production_modified").Error
+	err = testDB.GetConn().Table("workflows_production").First(&draftRec, "source_workflow_id = ? AND environment = ?", wfID, "production_modified").Error
 	if err != nil {
 		t.Fatalf("draft record not found in DB: %v", err)
 	}

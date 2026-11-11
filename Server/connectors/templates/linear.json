@@ -1,0 +1,115 @@
+{
+  "id": "linear",
+  "name": "Linear",
+  "category": "Project Management",
+  "description": "Streamline software projects, sprints, tasks, and bug tracking with Linear.",
+  "icon": "/src/components/Icons/linear.svg",
+  "baseUrl": "https://api.linear.app/graphql",
+  "authType": "apikey",
+  "fields": [
+    {
+      "key": "api_key",
+      "label": "Linear API Key (Personal API Key)",
+      "type": "password",
+      "required": true,
+      "placeholder": "lin_api_..."
+    }
+  ],
+  "actions": [
+    {
+      "id": "create_issue",
+      "name": "Create Issue",
+      "description": "Create a new issue in a Linear team",
+      "path": "",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "{{api_key}}"
+      },
+      "queryParams": [],
+      "payloadTemplate": "{\"query\": \"mutation CreateIssue($title: String!, $teamId: String!, $description: String) { issueCreate(input: { title: $title, teamId: $teamId, description: $description }) { success issue { id identifier title url state { name } } } }\", \"variables\": {\"title\": \"{{title}}\", \"teamId\": \"{{team_id}}\", \"description\": \"{{description}}\"}}",
+      "fields": [
+        { "key": "team_id", "label": "Team ID", "type": "text", "required": true, "placeholder": "UUID of Linear team" },
+        { "key": "title", "label": "Issue Title", "type": "text", "required": true, "placeholder": "Bug: fix checkout error" },
+        { "key": "description", "label": "Description", "type": "text", "required": false, "placeholder": "Reproduction steps..." }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "team_id": { "type": "string", "description": "Team ID" },
+          "title": { "type": "string", "description": "Title of the issue" },
+          "description": { "type": "string", "description": "Detailed description" }
+        },
+        "required": ["team_id", "title"]
+      },
+      "outputSchema": {
+        "success": true,
+        "issue": {
+          "id": "c1f7a60b-8d7e-4050-a9cf-f99a38f376cf",
+          "identifier": "ENG-101",
+          "title": "Bug: fix checkout error",
+          "url": "https://linear.app/team/issue/ENG-101",
+          "state": "Todo"
+        }
+      }
+    },
+    {
+      "id": "list_issues",
+      "name": "List Issues",
+      "description": "List recent issues from Linear",
+      "path": "",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "{{api_key}}"
+      },
+      "queryParams": [],
+      "payloadTemplate": "{\"query\": \"query { issues(first: 20) { nodes { id identifier title priority state { name } createdAt } } }\"}",
+      "fields": [],
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "outputSchema": [
+        {
+          "id": "c1f7a60b-8d7e-4050-a9cf-f99a38f376cf",
+          "identifier": "ENG-101",
+          "title": "Bug: fix checkout error",
+          "state": "Todo",
+          "priority": 1
+        }
+      ]
+    },
+    {
+      "id": "get_issue",
+      "name": "Get Issue",
+      "description": "Retrieve issue details by issue identifier or ID",
+      "path": "",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "{{api_key}}"
+      },
+      "queryParams": [],
+      "payloadTemplate": "{\"query\": \"query GetIssue($id: String!) { issue(id: $id) { id identifier title description url state { name } assignee { name email } } }\", \"variables\": {\"id\": \"{{issue_id}}\"}}",
+      "fields": [
+        { "key": "issue_id", "label": "Issue ID or Identifier", "type": "text", "required": true, "placeholder": "e.g. ENG-123 or UUID" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "issue_id": { "type": "string", "description": "Issue identifier or ID" }
+        },
+        "required": ["issue_id"]
+      },
+      "outputSchema": {
+        "id": "c1f7a60b-8d7e-4050-a9cf-f99a38f376cf",
+        "identifier": "ENG-101",
+        "title": "Bug: fix checkout error",
+        "description": "Reproduction steps...",
+        "url": "https://linear.app/team/issue/ENG-101",
+        "state": "In Progress"
+      }
+    }
+  ]
+}

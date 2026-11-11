@@ -15,8 +15,8 @@
             </Row>
         </div>
     </div>
-    <Teleport :to="'#' + canvasId">
-        <div class="replay-data--sidebar" v-if="currentSelectedNode">
+    <Teleport :to="'#' + canvasId" v-if="currentSelectedNode">
+        <div class="replay-data--sidebar">
             <div class="sidebar-header">
                 <span class="material-symbols-outlined">analytics</span>
                 <span>Execution Step Details</span>

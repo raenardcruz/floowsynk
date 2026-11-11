@@ -23,6 +23,8 @@ import (
 	wf "github.com/raenardcruz/floowsynk/CodeGen/go/workflow"
 	db "github.com/raenardcruz/floowsynk/Database"
 	"github.com/raenardcruz/floowsynk/Server/crypto"
+	"github.com/raenardcruz/floowsynk/Server/mcp"
+	"github.com/raenardcruz/floowsynk/Server/rag"
 	"github.com/raenardcruz/floowsynk/Server/workflow"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -160,6 +162,10 @@ func startRESTServer() {
 	restServer.HandleFunc("/api/history/clear", clearHistoryHandler)
 	restServer.HandleFunc("/api/publish/workflow", publishWorkflowHandler)
 	restServer.HandleFunc("/api/publish/connection", publishConnectionHandler)
+	restServer.HandleFunc("/api/rag/models", listRagModelsHandler)
+
+	mcpServer := mcp.NewServer(DBCon, producer)
+	restServer.HandleFunc("/api/mcp", mcpServer.ServeHTTP)
 
 	mainHandler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if strings.HasPrefix(r.URL.Path, "/staging/") {
@@ -989,6 +995,37 @@ func revertWorkflowHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]interface{}{"success": true, "message": "Workflow reverted to staging copy", "workflow": wfObj})
 }
+
+func listRagModelsHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	baseURL := strings.TrimSpace(r.URL.Query().Get("url"))
+	client := rag.NewOllamaClient(baseURL)
+	models, err := client.ListInstalledModels()
+	if err != nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]interface{}{
+			"success": false,
+			"error":   err.Error(),
+			"models":  []rag.InstalledModelInfo{},
+			"baseUrl": client.BaseURL,
+		})
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"success": true,
+		"models":  models,
+		"baseUrl": client.BaseURL,
+	})
+}
+
 
 
 

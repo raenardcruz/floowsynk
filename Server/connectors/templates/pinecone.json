@@ -1,0 +1,111 @@
+{
+  "id": "pinecone",
+  "name": "Pinecone",
+  "category": "AI & Vector Search",
+  "description": "High-performance vector database to index and search AI embeddings for RAG and semantic search.",
+  "icon": "/src/components/Icons/pinecone.svg",
+  "baseUrl": "https://{{index_host}}",
+  "authType": "apikey",
+  "fields": [
+    {
+      "key": "api_key",
+      "label": "Pinecone API Key",
+      "type": "password",
+      "required": true,
+      "placeholder": "pcsk_..."
+    },
+    {
+      "key": "index_host",
+      "label": "Index Host URL",
+      "type": "text",
+      "required": true,
+      "placeholder": "my-index-abc123.svc.aped-4627-b74a.pinecone.io"
+    }
+  ],
+  "actions": [
+    {
+      "id": "query_vectors",
+      "name": "Query Similar Vectors",
+      "description": "Find top-K nearest vector matches for an input embedding vector",
+      "path": "/query",
+      "method": "POST",
+      "headers": {
+        "Api-Key": "{{api_key}}",
+        "Content-Type": "application/json"
+      },
+      "queryParams": [],
+      "payloadTemplate": "{\"vector\": {{vector}}, \"topK\": {{top_k}}, \"includeMetadata\": true}",
+      "fields": [
+        { "key": "vector", "label": "Embedding Vector (Float Array)", "type": "text", "required": true, "placeholder": "[0.12, -0.45, 0.88, ...]" },
+        { "key": "top_k", "label": "Top K Matches", "type": "number", "required": false, "placeholder": "5", "defaultValue": "5" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "vector": { "type": "array", "description": "Float array representing query vector" },
+          "top_k": { "type": "number", "description": "Number of similar vectors to return" }
+        },
+        "required": ["vector"]
+      },
+      "outputSchema": {
+        "matches": [
+          {
+            "id": "vec-101",
+            "score": 0.942,
+            "metadata": { "text": "FlowSynk architecture docs", "category": "engineering" }
+          }
+        ]
+      }
+    },
+    {
+      "id": "upsert_vectors",
+      "name": "Upsert Vectors",
+      "description": "Insert or update vectors into a Pinecone index namespace",
+      "path": "/vectors/upsert",
+      "method": "POST",
+      "headers": {
+        "Api-Key": "{{api_key}}",
+        "Content-Type": "application/json"
+      },
+      "queryParams": [],
+      "payloadTemplate": "{\"vectors\": {{vectors}}}",
+      "fields": [
+        { "key": "vectors", "label": "Vectors Array (JSON)", "type": "text", "required": true, "placeholder": "[{\"id\": \"vec-1\", \"values\": [0.1, 0.2], \"metadata\": {\"title\": \"Sample\"}}]" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "vectors": { "type": "array", "description": "Array of vector objects with id, values, and optional metadata" }
+        },
+        "required": ["vectors"]
+      },
+      "outputSchema": {
+        "upsertedCount": 1
+      }
+    },
+    {
+      "id": "describe_index_stats",
+      "name": "Describe Index Stats",
+      "description": "Retrieve vector counts, dimensionality, and namespace statistics",
+      "path": "/describe_index_stats",
+      "method": "POST",
+      "headers": {
+        "Api-Key": "{{api_key}}",
+        "Content-Type": "application/json"
+      },
+      "queryParams": [],
+      "payloadTemplate": "{}",
+      "fields": [],
+      "inputSchema": {
+        "type": "object",
+        "properties": {}
+      },
+      "outputSchema": {
+        "namespaces": { "": { "vectorCount": 1500 } },
+        "dimension": 1536,
+        "indexFullness": 0.01,
+        "totalVectorCount": 1500
+      }
+    }
+  ]
+}

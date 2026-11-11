@@ -30,6 +30,7 @@
         @keyup="handleKeyup"
         @input="handleInput"
         v-tooltip.focus.bottom="tooltip"
+        class="password-input-field-override"
       />
       <label :for="id || inputId">{{ label }}</label>
     </FloatLabel>
@@ -61,6 +62,7 @@
       @keydown="handleKeydown"
       @keyup="handleKeyup"
       @input="handleInput"
+      class="password-input-field-override"
     />
   </div>
 </template>
@@ -158,6 +160,10 @@ defineExpose<PasswordInputExposed>({
 </script>
 
 <style scoped>
+.password-input-field-override{
+  width: 100%;
+}
+
 .password-input-wrapper {
   position: relative;
   width: 100%;

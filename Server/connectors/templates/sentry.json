@@ -1,0 +1,116 @@
+{
+  "id": "sentry",
+  "name": "Sentry",
+  "category": "Monitoring & Observability",
+  "description": "Application monitoring and error tracking platform for identifying, triaging, and resolving software exceptions.",
+  "icon": "/src/components/Icons/sentry.svg",
+  "baseUrl": "https://sentry.io/api/0",
+  "authType": "apikey",
+  "fields": [
+    {
+      "key": "auth_token",
+      "label": "Sentry Auth Token",
+      "type": "password",
+      "required": true,
+      "placeholder": "sntrys_..."
+    },
+    {
+      "key": "organization_slug",
+      "label": "Organization Slug",
+      "type": "text",
+      "required": true,
+      "placeholder": "my-org"
+    }
+  ],
+  "actions": [
+    {
+      "id": "list_issues",
+      "name": "List Project Issues",
+      "description": "Retrieve active error issues for a specific Sentry project",
+      "path": "/projects/{{organization_slug}}/{{project_slug}}/issues/",
+      "method": "GET",
+      "headers": {
+        "Authorization": "Bearer {{auth_token}}",
+        "Content-Type": "application/json"
+      },
+      "queryParams": ["query=is:unresolved"],
+      "payloadTemplate": "",
+      "fields": [
+        { "key": "project_slug", "label": "Project Slug", "type": "text", "required": true, "placeholder": "backend-api" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "project_slug": { "type": "string", "description": "Sentry project slug identifier" }
+        },
+        "required": ["project_slug"]
+      },
+      "outputSchema": [
+        {
+          "id": "12345678",
+          "shortId": "BACKEND-42",
+          "title": "NullPointerException in user_service.go",
+          "culprit": "workflow/process.go",
+          "count": 142,
+          "firstSeen": "2026-01-01T00:00:00Z",
+          "lastSeen": "2026-01-02T12:00:00Z"
+        }
+      ]
+    },
+    {
+      "id": "get_issue",
+      "name": "Get Issue Details",
+      "description": "Retrieve comprehensive exception details, stack traces, and frequency for an issue",
+      "path": "/issues/{{issue_id}}/",
+      "method": "GET",
+      "headers": {
+        "Authorization": "Bearer {{auth_token}}"
+      },
+      "queryParams": [],
+      "payloadTemplate": "",
+      "fields": [
+        { "key": "issue_id", "label": "Issue ID", "type": "text", "required": true, "placeholder": "12345678" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "issue_id": { "type": "string", "description": "Sentry numeric issue ID" }
+        },
+        "required": ["issue_id"]
+      },
+      "outputSchema": {
+        "id": "12345678",
+        "title": "NullPointerException in user_service.go",
+        "status": "unresolved",
+        "level": "error"
+      }
+    },
+    {
+      "id": "resolve_issue",
+      "name": "Resolve Issue",
+      "description": "Mark an issue as resolved in Sentry",
+      "path": "/issues/{{issue_id}}/",
+      "method": "PUT",
+      "headers": {
+        "Authorization": "Bearer {{auth_token}}",
+        "Content-Type": "application/json"
+      },
+      "queryParams": [],
+      "payloadTemplate": "{\"status\": \"resolved\"}",
+      "fields": [
+        { "key": "issue_id", "label": "Issue ID", "type": "text", "required": true, "placeholder": "12345678" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "issue_id": { "type": "string", "description": "Sentry numeric issue ID" }
+        },
+        "required": ["issue_id"]
+      },
+      "outputSchema": {
+        "id": "12345678",
+        "status": "resolved"
+      }
+    }
+  ]
+}

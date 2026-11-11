@@ -11,7 +11,9 @@ import (
 	"net/http"
 	"os"
 	"regexp"
+	"strconv"
 	"strings"
+	"sync"
 	"text/template"
 	"time"
 
@@ -22,15 +24,94 @@ import (
 	DB "github.com/raenardcruz/floowsynk/Database"
 )
 
+const (
+	// DefaultMaxReplayVariableBytes limits the size of a single variable serialized in ReplayData history to 64KB
+	DefaultMaxReplayVariableBytes = 64 * 1024
+	// DefaultMaxProcessVariableBytes limits in-memory variable size to 10MB to prevent out-of-memory
+	DefaultMaxProcessVariableBytes = 10 * 1024 * 1024
+	// DefaultMaxCachedTemplates limits the number of parsed templates in memory
+	DefaultMaxCachedTemplates = 2048
+)
+
+func getReplayVariableByteLimit() int {
+	if val := os.Getenv("MAX_REPLAY_VARIABLE_BYTES"); val != "" {
+		if limit, err := strconv.Atoi(val); err == nil && limit > 0 {
+			return limit
+		}
+	}
+	return DefaultMaxReplayVariableBytes
+}
+
+func getProcessVariableByteLimit() int {
+	if val := os.Getenv("MAX_VARIABLE_PAYLOAD_SIZE"); val != "" {
+		if limit, err := strconv.Atoi(val); err == nil && limit > 0 {
+			return limit
+		}
+	}
+	return DefaultMaxProcessVariableBytes
+}
+
+var (
+	templateCacheMu sync.RWMutex
+	templateCache   = make(map[string]*template.Template)
+
+	sharedTemplateFuncMap = template.FuncMap{
+		"toJSON": templateToJSON,
+		"toJson": templateToJSON,
+	}
+)
+
+func templateToJSON(v interface{}) (string, error) {
+	if str, ok := v.(string); ok {
+		var js json.RawMessage
+		if err := json.Unmarshal([]byte(str), &js); err == nil {
+			return str, nil
+		}
+	}
+	b, err := json.Marshal(v)
+	if err != nil {
+		return "", err
+	}
+	return string(b), nil
+}
+
+func getOrParseTemplate(text string) (*template.Template, error) {
+	templateCacheMu.RLock()
+	tmpl, exists := templateCache[text]
+	templateCacheMu.RUnlock()
+	if exists {
+		return tmpl, nil
+	}
+
+	newTmpl, err := template.New("template").Funcs(sharedTemplateFuncMap).Option("missingkey=zero").Parse(text)
+	if err != nil {
+		return nil, err
+	}
+
+	templateCacheMu.Lock()
+	if len(templateCache) >= DefaultMaxCachedTemplates {
+		templateCache = make(map[string]*template.Template)
+	}
+	templateCache[text] = newTmpl
+	templateCacheMu.Unlock()
+
+	return newTmpl, nil
+}
+
 func (wp *WorkflowProcessor) UpdateStatus(node *proto.Node, status proto.NodeStatus, output interface{}, message string, includeReplayData bool) {
 	if (output != nil) && (status == proto.NodeStatus_COMPLETED || status == proto.NodeStatus_FAILED) {
 		wp.VariablesMu.Lock()
 		if wp.ProcessVariables == nil {
 			wp.ProcessVariables = make(map[string]interface{})
 		}
+		maxVarSize := getProcessVariableByteLimit()
 		switch v := output.(type) {
 		case string:
-			wp.ProcessVariables[OUTPUT] = v
+			if len(v) > maxVarSize {
+				wp.ProcessVariables[OUTPUT] = fmt.Sprintf("%s... [truncated: exceeds %d byte limit]", v[:maxVarSize], maxVarSize)
+			} else {
+				wp.ProcessVariables[OUTPUT] = v
+			}
 		case []interface{}:
 			wp.ProcessVariables[OUTPUT] = v
 		case map[string]interface{}:
@@ -38,9 +119,11 @@ func (wp *WorkflowProcessor) UpdateStatus(node *proto.Node, status proto.NodeSta
 		case float64, int, int32, int64, bool:
 			wp.ProcessVariables[OUTPUT] = fmt.Sprintf("%v", v)
 		default:
-			outputBytes, err := json.MarshalIndent(output, "", "  ")
+			outputBytes, err := json.Marshal(output)
 			if err != nil {
 				wp.ProcessVariables[OUTPUT] = fmt.Sprintf("error marshaling output: %v", err)
+			} else if len(outputBytes) > maxVarSize {
+				wp.ProcessVariables[OUTPUT] = fmt.Sprintf("%s... [truncated: exceeds %d byte limit]", string(outputBytes[:maxVarSize]), maxVarSize)
 			} else {
 				wp.ProcessVariables[OUTPUT] = string(outputBytes)
 			}
@@ -65,7 +148,7 @@ func (wp *WorkflowProcessor) UpdateStatus(node *proto.Node, status proto.NodeSta
 		wp.Stream.SendMsg(res)
 	}
 
-	// DB Record format - save step to DB if it has replay data / message or is completed/failed/info
+	// DB Record format - save step to DB/Kafka if it has replay data / message or is completed/failed/info
 	if includeReplayData || message != "" || status != proto.NodeStatus_RUNNING {
 		data, err := json.Marshal(res.Data)
 		if err != nil {
@@ -77,11 +160,16 @@ func (wp *WorkflowProcessor) UpdateStatus(node *proto.Node, status proto.NodeSta
 			fmt.Printf("Error marshaling RunWorkflowResponse: %v\n", err)
 			return
 		}
-		env := DB.ResolveEnvName(wp.Workflow.Environment)
+		env := "staging"
+		workflowID := ""
+		if wp.Workflow != nil {
+			env = DB.ResolveEnvName(wp.Workflow.Environment)
+			workflowID = wp.Workflow.Id
+		}
 		dbRD := DB.ReplayData{
 			ID:              uuid.NewString(),
 			ProcessID:       wp.ID,
-			WorkflowID:      wp.Workflow.Id,
+			WorkflowID:      workflowID,
 			NodeID:          res.NodeId,
 			Data:            data,
 			Variables:       variables,
@@ -94,10 +182,15 @@ func (wp *WorkflowProcessor) UpdateStatus(node *proto.Node, status proto.NodeSta
 		rdBytes, err := json.Marshal(dbRD)
 		if err == nil {
 			if wp.Producer != nil && *wp.Producer != nil {
+				// Fast path: emit event to Kafka; Jobs/Consumer flushes batches to DB asynchronously
 				kafka.SendMessage(*wp.Producer, Broker.WORKFLOW_REPLAY_DATA, wp.ID, string(rdBytes))
-			}
-			if _, err := wp.DBcon.CreateReplayDataEnv(&dbRD, env); err != nil {
-				fmt.Printf("Error saving replay data to DB (%s): %v\n", env, err)
+			} else {
+				// Fallback when Kafka is not configured (e.g. standalone test mode)
+				if _, err := wp.DBcon.CreateReplayDataEnv(&dbRD, env); err != nil {
+					if err.Error() != "database connection is nil" {
+						fmt.Printf("Error saving replay data to DB (%s): %v\n", env, err)
+					}
+				}
 			}
 		}
 	}
@@ -107,20 +200,28 @@ func (wp *WorkflowProcessor) getVariableMapString() map[string]string {
 	wp.VariablesMu.RLock()
 	defer wp.VariablesMu.RUnlock()
 	variableMap := make(map[string]string)
+	replayLimit := getReplayVariableByteLimit()
+
 	for k, v := range wp.ProcessVariables {
+		var valStr string
 		switch value := v.(type) {
 		case string:
-			variableMap[k] = value
+			valStr = value
 		case float64, int, int32, int64, bool:
-			variableMap[k] = fmt.Sprintf("%v", value)
+			valStr = fmt.Sprintf("%v", value)
 		default:
 			outputBytes, err := json.Marshal(value)
 			if err != nil {
-				variableMap[k] = fmt.Sprintf("error marshaling value: %v", err)
+				valStr = fmt.Sprintf("error marshaling value: %v", err)
 			} else {
-				variableMap[k] = string(outputBytes)
+				valStr = string(outputBytes)
 			}
 		}
+
+		if len(valStr) > replayLimit {
+			valStr = fmt.Sprintf("%s... [truncated: %d bytes total]", valStr[:replayLimit], len(valStr))
+		}
+		variableMap[k] = valStr
 	}
 	return variableMap
 }
@@ -143,6 +244,11 @@ func (wp *WorkflowProcessor) setVariable(varName string, value interface{}) erro
 	defer wp.VariablesMu.Unlock()
 	if wp.ProcessVariables == nil {
 		wp.ProcessVariables = make(map[string]interface{})
+	}
+	maxVarSize := getProcessVariableByteLimit()
+	if strVal, ok := value.(string); ok && len(strVal) > maxVarSize {
+		wp.ProcessVariables[varName] = fmt.Sprintf("%s... [truncated: exceeds %d byte limit]", strVal[:maxVarSize], maxVarSize)
+		return nil
 	}
 	wp.ProcessVariables[varName] = value
 	return nil
@@ -316,6 +422,15 @@ func (wp *WorkflowProcessor) GetNextNodes(nodeId string, sourceHandle string) ([
 }
 
 func (wp *WorkflowProcessor) populateTemplate(text string, data map[string]interface{}) string {
+	if !strings.Contains(text, "{{") {
+		return text
+	}
+
+	tmpl, err := getOrParseTemplate(text)
+	if err != nil {
+		return text
+	}
+
 	joinedMap := make(map[string]interface{})
 	wp.VariablesMu.RLock()
 	for k, v := range wp.ProcessVariables {
@@ -326,39 +441,6 @@ func (wp *WorkflowProcessor) populateTemplate(text string, data map[string]inter
 		joinedMap[k] = v
 	}
 
-	funcMap := template.FuncMap{
-		"toJSON": func(v interface{}) (string, error) {
-			if str, ok := v.(string); ok {
-				var js json.RawMessage
-				if err := json.Unmarshal([]byte(str), &js); err == nil {
-					return str, nil
-				}
-			}
-			b, err := json.Marshal(v)
-			if err != nil {
-				return "", err
-			}
-			return string(b), nil
-		},
-		"toJson": func(v interface{}) (string, error) {
-			if str, ok := v.(string); ok {
-				var js json.RawMessage
-				if err := json.Unmarshal([]byte(str), &js); err == nil {
-					return str, nil
-				}
-			}
-			b, err := json.Marshal(v)
-			if err != nil {
-				return "", err
-			}
-			return string(b), nil
-		},
-	}
-
-	tmpl, err := template.New("template").Funcs(funcMap).Option("missingkey=zero").Parse(text)
-	if err != nil {
-		return text
-	}
 	var builder strings.Builder
 	if err := tmpl.Execute(&builder, joinedMap); err != nil {
 		return text

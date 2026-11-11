@@ -64,6 +64,32 @@ vi.mock('primevue/checkbox', () => ({
   }
 }))
 
+// Mock monaco-editor
+vi.mock('monaco-editor', () => ({
+  editor: {
+    create: vi.fn(() => ({
+      getValue: vi.fn(() => 'test value'),
+      onDidChangeModelContent: vi.fn(),
+      dispose: vi.fn(),
+      getModel: vi.fn(() => ({
+        getFullModelRange: vi.fn(),
+        pushEditOperations: vi.fn()
+      }))
+    })),
+    defineTheme: vi.fn()
+  },
+  languages: {
+    register: vi.fn(),
+    setMonarchTokensProvider: vi.fn(),
+    registerCompletionItemProvider: vi.fn(() => ({ dispose: vi.fn() })),
+    CompletionItemKind: {
+      Variable: 1,
+      Snippet: 2
+    }
+  },
+  Range: vi.fn()
+}))
+
 // Mock tooltip directive
 ;(global as any).vTooltip = {
   mounted() {},

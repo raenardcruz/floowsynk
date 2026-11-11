@@ -182,7 +182,9 @@ func (db *DatabaseConnection) Cleanup(retention int) error {
 func (db *DatabaseConnection) ClearAllReplayData() error {
 	for _, env := range []string{"staging", "production"} {
 		tableName := db.TableFor(env, "replay_data")
-		db.conn.Exec(fmt.Sprintf("TRUNCATE TABLE %s;", tableName))
+		if err := db.conn.Exec(fmt.Sprintf("TRUNCATE TABLE %s;", tableName)).Error; err != nil {
+			return err
+		}
 	}
 	ctx := context.Background()
 	DeleteCache(ctx, "replayHistoryList:staging")

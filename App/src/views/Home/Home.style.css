@@ -149,6 +149,17 @@
     font-size: 20px;
 }
 
+.help-quick-btn {
+    text-decoration: none;
+}
+
+.help-quick-btn:hover,
+.help-quick-btn.active {
+    color: #4f46e5;
+    background: rgba(79, 70, 229, 0.12);
+    border-color: rgba(79, 70, 229, 0.35);
+}
+
 .logout {
     display: flex;
     justify-content: center;

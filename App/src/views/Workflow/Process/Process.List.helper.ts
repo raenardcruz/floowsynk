@@ -26,13 +26,22 @@ export const initWorkflows = async () => {
 }
 
 export const clearHistoryAction = async () => {
+    const token = localStorage.getItem("sessionToken") || ''
+    if (token === 'guest') {
+        return
+    }
     try {
         const res = await fetch(`${getRestUrl()}/api/history/clear`, {
             method: 'POST',
+            headers: {
+                'Authorization': token,
+            },
         })
         if (res.ok) {
             const { history } = useProcessListStore()
             history.value = []
+        } else {
+            console.error('Failed to clear run history:', await res.text())
         }
     } catch (err) {
         console.error('Failed to clear run history:', err)
@@ -49,6 +58,9 @@ export const cardClicked = (e: MouseEvent, process: Workflow.AsObject) => {
 }
 
 export const createProcess = () => {
+    if (localStorage.getItem('sessionToken') === 'guest') {
+        return
+    }
     const { tabs, activeTab } = useWorkflowStore()
     let newProc = newProcess()
     if (newProc.nodesList) {

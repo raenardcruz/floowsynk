@@ -1,0 +1,112 @@
+{
+  "id": "ollama",
+  "name": "Ollama",
+  "description": "Run local and private open-source LLMs and embedding models.",
+  "icon": "/src/components/Icons/ollama.svg",
+  "baseUrl": "http://localhost:11434",
+  "authType": "none, apikey",
+  "fields": [
+    {
+      "key": "base_url",
+      "label": "Ollama Host URL",
+      "type": "text",
+      "required": false,
+      "placeholder": "http://localhost:11434"
+    },
+    {
+      "key": "api_key",
+      "label": "API Key (Optional)",
+      "type": "password",
+      "required": false,
+      "placeholder": "Optional for secured Ollama proxies"
+    }
+  ],
+  "actions": [
+    {
+      "id": "generate_chat",
+      "name": "Generate Chat Response",
+      "description": "Generate response using Ollama chat models (e.g. gemma4, llama3)",
+      "path": "/api/chat",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "queryParams": [],
+      "payloadTemplate": "{\"model\": \"{{model}}\", \"messages\": [{\"role\": \"user\", \"content\": \"{{prompt}}\"}], \"stream\": false}",
+      "fields": [
+        { "key": "model", "label": "Model Name", "required": true, "placeholder": "gemma4" },
+        { "key": "prompt", "label": "Prompt", "required": true, "placeholder": "Enter your prompt or question" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "model": { "type": "string", "description": "Ollama model name", "example": "gemma4" },
+          "prompt": { "type": "string", "description": "User prompt message", "example": "Summarize this data." }
+        },
+        "required": ["model", "prompt"]
+      },
+      "outputSchema": {
+        "message": {
+          "role": "assistant",
+          "content": "Generated response..."
+        },
+        "done": true
+      }
+    },
+    {
+      "id": "generate_completion",
+      "name": "Generate Text Completion",
+      "description": "Generate text from an Ollama completion model",
+      "path": "/api/generate",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "queryParams": [],
+      "payloadTemplate": "{\"model\": \"{{model}}\", \"prompt\": \"{{prompt}}\", \"stream\": false}",
+      "fields": [
+        { "key": "model", "label": "Model Name", "required": true, "placeholder": "gemma4" },
+        { "key": "prompt", "label": "Prompt", "required": true, "placeholder": "Enter prompt text" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "model": { "type": "string", "description": "Ollama model name", "example": "gemma4" },
+          "prompt": { "type": "string", "description": "Prompt text" }
+        },
+        "required": ["model", "prompt"]
+      },
+      "outputSchema": {
+        "response": "Completed text response...",
+        "done": true
+      }
+    },
+    {
+      "id": "generate_embedding",
+      "name": "Generate Embedding",
+      "description": "Generate vector embeddings using an Ollama embedding model",
+      "path": "/api/embeddings",
+      "method": "POST",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "queryParams": [],
+      "payloadTemplate": "{\"model\": \"{{model}}\", \"prompt\": \"{{prompt}}\"}",
+      "fields": [
+        { "key": "model", "label": "Embedding Model", "required": true, "placeholder": "nomic-embed-text" },
+        { "key": "prompt", "label": "Text to Embed", "required": true, "placeholder": "Text to embed" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "model": { "type": "string", "description": "Embedding model name", "example": "nomic-embed-text" },
+          "prompt": { "type": "string", "description": "Input text to embed", "example": "Vector search query" }
+        },
+        "required": ["model", "prompt"]
+      },
+      "outputSchema": {
+        "embedding": [0.012, -0.045, 0.089]
+      }
+    }
+  ]
+}

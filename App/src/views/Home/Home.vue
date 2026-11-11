@@ -25,6 +25,10 @@
                     <i class="pi pi-bolt"></i>
                     <span>RAG Knowledge</span>
                 </router-link>
+                <router-link to="/help" class="nav-tab-item" :class="{ active: route.path.startsWith('/help') }">
+                    <i class="pi pi-compass"></i>
+                    <span>Help &amp; Guide</span>
+                </router-link>
             </div>
         </template>
         
@@ -45,6 +49,15 @@
                     </div>
                     <span class="user-name">{{ userName }}</span>
                 </div>
+                <!-- Quick Help & Walkthrough Button -->
+                <router-link
+                    to="/help"
+                    class="theme-toggle-btn help-quick-btn"
+                    :class="{ active: route.path.startsWith('/help') }"
+                    title="Interactive Help & 3D Walkthrough (Shortcut: ?)"
+                >
+                    <span class="material-symbols-outlined">help</span>
+                </router-link>
                 <!-- Theme Mode Toggle -->
                 <button type="button" class="theme-toggle-btn" @click="toggleTheme" :title="`Theme: ${themeMode} (click to switch)`">
                     <span class="material-symbols-outlined">{{ isDark ? 'dark_mode' : 'light_mode' }}</span>
@@ -70,13 +83,14 @@ import Toolbar from 'primevue/toolbar'
 import Logo from "@/components/Composable/Logo/Logo.vue"
 import AppDrawer from "./AppDrawer"
 import { openAppDrawer, logout, pageInit } from './Home.helper'
-import { useRoute } from 'vue-router'
-import { ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { useStorage } from '@vueuse/core'
 import { SESSION_USER_KEY } from '@/views/Login/Login.constants'
 import { useTheme } from '@/components/Composable/UI/composables/useTheme'
 
 const route = useRoute()
+const router = useRouter()
 const userName = useStorage(SESSION_USER_KEY, 'Guest')
 const { isDark, toggleTheme, themeMode } = useTheme()
 const currentEnv = ref<'staging' | 'production'>(
@@ -87,6 +101,31 @@ const onEnvChange = () => {
     localStorage.setItem('app_environment', currentEnv.value)
     window.location.reload()
 }
+
+const onGlobalKeydown = (e: KeyboardEvent) => {
+    if (e.key !== '?') return
+    const target = e.target as HTMLElement | null
+    if (
+        target &&
+        (target.tagName === 'INPUT' ||
+            target.tagName === 'TEXTAREA' ||
+            target.tagName === 'SELECT' ||
+            target.isContentEditable)
+    ) {
+        return
+    }
+    if (!route.path.startsWith('/help')) {
+        router.push('/help')
+    }
+}
+
+onMounted(() => {
+    window.addEventListener('keydown', onGlobalKeydown)
+})
+
+onBeforeUnmount(() => {
+    window.removeEventListener('keydown', onGlobalKeydown)
+})
 
 pageInit();
 </script>

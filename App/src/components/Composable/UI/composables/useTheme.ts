@@ -8,7 +8,10 @@ import type { ThemeMode, ThemeConfig } from '../types'
  */
 export function useTheme() {
   // Persist theme preference in localStorage - default to light theme
-  const themeMode = useStorage<ThemeMode>('floowsynk-theme', 'light')
+  const hasStorage = typeof window !== 'undefined' && typeof window.localStorage?.getItem === 'function'
+  const themeMode = hasStorage
+    ? useStorage<ThemeMode>('floowsynk-theme', 'light', localStorage)
+    : ref<ThemeMode>('light')
   
   // Compute the actual theme based on mode
   const currentTheme = computed(() => {

@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -668,12 +669,24 @@ func (wp *WorkflowProcessor) ConnectorNodeProcess(node *proto.Node) (string, err
 		payloadStr = strings.ReplaceAll(payloadStr, "{{"+k+"}}", valStr)
 	}
 
-	urlStr := template.BaseURL + path
+	baseURL := template.BaseURL
+	if customBase, ok := creds["base_url"].(string); ok && strings.TrimSpace(customBase) != "" {
+		baseURL = strings.TrimRight(strings.TrimSpace(customBase), "/")
+	} else if customBase, ok := creds["baseUrl"].(string); ok && strings.TrimSpace(customBase) != "" {
+		baseURL = strings.TrimRight(strings.TrimSpace(customBase), "/")
+	}
+
+	urlStr := baseURL + path
 	method := action.Method
 
 	// Prepare request headers
 	headers := make([]*proto.KeyValue, 0)
 	for k, v := range action.Headers {
+		for ck, cv := range creds {
+			if strVal, ok := cv.(string); ok {
+				v = strings.ReplaceAll(v, "{{"+ck+"}}", strVal)
+			}
+		}
 		headers = append(headers, &proto.KeyValue{
 			Key:   k,
 			Value: v,
@@ -689,10 +702,24 @@ func (wp *WorkflowProcessor) ConnectorNodeProcess(node *proto.Node) (string, err
 		}
 	}
 	if tokenVal != "" {
-		headers = append(headers, &proto.KeyValue{
-			Key:   "Authorization",
-			Value: "Bearer " + tokenVal,
-		})
+		if conn.ConnectorID == "google_gemini" {
+			headers = append(headers, &proto.KeyValue{
+				Key:   "x-goog-api-key",
+				Value: tokenVal,
+			})
+			if !strings.Contains(urlStr, "key=") {
+				sep := "?"
+				if strings.Contains(urlStr, "?") {
+					sep = "&"
+				}
+				urlStr += sep + "key=" + url.QueryEscape(tokenVal)
+			}
+		} else {
+			headers = append(headers, &proto.KeyValue{
+				Key:   "Authorization",
+				Value: "Bearer " + tokenVal,
+			})
+		}
 	}
 
 	var payloadObj interface{}
@@ -745,11 +772,11 @@ func (wp *WorkflowProcessor) RagNodeProcess(node *proto.Node) (string, error) {
 		return "", errors.New("node data is nil")
 	}
 
-	ragConnID := node.Data.GetRagConnectionId()
+	ragConnID := strings.TrimSpace(node.Data.GetRagConnectionId())
 	promptRaw := node.Data.GetRagPrompt()
 	topK := node.Data.GetRagTopK()
 	systemPromptRaw := node.Data.GetRagSystemPrompt()
-	outputVar := node.Data.GetRagOutputVar()
+	outputVar := strings.TrimSpace(node.Data.GetRagOutputVar())
 
 	if outputVar == "" {
 		outputVar = "rag_output"
@@ -761,7 +788,27 @@ func (wp *WorkflowProcessor) RagNodeProcess(node *proto.Node) (string, error) {
 	prompt := wp.populateTemplate(promptRaw, nil)
 	systemPrompt := wp.populateTemplate(systemPromptRaw, nil)
 
+	if strings.TrimSpace(prompt) == "" {
+		if inVal, ok := wp.ProcessVariables[INPUT].(string); ok && strings.TrimSpace(inVal) != "" {
+			prompt = inVal
+		}
+	}
+
 	env := DB.ResolveEnvName(wp.Workflow.Environment)
+
+	if ragConnID == "" {
+		// Fallback: If only one RAG connection exists in this environment, auto-bind to it
+		if conns, err := wp.DBcon.ListRagConnectionsEnv(env); err == nil && len(conns) == 1 {
+			ragConnID = conns[0].ID
+			log.Printf("[RAG] Node %s had no ragConnectionId configured; defaulting to sole connection '%s' (%s)", node.Id, conns[0].Name, conns[0].ID)
+		} else {
+			replayNode := CopyNode(node)
+			errMsg := "RAG Connection is not configured. Please open the workflow editor, select the AI RAG Query node, and choose a RAG Knowledge Base in the sidebar."
+			wp.UpdateStatus(&replayNode, proto.NodeStatus_FAILED, nil, errMsg, true)
+			return "", errors.New(errMsg)
+		}
+	}
+
 	ragConn, err := wp.DBcon.GetRagConnectionEnv(ragConnID, env)
 	if err != nil {
 		replayNode := CopyNode(node)
@@ -769,9 +816,12 @@ func (wp *WorkflowProcessor) RagNodeProcess(node *proto.Node) (string, error) {
 		return "", fmt.Errorf("failed to get RAG Connection: %w", err)
 	}
 
-	answer, sources, err := rag.PerformRAGQuery(&wp.DBcon, env, ragConn, prompt, int(topK), systemPrompt)
+	ragLlmConnID := strings.TrimSpace(node.Data.GetRagLlmConnectionId())
+	answer, sources, err := rag.PerformRAGQuery(&wp.DBcon, env, ragConn, prompt, int(topK), systemPrompt, ragLlmConnID)
 	replayNode := CopyNode(node)
-	replayNode.Data.RagPrompt = &prompt
+	if replayNode.Data != nil {
+		replayNode.Data.RagPrompt = &prompt
+	}
 
 	if err != nil {
 		wp.UpdateStatus(&replayNode, proto.NodeStatus_FAILED, nil, fmt.Sprintf("RAG Execution Failed: %v", err), true)

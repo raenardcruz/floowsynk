@@ -8,7 +8,7 @@ import (
 	"slices"
 	"strings"
 	"sync"
-	"time"
+
 
 	"github.com/google/uuid"
 	DB "github.com/raenardcruz/floowsynk/Database"
@@ -273,7 +273,7 @@ func SearchSimilarChunks(db *DB.DatabaseConnection, env string, ragConn DB.RagCo
 }
 
 // PerformRAGQuery handles similarity retrieval + LLM chat response generation
-func PerformRAGQuery(db *DB.DatabaseConnection, env string, ragConn DB.RagConnection, query string, topK int, customSystemPrompt string) (string, []ScoredChunk, error) {
+func PerformRAGQuery(db *DB.DatabaseConnection, env string, ragConn DB.RagConnection, query string, topK int, customSystemPrompt string, llmConnID ...string) (string, []ScoredChunk, error) {
 	scoredChunks, err := SearchSimilarChunks(db, env, ragConn, query, topK)
 	if err != nil {
 		return "", nil, err
@@ -298,12 +298,17 @@ func PerformRAGQuery(db *DB.DatabaseConnection, env string, ragConn DB.RagConnec
 
 	userPrompt := fmt.Sprintf("%s\n\nQuestion: %s", contextBuilder.String(), query)
 
-	ollamaClient := NewOllamaClient(ragConn.OllamaBaseURL)
-	answer, err := ollamaClient.GenerateChat(ragConn.ChatModel, systemPrompt, userPrompt)
+	activeLLMConnID := ""
+	if len(llmConnID) > 0 && strings.TrimSpace(llmConnID[0]) != "" {
+		activeLLMConnID = strings.TrimSpace(llmConnID[0])
+	} else if strings.TrimSpace(ragConn.LLMConnectionID) != "" {
+		activeLLMConnID = strings.TrimSpace(ragConn.LLMConnectionID)
+	}
+
+	answer, err := SummarizeWithConnection(db, env, activeLLMConnID, ragConn.OllamaBaseURL, ragConn.ChatModel, systemPrompt, userPrompt)
 	if err != nil {
 		return "", scoredChunks, fmt.Errorf("LLM completion failed: %w", err)
 	}
 
-	_ = time.Now()
 	return answer, scoredChunks, nil
 }

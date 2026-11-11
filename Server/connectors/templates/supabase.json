@@ -1,0 +1,115 @@
+{
+  "id": "supabase",
+  "name": "Supabase",
+  "category": "Database & Backend",
+  "description": "The open-source Firebase alternative: query PostgreSQL tables, insert rows, and trigger stored procedures (RPC).",
+  "icon": "/src/components/Icons/supabase.svg",
+  "baseUrl": "{{project_url}}/rest/v1",
+  "authType": "apikey",
+  "fields": [
+    {
+      "key": "project_url",
+      "label": "Supabase Project URL",
+      "type": "text",
+      "required": true,
+      "placeholder": "https://xyzcompany.supabase.co"
+    },
+    {
+      "key": "api_key",
+      "label": "Supabase Anon / Service Role Key",
+      "type": "password",
+      "required": true,
+      "placeholder": "eyJhbGciOi..."
+    }
+  ],
+  "actions": [
+    {
+      "id": "select_rows",
+      "name": "Select Rows",
+      "description": "Fetch rows from a Supabase table with optional column selection and filtering",
+      "path": "/{{table}}?select={{columns}}",
+      "method": "GET",
+      "headers": {
+        "apikey": "{{api_key}}",
+        "Authorization": "Bearer {{api_key}}",
+        "Accept": "application/json"
+      },
+      "queryParams": [],
+      "payloadTemplate": "",
+      "fields": [
+        { "key": "table", "label": "Table Name", "type": "text", "required": true, "placeholder": "users" },
+        { "key": "columns", "label": "Columns to Select", "type": "text", "required": false, "placeholder": "* or id,name,email", "defaultValue": "*" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "table": { "type": "string", "description": "Target database table" },
+          "columns": { "type": "string", "description": "Comma-separated column names or *" }
+        },
+        "required": ["table"]
+      },
+      "outputSchema": [
+        { "id": 1, "created_at": "2026-01-01T00:00:00Z", "name": "Alice" }
+      ]
+    },
+    {
+      "id": "insert_row",
+      "name": "Insert Row",
+      "description": "Insert a new record into a Supabase table",
+      "path": "/{{table}}",
+      "method": "POST",
+      "headers": {
+        "apikey": "{{api_key}}",
+        "Authorization": "Bearer {{api_key}}",
+        "Content-Type": "application/json",
+        "Prefer": "return=representation"
+      },
+      "queryParams": [],
+      "payloadTemplate": "{{payload}}",
+      "fields": [
+        { "key": "table", "label": "Table Name", "type": "text", "required": true, "placeholder": "users" },
+        { "key": "payload", "label": "Row JSON Payload", "type": "text", "required": true, "placeholder": "{\"name\": \"Bob\", \"email\": \"bob@example.com\"}" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "table": { "type": "string", "description": "Target table" },
+          "payload": { "type": "object", "description": "JSON object of fields to insert" }
+        },
+        "required": ["table", "payload"]
+      },
+      "outputSchema": [
+        { "id": 2, "name": "Bob", "email": "bob@example.com" }
+      ]
+    },
+    {
+      "id": "call_rpc",
+      "name": "Call Stored Function (RPC)",
+      "description": "Execute a PostgreSQL stored procedure / function defined in Supabase",
+      "path": "/rpc/{{function_name}}",
+      "method": "POST",
+      "headers": {
+        "apikey": "{{api_key}}",
+        "Authorization": "Bearer {{api_key}}",
+        "Content-Type": "application/json"
+      },
+      "queryParams": [],
+      "payloadTemplate": "{{payload}}",
+      "fields": [
+        { "key": "function_name", "label": "Function Name", "type": "text", "required": true, "placeholder": "my_custom_function" },
+        { "key": "payload", "label": "Function Arguments (JSON)", "type": "text", "required": false, "placeholder": "{\"param1\": \"val\"}" }
+      ],
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "function_name": { "type": "string", "description": "Name of the Postgres RPC function" },
+          "payload": { "type": "object", "description": "JSON object parameters" }
+        },
+        "required": ["function_name"]
+      },
+      "outputSchema": {
+        "result": "success"
+      }
+    }
+  ]
+}

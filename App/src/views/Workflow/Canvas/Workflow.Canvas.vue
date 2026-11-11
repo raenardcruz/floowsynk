@@ -2,7 +2,7 @@
     <div class="canvas">
         <div class="canvas__header">
             <div class="canvas_titlecontainer">
-                <input class="canvas__headerinput canvas__label" type="text" v-model="tab.name" placeholder="Enter Process Title">
+                <input class="canvas__headerinput canvas__label" type="text" v-model="tab.name" :disabled="isGuest" placeholder="Enter Process Title">
                 <Tag v-if="isGuest" severity="warn" rounded style="margin-left: 10px; padding: 4px 10px; font-weight: bold; background-color: var(--orange-5); color: var(--white-1);">Guest Mode</Tag>
                 <!-- Environment badges -->
                 <span v-if="isProduction" class="env-badge env-badge--live" title="Production — live data, no versioning">
@@ -16,37 +16,39 @@
                     <span class="material-symbols-outlined">sync_problem</span> OUT OF SYNC
                 </span>
                 <div class="canvas_tags">
-                    <Tag pt:root:class="canvas__tag" @click="addTag" rounded>
+                    <Tag v-if="!isGuest" pt:root:class="canvas__tag" @click="addTag" rounded>
                         <span class="material-symbols-outlined">add</span>
                         <span>Add Tag</span>
                     </Tag>
                     <Tag rounded pt:root:class="canvas__tag canvas__tag--active" v-for="(_, index) in tab.tagsList"
                         removable>
                         <input class="canvas__headerinput canvas__tagtext" type="text" placeholder="New Tag" v-model="tab.tagsList[index]"
-                            :list="tab.tagsList[index]">
+                            :disabled="isGuest" :list="tab.tagsList[index]">
                         <datalist :id="tab.tagsList[index]">
                             <option :value="tag" v-for="tag in tab.tagsList.filter((f: string) => f != 'No Tags')">
                             </option>
                         </datalist>
-                        <span class="material-symbols-outlined" @click="removeTag(index)">close</span>
+                        <span v-if="!isGuest" class="material-symbols-outlined" @click="removeTag(index)">close</span>
                     </Tag>
                 </div>
             </div>
             <div class="description">
-                <input class="canvas__headerinput canvas__description" type="text" v-model="tab.description" placeholder="Enter Description">
+                <input class="canvas__headerinput canvas__description" type="text" v-model="tab.description" :disabled="isGuest" placeholder="Enter Description">
             </div>
         </div>
         <div class="content" :id="canvasId">
-            <SidebarCanvas />
+            <SidebarCanvas v-if="!isGuest" />
             <Modal title="Process Type" caption="Please select the workflow process type." :visible="show"
                 @update:visible="show = $event">
                 <ProcessTypeModal :id="tab.id" />
             </Modal>
             <div class="workspace">
                 <VueFlow class="vue-flow-container" tabindex="0" v-model:nodes="node" v-model:edges="edge"
-                    :only-render-visible-elements="false" :snapToGrid="true" @connect="onConnectEdge($event)"
-                    @drop="onDrop($event)" @dragover="onDragOver($event)" @dragleave="onDragLeave()"
-                    @selection-drag-stop="commit()" @edges-change="commit()" delete-key-code="false"
+                    :only-render-visible-elements="false" :snapToGrid="true"
+                    :nodes-draggable="!isGuest" :nodes-connectable="!isGuest" :elements-selectable="true"
+                    @connect="!isGuest && onConnectEdge($event)"
+                    @drop="!isGuest && onDrop($event)" @dragover="!isGuest && onDragOver($event)" @dragleave="onDragLeave()"
+                    @selection-drag-stop="!isGuest && commit()" @node-drag-stop="!isGuest && commit()" @edges-change="!isGuest && commit()" delete-key-code="false"
                     no-wheel-class-name="no-scroll">
                     <Background />
                     <MiniMap />
@@ -54,10 +56,10 @@
                         <ControlButton title="Reset Transform" @click="resetTransform">
                             <span class="material-symbols-outlined">refresh</span>
                         </ControlButton>
-                        <ControlButton title="Delete" v-if="!isRunning" @click="removeProcess">
+                        <ControlButton title="Delete" v-if="!isRunning && !isGuest" @click="removeProcess">
                             <span class="material-symbols-outlined">delete</span>
                         </ControlButton>
-                        <ControlButton title="Save" v-if="!isRunning" @click="saveProcess">
+                        <ControlButton title="Save" v-if="!isRunning && !isGuest" @click="saveProcess">
                             <span class="material-symbols-outlined">save</span>
                         </ControlButton>
                         <!-- Version History button (staging only) -->
@@ -65,7 +67,7 @@
                             <span class="material-symbols-outlined">history</span>
                         </ControlButton>
                         <!-- Revert to Staging copy (when modified in production) -->
-                        <ControlButton title="Revert to Staging Copy" v-if="!isRunning && tab.ismodified" style="background: #f97316; color: #ffffff;" @click="handleRevertWorkflow">
+                        <ControlButton title="Revert to Staging Copy" v-if="!isRunning && tab.ismodified && !isGuest" style="background: #f97316; color: #ffffff;" @click="handleRevertWorkflow">
                             <span class="material-symbols-outlined">restart_alt</span>
                         </ControlButton>
                         <ControlButton title="Run" style="background: var(--green-6); color: #ffffff;"
@@ -104,7 +106,7 @@
                                 :nodeType="activeInspectorNode.nodetype"
                                 v-model="activeInspectorNode.data"
                                 :tabid="tab.id"
-                                :disabled="isRunning"
+                                :disabled="isRunning || isGuest"
                             />
                         </div>
                     </div>
@@ -132,7 +134,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { getSelectedEnvironment } from '@/components/Composable/constants'
-const isGuest = ref(localStorage.getItem('sessionToken') === 'guest')
+const isGuest = computed(() => localStorage.getItem('sessionToken') === 'guest')
 const isProduction = computed(() => getSelectedEnvironment() === 'production')
 const showVersionHistory = ref(false)
 import { revertWorkflowToStaging } from './Workflow.Canvas.versions.api'
@@ -187,6 +189,7 @@ const onVersionRestored = () => {
 }
 
 const handleRevertWorkflow = () => {
+    if (isGuest.value) return
     confirm.require({
         message: 'Revert this production workflow? Any changes done directly on production will be discarded.',
         header: 'Revert to Staging Copy',
